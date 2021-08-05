@@ -1,0 +1,6 @@
+include(split-compilation)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/SDKCore.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/SDKModManagement.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/SDKModMetadata.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/SDKUserData.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/detail/ModioObjectTrack.ipp)

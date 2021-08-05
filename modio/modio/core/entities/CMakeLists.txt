@@ -1,0 +1,7 @@
+include(split-compilation)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioFileMetadata.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioModDetails.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioModInfo.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioModStats.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioPagedResult.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioURLList.ipp)

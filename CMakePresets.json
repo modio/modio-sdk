@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 15,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "win64",
+      "displayName": "win64",
+      "description": "Windows native x64",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/win64",
+      "cacheVariables": {
+        "MODIO_PLATFORM": {
+          "type": "STRING",
+          "value": "WIN"
+        },
+        "CMAKE_INSTALL_PREFIX": {
+          "type": "STRING",
+          "value": "${sourceDir}/out/install/win64"
+        }
+      }
+    },
+    {
+      "name": "win64-debug",
+      "inherits": "win64",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    },
+    {
+      "name": "win64-dbginfo",
+      "inherits": "win64",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
+    }
+  ]
+}

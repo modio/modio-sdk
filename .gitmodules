@@ -1,0 +1,22 @@
+[submodule "ext/asio"]
+	path = ext/asio
+	url = https://github.com/stephenwhittle/asio
+	branch = nn_support
+[submodule "ext/optional"]
+	path = ext/optional
+	url = https://github.com/TartanLlama/optional.git
+[submodule "ext/filesystem"]
+	path = ext/filesystem
+	url = https://github.com/gulrak/filesystem.git
+[submodule "ext/fmt"]
+	path = ext/fmt
+	url = https://github.com/fmtlib/fmt
+[submodule "ext/utfcpp"]
+	path = ext/utfcpp
+	url = https://github.com/nemtrif/utfcpp
+[submodule "ext/httpparser"]
+	path = ext/httpparser
+	url = https://github.com/nekipelov/httpparser.git
+[submodule "ext/json"]
+	path = ext/json
+	url = https://github.com/nlohmann/json.git

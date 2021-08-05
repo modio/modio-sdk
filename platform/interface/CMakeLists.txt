@@ -1,0 +1,13 @@
+if (NOT TARGET ${MODIO_TARGET_NAME})
+add_library (${MODIO_TARGET_NAME} INTERFACE)
+endif()
+
+target_include_directories(${MODIO_TARGET_NAME} INTERFACE ${CMAKE_CURRENT_LIST_DIR})
+
+	
+install(
+	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/
+	DESTINATION ${CMAKE_INSTALL_PREFIX}/header_only/common
+	COMPONENT header_only
+	
+)

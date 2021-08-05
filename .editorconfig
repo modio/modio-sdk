@@ -1,0 +1,8 @@
+[*.{c++,cc,cpp,cppm,cxx,h,h++,hh,hpp,hxx,inl,ipp,ixx,tlh,tli}]
+cpp_generate_documentation_comments = doxygen_triple_slash
+
+
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+

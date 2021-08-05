@@ -1,0 +1,12 @@
+# Visual studio files
+.vs/
+CMakeSettings.json
+
+# Output directory
+out/
+build/
+installed-sdk/
+
+# Generated documentation shouldn't be submitted
+doc/**/*.pdf
+doc/scripts/vendor/

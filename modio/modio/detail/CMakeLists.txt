@@ -1,0 +1,8 @@
+include(split-compilation)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioSDKSessionData.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioJsonHelpers.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/compression/zip/ArchiveFileImplementation.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/userdata/ModioUserDataContainer.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/userdata/ModioUserProfile.ipp)
+add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/ModioDefines.h)
+add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/ModioLibraryConfigurationHelpers.h)
