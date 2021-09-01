@@ -1,3 +1,13 @@
+/* 
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  
+ *  This file is part of the mod.io SDK.
+ *  
+ *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
+ *  
+ */
+
 #pragma once
 
 #include <system_error>
@@ -90,12 +100,12 @@ namespace Modio
 		return { static_cast<int>(e), HttpErrorCategory() };
 	}
 
-	inline bool operator==(Modio::ErrorCode A, HttpError B)
+	inline bool operator==(std::error_code A, HttpError B)
 	{
 		return A.category() == HttpErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
-	inline bool operator!=(Modio::ErrorCode A, HttpError B)
+	inline bool operator!=(std::error_code A, HttpError B)
 	{
 		return ! (A == B);
 	}
@@ -165,12 +175,12 @@ namespace Modio
 		return { static_cast<int>(e), FilesystemErrorCategory() };
 	}
 
-	inline bool operator==(Modio::ErrorCode A, FilesystemError B)
+	inline bool operator==(std::error_code A, FilesystemError B)
 	{
 		return A.category() == FilesystemErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
-	inline bool operator!=(Modio::ErrorCode A, FilesystemError B)
+	inline bool operator!=(std::error_code A, FilesystemError B)
 	{
 		return ! (A == B);
 	}
@@ -228,12 +238,12 @@ namespace Modio
 		return { static_cast<int>(e), UserAuthErrorCategory() };
 	}
 
-	inline bool operator==(Modio::ErrorCode A, UserAuthError B)
+	inline bool operator==(std::error_code A, UserAuthError B)
 	{
 		return A.category() == UserAuthErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
-	inline bool operator!=(Modio::ErrorCode A, UserAuthError B)
+	inline bool operator!=(std::error_code A, UserAuthError B)
 	{
 		return ! (A == B);
 	}
@@ -279,12 +289,12 @@ namespace Modio
 		return { static_cast<int>(e), UserDataErrorCategory() };
 	}
 
-	inline bool operator==(Modio::ErrorCode A, UserDataError B)
+	inline bool operator==(std::error_code A, UserDataError B)
 	{
 		return A.category() == UserDataErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
-	inline bool operator!=(Modio::ErrorCode A, UserDataError B)
+	inline bool operator!=(std::error_code A, UserDataError B)
 	{
 		return ! (A == B);
 	}
@@ -330,12 +340,12 @@ namespace Modio
 		return { static_cast<int>(e), ArchiveErrorCategory() };
 	}
 
-	inline bool operator==(Modio::ErrorCode A, ArchiveError B)
+	inline bool operator==(std::error_code A, ArchiveError B)
 	{
 		return A.category() == ArchiveErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
-	inline bool operator!=(Modio::ErrorCode A, ArchiveError B)
+	inline bool operator!=(std::error_code A, ArchiveError B)
 	{
 		return ! (A == B);
 	}
@@ -409,12 +419,12 @@ namespace Modio
 		return { static_cast<int>(e), GenericErrorCategory() };
 	}
 
-	inline bool operator==(Modio::ErrorCode A, GenericError B)
+	inline bool operator==(std::error_code A, GenericError B)
 	{
 		return A.category() == GenericErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
-	inline bool operator!=(Modio::ErrorCode A, GenericError B)
+	inline bool operator!=(std::error_code A, GenericError B)
 	{
 		return ! (A == B);
 	}
@@ -508,12 +518,12 @@ namespace Modio
 		return { static_cast<int>(e), ZlibErrorCategory() };
 	}
 
-	inline bool operator==(Modio::ErrorCode A, ZlibError B)
+	inline bool operator==(std::error_code A, ZlibError B)
 	{
 		return A.category() == ZlibErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
-	inline bool operator!=(Modio::ErrorCode A, ZlibError B)
+	inline bool operator!=(std::error_code A, ZlibError B)
 	{
 		return ! (A == B);
 	}
@@ -571,12 +581,12 @@ namespace Modio
 		return { static_cast<int>(e), ModManagementErrorCategory() };
 	}
 
-	inline bool operator==(Modio::ErrorCode A, ModManagementError B)
+	inline bool operator==(std::error_code A, ModManagementError B)
 	{
 		return A.category() == ModManagementErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
-	inline bool operator!=(Modio::ErrorCode A, ModManagementError B)
+	inline bool operator!=(std::error_code A, ModManagementError B)
 	{
 		return ! (A == B);
 	}
@@ -607,6 +617,7 @@ namespace Modio
 		MissingWritePermission = 11003,
 		ModioOutage = 10000,
 		Ratelimited = 11008,
+		ReportedEntityUnavailable = 15030,
 		RequestedCommentNotFound = 15026,
 		RequestedGameDeleted = 14006,
 		RequestedGameNotFound = 14001,
@@ -616,6 +627,7 @@ namespace Modio
 		RequestedModfileNotFound = 15010,
 		RequestedResourceNotFound = 14000,
 		RequestedUserNotFound = 21000,
+		SubmitReportRightsRevoked = 15029,
 		UnsupportedContentTypeHeader = 13006,
 		UserExistingModRating = 15028,
 		UserNoAcceptTermsOfUse = 11051,
@@ -687,6 +699,9 @@ namespace Modio
 				case ApiError::Ratelimited:
 						return "You have been ratelimited for making too many requests. See Rate Limiting.";
 					break;
+				case ApiError::ReportedEntityUnavailable:
+						return "The specified resource is not able to be reported at this time, this is potentially due to the resource in question being removed.";
+					break;
 				case ApiError::RequestedCommentNotFound:
 						return "The requested comment could not be found.";
 					break;
@@ -713,6 +728,9 @@ namespace Modio
 					break;
 				case ApiError::RequestedUserNotFound:
 						return "The requested user could not be found.";
+					break;
+				case ApiError::SubmitReportRightsRevoked:
+						return "The authenticated user does not have permission to submit reports on mod.io due to their access being revoked.";
 					break;
 				case ApiError::UnsupportedContentTypeHeader:
 						return "The Content-Type header is not supported for this endpoint.";
@@ -746,12 +764,12 @@ namespace Modio
 		return { static_cast<int>(e), ApiErrorCategory() };
 	}
 
-	inline bool operator==(Modio::ErrorCode A, ApiError B)
+	inline bool operator==(std::error_code A, ApiError B)
 	{
 		return A.category() == ApiErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
-	inline bool operator!=(Modio::ErrorCode A, ApiError B)
+	inline bool operator!=(std::error_code A, ApiError B)
 	{
 		return ! (A == B);
 	}
@@ -768,31 +786,33 @@ namespace Modio
 	enum class ErrorConditionTypes
 	{
 		/// @brief When this condition is true, the error code represents an error occurring at the mod.io server.
-		ModioServiceError,
+		ModioServiceError = 1,
 		/// @brief When this condition is true, the error code represents a connection or HTTP error between the client and the mod.io server.
-		NetworkError,
+		NetworkError = 2,
 		/// @brief When this condition is true, the error code indicates the SDK's configuration is not valid - the game ID or API key are incorrect or the game has been deleted.
-		ConfigurationError,
+		ConfigurationError = 3,
 		/// @brief When this condition is true, the error code indicates the arguments passed to the function have failed validation or were otherwise invalid.
-		InvalidArgsError,
+		InvalidArgsError = 4,
 		/// @brief When this condition is true, the error code indicates a permission or IO error when accessing local filesystem data.
-		FilesystemError,
+		FilesystemError = 5,
 		/// @brief When this condition is true, the error code represents an internal SDK error - please inform mod.io of the error code value.
-		InternalError,
+		InternalError = 6,
 		/// @brief When this condition is true, the error ref returned by the API indicates an implicit success because the operation has already been performed (ie a no-op is success).
-		ApiErrorRefSuccess,
+		ApiErrorRefSuccess = 7,
 		/// @brief When this condition is true, the error code represents a temporary error with installation, such as a network interruption. The mod installation can be reattempted at a later point this session
-		ModInstallRetryableError,
+		ModInstallRetryableError = 8,
 		/// @brief When this condition is true, the error code represents an error during installation that may be resolved during next SDK initialization, and will be deferred until then.
-		ModInstallDeferredError,
+		ModInstallDeferredError = 9,
 		/// @brief When this condition is true, the error code represents an error during uninstallation that may be resolved during the next SDK session, and will be deferred until then.
-		ModDeleteDeferredError,
+		ModDeleteDeferredError = 10,
 		/// @brief When this condition is true, the error code represents an error during installation that indicates future installation will not be possible, such as a deleted mod, and so will not be retried at all.
-		ModInstallUnrecoverableError,
+		ModInstallUnrecoverableError = 11,
 		/// @brief When this condition is true, the error code indicates that a specified game, mod, media file or mod file was not found.
-		EntityNotFoundError,
+		EntityNotFoundError = 12,
 		/// @brief When this condition is true, the error code indicates that the user has not yet accepted the mod.io Terms of Use.
-		UserTermsOfUseError
+		UserTermsOfUseError = 13,
+		/// @brief When this condition is true, the error code indicates that a report for the specified content could not be submitted.
+		SubmitReportError = 14
 	};
 
 	struct ErrorConditionCategoryImpl : std::error_category
@@ -840,6 +860,9 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::UserTermsOfUseError:
 					return "When this condition is true, the error code indicates that the user has not yet accepted the mod.io Terms of Use.";
+				break;
+				case ErrorConditionTypes::SubmitReportError:
+					return "When this condition is true, the error code indicates that a report for the specified content could not be submitted.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -1451,10 +1474,33 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::ApiError::RequestedResourceNotFound)
+					{
+						return true;
+					}
+
 
 				break;
 				case ErrorConditionTypes::UserTermsOfUseError:
 					if (ec == Modio::ApiError::UserNoAcceptTermsOfUse)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::SubmitReportError:
+					if (ec == Modio::ApiError::SubmitReportRightsRevoked)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::ReportedEntityUnavailable)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::RequestedResourceNotFound)
 					{
 						return true;
 					}

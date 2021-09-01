@@ -1,3 +1,13 @@
+/* 
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  
+ *  This file is part of the mod.io SDK.
+ *  
+ *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
+ *   
+ */
+
 #pragma once
 
 #include "modio/core/ModioStdTypes.h"
@@ -67,6 +77,8 @@ namespace Modio
 		UnderlyingIntegerType Value = 0;
 
 	public:
+
+		using UnderlyingType = UnderlyingIntegerType;
 		// Force explicit use of the constructor when we need a StrongInteger (ie this means you must construct a
 		// StrongInteger to pass into a function)
 
@@ -364,6 +376,16 @@ namespace Modio
 		User,
 		ModManagement
 	};
+
+	/// @docpublic
+	/// @brief A rating for a mod. 
+	enum class Rating : int8_t
+	{
+		Neutral = 0,
+		Positive = 1,
+		Negative = -1
+	};
+
 } // namespace Modio
 
 namespace Modio

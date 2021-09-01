@@ -1,3 +1,13 @@
+/* 
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  
+ *  This file is part of the mod.io SDK.
+ *  
+ *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
+ *   
+ */
+
 #pragma once
 // These are necessary because we're pulling in windows.h via ghc fileystem
 #include "ModioGeneratedVariables.h"
@@ -22,7 +32,17 @@ namespace Modio
 	template<typename Rep, typename Period = std::ratio<1>>
 	using Duration = std::chrono::duration<Rep, Period>;
 
-	using ErrorCode = std::error_code;
+	/// @docpublic
+	/// @brief Trivial wrapper around link:https://en.cppreference.com/w/cpp/error/error_code[std::error_code].
+	/// Implemented as a class instead of a type alias to allow it to be forward-declared in wrappers, eg the UE4
+	/// plugin.
+	class ErrorCode : public std::error_code
+	{
+	public:
+		ErrorCode(std::error_code ec) : error_code(ec) {};
+		ErrorCode() : error_code() {};
+		using error_code::error_code;
+	};
 
 	/// @docpublic
 	/// @brief nullable wrapper around object of type T. Used by async functions that return values - empty on function

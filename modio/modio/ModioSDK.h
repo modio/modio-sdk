@@ -1,3 +1,13 @@
+/* 
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  
+ *  This file is part of the mod.io SDK.
+ *  
+ *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
+ *   
+ */
+
 #pragma once
 
 #include "ModioGeneratedVariables.h"
@@ -9,6 +19,7 @@
 #include "modio/core/ModioFilterParams.h"
 #include "modio/core/ModioInitializeOptions.h"
 #include "modio/core/ModioModCollectionEntry.h"
+#include "modio/core/ModioReportParams.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioModDetails.h"
 #include "modio/core/entities/ModioModInfoList.h"
@@ -283,6 +294,21 @@ namespace Modio
 		Modio::ModID ModId, Modio::AvatarSize AvatarSize,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)> Callback);
 
+	/// @brief Submits a rating for a mod on behalf of the currently authenticated user.
+	/// @param ModID The mod to submit a rating for
+	/// @param Rating The rating to submit \r\n NOTE: To clear a rating for a mod, submit a rating of Rating::Neutral.
+	/// @param Callback Callback providing a status code to indicate the rating was submitted successfully
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @requires authenticated-user
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @errorcategory EntityNotFoundError|Specified mod could not be found
+	/// @error UserDataError::InvalidUser|No authenticated user
+	MODIOSDK_API void SubmitModRatingAsync(Modio::ModID ModID, Modio::Rating Rating, std::function<void(Modio::ErrorCode)> Callback);
+
+
+
 	/// @docpublic
 	/// @brief Fetches the available tags used on mods for the current game. These tags can them be used in conjunction
 	/// with the FilterParams passed to ListAllMods
@@ -359,6 +385,18 @@ namespace Modio
 	/// @return Collection of Modio::FieldError objects, or empty collection if there was no validation failures
 	/// @requires initialized-sdk
 	MODIOSDK_API std::vector<Modio::FieldError> GetLastValidationError();
+
+	/// @docpublic
+	/// @brief Sends a content report to mod.io. When using this function, please inform your users that if they provide
+	/// their contact name or details in the Report parameter, that those may be shared with the person responsible for
+	/// the content being reported. For more information on what data in a report will be shared with whom, please see
+	/// link:https://mod.io/report/widget[our website's report form] for more information.
+	/// @param Report Information about the content being reported and a description of the report.
+	/// @param Callback Callback providing a status code to indicate successful submission of the report.
+	/// @requires initialized-sdk
+	/// @errorcategory NetworkError|Couldn't Connect to mod.io servers
+	/// @errorcategory InvalidArgsError|Required information in the report did not pass validation
+	MODIOSDK_API void ReportContentAsync(Modio::ReportParams Report, std::function<void(Modio::ErrorCode)> Callback);
 
 } // namespace Modio
 

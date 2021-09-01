@@ -1,3 +1,13 @@
+# 
+#  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+#  
+#  This file is part of the mod.io SDK.
+#  
+#  Distributed under the MIT License. (See accompanying file LICENSE or 
+#   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
+#   
+# 
+
 include(GetGitRevisionDescription)
 find_package(Git)
 
@@ -61,15 +71,8 @@ function(GetVersionInfo _MainBranchName _MainCommitCount _BranchID _BranchCommit
 		endif ()
 	else()
 	
-		#Calculate the first two characters of the current commit hash
-		execute_process(
-			COMMAND "${GIT_EXECUTABLE}" rev-parse --short HEAD
-			WORKING_DIRECTORY "${MODIO_ROOT_DIR}"
-			OUTPUT_VARIABLE BranchCommitHash
-			RESULT_VARIABLE BranchCommitHashResult
-			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
-		)
-
+		#Calculate the first two characters of the hash of the current branch name
+		string (SHA1 BranchCommitHash "${BranchName}")
 		string(SUBSTRING "${BranchCommitHash}" 0 2 BranchShortID)
 		set ("${_BranchID}" "b${BranchShortID}" PARENT_SCOPE)
 

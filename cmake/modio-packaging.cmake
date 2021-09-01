@@ -1,3 +1,13 @@
+# 
+#  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+#  
+#  This file is part of the mod.io SDK.
+#  
+#  Distributed under the MIT License. (See accompanying file LICENSE or 
+#   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
+#   
+# 
+
 macro(create_target_installing_component Component )
 add_custom_target(component_${Component} 
     COMMAND ${CMAKE_COMMAND} --install ${CMAKE_CURRENT_BINARY_DIR} --component ${Component}

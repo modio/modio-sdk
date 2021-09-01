@@ -1,3 +1,13 @@
+/* 
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  
+ *  This file is part of the mod.io SDK.
+ *  
+ *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
+ *   
+ */
+
 #pragma once
 
 namespace Modio
@@ -16,7 +26,14 @@ namespace Modio
 				constexpr const char* Appdata = "appdata";
 				constexpr const char* EmailAddress = "email";
 				constexpr const char* TermsAgreed = "terms_agreed";
-			}
+				constexpr const char* ReportResourceType = "resource";
+				constexpr const char* ReportResourceID = "id";
+				constexpr const char* ReportType = "type";
+				constexpr const char* ReportSubmitterName = "name";
+				constexpr const char* ReportSubmitterContact = "contact";
+				constexpr const char* ReportSummary = "summary";
+				constexpr const char* Rating = "rating";
+			} // namespace APIStrings
 			namespace JSONKeys
 			{
 				constexpr const char* UserSubscriptionList = "subscriptions";
