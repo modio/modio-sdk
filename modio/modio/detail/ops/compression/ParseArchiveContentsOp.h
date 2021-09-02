@@ -90,6 +90,9 @@ namespace Modio
 						// If we haven't found the signature and we're at the end of the file, bail
 						if (ArchiveState->ZipMagicOffset == 0 && CurrentSearchOffset == 0)
 						{
+							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression,
+														"file had no central directory magic");
+
 							Self.complete(Modio::make_error_code(Modio::ArchiveError::InvalidHeader));
 							return;
 						}
@@ -109,6 +112,9 @@ namespace Modio
 					// consumer
 					if (ec == Modio::GenericError::EndOfFile)
 					{
+						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression,
+													"Truncated central directory metadata");
+
 						Self.complete(Modio::make_error_code(Modio::ArchiveError::InvalidHeader));
 						return;
 					}
@@ -126,6 +132,8 @@ namespace Modio
 						if (FileChunk.has_value() && FileChunk->GetSize() != ArchiveState->CentralDirectorySize)
 						{
 							// Could not read full central directory
+							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression, "Could not read full central directory");
+
 							Self.complete(Modio::make_error_code(Modio::FilesystemError::ReadError));
 							return;
 						}

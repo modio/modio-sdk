@@ -52,6 +52,8 @@ public:
 		{
 			if (!WinHttpQueryDataAvailable(Request->RequestHandle, NULL))
 			{
+				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+											"query data available received system error code {}", GetLastError());
 				Self.complete(Modio::make_error_code(Modio::HttpError::RequestError));
 				return;
 			}

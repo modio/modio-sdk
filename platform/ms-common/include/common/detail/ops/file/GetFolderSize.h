@@ -58,6 +58,7 @@ namespace Modio
 							CurrentSize += Modio::filesystem::file_size(DirectoryIterator->path(), FileSizeError);
 							if (FileSizeError)
 							{
+								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File, FileSizeError.message());
 								Self.complete(Modio::make_error_code(Modio::FilesystemError::ReadError), 0);
 							}
 						}

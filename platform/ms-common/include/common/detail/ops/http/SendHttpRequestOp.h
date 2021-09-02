@@ -60,6 +60,9 @@ public:
 											  (DWORD) -1L, WINHTTP_ADDREQ_FLAG_ADD))
 				{
 					auto err = GetLastError();
+					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+												"Adding request headers generated system error code {}", err);
+					
 					Self.complete(Modio::make_error_code(Modio::HttpError::CannotOpenConnection));
 					return;
 				}
@@ -72,7 +75,9 @@ public:
 										(void*) Payload.c_str(), (DWORD) Payload.length(), (DWORD) Payload.length(),
 										(DWORD_PTR) ContextPtr))
 				{
-					auto err = GetLastError();
+					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+												"sending request received system error code {}", GetLastError());
+					
 					Self.complete(Modio::make_error_code(Modio::HttpError::CannotOpenConnection));
 					return;
 				}
@@ -82,6 +87,9 @@ public:
 				if (!WinHttpSendRequest(Request->RequestHandle, WINHTTP_NO_ADDITIONAL_HEADERS, 0,
 										WINHTTP_NO_REQUEST_DATA, 0, 0, (DWORD_PTR) ContextPtr))
 				{
+					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+												"sending request received system error code {}", GetLastError());
+
 					Self.complete(Modio::make_error_code(Modio::HttpError::CannotOpenConnection));
 					return;
 				}

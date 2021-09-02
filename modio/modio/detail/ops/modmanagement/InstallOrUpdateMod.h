@@ -76,6 +76,9 @@ namespace Modio
 
 						if (!TempFilePath)
 						{
+							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+														"couldn't create temp file {}", ModInfoResponse["modfile"]["filename"]);
+
 							Self.complete(Modio::make_error_code(FilesystemError::UnableToCreateFile));
 							return;
 						}

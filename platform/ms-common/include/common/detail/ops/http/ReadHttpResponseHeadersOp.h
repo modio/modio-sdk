@@ -47,6 +47,9 @@ public:
 		{
 			if (!WinHttpReceiveResponse(Request->RequestHandle, 0))
 			{
+				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+											"ReceiveResponse returned system error code {}", GetLastError());
+				
 				Self.complete(Modio::make_error_code(Modio::HttpError::RequestError));
 				return;
 			}

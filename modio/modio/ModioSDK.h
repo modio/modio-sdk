@@ -19,6 +19,7 @@
 #include "modio/core/ModioFilterParams.h"
 #include "modio/core/ModioInitializeOptions.h"
 #include "modio/core/ModioModCollectionEntry.h"
+#include "modio/core/ModioModDependency.h"
 #include "modio/core/ModioReportParams.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioModDetails.h"
@@ -50,14 +51,14 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Provide a callback to handle log messages emitted by the SDK.
-	/// @param LogCallback Callback invoked by the SDK during xref:Modio::RunPendingHandlers[] for each log emitted
+	/// @param LogCallback Callback invoked by the SDK during xref:RunPendingHandlers[Modio::RunPendingHandlers] for each log emitted
 	/// during that invocation
 	MODIOSDK_API void SetLogCallback(std::function<void(Modio::LogLevel, const std::string&)> LogCallback);
 
 	/// @docpublic
 	/// @brief Runs any pending SDK work on the calling thread, including invoking any callbacks passed to asynchronous
 	/// operations.
-	/// NOTE: This should be called while xref:InitializeAsync[] and xref:Modio::Shutdown[] are running,
+	/// NOTE: This should be called while xref:InitializeAsync[Modio::InitializeAsync] and xref:ShutdownAsync[Modio::ShutdownAsync] are running,
 	/// as they both utilize the internal event loop for functionality.
 	MODIOSDK_API void RunPendingHandlers();
 
@@ -175,7 +176,7 @@ namespace Modio
 	/// @brief Forcibly uninstalls a mod from the system. This is intended for use when a host application requires more
 	/// room for a mod that the user wants to install, and as such will return an error if the current user is
 	/// subscribed to the mod. To remove a mod the current user is subscribed to, use
-	/// xref:UnsubscribeFromModAsync[].
+	/// xref:UnsubscribeFromModAsync[Modio::UnsubscribeFromModAsync].
 	/// @param Callback Callback invoked when the uninstallation is successful, or if it failed because the current user
 	/// remains subscribed.
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
@@ -320,6 +321,21 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	MODIOSDK_API void GetModTagOptionsAsync(
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)> Callback);
+
+	/// @docpublic
+	/// @brief For a given Mod ID, fetches a list of any mods that the creator has marked as dependencies
+	/// @param ModID The mod to retrieve dependencies for
+	/// @param Callback Callback providing a status code and an optional xref:ModDependencyList[ModDependencyList]
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @experimental
+	MODIOSDK_API void GetModDependenciesAsync(
+		Modio::ModID ModID,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)>
+			Callback);
+
 
 	/// @docpublic
 	/// @brief Begins email authentication for the current session by requesting a one-time code be sent to the
