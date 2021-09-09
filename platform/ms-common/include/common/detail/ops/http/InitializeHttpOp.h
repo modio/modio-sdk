@@ -32,7 +32,14 @@ public:
 			HINTERNET CurrentSession = NULL;
 
 			CurrentSession = WinHttpOpen(UserAgentString.c_str(), WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY,
-										 WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, WINHTTP_FLAG_ASYNC);
+										 WINHTTP_NO_PROXY_NAME,
+										 WINHTTP_NO_PROXY_BYPASS, WINHTTP_FLAG_ASYNC);
+
+			if (CurrentSession == NULL)
+			{
+				CurrentSession = WinHttpOpen(UserAgentString.c_str(), WINHTTP_ACCESS_TYPE_NO_PROXY,
+											 WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, WINHTTP_FLAG_ASYNC);
+			}
 
 			if (CurrentSession == NULL)
 			{
