@@ -78,7 +78,7 @@ namespace Modio
 						CurrentResultIndex += 100;
 					} while (CurrentResultIndex < PageInfo.GetTotalResultCount());
 
-					Self.complete({}, *(CollatedResults.release()));
+					Self.complete({}, std::move(*CollatedResults));
 				}
 			}
 

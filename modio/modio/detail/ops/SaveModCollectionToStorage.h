@@ -43,7 +43,7 @@ namespace Modio
 						std::copy(teststring.begin(), teststring.end(), DataBuffer->begin());
 					}
 
-					yield DestinationFile->WriteAsync(std::move(*(DataBuffer.release())), std::move(Self));
+					yield DestinationFile->WriteAsync(std::move(*DataBuffer), std::move(Self));
 					if (ec)
 					{
 						Self.complete(ec);
