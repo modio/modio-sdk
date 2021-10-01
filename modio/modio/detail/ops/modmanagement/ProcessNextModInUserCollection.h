@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -35,14 +35,19 @@ namespace Modio
 				{
 					{
 						EntryToProcess = nullptr;
+
+						// Note: because we aren't `yield`ing in these loops, we're safe to use range-based for. If we
+						// needed to `yield` in the loop, we'd need to store the iterator so we can pick up where we left
+						// off when we return from `yield`.
+
 						// Check for pending uninstallations regardless of user
-						for (auto ModEntry : Modio::Detail::SDKSessionData::GetSystemModCollection().Entries())
+						for (auto ModEntry : Modio::Detail::SDKSessionData::GetSystemModCollection().SortEntriesByRetryPriority())
 						{
-							if (ModEntry.second->GetModState() == Modio::ModState::UninstallPending)
+							if (ModEntry->GetModState() == Modio::ModState::UninstallPending)
 							{
-								if (ModEntry.second->ShouldRetry())
+								if (ModEntry->ShouldRetry())
 								{
-									EntryToProcess = ModEntry.second;
+									EntryToProcess = ModEntry;
 								}
 							}
 						}
@@ -52,15 +57,15 @@ namespace Modio
 						{
 							Modio::ModCollection UserModCollection =
 								Modio::Detail::SDKSessionData::FilterSystemModCollectionByUserSubscriptions();
-							for (auto ModEntry : UserModCollection.Entries())
+							for (auto ModEntry : UserModCollection.SortEntriesByRetryPriority())
 							{
-								Modio::ModState CurrentState = ModEntry.second->GetModState();
+								Modio::ModState CurrentState = ModEntry->GetModState();
 								if (CurrentState == Modio::ModState::InstallationPending ||
 									CurrentState == Modio::ModState::UpdatePending)
 								{
-									if (ModEntry.second->ShouldRetry())
+									if (ModEntry->ShouldRetry())
 									{
-										EntryToProcess = ModEntry.second;
+										EntryToProcess = ModEntry;
 									}
 								}
 							}
@@ -85,19 +90,7 @@ namespace Modio
 							ec});
 						if (ec)
 						{
-							if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::NetworkError) &&
-								ec != Modio::ModManagementError::InstallOrUpdateCancelled)
-							{
-								EntryToProcess->MarkModNoRetry();
-							}
-							if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::ModInstallDeferredError))
-							{
-								EntryToProcess->MarkModNoRetry();
-							}
-							if (Modio::ErrorCodeMatches(ec, Modio::ApiError::ExpiredOrRevokedAccessToken))
-							{
-								EntryToProcess->MarkModNoRetry();
-							}
+							EntryToProcess->SetLastError(ec);
 							Self.complete(ec);
 							return;
 						}
@@ -116,10 +109,7 @@ namespace Modio
 							EntryToProcess->GetID(), Modio::ModManagementEvent::EventType::Uninstalled, ec});
 						if (ec)
 						{
-							if (Modio::ErrorCodeMatches(Modio::ErrorCode(0x91, std::system_category()),
-														Modio::ErrorConditionTypes::ModDeleteDeferredError))
-							{}
-							EntryToProcess->MarkModNoRetry();
+							EntryToProcess->SetLastError(ec);
 							Self.complete(ec);
 							return;
 						}

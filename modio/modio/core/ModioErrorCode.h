@@ -94,7 +94,7 @@ namespace Modio
 		static HttpErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
-	
+
 	inline std::error_code make_error_code(HttpError e)
 	{
 		return { static_cast<int>(e), HttpErrorCategory() };
@@ -169,7 +169,7 @@ namespace Modio
 		static FilesystemErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
-	
+
 	inline std::error_code make_error_code(FilesystemError e)
 	{
 		return { static_cast<int>(e), FilesystemErrorCategory() };
@@ -232,7 +232,7 @@ namespace Modio
 		static UserAuthErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
-	
+
 	inline std::error_code make_error_code(UserAuthError e)
 	{
 		return { static_cast<int>(e), UserAuthErrorCategory() };
@@ -283,7 +283,7 @@ namespace Modio
 		static UserDataErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
-	
+
 	inline std::error_code make_error_code(UserDataError e)
 	{
 		return { static_cast<int>(e), UserDataErrorCategory() };
@@ -334,7 +334,7 @@ namespace Modio
 		static ArchiveErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
-	
+
 	inline std::error_code make_error_code(ArchiveError e)
 	{
 		return { static_cast<int>(e), ArchiveErrorCategory() };
@@ -413,7 +413,7 @@ namespace Modio
 		static GenericErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
-	
+
 	inline std::error_code make_error_code(GenericError e)
 	{
 		return { static_cast<int>(e), GenericErrorCategory() };
@@ -512,7 +512,7 @@ namespace Modio
 		static ZlibErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
-	
+
 	inline std::error_code make_error_code(ZlibError e)
 	{
 		return { static_cast<int>(e), ZlibErrorCategory() };
@@ -575,7 +575,7 @@ namespace Modio
 		static ModManagementErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
-	
+
 	inline std::error_code make_error_code(ModManagementError e)
 	{
 		return { static_cast<int>(e), ModManagementErrorCategory() };
@@ -758,7 +758,7 @@ namespace Modio
 		static ApiErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
-	
+
 	inline std::error_code make_error_code(ApiError e)
 	{
 		return { static_cast<int>(e), ApiErrorCategory() };
@@ -779,7 +779,93 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
-	
+
+	namespace Detail
+	{
+		/// @docinternal
+		/// @brief Helper method to deserialize a numerical ID to an error category
+		/// will only work with Modio specific error categories
+		inline const std::error_category& GetModioErrorCategoryByID(std::uint64_t CategoryID)
+		{
+			switch (CategoryID)
+			{
+				case 1:
+					return HttpErrorCategory();
+				break;
+				case 2:
+					return FilesystemErrorCategory();
+				break;
+				case 3:
+					return UserAuthErrorCategory();
+				break;
+				case 4:
+					return UserDataErrorCategory();
+				break;
+				case 5:
+					return ArchiveErrorCategory();
+				break;
+				case 6:
+					return GenericErrorCategory();
+				break;
+				case 7:
+					return ZlibErrorCategory();
+				break;
+				case 8:
+					return ModManagementErrorCategory();
+				break;
+				case 9:
+					return ApiErrorCategory();
+				break;
+				default:
+					return std::system_category();
+			}
+
+		}
+		/// @docinternal
+		/// @brief Helper method to serialize a modio error category to a numerical ID
+		inline const std::uint64_t ModioErrorCategoryID(const std::error_category& Category)
+		{
+			if (Category ==  HttpErrorCategory())
+			{
+					return 1;
+			}
+			if (Category ==  FilesystemErrorCategory())
+			{
+					return 2;
+			}
+			if (Category ==  UserAuthErrorCategory())
+			{
+					return 3;
+			}
+			if (Category ==  UserDataErrorCategory())
+			{
+					return 4;
+			}
+			if (Category ==  ArchiveErrorCategory())
+			{
+					return 5;
+			}
+			if (Category ==  GenericErrorCategory())
+			{
+					return 6;
+			}
+			if (Category ==  ZlibErrorCategory())
+			{
+					return 7;
+			}
+			if (Category ==  ModManagementErrorCategory())
+			{
+					return 8;
+			}
+			if (Category ==  ApiErrorCategory())
+			{
+					return 9;
+			}
+			return 0;
+		}
+
+	}
+
 	/// @docpublic
 	/// @brief Enum describing the different conditions a Modio::ErrorCode can satisfy
 	/// Check if a Modio::ErrorCode meets a particular condition using <<ErrorCodeMatches>>
@@ -801,7 +887,7 @@ namespace Modio
 		ApiErrorRefSuccess = 7,
 		/// @brief When this condition is true, the error code represents a temporary error with installation, such as a network interruption. The mod installation can be reattempted at a later point this session
 		ModInstallRetryableError = 8,
-		/// @brief When this condition is true, the error code represents an error during installation that may be resolved during next SDK initialization, and will be deferred until then.
+		/// @brief When this condition is true, the error code represents an error during installation that may be resolved during next SDK initialization, and will be deferred until then. This category is now deprecated as deferral is the default retry behaviour for mod installation.
 		ModInstallDeferredError = 9,
 		/// @brief When this condition is true, the error code represents an error during uninstallation that may be resolved during the next SDK session, and will be deferred until then.
 		ModDeleteDeferredError = 10,
@@ -847,7 +933,7 @@ namespace Modio
 					return "When this condition is true, the error code represents a temporary error with installation, such as a network interruption. The mod installation can be reattempted at a later point this session";
 				break;
 				case ErrorConditionTypes::ModInstallDeferredError:
-					return "When this condition is true, the error code represents an error during installation that may be resolved during next SDK initialization, and will be deferred until then.";
+					return "When this condition is true, the error code represents an error during installation that may be resolved during next SDK initialization, and will be deferred until then. This category is now deprecated as deferral is the default retry behaviour for mod installation.";
 				break;
 				case ErrorConditionTypes::ModDeleteDeferredError:
 					return "When this condition is true, the error code represents an error during uninstallation that may be resolved during the next SDK session, and will be deferred until then.";
@@ -1217,78 +1303,6 @@ namespace Modio
 					}
 
 	
-
-					if (ec == Modio::ZlibError::EndOfStream)
-					{
-						return true;
-					}
-
-					if (ec == Modio::ZlibError::IncompleteLengthSet)
-					{
-						return true;
-					}
-
-					if (ec == Modio::ZlibError::InvalidBitLengthRepeat)
-					{
-						return true;
-					}
-
-					if (ec == Modio::ZlibError::InvalidBlockType)
-					{
-						return true;
-					}
-
-					if (ec == Modio::ZlibError::InvalidCodeLengths)
-					{
-						return true;
-					}
-
-					if (ec == Modio::ZlibError::InvalidDistance)
-					{
-						return true;
-					}
-
-					if (ec == Modio::ZlibError::InvalidDistanceCode)
-					{
-						return true;
-					}
-
-					if (ec == Modio::ZlibError::InvalidLiteralLength)
-					{
-						return true;
-					}
-
-					if (ec == Modio::ZlibError::InvalidStoredLength)
-					{
-						return true;
-					}
-
-					if (ec == Modio::ZlibError::MissingEOB)
-					{
-						return true;
-					}
-
-					if (ec == Modio::ZlibError::NeedBuffers)
-					{
-						return true;
-					}
-
-					if (ec == Modio::ZlibError::OverSubscribedLength)
-					{
-						return true;
-					}
-
-					if (ec == Modio::ZlibError::StreamError)
-					{
-						return true;
-					}
-
-					if (ec == Modio::ZlibError::TooManySymbols)
-					{
-						return true;
-					}
-
-	
 				break;
 				case ErrorConditionTypes::ModInstallDeferredError:
 					if (ec == Modio::GenericError::OperationCanceled)
@@ -1447,6 +1461,78 @@ namespace Modio
 					}
 
 
+
+					if (ec == Modio::ZlibError::EndOfStream)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ZlibError::IncompleteLengthSet)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ZlibError::InvalidBitLengthRepeat)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ZlibError::InvalidBlockType)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ZlibError::InvalidCodeLengths)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ZlibError::InvalidDistance)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ZlibError::InvalidDistanceCode)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ZlibError::InvalidLiteralLength)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ZlibError::InvalidStoredLength)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ZlibError::MissingEOB)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ZlibError::NeedBuffers)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ZlibError::OverSubscribedLength)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ZlibError::StreamError)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ZlibError::TooManySymbols)
+					{
+						return true;
+					}
+
+	
 				break;
 				case ErrorConditionTypes::EntityNotFoundError:
 					if (ec == Modio::ApiError::RequestedGameNotFound)

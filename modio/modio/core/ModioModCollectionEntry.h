@@ -60,10 +60,15 @@ namespace Modio
 
 		/// @docinternal
 		/// @brief flag if this mod should not be processed because it encountered an unrecoverable error during
-		/// installation/update should not be saved to disk as we will more than likely want to retry next session
+		/// installation/update. This should not be saved to disk as we will more than likely want to retry next session
 		std::atomic<bool> ShouldNotRetry {};
 
+		Modio::ErrorCode NeverRetryReason;
+
+		uint8_t RetriesRemainingThisSession;
+
 	public:
+
 		ModCollectionEntry() = default;
 
 		/// @docinternal
@@ -75,6 +80,11 @@ namespace Modio
 		MODIO_IMPL ModCollectionEntry(const ModCollectionEntry& Other);
 
 		MODIO_IMPL ModCollectionEntry& operator=(const ModCollectionEntry& Other);
+
+		/// @docinternal
+		/// @brief Gets the number of retries remaining this session
+		/// @returns Integer number of retries remaining
+		MODIO_IMPL uint8_t GetRetriesRemaining();
 
 		/// @docinternal
 		/// @brief Updates the associated profile data in the collection entry, marks the mod as requiring an update if
@@ -102,7 +112,11 @@ namespace Modio
 		/// @docinternal
 		/// @brief Marks the mod as having encountered an error that means installation or updates should not be
 		/// reattempted this session
-		MODIO_IMPL void MarkModNoRetry();
+		MODIO_IMPL void MarkModNoRetryThisSession();
+
+		/// @docinternal
+		/// @brief Updates the error status on this mod and internal variables determining if the mod should have the relevant operation retried
+		MODIO_IMPL void SetLastError(Modio::ErrorCode Reason);
 
 		/// @docinternal
 		/// @brief Clears the no retry flag - this probably won't ever get called but may if we want to retry everything
@@ -268,6 +282,8 @@ namespace Modio
 		MODIO_IMPL const std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& Entries();
 		MODIO_IMPL Modio::Optional<Modio::ModCollectionEntry&> GetByModID(Modio::ModID ModId) const;
 		MODIO_IMPL bool RemoveMod(Modio::ModID ModId);
+		MODIO_IMPL std::vector<std::shared_ptr<Modio::ModCollectionEntry>> SortEntriesByRetryPriority() const;
+
 		friend void to_json(nlohmann::json& Json, const Modio::ModCollection& Collection)
 		{
 			std::vector<Modio::ModCollectionEntry> ResolvedEntries;

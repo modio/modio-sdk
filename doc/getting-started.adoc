@@ -225,10 +225,10 @@ When you are ready to initialize the SDK for the current user, you'll need to ca
 ----
 
 //represents some external state so we know that the SDK is good to go - could be anything
-Modio::optional<bool> SDKInitialized;
+Modio::Optional<bool> SDKInitialized;
 
 Modio::InitializeOptions Options;
-Options.APIKey = "YOUR_API_KEY";
+Options.APIKey = Modio::ApiKey(YOUR_API_KEY);
 Options.GameEnvironment = Modio::Environment::Test;
 Options.GameID = Modio::GameID(YOUR_GAME_ID);
 Options.User = LocalProfileName;
@@ -256,8 +256,6 @@ Modio::InitializeAsync(Options, [&SDKInitialized](Modio::ErrorCode ec) {
 Doing the reverse and shutting down the SDK is equally simple:
 [source, cpp]
 ----
-// Async
-
 //State variable, stored in some valid scope
 bool SDKShutdownComplete = false;
 

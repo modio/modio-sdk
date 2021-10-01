@@ -49,6 +49,12 @@ namespace Modio
 				constexpr const char* ModSizeOnDisk = "SizeOnDisk";
 				constexpr const char* ModPathOnDisk = "PathOnDisk";
 				constexpr const char* RootLocalStoragePath = "RootLocalStoragePath";
+				constexpr const char* ModNeverRetryCategory = "NeverRetryCategory";
+				constexpr const char* ModNeverRetryCode = "NeverRetryCode";
+			}
+			namespace Configuration
+			{
+				constexpr uint8_t DefaultNumberOfRetries = 3;
 			}
 		}
 	}
