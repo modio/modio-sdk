@@ -764,13 +764,22 @@ table.stripes-odd tr:nth-of-type(odd) {
 <ul class="sectlevel1">
 <li><a href="#_getting_started">Getting started</a>
 <ul class="sectlevel2">
-<li><a href="#_installation">Installation</a></li>
+<li><a href="#_prerequisites">Prerequisites</a></li>
+<li><a href="#_dependencies">Dependencies</a></li>
+</ul>
+</li>
+<li><a href="#_installation">Installation</a>
+<ul class="sectlevel2">
+<li><a href="#_inside_a_cmake_project">Inside a CMake project</a></li>
+<li><a href="#_standalone">Standalone</a></li>
+<li><a href="#override">Other Build Systems</a></li>
 <li><a href="#_requirements">Requirements</a></li>
 <li><a href="#_sdk_structure_and_concepts">SDK structure and concepts</a></li>
+<li><a href="#quick-start">SDK quick-start</a></li>
 <li><a href="#_sdk_quick_start_initialization_and_teardown">SDK quick-start: Initialization and Teardown</a></li>
 <li><a href="#_sdk_quick_start_user_authentication">SDK quick-start: User Authentication</a></li>
 <li><a href="#_sdk_quick_start_browsing_available_mods">SDK quick-start: Browsing available mods</a></li>
-<li><a href="#_sdk_quick_start_mod_subscriptions_and_management">SDK quick-start: Mod subscriptions and management</a></li>
+<li><a href="#_sdk_quick_start_mod_management_and_subscriptions">SDK quick-start: Mod management and subscriptions</a></li>
 <li><a href="#_sdk_quick_start_error_handling">SDK quick-start: Error Handling</a></li>
 </ul>
 </li>
@@ -837,6 +846,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_filemetadata">  FileMetadata</a></li>
 <li><a href="#_modstats">  ModStats</a></li>
 <li><a href="#_user">  User</a></li>
+<li><a href="#_profilematurity">  ProfileMaturity</a></li>
 <li><a href="#_modinfo">  ModInfo</a></li>
 <li><a href="#_modmanagementevent">  ModManagementEvent</a></li>
 <li><a href="#_moddependency">  ModDependency</a></li>
@@ -878,35 +888,124 @@ table.stripes-odd tr:nth-of-type(odd) {
 <h2 id="_getting_started">Getting started</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_installation">Installation</h3>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">FUTURE RELEASE</div>
-</td>
-<td class="content">
-CMake exported target and find_package support forthcoming
-</td>
-</tr>
-</table>
+<h3 id="_prerequisites">Prerequisites</h3>
+<div class="paragraph">
+<p>The following packages are required to build the mod.io SDK for Windows 10:</p>
 </div>
-<div class="sect3">
-<h4 id="_inside_a_cmake_project">Inside a CMake project</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Visual Studio 2019 (Community version works)</p>
+</li>
+<li>
+<p>Visual Studio 2019 "Desktop Development with C++" (via Visual Studio Installer)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These include the required CMake (version 3.15 or higher), Ninja, and MSVC C++ compiler.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_dependencies">Dependencies</h3>
+<div class="paragraph">
+<p>The mod.io SDK has the following dependencies:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/stephenwhittle/asio">asio</a></p>
+</li>
+<li>
+<p><a href="https://github.com/fmtlib/fmt">fmt</a></p>
+</li>
+<li>
+<p><a href="https://github.com/nekipelov/httpparser">httpparser</a></p>
+</li>
+<li>
+<p><a href="https://github.com/nlohmann/json">json</a></p>
+</li>
+<li>
+<p><a href="https://github.com/TartanLlama/optional">optional</a></p>
+</li>
+<li>
+<p><a href="https://github.com/nemtrif/utfcpp">utfcpp</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>While it is possible to download the SDK source code as a zip file from GitHub, a recursive clone will also download all dependencies. To ensure these dependencies are downloaded, use the following commands:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="zsh">git clone <span class="nt">--recurse-submodule</span> https://github.com/modio/modio-sdk
+<span class="nb">cd </span>modio-sdk</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_installation">Installation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The mod.io SDK can be installed using one of the following methods:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Inside a CMake project</p>
+</li>
+<li>
+<p>Standalone: <a href="#header-only">Header-only mode</a></p>
+</li>
+<li>
+<p>Standalone: <a href="#separate-compilation">Separate compilation mode</a></p>
+</li>
+<li>
+<p>Standalone: <a href="#static-library">Static library mode</a></p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_inside_a_cmake_project">Inside a CMake project</h3>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Clone the repository, or add as a submodule</p>
+<p>Clone the repository, or add it as a submodule</p>
 </li>
 <li>
-<p>Ensure your project is using <code>cmake_minimum_required(VERSION 3.15)</code> or later</p>
+<p>Add the following commands to a CMakeLists.txt file specific to your project</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Confirm <code>your_project</code> uses CMake 3.15 or later</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="cmake"><span class="nb">cmake_minimum_required</span><span class="p">(</span>VERSION 3.15<span class="p">)</span></code></pre>
+</div>
+</div>
 </li>
 <li>
-<p><code>set (MODIO_PLATFORM WIN)</code></p>
+<p>Specify the target platform</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="cmake"><span class="nb">set</span> <span class="p">(</span>MODIO_PLATFORM WIN<span class="p">)</span></code></pre>
+</div>
+</div>
 </li>
 <li>
-<p><code>add_subdirectory(&lt;sdk folder&gt;)</code></p>
+<p>Add the SDK subdirectory to your project</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="cmake"><span class="nb">add_subdirectory</span><span class="p">(</span>&lt;modio-sdk folder&gt; EXCLUDE_FROM_ALL<span class="p">)</span></code></pre>
+</div>
+</div>
 </li>
+<li>
+<p>Link the library to your project</p>
+<div class="ulist">
+<ul>
 <li>
 <p>To use the header-only configuration:</p>
 <div class="listingblock">
@@ -917,7 +1016,7 @@ CMake exported target and find_package support forthcoming
 </div>
 </li>
 <li>
-<p>To use the static library configuration:</p>
+<p>Or to use the static library configuration:</p>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="cmake"><span class="nb">target_compile_features</span><span class="p">(</span>your_project PUBLIC cxx_std_14<span class="p">)</span>
@@ -925,34 +1024,56 @@ CMake exported target and find_package support forthcoming
 </div>
 </div>
 </li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
 </ol>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_standalone">Standalone</h4>
+<div class="sect2">
+<h3 id="_standalone">Standalone</h3>
 <div class="paragraph">
-<p>To make building the SDK easier, we provide a <code>CMakePresets.json</code> that will include the most common configurations as presets.</p>
+<p>To simplify the SDK compilation, the file <code>CMakePresets.json</code> includes the most common configurations as <code>presets</code> that employ Ninja by default. Therefore, confirm it is available on your <code>PATH</code> unless you want to <a href="#override">override</a> the CMake generator in use.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
 </colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Platform</th>
-<th class="tableblock halign-left valign-top">Preset Name</th>
-</tr>
-</thead>
 <tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Platform</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Preset</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Target</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Build System</p></td>
+</tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Windows</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">win64</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Release</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Visual Studio 2019</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Windows</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">win64-debug</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Debug</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Visual Studio 2019</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Windows</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">win64-dbginfo</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Pre-Release</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Visual Studio 2019</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>Debug presets have the <code>-debug</code> suffix, and Release-with-debug-info is <code>-dbginfo</code>, so if you want to build the SDK in debug configuration specify <code>win64-debug</code> as the preset name.</p>
+<p>Debug presets have the <code>-debug</code> suffix, and Release-with-debug-info is <code>-dbginfo</code>. If you want to build the SDK in debug configuration specify <code>win64-debug</code> as the preset name.</p>
 </div>
 <div class="paragraph">
 <p>To build the SDK using the default build and install directories:</p>
@@ -960,21 +1081,21 @@ CMake exported target and find_package support forthcoming
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p><code>cmake -S &lt;path to sdk folder&gt; --preset=Win64</code></p>
+<p><code>cmake -S &lt;modio-sdk folder&gt; --preset=win64</code></p>
 <div class="paragraph">
-<p>This will use the Ninja generator to create a Ninja build system in <code>&lt;sdk folder&gt;/out/build/win64</code>, which installs the compiled libraries etc to <code>&lt;sdk folder&gt;/out/install/win64</code>.</p>
+<p>This will use the Ninja generator to create a Ninja build system in <code>&lt;modio-sdk folder&gt;/out/build/win64</code>. It installs the compiled libraries/headers to <code>&lt;modio-sdk folder&gt;/out/install/win64</code>.</p>
 </div>
 </li>
 <li>
-<p><code>cmake --build &lt;sdk folder&gt;/out/build/win64</code></p>
+<p><code>cmake --build &lt;modio-sdk folder&gt;/out/build/win64</code></p>
 <div class="paragraph">
 <p>This step compiles the SDK as a static library.</p>
 </div>
 </li>
 <li>
-<p><code>cmake --install out/win64/build</code></p>
+<p><code>cmake --install &lt;modio-sdk folder&gt;/out/build/win64</code></p>
 <div class="paragraph">
-<p>This will produce a folder <code>&lt;sdk folder&gt;/out/install/win64</code> which contains the following:</p>
+<p>This produces a folder <code>&lt;modio-sdk folder&gt;/out/install/win64</code> with the following:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -985,42 +1106,46 @@ CMake exported target and find_package support forthcoming
 <p><code>source</code> - directory containing the implementation files of the SDK for use in 'split compilation' mode</p>
 </li>
 <li>
-<p><code>static</code> - directory containing the static library binaries and minimal public includes</p>
+<p><code>static</code> - directory containing the static library binaries and necessary public include headers</p>
 </li>
 </ul>
 </div>
 </li>
 </ol>
 </div>
-<div class="sect4">
-<h5 id="_header_only_mode">Header-only mode</h5>
+<div class="sect3">
+<h4 id="header-only">Header-only mode</h4>
 <div class="paragraph">
-<p>Simply add each of the subdirectories in <code>header_only</code> to your include directories and then <code>#include "modio/ModioSDK.h"</code></p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_separate_compilation_mode">Separate compilation mode</h5>
-<div class="paragraph">
-<p>If you&#8217;d rather compile the implementation directly, simply add the cpp files in the <code>source</code> directory, and add the includes as per header-only mode. Define <code>MODIO_SEPARATE_COMPILATION</code>, and then <code>#include "modio/ModioSDK.h"</code></p>
-</div>
-</div>
-<div class="sect4">
-<h5 id="_static_library_mode">Static library mode</h5>
-<div class="paragraph">
-<p>Add the <code>inc</code> directory inside <code>static</code> to your includes and link against the static binary in the <code>lib</code> folder, defining <code>MODIO_SEPARATE_COMPILATION</code> and <code>#include "modio/ModioSDK.h"</code> as per separate compilation mode.</p>
-</div>
+<p>Simply add each of the subdirectories in <code>header_only</code> to your include directories. Then, in <code>your_project</code> source file add <code>#include "modio/ModioSDK.h"</code></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_other_build_systems">Other Build Systems</h4>
+<h4 id="separate-compilation">Separate compilation mode</h4>
 <div class="paragraph">
-<p>If you&#8217;d like to use another build system, or generate project files you can add to a larger Visual Studio solution, simply override the default generator when performing the first command above. For instance, to use a MSBuild-based Visual Studio Solution:</p>
+<p>If you prefer to compile the source code directly, add the <code>cpp</code> files in the <code>source</code> directory, along with the <code>include</code> from the header-only mode.
+You must add <code>MODIO_SEPARATE_COMPILATION</code> to your project&#8217;s compiler definitions. Then, in <code>your_project</code> source file add <code>#include "modio/ModioSDK.h"</code></p>
 </div>
+</div>
+<div class="sect3">
+<h4 id="static-library">Static library mode</h4>
 <div class="paragraph">
-<p><code>cmake -S &lt;path to sdk folder&gt; --preset=Win64 -G"Visual Studio 16 2019"</code></p>
+<p>Add the <code>inc</code> directory inside <code>static</code> to your <code>include</code> and link against the static binary in the <code>lib</code> folder.  You must add <code>MODIO_SEPARATE_COMPILATION</code> to your project&#8217;s compiler definitions. Then, in <code>your_project</code> source file add <code>#include "modio/ModioSDK.h"</code></p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="override">Other Build Systems</h3>
+<div class="paragraph">
+<p>If you use a different build system or wish to generate project files for inclusion in an existing Visual Studio solution, you can override the default CMake generator. For example, it is possible to use an MSBuild-based Visual Studio Solution:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>cmake -S &lt;modio-sdk folder&gt; --preset=win64 -G "Visual Studio 16 2019"
+cmake --build &lt;modio-sdk folder&gt;/out/install/win64
+cmake --install &lt;modio-sdk folder&gt;/out/install/win64</code></pre>
+</div>
 </div>
 <hr>
-</div>
 </div>
 <div class="sect2">
 <h3 id="_requirements">Requirements</h3>
@@ -1032,43 +1157,41 @@ CMake exported target and find_package support forthcoming
 <col style="width: 33.3333%;">
 <col style="width: 33.3334%;">
 </colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Platform</th>
-<th class="tableblock halign-left valign-top">Supported?</th>
-<th class="tableblock halign-left valign-top">Compiler</th>
-</tr>
-</thead>
 <tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Platform</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Support</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Compiler</p></td>
+</tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Windows</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">✔</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">MSVC</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MSVC C++ 2019</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Windows (GDK)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">✔ (Contact us)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✔ <a href="#contact-us">(Contact Us)</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Vendor-provided</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">OSX</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">2022</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nintendo Switch</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✔ <a href="#contact-us">(Contact Us)</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Vendor-provided</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">XBox (GDK)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✔ <a href="#contact-us">(Contact Us)</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Vendor-provided</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">macOS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q4 2021</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Linux</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Q4 2021</p></td>
 <td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Nintendo Switch</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">✔ (Contact us)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Vendor-provided</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">XBox (GDK)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">✔ (Contact us)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Vendor-provided</p></td>
 </tr>
 </tbody>
 </table>
@@ -1102,15 +1225,19 @@ CMake exported target and find_package support forthcoming
 </div>
 <div class="sect2">
 <h3 id="_sdk_structure_and_concepts">SDK structure and concepts</h3>
+<div class="paragraph">
+<p>The following diagram provides an overview of the mod.io SDK initialization procedure, its asynchronous nature.
+<span class="image"><img src="http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/modio/modio-sdk/doc/chapters/diagrams/general-overview/modio_sdk_flow-init.puml" alt="alt:&quot;mod.io SDK Initialization flow&quot;"></span></p>
+</div>
 <div class="sect3">
 <h4 id="_flat_api">Flat API</h4>
 <div class="paragraph">
-<p>The mod.io SDK has a fairly simple overall structure which primarily consists of a flat interface of free functions. These broadly have the following categories:</p>
+<p>The mod.io SDK has a simple structure that primarily consists of a flat interface. These broadly have the following categories:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>SDK management (initialization, teardown, event loop)</p>
+<p>SDK management: Initialization, teardown, event loop</p>
 </li>
 <li>
 <p>User authentication</p>
@@ -1119,32 +1246,37 @@ CMake exported target and find_package support forthcoming
 <p>Mod browsing and querying</p>
 </li>
 <li>
-<p>Mod management (subscription, unsubscription)</p>
+<p>Mod management: subscribe, unsubscribe.</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>See <a href="#quick-start">SDK quick-start</a> for basic guides for each of these categories.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_value_objects">Value objects</h4>
 <div class="paragraph">
-<p>All data returned by the free functions is presented using a small set of classes, containing information such as:</p>
+<p>All data returned by the SDK uses a small set of classes, containing information such as:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Details for mods that are available for installation</p>
+<p>Details for mods available for installation</p>
 </li>
 <li>
-<p>Progress information about mods being installed</p>
+<p>Status information about in-progress mod management operations</p>
 </li>
 <li>
-<p>Details, and load paths, for installed mods</p>
+<p>Details and load paths for installed mods.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>These objects will be returned to you by the SDK by-value, so if you want to hold onto them once you&#8217;ve shut down the SDK you can do so, and unlike interfaces that return values via interface pointers you do not need to call <code>dispose</code>, <code>release</code> or some other management function when you are done with them.
-This allows you, for instance, to initialize the SDK, query the installed mods, and retain that list even after shutting down the SDK again so you can stop running the SDK&#8217;s event loop.</p>
+<p>These objects return as <code>pass-by-value</code>. In other words, if you want to hold onto them once you&#8217;ve shut down the SDK you can do so. In contrast to interfaces that return values via interface pointers, all SDK objects do not need to call <code>dispose</code>, <code>release</code>, or some other memory manager when their scope finishes.</p>
+</div>
+<div class="paragraph">
+<p>This flexibility allows you to initialize the SDK, query the installed mods, and keep that list. Then shut down the SDK and stop running the SDK&#8217;s event loop.</p>
 </div>
 </div>
 <div class="sect3">
@@ -1154,48 +1286,9 @@ This allows you, for instance, to initialize the SDK, query the installed mods, 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_thread_safety_guarantees">Thread-safety guarantees</h4>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">CURRENT RELEASE</div>
-</td>
-<td class="content">
-The mod.io SDK is currently NOT thread-safe. All calls to SDK functions should be made on the same thread.
-</td>
-</tr>
-</table>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">FUTURE RELEASE</div>
-</td>
-<td class="content">
-The mod.io SDK is thread-safe for all calls EXCEPT <a href="#_runpendinghandlers">RunPendingHandlers</a>. See <a href="#_maintaining_the_sdk_event_loop">Maintaining the SDK event loop</a> below for further information.
-</td>
-</tr>
-</table>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-The SDK event loop, any internal SDK event handlers, and all callbacks you provide to the mod.io SDK, will be run on the thread invoking <a href="#_runpendinghandlers">RunPendingHandlers</a>.
-</td>
-</tr>
-</table>
-</div>
-</div>
-<div class="sect3">
 <h4 id="_non_blocking_asynchronous_interface">Non-blocking, asynchronous interface</h4>
 <div class="paragraph">
-<p>The SDK communicates with the mod.io servers, the filesystem on the device you&#8217;re using, and platform-provided services for authentication. All of these may not return results immediately, so a large number of the SDK&#8217;s public methods are non-blocking and asynchronous.</p>
+<p>The SDK communicates with the mod.io servers, the filesystem on the device it is running on, and platform-specific authentication services. All of these may not return results immediately; therefore, a large number of the SDK&#8217;s public methods are non-blocking and asynchronous.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1204,7 +1297,7 @@ The SDK event loop, any internal SDK event handlers, and all callbacks you provi
 <div class="title">Note</div>
 </td>
 <td class="content">
-All async methods in the public API end with the suffix <code>Async</code>.
+All asynchronous methods in the public API have the suffix <code>Async</code>.
 </td>
 </tr>
 </table>
@@ -1212,11 +1305,13 @@ All async methods in the public API end with the suffix <code>Async</code>.
 <div class="sect4">
 <h5 id="_callback_conventions">Callback conventions</h5>
 <div class="paragraph">
-<p>All of these asynchronous methods take a <code>std::function</code>-derived callback, which will be invoked exactly once with the results of the requested operation.
-Every async callback takes a <a href="#ErrorCode">[ErrorCode]</a> as its first parameter, with any optional results wrapped in <a href="#Optional">[Optional]</a> so that you can easily check if a result is valid or not.</p>
+<p>These asynchronous methods take a <code>std::function</code>-derived callback, which will be invoked exactly once with the results of the requested operation.</p>
 </div>
 <div class="paragraph">
-<p>Any return values provided to your callback are passed-by-value - the SDK doesn&#8217;t expect you to have to call <code>release</code> or otherwise free up resources given to you.</p>
+<p>Every async callback takes an <a href="#ErrorCode">[ErrorCode]</a> as its first parameter, with any results wrapped in <a href="#Optional">[Optional]</a> to check if a result is valid or empty.</p>
+</div>
+<div class="paragraph">
+<p>Return values provided to your callback are passed <code>by-value</code>. The SDK does not expect you to have to call <code>release</code> or free up resources given to you.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1225,7 +1320,7 @@ Every async callback takes a <a href="#ErrorCode">[ErrorCode]</a> as its first p
 <div class="title">Note</div>
 </td>
 <td class="content">
-Even if the SDK is shut down while asynchronous operations are in-flight, your callbacks will still be invoked <strong>exactly once</strong>. In this instance, the <a href="#ErrorCode">[ErrorCode]</a> the callback receives will indicate a cancellation state, and you should check for this as part of your error handling in your callbacks.
+Even if the SDK shuts down while asynchronous operations are pending, the remaining callbacks will still execute <strong>exactly once</strong>. In this case, the callback receives an <a href="#ErrorCode">[ErrorCode]</a> to indicate a canceled state. Your project should handle gracefully this behavior as part of your error handling.
 </td>
 </tr>
 </table>
@@ -1234,7 +1329,10 @@ Even if the SDK is shut down while asynchronous operations are in-flight, your c
 <div class="sect4">
 <h5 id="_maintaining_the_sdk_event_loop">Maintaining the SDK event loop</h5>
 <div class="paragraph">
-<p>In order to provide a non-blocking implementation, the SDK operates an internal event loop. This event loop, will only ever run on the thread which calls <a href="#_runpendinghandlers">RunPendingHandlers</a>.</p>
+<p>In order to provide a non-blocking implementation, the SDK operates an internal event loop. This event loop only runs on the thread which calls <a href="#_runpendinghandlers">RunPendingHandlers</a>.</p>
+</div>
+<div class="paragraph">
+<p>The event loop, all internal event handlers and callbacks provided to the mod.io SDK execute on the thread invoking <a href="#_runpendinghandlers">RunPendingHandlers</a>. It is necessary to execute <a href="#_runpendinghandlers">RunPendingHandlers</a> on the same thread, otherwise, its behavior is undefined.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1243,7 +1341,7 @@ Even if the SDK is shut down while asynchronous operations are in-flight, your c
 <div class="title">Note</div>
 </td>
 <td class="content">
-This means that if you stop calling <a href="#_runpendinghandlers">RunPendingHandlers</a>, any pending asynchronous API methods you have called will not complete and their associated callbacks will not be invoked, nor will the internal data allocated for those operations be freed.
+If you stop calling <a href="#_runpendinghandlers">RunPendingHandlers</a>, any pending asynchronous API methods will not complete and their associated callbacks will not be invoked. It also includes the internal data allocated for those operations, as well as the release of any allocated objects.
 </td>
 </tr>
 </table>
@@ -1253,13 +1351,13 @@ This means that if you stop calling <a href="#_runpendinghandlers">RunPendingHan
 <div class="sect3">
 <h4 id="_users_and_local_profiles">Users and Local Profiles</h4>
 <div class="paragraph">
-<p>The mod.io SDK uses a Local Profile throughout it&#8217;s lifetime. The Local Profile may optionally contain an authenticated user (if you have called any of the authentication functions).</p>
+<p>The mod.io SDK uses a "Local Profile" throughout its lifetime. The Local Profile may optionally contain an authenticated user, once you have successfully authenticated using the appropriate SDK function.</p>
 </div>
 <div class="paragraph">
-<p>An authenticated user is required in order to install mods, and perform other operations. Check the <code>requires</code> section on any public SDK function to see what operations require an authenticated user. However, you can freely browse and search the available mods for your game and only prompt the user to authenticate/create an account when they wish to perform any of those restricted operations.</p>
+<p>An authenticated user is required to install mods and perform other operations. Check the <code>requires</code> section on any SDK function to see what operations need an authenticated user. However, anyone can freely browse and search your game&#8217;s available mods and only prompt the user to authenticate/create an account when they wish to perform any restricted operations (such as rating or subscribing to a mod).</p>
 </div>
 <div class="paragraph">
-<p>To change a Local Profile&#8217;s authenticated user, call <a href="#_clearuserdataasync">ClearUserDataAsync</a> to remove the authenticated user, and then re-authenticate as per normal.</p>
+<p>To change a Local Profile&#8217;s authenticated user, call <a href="#_clearuserdataasync">ClearUserDataAsync</a> to remove the authenticated user, and then re-authenticate as normal.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1268,22 +1366,22 @@ This means that if you stop calling <a href="#_runpendinghandlers">RunPendingHan
 <div class="title">Note</div>
 </td>
 <td class="content">
-This will remove the authenticated user from the local device. Any UGC they have installed will be uninstalled, if no other Local Profiles have authenticated users that are currently subscribed to it.
+A call to <a href="#_clearuserdataasync">ClearUserDataAsync</a> removes the authenticated user from the local device. Any installed content is removed from local storage if no other Local Profiles contain authenticated users with active subscriptions to it.
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>If you&#8217;d like to simply switch which authenticated user is currently being used, without uninstalling, or add a new authenticated user to the local system, simply switch to another Local Profile by calling <a href="#_shutdownasync">ShutdownAsync</a> and then re-initializing via <a href="#_initializeasync">InitializeAsync</a>, specifying a different Local Profile name in the initialization parameters you supply.</p>
+<p>To add a newly authenticated user or switch to one already-authenticated without removing the current one, swap to another Local Profile by calling <a href="#_shutdownasync">ShutdownAsync</a>, then re-initialize via <a href="#_initializeasync">InitializeAsync</a> specifying a different Local Profile name in the initialization parameters you supply.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_error_handling">Error handling</h4>
 <div class="paragraph">
-<p>Many functions in the SDK&#8217;s public interface either return, or provide as the first parameter in a callback, a <a href="#ErrorCode">[ErrorCode]</a> value. This is essentially a numeric error code with a category and an associated string message.</p>
+<p>Callback functions in the SDK either return a value or provide an <a href="#ErrorCode">[ErrorCode]</a> value. It is a numeric error code with a category and an associated string message.</p>
 </div>
 <div class="paragraph">
-<p>The SDK doesn&#8217;t attempt to predict what your error-handling logic or requirements are: instead, we return the error code to you so you can decide what to do. For instance, if you call a function and receive an error code <code>ec == Modio::HttpError::CannotOpenConnection</code>, do you want to close down the SDK? Retry again according to custom back-off logic? That decision is left to the consuming application.</p>
+<p>The SDK doesn&#8217;t attempt to predict what your error-handling logic or requirements are. For example, if you call a function and receive an error code <code>ec == Modio::HttpError::CannotOpenConnection</code>, your application could potentially handle this by shutting down the SDK. Another application, however, might wish to retry after an interval determined by its own internal logic. As a result, the SDK defers to your application to decide how to handle errors for the functions you call.</p>
 </div>
 <div class="paragraph">
 <p>For more details on the error codes and how to inspect their values, please see <a href="#_sdk_quick_start_error_handling">SDK quick-start: Error Handling</a> and <a href="#ErrorCode">[ErrorCode]</a>.</p>
@@ -1292,7 +1390,7 @@ This will remove the authenticated user from the local device. Any UGC they have
 <div class="sect3">
 <h4 id="_mod_data_directory">Mod Data Directory</h4>
 <div class="paragraph">
-<p>The plugin stores mods in a game-specific directory in the following directory by default:</p>
+<p>The plugin stores mods in a game-specific directory in the following path by default:</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -1300,14 +1398,12 @@ This will remove the authenticated user from the local device. Any UGC they have
 <col style="width: 33.3333%;">
 <col style="width: 33.3334%;">
 </colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Windows</th>
-<th class="tableblock halign-left valign-top">Linux</th>
-<th class="tableblock halign-left valign-top">OSX</th>
-</tr>
-</thead>
 <tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Windows</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Linux</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OSX</p></td>
+</tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>${FolderID_Public}/mod.io</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">TBD</p></td>
@@ -1323,10 +1419,10 @@ This will remove the authenticated user from the local device. Any UGC they have
 <li>
 <p>Globally for a system account</p>
 <div class="paragraph">
-<p>On first run of a game using the plugin, <code>${FOLDERID_LocalAppData}/mod.io/globalsettings.json</code> will be created.</p>
+<p>On the first run of a game using the plugin, <code>${FolderID_LocalAppData}/mod.io/globalsettings.json</code> will be created.</p>
 </div>
 <div class="paragraph">
-<p>This JSON object contains a <code>RootLocalDataPath</code> element - changing the string here to a valid path on disk will globally redirect the mod installation directory for <strong>ALL</strong> games using the mod.io UE4 plugin or native SDK for the current system account.</p>
+<p>This JSON object contains a <code>RootLocalDataPath</code> element. A change to this string to a valid path on disk will globally redirect the mod installation directory for <strong>ALL</strong> games using the mod.io SDK for the current system account (it also includes the Unreal Engine 4 plugin).</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1335,7 +1431,19 @@ This will remove the authenticated user from the local device. Any UGC they have
 <div class="title">Note</div>
 </td>
 <td class="content">
-Changing this value while the SDK is initialized is not supported and behaviour is undefined.
+Changing this value while the SDK is initialized is not supported and behavior is undefined.
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Consider that the mod.io SDK configuration folder is different from that where mod metadata and files stored.
 </td>
 </tr>
 </table>
@@ -1344,7 +1452,7 @@ Changing this value while the SDK is initialized is not supported and behaviour 
 <li>
 <p>Per-Local Profile override</p>
 <div class="paragraph">
-<p>Per-game, Local Profile-specific settings are stored in <code>${FOLDERID_LocalAppData}/mod.io/${GameId}/${Local Profile Name}/user.json</code>.</p>
+<p>Per-game, Local Profile-specific settings are stored in <code>${FolderID_LocalAppData}/mod.io/${Game_ID}/${Local_Profile_Name}/user.json</code>.</p>
 </div>
 <div class="paragraph">
 <p><strong>Adding</strong> a <code>RootLocalDataPath</code> element to this file will redirect the mod installation directory for this specific game only, for the current Local Profile. Removing this value will cause the game to revert back to the global value in <code>globalsettings.json</code>.</p>
@@ -1356,33 +1464,63 @@ Changing this value while the SDK is initialized is not supported and behaviour 
 </div>
 </div>
 <div class="sect2">
+<h3 id="quick-start">SDK quick-start</h3>
+<div class="paragraph">
+<p>The following guides are provided to help you through the basic functions of the SDK as described in <a href="#_sdk_structure_and_concepts">SDK structure and concepts</a>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="#_sdk_quick_start_initialization_and_teardown">SDK quick-start: Initialization and Teardown</a></p>
+</li>
+<li>
+<p><a href="#_sdk_quick_start_user_authentication">SDK quick-start: User Authentication</a></p>
+</li>
+<li>
+<p><a href="#_sdk_quick_start_browsing_available_mods">SDK quick-start: Browsing available mods</a></p>
+</li>
+<li>
+<p><a href="#_sdk_quick_start_mod_management_and_subscriptions">SDK quick-start: Mod management and subscriptions</a></p>
+</li>
+<li>
+<p><a href="#_sdk_quick_start_error_handling">SDK quick-start: Error Handling</a></p>
+</li>
+</ul>
+</div>
+<hr>
+</div>
+<div class="sect2">
 <h3 id="_sdk_quick_start_initialization_and_teardown">SDK quick-start: Initialization and Teardown</h3>
 <div class="paragraph">
-<p>As mentioned in <a href="#_maintaining_the_sdk_event_loop">Maintaining the SDK event loop</a>, the SDK&#8217;s internal event loop requires care and attention in the form of <a href="#_runpendinghandlers">RunPendingHandlers</a>.
-For best performance it should be called at least once per frame, so it should either go into your project&#8217;s main loop or into a <code>tick</code>-style function on an appropriate controller/manager object.</p>
+<p>As mentioned in <a href="#_maintaining_the_sdk_event_loop">Maintaining the SDK event loop</a>, the SDK&#8217;s internal event loop requires care and attention in the form of <a href="#_runpendinghandlers">RunPendingHandlers</a>.</p>
+</div>
+<div class="paragraph">
+<p>For optimal execution, <a href="#_runpendinghandlers">RunPendingHandlers</a> should be called at least once per frame. It could be located into your project&#8217;s main loop or into a <code>tick</code>-style function on an appropriate controller/manager object.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="cpp"><span class="k">while</span><span class="p">(</span><span class="n">bGameIsRunning</span><span class="p">)</span>
+<pre class="rouge highlight"><code data-lang="cpp"><span class="k">while</span><span class="p">(</span><span class="n">bGameIsRunning</span> <span class="o">==</span> <span class="nb">true</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="n">Modio</span><span class="o">::</span><span class="n">RunPendingHandlers</span><span class="p">();</span>
+    <span class="c1">//other stuff</span>
+   <span class="n">Modio</span><span class="o">::</span><span class="n">RunPendingHandlers</span><span class="p">();</span>
     <span class="c1">//other stuff</span>
 <span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>When you are ready to initialize the SDK for the current user, you&#8217;ll need to call <a href="#_initializeasync">InitializeAsync</a>, passing in your product&#8217;s mod.io ID, your API key, the Local Profile name, and a callback/handler so you know when the SDK is initialized correctly.</p>
+<p>When you are ready to initialize the SDK for the current user, you&#8217;ll need to call <a href="#_initializeasync">InitializeAsync</a>, passing in your product&#8217;s mod.io ID, your API key, the Local Profile name, and a callback/handler so you know when the SDK is initialized correctly.  Note that <a href="#_initializeasync">InitializeAsync</a>'s callback will be invoked after calling <a href="#_runpendinghandlers">RunPendingHandlers</a> from your project&#8217;s main loop.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="cpp"><span class="c1">//represents some external state so we know that the SDK is good to go - could be anything</span>
+<pre class="rouge highlight"><code data-lang="cpp"><span class="c1">//represents some external state so we know that the SDK is good to go</span>
 <span class="n">Modio</span><span class="o">::</span><span class="n">Optional</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span> <span class="n">SDKInitialized</span><span class="p">;</span>
 
 <span class="n">Modio</span><span class="o">::</span><span class="n">InitializeOptions</span> <span class="n">Options</span><span class="p">;</span>
 <span class="n">Options</span><span class="p">.</span><span class="n">APIKey</span> <span class="o">=</span> <span class="n">Modio</span><span class="o">::</span><span class="n">ApiKey</span><span class="p">(</span><span class="n">YOUR_API_KEY</span><span class="p">);</span>
-<span class="n">Options</span><span class="p">.</span><span class="n">GameEnvironment</span> <span class="o">=</span> <span class="n">Modio</span><span class="o">::</span><span class="n">Environment</span><span class="o">::</span><span class="n">Test</span><span class="p">;</span>
 <span class="n">Options</span><span class="p">.</span><span class="n">GameID</span> <span class="o">=</span> <span class="n">Modio</span><span class="o">::</span><span class="n">GameID</span><span class="p">(</span><span class="n">YOUR_GAME_ID</span><span class="p">);</span>
-<span class="n">Options</span><span class="p">.</span><span class="n">User</span> <span class="o">=</span> <span class="n">LocalProfileName</span><span class="p">;</span>
+<span class="n">Options</span><span class="p">.</span><span class="n">User</span> <span class="o">=</span> <span class="s">"LocalProfileName"</span><span class="p">;</span>
+<span class="n">Options</span><span class="p">.</span><span class="n">PortalInUse</span> <span class="o">=</span> <span class="n">Modio</span><span class="o">::</span><span class="n">Portal</span><span class="o">::</span><span class="n">None</span><span class="p">;</span>
+<span class="n">Options</span><span class="p">.</span><span class="n">GameEnvironment</span> <span class="o">=</span> <span class="n">Modio</span><span class="o">::</span><span class="n">Environment</span><span class="o">::</span><span class="n">Test</span><span class="p">;</span>
 
 <span class="n">Modio</span><span class="o">::</span><span class="n">InitializeAsync</span><span class="p">(</span><span class="n">Options</span><span class="p">,</span> <span class="p">[</span><span class="o">&amp;</span><span class="n">SDKInitialized</span><span class="p">](</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span> <span class="n">ec</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
@@ -1443,7 +1581,7 @@ For best performance it should be called at least once per frame, so it should e
 <div class="sect2">
 <h3 id="_sdk_quick_start_user_authentication">SDK quick-start: User Authentication</h3>
 <div class="paragraph">
-<p>Mod.io provides two ways for users to create an account to use the service: email authentication, and single sign on (SSO) through an external authentication partner. The flow for these is slightly different.</p>
+<p>Mod.io provides two ways for users to create an account to use the service: email authentication and single sign on (SSO) through an external authentication partner. The flow for these is slightly different.</p>
 </div>
 <div class="sect3">
 <h4 id="_email_authentication">Email authentication</h4>
@@ -1529,7 +1667,11 @@ For best performance it should be called at least once per frame, so it should e
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="cpp"><span class="n">UserParams</span><span class="p">.</span><span class="n">bUserHasAcceptedTerms</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+<pre class="rouge highlight"><code data-lang="cpp"><span class="n">Modio</span><span class="o">::</span><span class="n">AuthenticationParams</span> <span class="n">UserParams</span><span class="p">;</span>
+<span class="n">UserParams</span><span class="p">.</span><span class="n">AuthToken</span> <span class="o">=</span> <span class="s">"AuthenticationToken"</span><span class="p">;</span>
+<span class="n">UserParams</span><span class="p">.</span><span class="n">UserEmail</span> <span class="o">=</span> <span class="s">"UserEmail"</span><span class="p">;</span>
+<span class="n">UserParams</span><span class="p">.</span><span class="n">bUserHasAcceptedTerms</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+
 <span class="n">Modio</span><span class="o">::</span><span class="n">AuthenticateUserExternalAsync</span><span class="p">(</span><span class="n">UserParams</span><span class="p">,</span><span class="n">Provider</span><span class="p">,[</span><span class="n">Provider</span><span class="p">,</span> <span class="n">Language</span><span class="p">](</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span> <span class="n">ec</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
@@ -1607,29 +1749,69 @@ For best performance it should be called at least once per frame, so it should e
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_sdk_quick_start_mod_subscriptions_and_management">SDK quick-start: Mod subscriptions and management</h3>
+<h3 id="_sdk_quick_start_mod_management_and_subscriptions">SDK quick-start: Mod management and subscriptions</h3>
 <div class="paragraph">
-<p>So you&#8217;ve shown the user some mods based on a query they&#8217;ve submitted through your UI, and the user has picked one that they&#8217;d like to install. How do you begin the installation process, and once the mod is installed how do you know what files to be loading into memory?</p>
+<p>So you&#8217;ve shown the user some mods based on a query they&#8217;ve submitted through your UI. The user has picked one that they&#8217;d like to install. This section explains how to trigger an installation process and the files downloaded to the filesystem.</p>
+</div>
+<div class="sect3">
+<h4 id="_installation_management_and_mod_filepaths">Installation management and mod filepaths</h4>
+<div class="paragraph">
+<p>A subscription marks a mod as requiring installation, whereas an unsubscription indicates uninstallation. But, how do you actually control when the SDK <strong>does</strong> those things? After all, you don&#8217;t want a mod to be uninstalled after your main program has loaded those files into memory, locking them from deletion. Likewise, you probably don&#8217;t want to be using networking or processor resources during gameplay for downloading mods. In order to give you control over when these processes occur, without forcing you to shut down the SDK entirely, you can call <a href="#_enablemodmanagement">EnableModManagement</a> and <a href="#_disablemodmanagement">DisableModManagement</a>.</p>
+</div>
+<div class="paragraph">
+<p>In order to display a notification to your users when a mod is finished installing or updating, <a href="#_enablemodmanagement">EnableModManagement</a> asks you to provide a callback. Because <a href="#_enablemodmanagement">EnableModManagement</a> is <strong>not an async</strong> function (ie it doesn&#8217;t end with *Async), the function handler operates differently compared to other asynchronous results callbacks you use elsewhere in the SDK. A handler given to this function will be held by the SDK until a corresponding call to <a href="#_disablemodmanagement">DisableModManagement</a> or <a href="#_shutdownasync">ShutdownAsync</a> takes place. The handler will be invoked every time a mod is automatically installed, updated, or uninstalled by the SDK&#8217;s internal event loop.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="cpp"><span class="n">Modio</span><span class="o">::</span><span class="n">EnableModManagement</span><span class="p">([](</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModManagementEvent</span> <span class="n">ModEvent</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">ModEvent</span><span class="p">.</span><span class="n">Status</span> <span class="o">&amp;&amp;</span> <span class="n">ModEvent</span><span class="p">.</span><span class="n">Event</span> <span class="o">==</span> <span class="n">Modio</span><span class="o">::</span><span class="n">ModManagementEvent</span><span class="o">::</span><span class="n">EventType</span><span class="o">::</span><span class="n">Installed</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"Mod with ID: &lt;&lt; ModEvent.ID &lt;&lt; "</span> <span class="n">is</span> <span class="n">installed</span><span class="s">" &lt;&lt; std::endl;</span><span class="err">
+</span><span class="s">    }</span><span class="err">
+</span><span class="s">    else {</span><span class="err">
+</span><span class="s">        std::cout &lt;&lt; "</span><span class="n">Mod</span> <span class="n">with</span> <span class="n">ID</span><span class="o">:</span> <span class="o">&lt;&lt;</span> <span class="n">ModEvent</span><span class="p">.</span><span class="n">ID</span> <span class="o">&lt;&lt;</span> <span class="s">" failed to install: "</span> <span class="o">&lt;&lt;</span> <span class="n">ModEvent</span><span class="p">.</span><span class="n">Status</span><span class="p">.</span><span class="n">message</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="c1">//////////</span>
+<span class="c1">//Sometime later: check if there's a mod being installed, or more mods that require installation pending</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">Modio</span><span class="o">::</span><span class="n">IsModManagementBusy</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="c1">//This will reset any in-progress installations to pending, so we're only calling it if nothing's being processed</span>
+    <span class="n">Modio</span><span class="o">::</span><span class="n">DisableModManagement</span><span class="p">();</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_mod_subscriptions">Mod subscriptions</h4>
 <div class="paragraph">
-<p>A user indicates that they want to have a mod installed by 'subscribing' to it. Subscriptions are stored on the mod.io servers and associated to a user&#8217;s mod.io account.</p>
-</div>
-<div class="paragraph">
-<p>When a user 'unsubscribes' to a mod, they&#8217;re indicating they&#8217;d like to have that mod uninstalled from any device they&#8217;re logged in on.</p>
+<p>A user indicates they want to have a mod installed by 'subscribing' to it. The mod.io servers stores subscriptions and associates them with a particular user&#8217;s mod.io account. When a user 'unsubscribes' to a mod, they indicate that mod should be uninstalled from any device they&#8217;re logged in on.</p>
 </div>
 <div class="paragraph">
 <p>The API for managing subscriptions is simple and consists of a call to either <a href="#_subscribetomodasync">SubscribeToModAsync</a> or <a href="#_unsubscribefrommodasync">UnsubscribeFromModAsync</a> with the ID of the mod in question and a callback to receive the status of the request:</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+In order to subscribe to a mod, it is necessary to call <a href="#_enablemodmanagement">EnableModManagement</a> beforehand.
+</td>
+</tr>
+</table>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="cpp"><span class="c1">//Subscription</span>
-<span class="n">Modio</span><span class="o">::</span><span class="n">SubscribeToModAsync</span><span class="p">(</span><span class="n">SomeModId</span><span class="p">,</span> <span class="p">[](</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span> <span class="n">ec</span><span class="p">)</span>
+<span class="n">Modio</span><span class="o">::</span><span class="n">SubscribeToModAsync</span><span class="p">(</span><span class="n">ModID</span><span class="p">,</span> <span class="p">[](</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span> <span class="n">ec</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="c1">//Didn't subscribe, show message to user</span>
+        <span class="c1">//Didn't subscribe, show a message to the user</span>
     <span class="p">}</span>
     <span class="k">else</span>
     <span class="p">{</span>
@@ -1638,15 +1820,15 @@ For best performance it should be called at least once per frame, so it should e
 <span class="p">});</span>
 
 <span class="c1">//Unsubscription</span>
-<span class="n">Modio</span><span class="o">::</span><span class="n">UnsubscribeFromModAsync</span><span class="p">(</span><span class="n">SomeModId</span><span class="p">,</span> <span class="p">[](</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span> <span class="n">ec</span><span class="p">)</span>
+<span class="n">Modio</span><span class="o">::</span><span class="n">UnsubscribeFromModAsync</span><span class="p">(</span><span class="n">ModID</span><span class="p">,</span> <span class="p">[](</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span> <span class="n">ec</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="c1">//Couldn't unsub, show error</span>
+        <span class="c1">//Couldn't unsubscribe, show error</span>
     <span class="p">}</span>
     <span class="k">else</span>
     <span class="p">{</span>
-        <span class="c1">//Server records unsubscription, mod won't be installed or available for this user any longer</span>
+        <span class="c1">//Server records unsubscription to remove the user's association to this mod</span>
     <span class="p">}</span>
 <span class="p">});</span></code></pre>
 </div>
@@ -1654,7 +1836,7 @@ For best performance it should be called at least once per frame, so it should e
 <div class="sect4">
 <h5 id="_external_subscription_changes">External subscription changes</h5>
 <div class="paragraph">
-<p>Because the mod.io service is available as a website as well as integration within your applications, users can manage their subscriptions (and therefore installations) outside of your application. This means that we need to be able to query the server for any external subscription changes. To do this, you will need to use <a href="#_fetchexternalupdatesasync">FetchExternalUpdatesAsync</a> to synchronise the server state with the SDK&#8217;s local subscriptions:</p>
+<p>Remember that the mod.io service is available as a website besides the integration within your application. Users can manage their subscriptions (and therefore installations) outside of your game. Consequently, you must query the server for any external subscription changes. To do this, you will use <a href="#_fetchexternalupdatesasync">FetchExternalUpdatesAsync</a> to synchronise the server state with the SDK&#8217;s local subscriptions:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1664,7 +1846,7 @@ For best performance it should be called at least once per frame, so it should e
         <span class="c1">//Couldn't fetch external subscription data, handle error</span>
     <span class="p">}</span>
     <span class="p">{</span>
-        <span class="c1">//Don't need to do anything here as such, the SDK's internal state has been synchronised</span>
+        <span class="c1">//The SDK's internal state synchronised. This is an acknowledgment of success</span>
     <span class="p">}</span>
 <span class="p">});</span></code></pre>
 </div>
@@ -1676,7 +1858,7 @@ For best performance it should be called at least once per frame, so it should e
 <div class="title">Note</div>
 </td>
 <td class="content">
-You should call <a href="#_fetchexternalupdatesasync">FetchExternalUpdatesAsync</a> at particular times in your application when you want to ensure that the state is up-to-date - the SDK will apply rate-limiting internally if you try to call it too often.
+You should call <a href="#_fetchexternalupdatesasync">FetchExternalUpdatesAsync</a> at particular times in your application when you want to ensure that the state is up-to-date. The mod.io SDK will apply rate-limiting internally if you try to call it too often.
 </td>
 </tr>
 </table>
@@ -1686,7 +1868,7 @@ You should call <a href="#_fetchexternalupdatesasync">FetchExternalUpdatesAsync<
 <h5 id="_checking_the_user_subscription_list">Checking the user subscription list</h5>
 <div class="paragraph">
 <p>In order to see which mods the user has subscribed to, call <a href="#_queryusersubscriptions">QueryUserSubscriptions</a> to retrieve a collection of <a href="#ModCollectionEntry">[ModCollectionEntry]</a> objects, one for each subscribed mod.
-Each of these objects contains the mod&#8217;s state, profile information, ID, and other data, suitable for showing users a list of their subscriptions.</p>
+Each of these objects contains the mod&#8217;s state, profile information, ID, and other data suitable for showing users a list of their subscriptions.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1695,55 +1877,27 @@ Each of these objects contains the mod&#8217;s state, profile information, ID, a
 <div class="title">Note</div>
 </td>
 <td class="content">
-This collection includes mods that are still in the process of being installed! Make sure to check the result of <a href="#ModCollectionEntry::GetModState">[ModCollectionEntry::GetModState]</a> before trying to load files from the mods in this collection, or alternatively use <a href="#_queryuserinstallations">QueryUserInstallations</a> as described in <a href="#_retrieving_mod_directory_paths_for_loading">Retrieving mod directory paths for loading</a>.
+This collection includes mods that are still in the process of being installed. Make sure to check the result of <a href="#ModCollectionEntry::GetModState">[ModCollectionEntry::GetModState]</a> before trying to load files from the mods in this collection. Alternatively, use <a href="#_queryuserinstallations">QueryUserInstallations</a> as described in <a href="#Retrieving mod directory paths for loading">[Retrieving mod directory paths for loading]</a>.
 </td>
 </tr>
 </table>
 </div>
 </div>
-</div>
-<div class="sect3">
-<h4 id="_installation_management_mod_paths">Installation management, mod paths</h4>
-<div class="paragraph">
-<p>So a subscription marks a mod as requiring installation, and an unsubscription indicates uninstallation, but how do you actually control when the SDK <strong>does</strong> those things? After all, you don&#8217;t want a mod to be uninstalled after your main program has loaded those files into memory, locking them from deletion. Likewise, you probably don&#8217;t want to be using networking or processor resources during gameplay for downloading mods. In order to give you control over when these processes occur, without forcing you to shut down the SDK entirely, you can call <a href="#_enablemodmanagement">EnableModManagement</a> and <a href="#_disablemodmanagement">DisableModManagement</a>.</p>
-</div>
-<div class="paragraph">
-<p>In order to display a notification to your users when a mod is finished installing or updating, <a href="#_enablemodmanagement">EnableModManagement</a> asks you to provide it with a callback. Because <a href="#_enablemodmanagement">EnableModManagement</a> is not an async function (ie it doesn&#8217;t end with *Async), the callback operates differently to asynchronous result callbacks you use elsewhere in the SDK. A callback given to this function will be held by the SDK until a corresponding call to <a href="#_disablemodmanagement">DisableModManagement</a> or <a href="#_shutdownasync">ShutdownAsync</a>, and the callback will be invoked every time a mod is automatically installed, updated, or uninstalled by the SDK&#8217;s internal event loop.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="cpp"><span class="n">Modio</span><span class="o">::</span><span class="n">EnableModManagement</span><span class="p">([](</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModManagementEvent</span> <span class="n">ModEvent</span><span class="p">)</span> <span class="p">{</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">ModEvent</span><span class="p">.</span><span class="n">Status</span> <span class="o">&amp;&amp;</span> <span class="n">ModEvent</span><span class="p">.</span><span class="n">Event</span> <span class="o">==</span> <span class="n">Modio</span><span class="o">::</span><span class="n">ModManagementEvent</span><span class="o">::</span><span class="n">EventType</span><span class="o">::</span><span class="n">Installed</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">fmt</span><span class="o">::</span><span class="n">print</span><span class="p">(</span><span class="s">"Mod with id {} failed to install : {}"</span><span class="p">,</span> <span class="n">ModEvent</span><span class="p">.</span><span class="n">ID</span><span class="p">,</span> <span class="n">ModEvent</span><span class="p">.</span><span class="n">Status</span><span class="p">.</span><span class="n">message</span><span class="p">());</span>
-    <span class="p">}</span>
-
-<span class="p">});</span>
-
-
-<span class="c1">//Some time later: check if there's a mod being installed, or more mods that require installation pending</span>
-<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">Modio</span><span class="o">::</span><span class="n">IsModManagementBusy</span><span class="p">())</span>
-<span class="p">{</span>
-    <span class="c1">//This will reset any in-progress installations to pending, so we're only calling it if nothing's being processed</span>
-    <span class="n">Modio</span><span class="o">::</span><span class="n">DisableModManagement</span><span class="p">();</span>
-<span class="p">}</span></code></pre>
-</div>
-</div>
 <div class="sect4">
-<h5 id="_retrieving_mod_directory_paths_for_loading">Retrieving mod directory paths for loading</h5>
+<h5 id="_retrieving_mod_directory_filepaths_for_loading">Retrieving mod directory filepaths for loading</h5>
 <div class="paragraph">
-<p>So now we have the user picking mods and marking them for installation, we&#8217;re enabling mod management at a point where we don&#8217;t mind the SDK changing the filesystem, and mods are being installed by the SDK, we now need to know where they are on disk, otherwise you can&#8217;t load them into your game!</p>
+<p>Once the user can pick mods and subscribe to them (mark them for installation), mod.io SDK management can change the filesystem and retrieve mods. We now need to know where they are on the filesystem to load them into your gameplay.</p>
 </div>
 <div class="paragraph">
-<p>The easiest way to do this is by using <a href="#_queryuserinstallations">QueryUserInstallations</a>. This function allows you to specify if you want to include outdated mods or not, and will return a collection of <a href="#ModCollectionEntry">[ModCollectionEntry]</a> objects that you can query for folder paths you can use to load files into your title.</p>
+<p>The easiest way to do this is by using <a href="#_queryuserinstallations">QueryUserInstallations</a>. This function allows you to specify if you want to include outdated mods or not. It returns a collection of <a href="#ModCollectionEntry">[ModCollectionEntry]</a> objects that you can query for folder paths you can use to load files into your title.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="cpp"><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Modio</span><span class="o">::</span><span class="n">filesystem</span><span class="o">::</span><span class="n">path</span><span class="o">&gt;</span> <span class="n">ModPaths</span><span class="p">;</span>
 
-<span class="c1">//This will iterate over all the installed mods that are up-to-date</span>
-<span class="k">for</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModID</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">ModCollectionEntry</span><span class="o">&gt;&amp;</span> <span class="n">Entry</span> <span class="o">:</span> <span class="n">Modio</span><span class="o">::</span><span class="n">QueryUserInstallations</span><span class="p">())</span>
+<span class="c1">//It iterates over all the installed mods that are up-to-date</span>
+<span class="kt">bool</span> <span class="n">bIncludeOutdatedMods</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModID</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">ModCollectionEntry</span><span class="o">&gt;&amp;</span> <span class="n">Entry</span> <span class="o">:</span> <span class="n">Modio</span><span class="o">::</span><span class="n">QueryUserInstallations</span><span class="p">(</span><span class="n">bIncludeOutdatedMods</span><span class="p">))</span>
 <span class="p">{</span>
     <span class="n">ModPaths</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">Entry</span><span class="p">.</span><span class="n">second</span><span class="p">().</span><span class="n">GetPath</span><span class="p">());</span>
 <span class="p">}</span>
@@ -1762,7 +1916,7 @@ This collection includes mods that are still in the process of being installed! 
 <div class="sect2">
 <h3 id="_sdk_quick_start_error_handling">SDK quick-start: Error Handling</h3>
 <div class="paragraph">
-<p>Many functions in the SDK, especially asynchronous functions either return a Modio::ErrorCode, or else invoke your passed-in callback with a Modio::ErrorCode as the first parameter.</p>
+<p>Mayority of mod.io SDK functions return a Modio::ErrorCode. In particular, asynchronous callbacks execute with a Modio::ErrorCode as the first parameter.</p>
 </div>
 <div class="sect3">
 <h4 id="_checking_for_errors">Checking for errors</h4>
@@ -1789,7 +1943,7 @@ This collection includes mods that are still in the process of being installed! 
 <p>Sometimes, this information will be all that is required, just a simple 'success/fail' that you can handle.</p>
 </div>
 <div class="paragraph">
-<p>In many cases, however, you will want to perform some degree of inspection on an ErrorCode in order to determine specific information about that error - if nothing else, so that you can display a reason for the failure to the end user.</p>
+<p>In many cases, however, you will want to perform some degree of inspection on an ErrorCode to determine specific information about that error. If nothing else you can display a reason for the failure to the end user.</p>
 </div>
 <div class="sect4">
 <h5 id="_direct_queries">Direct Queries</h5>
@@ -1800,7 +1954,7 @@ This collection includes mods that are still in the process of being installed! 
 <div class="content">
 <pre class="rouge highlight"><code data-lang="cpp"><span class="k">if</span> <span class="p">(</span><span class="n">ec</span> <span class="o">==</span> <span class="n">Modio</span><span class="o">::</span><span class="n">FilesystemError</span><span class="o">::</span><span class="n">InsufficientSpace</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="c1">//Handle insufficient space by deleting some files, or something else</span>
+    <span class="c1">//Handle insufficient space by possibly deleting some files.</span>
 <span class="p">}</span>
 <span class="k">else</span>
 <span class="p">{</span>
@@ -1815,11 +1969,11 @@ This collection includes mods that are still in the process of being installed! 
 <div class="content">
 <pre class="rouge highlight"><code data-lang="cpp"><span class="k">if</span> <span class="p">(</span><span class="n">ec</span> <span class="o">==</span> <span class="n">Modio</span><span class="o">::</span><span class="n">FilesystemError</span><span class="o">::</span><span class="n">InsufficientSpace</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="c1">//Handle insufficient space by deleting some files, or something else</span>
+    <span class="c1">//Handle insufficient space by possibly deleting some files.</span>
 <span class="p">}</span>
 <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">ec</span> <span class="o">==</span> <span class="n">Modio</span><span class="o">::</span><span class="n">FilesystemError</span><span class="o">::</span><span class="n">NoPermission</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="c1">//Handle permissions error by asking the user to re-run as admin, or prompt for elevation, or similar</span>
+    <span class="c1">//Handle permissions error by asking the user to re-run as admin, or prompt for priviledge elevation.</span>
 <span class="p">}</span>
 <span class="k">else</span>
 <span class="p">{</span>
@@ -1828,23 +1982,11 @@ This collection includes mods that are still in the process of being installed! 
 </div>
 </div>
 <div class="paragraph">
-<p>This isn&#8217;t ideal though, for a number of reasons:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>It&#8217;s quite verbose</p>
-</li>
-<li>
-<p>Doesn&#8217;t check for semantic equivalency, only literal equivalency (some hypothetical other error that means the same thing, would return false because the codes don&#8217;t match)</p>
-</li>
-<li>
-<p>Requires you to handle each individual case regardless of whether you need to or not</p>
-</li>
-<li>
-<p>Scales poorly if there are a number of error codes with equivalent semantics in this context</p>
-</li>
-</ul>
+<p>This isn&#8217;t ideal though, here are some reasons:
+* It&#8217;s considerably verbose
+* Doesn&#8217;t check for semantic equivalency, only literal equivalency. In other words, some other error that derive from a similar issues, would return false because the codes don&#8217;t match
+* It requires you to handle each case regardless of whether you need to or not
+* Scales poorly if there are several error codes with equivalent semantics in this context.</p>
 </div>
 <div class="paragraph">
 <p>We can address these by using so-called 'semantic queries' against the error code rather than directly comparing numerical values.</p>
@@ -1853,7 +1995,7 @@ This collection includes mods that are still in the process of being installed! 
 <div class="sect4">
 <h5 id="_semantic_queries">Semantic Queries</h5>
 <div class="paragraph">
-<p>The SDK provides a function with a number of overloads that you can use to query for the semantic meaning of an ErrorCode.</p>
+<p>The SDK provides a function with several overloads that you can use to query for the semantic meaning of an ErrorCode.</p>
 </div>
 <div class="paragraph">
 <p>Firstly, you can query if an ErrorCode is equivalent to a specific raw enum value:</p>
@@ -1879,18 +2021,15 @@ This collection includes mods that are still in the process of being installed! 
 <span class="p">}</span>
 <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCodeMatches</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">HttpError</span><span class="o">::</span><span class="n">ServerClosedConnection</span><span class="p">))</span>
 <span class="p">{</span>
-    <span class="c1">// Server unexpectedly closed the connection</span>
+    <span class="c1">//Server unexpectedly closed the connection</span>
 <span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>This still requires, however, knowledge of the different types of HTTP errors. In your application, though, you probably don&#8217;t actually need to handle them differently. The semantics of networking errors are largely 'try the function again later'.</p>
+<p>This still requires, however, knowledge of the different types of HTTP errors. In your application, though, you probably don&#8217;t need to handle them differently. The semantics of networking errors are largely 'try the function again later'.</p>
 </div>
 <div class="paragraph">
-<p>This is where the second overload of <a href="#ErrorCodeMatches">[ErrorCodeMatches]</a> comes in.</p>
-</div>
-<div class="paragraph">
-<p>It allows you to query if the error satisfies a particular condition, such as 'does this code represent some kind of networking error':</p>
+<p>This is where the second overload of <a href="#ErrorCodeMatches">[ErrorCodeMatches]</a> comes in. It allows you to query if the error satisfies a particular condition, such as 'does this code represent some kind of networking error':</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1906,30 +2045,30 @@ This collection includes mods that are still in the process of being installed! 
 </div>
 </div>
 <div class="paragraph">
-<p>By querying if the error meets a specific condition, you can focus on handling a family of errors (in this case, network transmission errors) without needing to deal with individual errors within that grouping. No more manually checking against individual HttpError values, just a single query.</p>
+<p>By querying if the error meets a specific condition, you can focus on handling a family of errors (in this case, network transmission errors) without needing to deal with individual errors within that group. No more manually checking against individual HttpError values, just a single query.</p>
 </div>
 <div class="paragraph">
-<p>As a second example, when you ask the SDK to retrieve information about a specific mod, that mod ID might be invalid, or possibly even the mod could be deleted. Both of these result in an error, which you could handle like the following:</p>
+<p>As a second example, when you ask the SDK to retrieve information about a specific mod, that ModID might be invalid, or possibly even deleted. Both of these result in an error, which you could handle like the following:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="cpp"><span class="c1">// In Modio::GetModInfoAsync callback</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCodeMatches</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span><span class="n">Modio</span><span class="o">::</span><span class="n">ApiError</span><span class="o">::</span><span class="n">RequestedModNotFound</span><span class="p">))</span>
+<pre class="rouge highlight"><code data-lang="cpp"><span class="c1">// Inside a Modio::GetModInfoAsync callback</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCodeMatches</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">ApiError</span><span class="o">::</span><span class="n">RequestedModNotFound</span><span class="p">))</span>
 <span class="p">{</span>
-    <span class="c1">//The mod ID wasn't valid, we couldn't find it</span>
+    <span class="c1">//The ModID wasn't valid, we couldn't find it</span>
 <span class="p">}</span>
 <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCodeMatches</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">ApiError</span><span class="o">::</span><span class="n">RequestedModDeleted</span><span class="p">))</span>
 <span class="p">{</span>
-    <span class="c1">//The mod ID used to be valid, but the mod was deleted</span>
+    <span class="c1">//The ModID used to be valid, but the mod was deleted</span>
 <span class="p">}</span>
 <span class="k">else</span>
 <span class="p">{</span>
-    <span class="c1">// ...</span>
+    <span class="c1">// Some other error...</span>
 <span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>However, you may not really care about the reasons the mod couldn&#8217;t be looked up - just that the mod information couldn&#8217;t be returned.</p>
+<p>However, you may not care about the reasons the mod couldn&#8217;t be retrieved just that the mod information did not return a valid object.</p>
 </div>
 <div class="paragraph">
 <p>As a result, you can query if the error code matches the <code>EntityNotFoundError</code> condition:</p>
@@ -1937,9 +2076,9 @@ This collection includes mods that are still in the process of being installed! 
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="cpp"><span class="c1">// In Modio::GetModInfoAsync callback</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCodeMatches</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorConditionTypes</span><span class="o">::</span><span class="n">EntityNotFoundError</span><span class="p">))</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCodeMatches</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">ErrorConditionTypes</span><span class="o">::</span><span class="n">EntityNotFoundError</span><span class="p">))</span>
 <span class="p">{</span>
-    <span class="c1">//For whatever reason, the mod couldn't be found. Handle appropriately.</span>
+    <span class="c1">//The mod couldn't be found. Handle appropriately.</span>
 <span class="p">}</span></code></pre>
 </div>
 </div>
@@ -1951,24 +2090,23 @@ This collection includes mods that are still in the process of being installed! 
 <div class="sect3">
 <h4 id="_putting_it_all_together">Putting it all together</h4>
 <div class="paragraph">
-<p>By combining queries against categories with queries against specific values, you can handle general families of errors at a single location with special-case clauses for a particular error as necessary:</p>
+<p>By combining queries of categories with queries of specific values, you can handle general families of errors at a single location with special-case clauses for a particular error as necessary:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="cpp"><span class="n">Modio</span><span class="o">::</span><span class="n">GetModInfoAsync</span><span class="p">(</span><span class="n">SomeModId</span><span class="p">,</span> <span class="p">[](</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span> <span class="n">ec</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModInfo</span><span class="o">&gt;</span> <span class="n">Info</span><span class="p">)</span>
+<pre class="rouge highlight"><code data-lang="cpp"><span class="n">Modio</span><span class="o">::</span><span class="n">GetModInfoAsync</span><span class="p">(</span><span class="n">ModID</span><span class="p">,</span> <span class="p">[](</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span> <span class="n">ec</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModInfo</span><span class="o">&gt;</span> <span class="n">Info</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
     <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCodeMatches</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">ErrorConditionTypes</span><span class="o">::</span><span class="n">NetworkError</span><span class="p">))</span> <span class="c1">// Does the code belong to the network error group?</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCodeMatches</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">ErrorConditionTypes</span><span class="o">::</span><span class="n">NetworkError</span><span class="p">))</span> <span class="c1">// NetworkError group</span>
         <span class="p">{</span>
-            <span class="c1">//Error code represents some kind of network error, ask the user to try again later</span>
+            <span class="c1">//Error code represents some network error kind. Possibly ask the user to try again later.</span>
         <span class="p">}</span>
-        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCodeMatches</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">ErrorConditionTypes</span><span class="o">::</span><span class="n">EntityNotFoundError</span><span class="p">))</span> <span class="c1">//Does the code belong to the 'not found' group?</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCodeMatches</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">ErrorConditionTypes</span><span class="o">::</span><span class="n">EntityNotFoundError</span><span class="p">))</span> <span class="c1">//Entity Not Found group</span>
         <span class="p">{</span>
-            <span class="c1">//We couldn't find that mod for whatever reason, this means that the list you're fetching the mod ID from is probably stale</span>
-            <span class="c1">//Call something here to fetch an updated version of the list from the server</span>
+            <span class="c1">//An mod entity is not located with this configuration. Therefore, the list you're fetching the ModID from is probably stale. A remedy could be to fetch an updated version of the list from the server.</span>
         <span class="p">}</span>
-        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCodeMatches</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">GenericError</span><span class="o">::</span><span class="n">SDKNotInitialized</span><span class="p">))</span> <span class="c1">// Is the code semantically equivalent to the specific error "SDK not initialized"?</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCodeMatches</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">GenericError</span><span class="o">::</span><span class="n">SDKNotInitialized</span><span class="p">))</span> <span class="c1">// SDK not initialized group</span>
         <span class="p">{</span>
             <span class="c1">//Your application is trying to call SDK functions without initializing the SDK first</span>
         <span class="p">}</span>
@@ -1980,7 +2118,7 @@ This collection includes mods that are still in the process of being installed! 
 <div class="sect3">
 <h4 id="_parameter_validation_errors">Parameter Validation Errors</h4>
 <div class="paragraph">
-<p>Some of the SDK functions may return errors that indicate a parameter or data validation failure. For these cases, the SDK parses the error response from the mod.io API and stores the information about which parameters failed validation until the next network request is performed. If an SDK function returns an error which matches <code>Modio::ErrorConditionTypes::InvalidArgsError</code>, you can call <a href="#_getlastvalidationerror">GetLastValidationError</a> in your callback to retrieve those errors and display appropriate feedback to the end user.</p>
+<p>Some of the SDK functions may return errors that indicate a parameter or data validation failure. For these cases, the SDK parses the error response from the mod.io API and stores the information about which parameters failed validation until the next network request executes. If an SDK function returns an error which matches <code>Modio::ErrorConditionTypes::InvalidArgsError</code>, you can call <a href="#_getlastvalidationerror">GetLastValidationError</a> in your callback to retrieve those errors and display appropriate feedback to the end-user.</p>
 </div>
 <hr>
 </div>
@@ -2385,11 +2523,11 @@ during that invocation</p></td>
 <h3 id="_enablemodmanagement">EnableModManagement</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span> <span class="n">EnableModManagement</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModManagementEvent</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span> <span class="n">EnableModManagement</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModManagementEvent</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">ModManagementHandler</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Enables the automatic management of installed mods on the system based on the user&#8217;s subscriptions. Does nothing if mod management is currently enabled.</p>
+<p>Enables the automatic management of installed mods on the system based on the user&#8217;s subscriptions. Does nothing if mod management is currently enabled. Note: this function does not behave like other "async" methods, given that its name does not include the word async.</p>
 </div>
 <div class="sect3">
 <h4 id="_parameters_8">Parameters</h4>
@@ -2400,9 +2538,8 @@ during that invocation</p></td>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Callback</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">This callback handler will be invoked with a ModManagementEvent for each mod operation performed
-by the SDK</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">ModManagementHandler</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This callback handler will be invoked with a ModManagementEvent for each mod operation performed by the SDK</p></td>
 </tr>
 </tbody>
 </table>
@@ -3600,7 +3737,7 @@ returned by this function are informative only - it will always succeed.</p></td
 <div class="sectionbody">
 <hr>
 <div class="sect2">
-<h3 id="_errorcode"><a id="_2327881437616"></a> <a id="ErrorCode"></a> ErrorCode</h3>
+<h3 id="_errorcode"><a id="_1733561804624"></a> <a id="ErrorCode"></a> ErrorCode</h3>
 <div class="paragraph">
 <p>Trivial wrapper around <a href="https://en.cppreference.com/w/cpp/error/error_code">std::error_code</a>. Implemented as a class instead of a type alias to allow it to be forward-declared in wrappers, eg the UE4 plugin.</p>
 </div>
@@ -3610,14 +3747,14 @@ returned by this function are informative only - it will always succeed.</p></td
 </div>
 </div>
 <div class="sect2">
-<h3 id="_filterparams"><a id="_2327898229168"></a> <a id="FilterParams"></a> FilterParams</h3>
+<h3 id="_filterparams"><a id="_1733583419744"></a> <a id="FilterParams"></a> FilterParams</h3>
 <div class="paragraph">
 <p>Class storing a set of filter parameters for use in <a href="#Modio::ListAllModsAsync">[Modio::ListAllModsAsync]</a></p>
 </div>
 <div class="sect3">
 <h4 id="_enums">Enums</h4>
 <div class="sect4">
-<h5 id="_sortfieldtype"><a id="_2327898229712"></a> SortFieldType</h5>
+<h5 id="_sortfieldtype"><a id="_1733583420288"></a> SortFieldType</h5>
 <div class="paragraph">
 <p>Enum indicating which field should be used to sort the results</p>
 </div>
@@ -3658,7 +3795,7 @@ returned by this function are informative only - it will always succeed.</p></td
 </div>
 </div>
 <div class="sect4">
-<h5 id="_sortdirection"><a id="_2327898230768"></a> SortDirection</h5>
+<h5 id="_sortdirection"><a id="_1733583421344"></a> SortDirection</h5>
 <div class="paragraph">
 <p>Enum indicating which direction sorting should be applied</p>
 </div>
@@ -4133,62 +4270,62 @@ returned by this function are informative only - it will always succeed.</p></td
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327898229712">enum Modio::FilterParams::SortFieldType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733583420288">enum Modio::FilterParams::SortFieldType</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SortField</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327898230768">enum Modio::FilterParams::SortDirection</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733583421344">enum Modio::FilterParams::SortDirection</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Direction</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327875999968">std::vector&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733556300000">std::vector&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SearchKeywords</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327898244016">Modio::Optional&lt;std::chrono::system_clock::time_point&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733583434592">Modio::Optional&lt;std::chrono::system_clock::time_point&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateRangeBegin</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327898244016">Modio::Optional&lt;std::chrono::system_clock::time_point&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733583434592">Modio::Optional&lt;std::chrono::system_clock::time_point&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateRangeEnd</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327875999968">std::vector&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733556300000">std::vector&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tags</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327875999968">std::vector&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733556300000">std::vector&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExcludedTags</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327898234160">std::vector&lt;Modio::ModID&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733583424736">std::vector&lt;Modio::ModID&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">IncludedIDs</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327898234160">std::vector&lt;Modio::ModID&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733583424736">std::vector&lt;Modio::ModID&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExcludedIDs</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058336">_Bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088688">_Bool</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">IsPaged</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058688">std::size_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489089040">std::size_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Index</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058688">std::size_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489089040">std::size_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Count</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -4198,7 +4335,7 @@ returned by this function are informative only - it will always succeed.</p></td
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modcollectionentry"><a id="_2327902277808"></a> <a id="ModCollectionEntry"></a> ModCollectionEntry</h3>
+<h3 id="_modcollectionentry"><a id="_1733588585344"></a> <a id="ModCollectionEntry"></a> ModCollectionEntry</h3>
 <div class="paragraph">
 <p>Class representing a mod which is installed locally</p>
 </div>
@@ -4297,57 +4434,57 @@ returned by this function are informative only - it will always succeed.</p></td
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896115920">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581372112">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ID</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The ID of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327902281024">std::atomic&lt;Modio::ModState&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733588588560">std::atomic&lt;Modio::ModState&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CurrentState</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The status of the mod, is it pending installation, is it installed but needing an update, etc</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327902412224">Modio::Optional&lt;Modio::ModState&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733588990016">Modio::Optional&lt;Modio::ModState&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RollbackState</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327901895424">struct Modio::ModInfo</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733588201024">struct Modio::ModInfo</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModProfile</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Mod descriptor from the REST API</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330004046688">std::atomic&lt;uint8_t&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733544833888">std::atomic&lt;uint8_t&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">LocalUserSubscriptionCount</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Reference counting to allow automatic uninstalltion of unused local mods</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327902740832">std::set&lt;Modio::UserID&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733589276288">std::set&lt;Modio::UserID&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">LocalUserSubscriptions</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327875361520">Modio::filesystem::path</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733555661552">Modio::filesystem::path</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PathOnDisk</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896141552">Modio::FileSize</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581397744">Modio::FileSize</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SizeOnDisk</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330004045168">std::atomic&lt;_Bool&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733544832368">std::atomic&lt;_Bool&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ShouldNotRetry</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">flag if this mod should not be processed because it encountered an unrecoverable error during installation/update. This should not be saved to disk as we will more than likely want to retry next session</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327881437616">Modio::ErrorCode</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733561804624">Modio::ErrorCode</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NeverRetryReason</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058560">uint8_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088912">uint8_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RetriesRemainingThisSession</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -4357,7 +4494,7 @@ returned by this function are informative only - it will always succeed.</p></td
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modprogressinfo"><a id="_2327903314768"></a> <a id="ModProgressInfo"></a> ModProgressInfo</h3>
+<h3 id="_modprogressinfo"><a id="_1733589579808"></a> <a id="ModProgressInfo"></a> ModProgressInfo</h3>
 <div class="paragraph">
 <p>Class representing the progress of a mod installation or update</p>
 </div>
@@ -4375,27 +4512,27 @@ returned by this function are informative only - it will always succeed.</p></td
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896141552">Modio::FileSize</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581397744">Modio::FileSize</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TotalDownloadSize</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Total size of the downloaded file</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896141552">Modio::FileSize</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581397744">Modio::FileSize</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CurrentlyDownloadedBytes</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Current amount downloaded in bytes</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896141552">Modio::FileSize</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581397744">Modio::FileSize</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TotalExtractedSizeOnDisk</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Total size on disk when fully extracted</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896141552">Modio::FileSize</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581397744">Modio::FileSize</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CurrentlyExtractedBytes</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Amount of data currently extracted</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896115920">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581372112">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ID</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The mod ID of the mod being processed</p></td>
 </tr>
@@ -4405,7 +4542,7 @@ returned by this function are informative only - it will always succeed.</p></td
 </div>
 </div>
 <div class="sect2">
-<h3 id="_moddependencylist"><a id="_2327906218384"></a> <a id="ModDependencyList"></a> ModDependencyList</h3>
+<h3 id="_moddependencylist"><a id="_1733592938096"></a> <a id="ModDependencyList"></a> ModDependencyList</h3>
 <div class="paragraph">
 <p>Container for a collection of ModDependency objects</p>
 </div>
@@ -4424,14 +4561,14 @@ This class is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_moddetails"><a id="_2327906374032"></a> <a id="ModDetails"></a> ModDetails</h3>
+<h3 id="_moddetails"><a id="_1733593372240"></a> <a id="ModDetails"></a> ModDetails</h3>
 <div class="paragraph">
 <p>Collection of FileMetadata objects representing mod file updates</p>
 </div>
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_modtagoptions"><a id="_2327906716400"></a> <a id="ModTagOptions"></a> ModTagOptions</h3>
+<h3 id="_modtagoptions"><a id="_1733593714656"></a> <a id="ModTagOptions"></a> ModTagOptions</h3>
 <div class="paragraph">
 <p>Container for a collection of ModTagInfo objects</p>
 </div>
@@ -4443,7 +4580,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="sectionbody">
 <hr>
 <div class="sect2">
-<h3 id="_stronginteger"><a id="_2327896075776"></a> <a id="StrongInteger"></a> StrongInteger</h3>
+<h3 id="_stronginteger"><a id="_1733581331968"></a> <a id="StrongInteger"></a> StrongInteger</h3>
 <div class="paragraph">
 <p>Strong integer type to prevent accidental function parameter reordering and prevent unwanted implicit conversions</p>
 </div>
@@ -4486,7 +4623,7 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948309648">UnderlyingIntegerType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489388816">UnderlyingIntegerType</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Value</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -4496,7 +4633,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_emailauthcode"><a id="_2327896088592"></a> <a id="EmailAuthCode"></a> EmailAuthCode</h3>
+<h3 id="_emailauthcode"><a id="_1733581344784"></a> <a id="EmailAuthCode"></a> EmailAuthCode</h3>
 <div class="paragraph">
 <p>Strong type representing an email authentication code sent to a user email address</p>
 </div>
@@ -4514,7 +4651,7 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalCode</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -4524,7 +4661,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_emailaddress"><a id="_2327896092048"></a> <a id="EmailAddress"></a> EmailAddress</h3>
+<h3 id="_emailaddress"><a id="_1733581348240"></a> <a id="EmailAddress"></a> EmailAddress</h3>
 <div class="paragraph">
 <p>Strong type representing an email address</p>
 </div>
@@ -4542,7 +4679,7 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalAddress</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -4552,7 +4689,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_apikey"><a id="_2327896095408"></a> <a id="ApiKey"></a> ApiKey</h3>
+<h3 id="_apikey"><a id="_1733581351600"></a> <a id="ApiKey"></a> ApiKey</h3>
 <div class="paragraph">
 <p>Strong type representing an api key</p>
 </div>
@@ -4570,7 +4707,7 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalApiKey</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -4580,7 +4717,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modid"><a id="_2327896115920"></a> <a id="ModID"></a> ModID</h3>
+<h3 id="_modid"><a id="_1733581372112"></a> <a id="ModID"></a> ModID</h3>
 <div class="paragraph">
 <p>Strong type for Mod IDs</p>
 </div>
@@ -4590,21 +4727,21 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_filemetadataid"><a id="_2327896122848"></a> <a id="FileMetadataID"></a> FileMetadataID</h3>
+<h3 id="_filemetadataid"><a id="_1733581379040"></a> <a id="FileMetadataID"></a> FileMetadataID</h3>
 <div class="paragraph">
 <p>Strong type for File Metadata IDs</p>
 </div>
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_commentid"><a id="_2327896125296"></a> <a id="CommentID"></a> CommentID</h3>
+<h3 id="_commentid"><a id="_1733581381488"></a> <a id="CommentID"></a> CommentID</h3>
 <div class="paragraph">
 <p>Strong type for Comment ID</p>
 </div>
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_gameid"><a id="_2327896144000"></a> <a id="GameID"></a> GameID</h3>
+<h3 id="_gameid"><a id="_1733581400192"></a> <a id="GameID"></a> GameID</h3>
 <div class="paragraph">
 <p>Strong type for a game ID</p>
 </div>
@@ -4614,7 +4751,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_authenticationparams"><a id="_2327896149424"></a> <a id="AuthenticationParams"></a> AuthenticationParams</h3>
+<h3 id="_authenticationparams"><a id="_1733581405616"></a> <a id="AuthenticationParams"></a> AuthenticationParams</h3>
 <div class="paragraph">
 <p>Simple struct to encapsulate data passed to external authentication systems</p>
 </div>
@@ -4628,17 +4765,17 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AuthToken</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896150352">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581406544">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">UserEmail</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058336">_Bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088688">_Bool</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bUserHasAcceptedTerms</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -4648,7 +4785,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_initializeoptions"><a id="_2327898865968"></a> <a id="InitializeOptions"></a> InitializeOptions</h3>
+<h3 id="_initializeoptions"><a id="_1733584056544"></a> <a id="InitializeOptions"></a> InitializeOptions</h3>
 <div class="paragraph">
 <p>Structure with all initialization parameters needed to start the API, all need to be filled in for the SDK to properly initialize</p>
 </div>
@@ -4666,32 +4803,32 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896144000">Modio::GameID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581400192">Modio::GameID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GameID</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The Mod.io-provided ID for the game</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896095408">Modio::ApiKey</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581351600">Modio::ApiKey</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">APIKey</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The Mod.io-provided API key for your application or game</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">Modio::UserHandleType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">Modio::UserHandleType</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">User</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The user handle for the platform you are targeting</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896072048">Modio::Portal</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581328240">Modio::Portal</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PortalInUse</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Which portal is this game currently running in?</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896071632">Modio::Environment</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581327824">Modio::Environment</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GameEnvironment</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The mod.io environment you want to run the SDK on</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327898871088">std::map&lt;std::string, std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733584061664">std::map&lt;std::string, std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExtendedParameters</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Platform-specific extended initialization parameters. See <a href="#Platform-specific Notes">[Platform-specific Notes]</a> for more information regarding any special values your platform requires or supports.</p></td>
 </tr>
@@ -4701,7 +4838,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_filemetadata"><a id="_2327899107840"></a> <a id="FileMetadata"></a> FileMetadata</h3>
+<h3 id="_filemetadata"><a id="_1733584298416"></a> <a id="FileMetadata"></a> FileMetadata</h3>
 <div class="paragraph">
 <p>Metadata for a release archive for a mod</p>
 </div>
@@ -4719,52 +4856,52 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896122848">Modio::FileMetadataID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581379040">Modio::FileMetadataID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataId</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unique modfile id.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896115920">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581372112">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModId</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unique mod id.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058528">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088880">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateAdded</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of date file was added.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327899108416">enum Modio::FileMetadata::VirusScanStatus</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733584298992">enum Modio::FileMetadata::VirusScanStatus</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CurrentVirusScanStatus</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Current virus scan status of the file. For newly added files that have yet to be scanned this field will change frequently until a scan is complete</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327899109792">enum Modio::FileMetadata::VirusStatus</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733584300368">enum Modio::FileMetadata::VirusStatus</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CurrentVirusStatus</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Was a virus detected?</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058528">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088880">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Filesize</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Size of the file in bytes.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Filename</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Filename including extension.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Version</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Release version this file represents.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Changelog</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Changelog for the file.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataBlob</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Metadata stored by the game developer for this file.</p></td>
 </tr>
@@ -4774,7 +4911,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modstats"><a id="_2327899118352"></a> <a id="ModStats"></a> ModStats</h3>
+<h3 id="_modstats"><a id="_1733584308928"></a> <a id="ModStats"></a> ModStats</h3>
 <div class="paragraph">
 <p>Contains download stats and ratings for a mod</p>
 </div>
@@ -4788,52 +4925,52 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058528">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088880">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PopularityRankPosition</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Current rank of the mod.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058528">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088880">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PopularityRankTotalMods</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of ranking spots the current rank is measured against.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058528">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088880">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DownloadsTotal</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of total mod downloads.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058528">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088880">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SubscribersTotal</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of total users who have subscribed to the mod.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058528">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088880">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingTotal</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of times this mod has been rated.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058528">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088880">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingPositive</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of positive ratings.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058528">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088880">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingNegative</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of negative ratings.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058528">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088880">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingPercentagePositive</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of positive ratings, divided by the total ratings to determine it’s percentage score.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058752">double</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489089104">double</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingWeightedAggregate</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Overall rating of this item calculated using the [Wilson score confidence interval](<a href="https://www.evanmiller.org/how-not-to-sort-by-average-Ratinghtml" class="bare">https://www.evanmiller.org/how-not-to-sort-by-average-Ratinghtml</a>). This column is good to sort on, as it will order items based on number of ratings and will place items with many positive ratings above those with a higher score but fewer ratings.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingDisplayText</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Textual representation of the rating in format: Overwhelmingly Positive &#8594; Very Positive &#8594; Positive &#8594; Mostly Positive &#8594; Mixed &#8594; Negative &#8594; Mostly Negative &#8594; Very Negative &#8594; Overwhelmingly Negative &#8594; Unrated</p></td>
 </tr>
@@ -4843,7 +4980,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_user"><a id="_2327899734864"></a> <a id="User"></a> User</h3>
+<h3 id="_user"><a id="_1733584925440"></a> <a id="User"></a> User</h3>
 <div class="paragraph">
 <p>Object representing a mod.io user profile</p>
 </div>
@@ -4857,22 +4994,22 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896104592">Modio::UserID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581360784">Modio::UserID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">UserId</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unique id for the user</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Username</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Username of the user</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058528">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088880">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateOnline</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp the user was last online</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileUrl</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URL of the user&#8217;s mod.io profile</p></td>
 </tr>
@@ -4882,7 +5019,17 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modinfo"><a id="_2327901895424"></a> <a id="ModInfo"></a> ModInfo</h3>
+<h3 id="_profilematurity"><a id="_1733587210896"></a> <a id="ProfileMaturity"></a> ProfileMaturity</h3>
+<div class="paragraph">
+<p>A strong type flag object to represent MaturityOption from a mod.io info. * Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to * be labeled as mature. The value of this field will default to "Maturity Option None" unless the parent * game allows to flag mature content.</p>
+</div>
+<div class="sect3">
+<h4 id="_functions_13">Functions</h4>
+<hr>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_modinfo"><a id="_1733588201024"></a> <a id="ModInfo"></a> ModInfo</h3>
 <div class="paragraph">
 <p>Full mod profile including current release information, media links, and stats</p>
 </div>
@@ -4896,97 +5043,97 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896115920">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581372112">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModId</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unique Mod ID</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileName</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Name of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileSummary</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Summary of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileDescription</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Detailed description in HTML format</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileDescriptionPlaintext</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Detailed description in plaintext</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileURL</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URL to the mod profile</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327899734864">Modio::User</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733584925440">Modio::User</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileSubmittedBy</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Information on the user who submitted the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058528">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088880">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileDateAdded</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of the date the mod was registered</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058528">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088880">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileDateUpdated</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of the date the mod was updated</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058528">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088880">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileDateLive</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of the date the mod was marked live</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058560">std::uint8_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733587210896">Modio::ProfileMaturity</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileMaturityOption</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Flags for maturity options	* Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to	* be labeled as mature.	*	* 0 = None set (default)	* 1 = Alcohol	* 2 = Drugs	* 4 = Violence	* 8 = Explicit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Object representing a mod.io user profile	* Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to	* be labeled as mature. The value of this field will default to None unless the parent game allows * to flag mature content.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataBlob</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metadata stored by the game developer.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327899107840">Modio::FileMetadata</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733584298416">Modio::FileMetadata</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">FileInfo</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Information about the mod&#8217;s most recent public release</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327901899424">std::vector&lt;Modio::Metadata&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733588205120">std::vector&lt;Modio::Metadata&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataKvp</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Arbitrary key-value metadata set for this mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327902024720">std::vector&lt;Modio::ModTag&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733588330496">std::vector&lt;Modio::ModTag&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tags</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Tags this mod has set</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058688">std::size_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489089040">std::size_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NumGalleryImages</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of images in the mod&#8217;s media gallery</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327899141712">Modio::YoutubeURLList</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733584332288">Modio::YoutubeURLList</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">YoutubeURLs</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">List of youtube links provided by the creator of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327899151312">Modio::SketchfabURLList</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733584341888">Modio::SketchfabURLList</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SketchfabURLs</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">List of sketchfab links provided by the creator of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327899118352">Modio::ModStats</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733584308928">Modio::ModStats</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Stats</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Stats and rating information for the mod</p></td>
 </tr>
@@ -4996,7 +5143,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modmanagementevent"><a id="_2327904521008"></a> <a id="ModManagementEvent"></a> ModManagementEvent</h3>
+<h3 id="_modmanagementevent"><a id="_1733591129824"></a> <a id="ModManagementEvent"></a> ModManagementEvent</h3>
 <div class="paragraph">
 <p>Simple struct representing the outcome of a mod management operation</p>
 </div>
@@ -5014,17 +5161,17 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896115920">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581372112">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ID</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">ID for the mod that the event occurred on</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327904521504">enum Modio::ModManagementEvent::EventType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733591130320">enum Modio::ModManagementEvent::EventType</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Event</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">What type of event occurred</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327881437616">Modio::ErrorCode</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733561804624">Modio::ErrorCode</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Status</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Empty if operation completed successfully, truthy/contains error code if operation failed</p></td>
 </tr>
@@ -5034,7 +5181,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_moddependency"><a id="_2327906212224"></a> <a id="ModDependency"></a> ModDependency</h3>
+<h3 id="_moddependency"><a id="_1733592931936"></a> <a id="ModDependency"></a> ModDependency</h3>
 <div class="paragraph">
 <p>Simple struct containing simplified information about a mod which is a dependency of another mod</p>
 </div>
@@ -5060,12 +5207,12 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327896115920">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733581372112">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModID</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModName</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -5075,7 +5222,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modtaginfo"><a id="_2327906684800"></a> <a id="ModTagInfo"></a> ModTagInfo</h3>
+<h3 id="_modtaginfo"><a id="_1733593683056"></a> <a id="ModTagInfo"></a> ModTagInfo</h3>
 <div class="paragraph">
 <p>Metadata about a group of tags that can be used for filtering mods</p>
 </div>
@@ -5089,17 +5236,17 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2330000850048">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733542292608">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupName</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The display name for the tag</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2327875999968">std::vector&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733556300000">std::vector&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupValues</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The valid tags the group can have</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2329948058336">_Bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1733489088688">_Bool</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bAllowMultipleSelection</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">True if multiple tags from the group can be used simultaneously</p></td>
 </tr>
@@ -5113,7 +5260,7 @@ This class is part of an experimental feature and is subject to change.
 <h2 id="_enums_4">Enums</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_environment"><a id="_2327896071632"></a> Environment</h3>
+<h3 id="_environment"><a id="_1733581327824"></a> Environment</h3>
 <div class="paragraph">
 <p>Enum representing what environment your game is deployed in</p>
 </div>
@@ -5138,7 +5285,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_portal"><a id="_2327896072048"></a> Portal</h3>
+<h3 id="_portal"><a id="_1733581328240"></a> Portal</h3>
 <div class="paragraph">
 <p>Enum representing the store or service your game is being distributed through</p>
 </div>
@@ -5195,7 +5342,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_logosize"><a id="_2327896073296"></a> LogoSize</h3>
+<h3 id="_logosize"><a id="_1733581329488"></a> LogoSize</h3>
 <div class="paragraph">
 <p>Enum representing mod logo sizes</p>
 </div>
@@ -5228,7 +5375,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_avatarsize"><a id="_2327896074112"></a> AvatarSize</h3>
+<h3 id="_avatarsize"><a id="_1733581330304"></a> AvatarSize</h3>
 <div class="paragraph">
 <p>Enum representing avatar image sizes</p>
 </div>
@@ -5257,7 +5404,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gallerysize"><a id="_2327896074752"></a> GallerySize</h3>
+<h3 id="_gallerysize"><a id="_1733581330944"></a> GallerySize</h3>
 <div class="sect3">
 <h4 id="_values_7">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -5279,7 +5426,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_language"><a id="_2327896960512"></a> Language</h3>
+<h3 id="_language"><a id="_1733582151088"></a> Language</h3>
 <div class="paragraph">
 <p>Enum representing the languages mod.io support responses in</p>
 </div>
@@ -5356,7 +5503,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_authenticationprovider"><a id="_2327896962144"></a> AuthenticationProvider</h3>
+<h3 id="_authenticationprovider"><a id="_1733582152720"></a> AuthenticationProvider</h3>
 <div class="paragraph">
 <p>Simple struct to encapsulate data passed to external authentication systems</p>
 </div>
@@ -5397,7 +5544,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_loglevel"><a id="_2327896965808"></a> LogLevel</h3>
+<h3 id="_loglevel"><a id="_1733582156384"></a> LogLevel</h3>
 <div class="paragraph">
 <p>Degree of severity for the log output</p>
 </div>
@@ -5430,7 +5577,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_logcategory"><a id="_2327896966832"></a> LogCategory</h3>
+<h3 id="_logcategory"><a id="_1733582157408"></a> LogCategory</h3>
 <div class="paragraph">
 <p>The category of the log message (usually the internal service the message is originating from)</p>
 </div>
@@ -5471,7 +5618,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_rating"><a id="_2327896967616"></a> Rating</h3>
+<h3 id="_rating"><a id="_1733582158192"></a> Rating</h3>
 <div class="paragraph">
 <p>A rating for a mod.</p>
 </div>
@@ -5500,7 +5647,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_httperror"><a id="_2327896983088"></a> HttpError</h3>
+<h3 id="_httperror"><a id="_1733582173664"></a> HttpError</h3>
 <div class="sect3">
 <h4 id="_values_13">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -5570,7 +5717,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_filesystemerror"><a id="_2327897023648"></a> FilesystemError</h3>
+<h3 id="_filesystemerror"><a id="_1733582214224"></a> FilesystemError</h3>
 <div class="sect3">
 <h4 id="_values_14">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -5616,7 +5763,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_userautherror"><a id="_2327897053808"></a> UserAuthError</h3>
+<h3 id="_userautherror"><a id="_1733582244384"></a> UserAuthError</h3>
 <div class="sect3">
 <h4 id="_values_15">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -5650,7 +5797,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_userdataerror"><a id="_2327897082800"></a> UserDataError</h3>
+<h3 id="_userdataerror"><a id="_1733582273376"></a> UserDataError</h3>
 <div class="sect3">
 <h4 id="_values_16">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -5672,7 +5819,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_archiveerror"><a id="_2327897110464"></a> ArchiveError</h3>
+<h3 id="_archiveerror"><a id="_1733582301040"></a> ArchiveError</h3>
 <div class="sect3">
 <h4 id="_values_17">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -5694,7 +5841,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_genericerror"><a id="_2327897138880"></a> GenericError</h3>
+<h3 id="_genericerror"><a id="_1733582329456"></a> GenericError</h3>
 <div class="sect3">
 <h4 id="_values_18">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -5744,7 +5891,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_zliberror"><a id="_2327897172688"></a> ZlibError</h3>
+<h3 id="_zliberror"><a id="_1733582363264"></a> ZlibError</h3>
 <div class="sect3">
 <h4 id="_values_19">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -5814,7 +5961,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modmanagementerror"><a id="_2327897210336"></a> ModManagementError</h3>
+<h3 id="_modmanagementerror"><a id="_1733582400912"></a> ModManagementError</h3>
 <div class="sect3">
 <h4 id="_values_20">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -5848,7 +5995,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_apierror"><a id="_2327897374432"></a> ApiError</h3>
+<h3 id="_apierror"><a id="_1733582565008"></a> ApiError</h3>
 <div class="sect3">
 <h4 id="_values_21">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -6002,7 +6149,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_errorconditiontypes"><a id="_2327897509808"></a> ErrorConditionTypes</h3>
+<h3 id="_errorconditiontypes"><a id="_1733582700384"></a> ErrorConditionTypes</h3>
 <div class="paragraph">
 <p>Enum describing the different conditions a Modio::ErrorCode can satisfy Check if a Modio::ErrorCode meets a particular condition using <a href="#ErrorCodeMatches">[ErrorCodeMatches]</a></p>
 </div>
@@ -6075,7 +6222,10 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_maturityoption"><a id="_2327901885648"></a> MaturityOption</h3>
+<h3 id="_maturityoption"><a id="_1733587209744"></a> MaturityOption</h3>
+<div class="paragraph">
+<p>Maturity types classification according to the mod.io API	* 0 = None set (default)	* 1 = Alcohol	* 2 = Drugs	* 4 = Violence	* 8 = Explicit</p>
+</div>
 <div class="sect3">
 <h4 id="_values_23">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -6109,7 +6259,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modstate"><a id="_2327902277056"></a> ModState</h3>
+<h3 id="_modstate"><a id="_1733588584592"></a> ModState</h3>
 <div class="paragraph">
 <p>Enum representing the current state of a mod</p>
 </div>
@@ -6150,7 +6300,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_reporttype"><a id="_2327906356416"></a> ReportType</h3>
+<h3 id="_reporttype"><a id="_1733593354624"></a> ReportType</h3>
 <div class="paragraph">
 <p>The type of report being made</p>
 </div>
@@ -6203,7 +6353,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-10-01 12:04:34 +1000
+Last updated 2021-10-21 15:15:55 +1100
 </div>
 </div>
 </body>

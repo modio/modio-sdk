@@ -1,14 +1,14 @@
 ++++
 <a href="https://mod.io"><img src="https://static.mod.io/v1/images/branding/modio-color-dark.svg" alt="mod.io" width="360" align="right"/></a>
 ++++
-# mod.io SDK2
+= mod.io SDK2
 
 image:https://img.shields.io/badge/license-MIT-brightgreen.svg[alt="License", link="https://github.com/modio/modio-sdk/blob/master/LICENSE"]
 image:https://img.shields.io/discord/389039439487434752.svg?label=Discord&logo=discord&color=7289DA&labelColor=2C2F33[alt="Discord", link="https://discord.mod.io"]
 
-Welcome to the mod.io SDK repository, built using C++. It allows game developers to host and automatically install user-created mods in their games. It connects to the https://docs.mod.io[mod.io REST API].
+Welcome to the mod.io SDK repository, built using C++. It allows game developers to host and automatically install user-generated content in their games. It connects to the https://docs.mod.io[mod.io REST API].
 
-## Features
+== Features
 
 * Permissive MIT/BSL-license
 * Async callback-based interface
@@ -16,46 +16,61 @@ Welcome to the mod.io SDK repository, built using C++. It allows game developers
 * Automatic downloads and updates
 * Email / Steam / GoG authentication
 * Mod Browsing / Filtering
-* C++14 codebase (static library or direct compilation)
-* Header-only support (Requires C++17 compiler)
-* Native UE4 support available via our dedicated plugin
+* Header-only support with C++17 compiler or later
+* C++14 codebases can use a static library or direct compilation
+* Native Unreal Engine 4 integration available via our https://github.com/modio/modio-ue4[dedicated plugin]
 
-## Platform Support
-
-|===
-|Platform | Supported? |Compiler
-
-|Windows | ✔ | MSVC
-|Windows (GDK) | ✔ (Contact us) | Vendor-provided
-|OSX |2022 |
-|Linux |Q4 2021 |
-|Nintendo Switch | ✔ (Contact us) | Vendor-provided
-|XBox (GDK) | ✔ (Contact us) | Vendor-provided
+== Platform Support
 
 |===
+|Platform       | Support                       |Compiler
+|Windows        | ✔                             | MSVC C++ 2019
+|Windows (GDK)  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
+|Nintendo Switch| ✔ <<contact-us,(Contact Us)>> | Vendor-provided
+|XBox (GDK)     | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
+|macOS          | Q4 2021                       |
+|Linux          | Q4 2021                       |
+|===
 
-## Compiler Support
+== Compiler Support
 
 |===
-|Configuration | C++ Version
-
-|Header-only| C++17
+|Configuration  | Version
+|Header-only    | C++17
 |Static Library | C++14
 |===
 
+== Download repository
 
-## Installation
+Pre-requisites to compile this SDK are listed in link:doc/getting-started.adoc[Getting Started documentation]
 
-### Inside a CMake project
+It is possible to download the source code as a zip file from this webpage. However, a recursive clone downloads all dependencies. Therefore, the suggestion is to perform the following:
 
-. Clone the repository, or add as a submodule
-. Ensure your project is using CMake 3.15 or later 
+[source, zsh]
+----
+git clone --recurse-submodule https://github.com/modio/modio-sdk
+cd modio-sdk
+----
+
+== Installation
+
+To use the mod.io SDK, you can proceed with the installation using one of the following perspectives:
+
+- Inside a CMake project
+- Standalone: <<header-only>>
+- Standalone: <<separate-compilation>>
+- Standalone: <<static-library>>
+
+=== Inside a CMake project
+
+. Clone the repository, or add it as a submodule
+. Confirm `your_project` uses CMake 3.15 or later
 +
 [source,cmake]
 ----
 cmake_minimum_required(VERSION 3.15)
 ----
-. Specify the target platform 
+. Specify the target platform
 +
 [source,cmake]
 ----
@@ -65,7 +80,7 @@ set (MODIO_PLATFORM WIN)
 +
 [source,cmake]
 ----
-add_subdirectory(<sdk folder> EXCLUDE_FROM_ALL)
+add_subdirectory(<modio-sdk folder> EXCLUDE_FROM_ALL)
 ----
 . Link the library to your project
 +
@@ -75,76 +90,81 @@ add_subdirectory(<sdk folder> EXCLUDE_FROM_ALL)
 ----
 target_compile_features(your_project PUBLIC cxx_std_17)
 target_link_libraries(your_project PUBLIC modio)
----- 
-* To use the static library configuration:
+----
+* Or to use the static library configuration:
 +
 [source,cmake]
 ----
 target_compile_features(your_project PUBLIC cxx_std_14)
-target_link_libraries(your_project PUBLIC modioStatic) 
+target_link_libraries(your_project PUBLIC modioStatic)
 ----
 
 
-### Standalone 
-To make building the SDK easier, we provide a `CMakePresets.json` that will include the most common configurations as presets. By default these presets will use Ninja, so make sure it is available on your PATH unless you want to override the CMake generator in use (see below).
+=== Standalone
+To simplify the SDK compilation, the file `CMakePresets.json` includes the most common configurations as `presets` that employ Ninja by default. Therefore, confirm it is available on your `PATH` unless you want to <<override, override>> the CMake generator in use.
 
 |===
-|Platform | Preset Name
-
-|Windows | win64
+|Platform | Preset       | Target       | Build System
+|Windows  | win64        | Release      | Visual Studio 2019
+|Windows  | win64-debug  | Debug        | Visual Studio 2019
+|Windows  | win64-dbginfo| Pre-Release  | Visual Studio 2019
 |===
 
-Debug presets have the `-debug` suffix, and Release-with-debug-info is `-dbginfo`, so if you want to build the SDK in debug configuration specify `win64-debug` as the preset name. 
+Debug presets have the `-debug` suffix, and Release-with-debug-info is `-dbginfo`. If you want to build the SDK in debug configuration specify `win64-debug` as the preset name.
 
 To build the SDK using the default build and install directories:
 
-. `cmake -S <path to sdk folder> --preset=win64`
-+ 
-This will use the Ninja generator to create a Ninja build system in `<sdk folder>/out/build/win64`, which installs the compiled libraries etc to `<sdk folder>/out/install/win64`.
-. `cmake --build <sdk folder>/out/build/win64`
+. `cmake -S <modio-sdk folder> --preset=win64`
++
+This will use the Ninja generator to create a Ninja build system in `<modio-sdk folder>/out/build/win64`. It installs the compiled libraries/headers to `<modio-sdk folder>/out/install/win64`.
+. `cmake --build <modio-sdk folder>/out/build/win64`
 +
 This step compiles the SDK as a static library.
-. `cmake --install out/win64/build`
+. `cmake --install <modio-sdk folder>/out/build/win64`
 +
-This will produce a folder `<sdk folder>/out/install/win64` which contains the following:
+This produces a folder `<modio-sdk folder>/out/install/win64` with the following:
 +
 * `header_only` - directory with the header-only version of the SDK
 * `source` - directory containing the implementation files of the SDK for use in 'split compilation' mode
-* `static` - directory containing the static library binaries and minimal public includes
+* `static` - directory containing the static library binaries and necessary public include headers
 
-#### Header-only mode
+==== Header-only mode [[header-only]]
 
-Simply add each of the subdirectories in `header_only` to your include directories and then `#include "modio/ModioSDK.h"`
+Simply add each of the subdirectories in `header_only` to your include directories. Then, in `your_project` source file add `#include "modio/ModioSDK.h"`
 
-#### Separate compilation mode
+==== Separate compilation mode [[separate-compilation]]
 
-If you'd rather compile the implementation directly, simply add the cpp files in the `source` directory, and add the includes as per header-only mode. Define `MODIO_SEPARATE_COMPILATION`, and then `#include "modio/ModioSDK.h"`
+If you prefer to compile the source code directly, add the `cpp` files in the `source` directory, along with the `include` from the header-only mode.
+You must add `MODIO_SEPARATE_COMPILATION` to your project's compiler definitions. Then, in `your_project` source file add `#include "modio/ModioSDK.h"`
 
-#### Static library mode
+==== Static library mode [[static-library]]
 
-Add the `inc` directory inside `static` to your includes and link against the static binary in the `lib` folder, defining `MODIO_SEPARATE_COMPILATION` and `#include "modio/ModioSDK.h"` as per separate compilation mode.
+Add the `inc` directory inside `static` to your `include` and link against the static binary in the `lib` folder.  You must add `MODIO_SEPARATE_COMPILATION` to your project's compiler definitions. Then, in `your_project` source file add `#include "modio/ModioSDK.h"`
 
+=== Other Build Systems [[override]]
 
-### Other Build Systems
+If you use a different build system or wish to generate project files for inclusion in an existing Visual Studio solution, you can override the default CMake generator. For example, it is possible to use an MSBuild-based Visual Studio Solution:
 
-If you'd like to use another build system, or generate project files you can add to a larger Visual Studio solution, simply override the default generator when performing the first command above. For instance, to use a MSBuild-based Visual Studio Solution:
+```
+cmake -S <modio-sdk folder> --preset=win64 -G "Visual Studio 16 2019"
+cmake --build <modio-sdk folder>/out/install/win64
+cmake --install <modio-sdk folder>/out/install/win64
+```
 
-`cmake -S <path to sdk folder> --preset=Win64 -G"Visual Studio 16 2019"`
+== Usage
 
-## Usage
-
-Please see the link:doc/getting-started.adoc[Getting Started documentation] for a breakdown of the SDK's concepts and usage, including:
+Please see the link:doc/getting-started.adoc[Getting Started documentation] for a breakdown of the mod.io SDK's concepts and usage, including:
 
 * link:doc/getting-started.adoc#sdk-quick-start-initialization-and-teardown[SDK initialization and event loop]
 * link:doc/getting-started.adoc#sdk-quick-start-user-authentication[Authentication]
 * link:doc/getting-started.adoc#sdk-quick-start-browsing-available-mods[Mod Browsing]
 * link:doc/getting-started.adoc#sdk-quick-start-mod-subscriptions-and-management[Mod Subscription Management]
 
-## Large studios and Publishers
-A private white label option is available to license, if you want a fully featured mod-platform that you can control and host in-house. mailto:developers@mod.io[Contact us,Whitelabel Inquiry] to discuss.
+== Game studios and Publishers [[contact-us]]
+A private, white-label option is available for license. If you want a fully-featured platform that you control and host in-house send us a message mailto:developers@mod.io[Contact us,Whitelabel Inquiry] to discuss.
 
-## Contributions Welcome
-Our SDK is public and open source. Game developers are welcome to utilize it directly, to add support for mods in their games, or fork it for their games customized use. Want to make changes to the SDK? Submit a pull request with your recommended changes to be reviewed.
+== Contributions Welcome
+Our SDK is public and open source. Game developers are welcome to utilize it directly, to add support for mods in their games, or fork it for their customized use. If you want to contribute to the SDK, submit a pull request with your recommended changes for review.
 
-## Other Repositories
-Our aim with https://mod.io[mod.io], is to provide an https://docs.mod.io[open modding API]. You are welcome to https://github.com/modio[view, fork and contribute to our other codebases] in use.
+== Other Repositories
+https://mod.io[mod.io] provides an https://docs.mod.io[open API for user-generated content]. You are welcome to https://github.com/modio[view, fork and contribute to other codebases] we release.

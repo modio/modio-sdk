@@ -17,21 +17,13 @@
 #include "modio/core/entities/ModioURLList.h"
 #include "modio/core/entities/ModioUser.h"
 #include "modio/detail/entities/ModioGalleryList.h"
+#include "modio/core/entities/ModioProfileMaturity.h"
 #include <string>
 #include <vector>
 #include <nlohmann/json.hpp>
 
 namespace Modio
 {
-	enum class MaturityOption : std::uint8_t
-	{
-		None = 0,
-		Alcohol = 1,
-		Drugs = 2,
-		Violence = 4,
-		Explicit = 8
-	};
-
 	// @todo: If ModTag and Metadata is used somewhere else than in ModInfo, then migrate them to their own headers
 	struct ModTag
 	{
@@ -78,17 +70,12 @@ namespace Modio
 		std::int64_t ProfileDateUpdated;
 		/// @brief Unix timestamp of the date the mod was marked live
 		std::int64_t ProfileDateLive;
-		/// @brief Flags for maturity options
+		/// @brief Object representing a mod.io user profile
 		///	* Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to
-		///	* be labeled as mature.
-		///	*
-		///	* 0 = None set (default)
-		///	* 1 = Alcohol
-		///	* 2 = Drugs
-		///	* 4 = Violence
-		///	* 8 = Explicit
-		std::uint8_t ProfileMaturityOption;
-
+		///	* be labeled as mature. The value of this field will default to None unless the parent game allows
+		/// * to flag mature content.
+		Modio::ProfileMaturity ProfileMaturityOption;
+		/// @brief Metadata stored by the game developer.
 		std::string MetadataBlob;
 		/// @brief Information about the mod's most recent public release
 		Modio::FileMetadata FileInfo;

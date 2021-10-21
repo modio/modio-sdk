@@ -1,0 +1,17 @@
+@startuml
+start
+:Videogame Starts;
+:User Generated Content Interface;
+fork
+    repeat :RunPendingHandlers;
+    repeat while (SDK did "Shutdown") is (no)
+fork again
+    -[dashed]->
+    #SkyBlue:Initialize**Async**;
+    -[dashed]->
+    #SkyBlue:ListAllMods**Async**;
+    -[dashed]->
+    #SkyBlue:Shutdown**Async**;
+end merge
+end
+@enduml

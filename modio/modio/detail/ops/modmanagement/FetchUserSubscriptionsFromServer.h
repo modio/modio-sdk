@@ -72,7 +72,7 @@ namespace Modio
 									return;
 								}
 							}
-
+							SubscriptionBuffer.Clear();
 							CollatedResults->Append(CurrentModInfoPage.value());
 						}
 						CurrentResultIndex += 100;

@@ -125,14 +125,15 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Enables the automatic management of installed mods on the system based on the user's subscriptions.
-	/// Does nothing if mod management is currently enabled.
-	/// @param Callback This callback handler will be invoked with a ModManagementEvent for each mod operation performed
-	/// by the SDK
+	/// Does nothing if mod management is currently enabled. Note: this function does not behave like other "async"
+	/// methods, given that its name does not include the word async.
+	/// @param ModManagementHandler This callback handler will be invoked with a ModManagementEvent for each mod operation performed by the SDK
+	///
 	/// @return Modio::ErrorCode indicating if mod management was enabled successfully
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error ModManagementError::ModManagementAlreadyEnabled|Mod management was already enabled. The mod management
 	/// callback has not been changed
-	MODIOSDK_API Modio::ErrorCode EnableModManagement(std::function<void(Modio::ModManagementEvent)> Callback);
+	MODIOSDK_API Modio::ErrorCode EnableModManagement(std::function<void(Modio::ModManagementEvent)> ModManagementHandler);
 
 	/// @docpublic
 	/// @brief Disables automatic installation or uninstallation of mods based on the user's subscriptions. Allows
