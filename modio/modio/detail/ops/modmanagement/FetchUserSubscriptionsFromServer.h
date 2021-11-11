@@ -72,7 +72,7 @@ namespace Modio
 									return;
 								}
 							}
-							SubscriptionBuffer.Clear();
+							SubscriptionBuffer = Modio::Detail::DynamicBuffer();
 							CollatedResults->Append(CurrentModInfoPage.value());
 						}
 						CurrentResultIndex += 100;
