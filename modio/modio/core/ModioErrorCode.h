@@ -118,13 +118,14 @@ namespace Modio
 	enum class FilesystemError
 	{
 		DirectoryNotEmpty = 20737,
-		FileLocked = 20738,
-		FileNotFound = 20739,
-		InsufficientSpace = 20740,
-		NoPermission = 20741,
-		ReadError = 20742,
-		UnableToCreateFile = 20743,
-		UnableToCreateFolder = 20744
+		DirectoryNotFound = 20738,
+		FileLocked = 20739,
+		FileNotFound = 20740,
+		InsufficientSpace = 20741,
+		NoPermission = 20742,
+		ReadError = 20743,
+		UnableToCreateFile = 20744,
+		UnableToCreateFolder = 20745
 	};
 
 	struct FilesystemErrorCategoryImpl : std::error_category
@@ -136,6 +137,9 @@ namespace Modio
 			{
 				case FilesystemError::DirectoryNotEmpty:
 						return "Directory not empty";
+					break;
+				case FilesystemError::DirectoryNotFound:
+						return "Directory not found";
 					break;
 				case FilesystemError::FileLocked:
 						return "File locked (already in use?)";
@@ -539,7 +543,8 @@ namespace Modio
 		InstallOrUpdateCancelled = 22274,
 		ModManagementAlreadyEnabled = 22275,
 		ModManagementDisabled = 22276,
-		NoPendingWork = 22277
+		NoPendingWork = 22277,
+		UploadCancelled = 22278
 	};
 
 	struct ModManagementErrorCategoryImpl : std::error_category
@@ -563,6 +568,9 @@ namespace Modio
 					break;
 				case ModManagementError::NoPendingWork:
 						return "Internal: No mods require processing for this iteration";
+					break;
+				case ModManagementError::UploadCancelled:
+						return "The current modfile upload was cancelled";
 					break;
 				default:
 					return "Unknown ModManagementError error";
@@ -1126,6 +1134,11 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::FilesystemError::DirectoryNotFound)
+					{
+						return true;
+					}
+
 					if (ec == Modio::FilesystemError::FileLocked)
 					{
 						return true;
@@ -1327,6 +1340,11 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::FilesystemError::DirectoryNotFound)
+					{
+						return true;
+					}
+
 					if (ec == Modio::FilesystemError::FileLocked)
 					{
 						return true;
@@ -1393,6 +1411,11 @@ namespace Modio
 
 
 					if (ec == Modio::FilesystemError::DirectoryNotEmpty)
+					{
+						return true;
+					}
+
+					if (ec == Modio::FilesystemError::DirectoryNotFound)
 					{
 						return true;
 					}
@@ -1528,6 +1551,18 @@ namespace Modio
 					}
 
 					if (ec == Modio::ZlibError::TooManySymbols)
+					{
+						return true;
+					}
+
+	
+
+					if (ec == Modio::ArchiveError::InvalidHeader)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ArchiveError::UnsupportedCompression)
 					{
 						return true;
 					}

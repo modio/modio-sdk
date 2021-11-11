@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -257,6 +257,11 @@ namespace Modio
 			// @todo: Should all functions be able to operate on any directory anywhere or should we ensure that you
 			// can only use the functions within a "sandbox" directory and don't accidentally create files outside it
 
+			bool DirectoryExists(const Modio::filesystem::path& DirectoryPath) const
+			{
+				return PlatformImplementation->DirectoryExists(DirectoryPath);
+			}
+
 			/// @brief Creates a directory at an arbitrary fully-qualified location
 			/// @param FolderPath The full path to the directory
 			/// @return True if the folder already exists or was created successfully
@@ -272,7 +277,7 @@ namespace Modio
 			{
 				return PlatformImplementation->FileExists(FilePath);
 			}
-			
+
 			/// @brief Attempts to delete a file from disk
 			/// @param FilePath The fully-qualifieid path of the file we wish to delete
 			/// @return True if the path has a filename component and we deleted it successfully
@@ -292,7 +297,6 @@ namespace Modio
 			}
 
 		private:
-			
 			/// @brief Internal method for getting filepath of a mod media file if it exists
 			/// @param FolderPath The path that contains the different sizes for the image
 			/// @param SizeSuffix Image size suffix

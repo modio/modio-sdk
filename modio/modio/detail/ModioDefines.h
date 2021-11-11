@@ -128,11 +128,6 @@
 	#define FMT_HEADER_ONLY
 #endif
 
-#ifndef BOOST_BEAST_DECL
-	#define MODIO_DEFINED_BOOST_BEAST_DECL
-	#define BOOST_BEAST_DECL inline
-#endif
-
 #ifndef NOMINMAX
 	#define MODIO_DEFINED_NOMINMAX
 	#define NOMINMAX

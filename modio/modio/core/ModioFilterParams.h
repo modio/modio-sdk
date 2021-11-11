@@ -116,6 +116,12 @@ namespace Modio
 		MODIO_IMPL FilterParams& WithoutTags(std::vector<std::string> NewTags);
 
 		/// @docpublic
+		/// @brief Only include mods that contain a metadata blob that contains the specified string
+		/// @param SearchString String to search for
+		/// @return *this
+		MODIO_IMPL FilterParams& MetadataLike(std::string SearchString);
+
+		/// @docpublic
 		/// @brief Returns a sub-range of query results from StartIndex to StartIndex + ResultCount
 		/// @param StartIndex Zero-based index of first result to return
 		/// @param ResultCount Number of results to return
@@ -161,6 +167,8 @@ namespace Modio
 
 		std::vector<Modio::ModID> IncludedIDs;
 		std::vector<Modio::ModID> ExcludedIDs;
+
+		Modio::Optional<std::string> MetadataBlobSearchString;
 
 		bool IsPaged;
 		std::size_t Index;

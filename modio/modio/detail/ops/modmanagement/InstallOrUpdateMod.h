@@ -13,6 +13,7 @@
 #include "modio/detail/CoreOps.h"
 #include "modio/detail/ModioObjectTrack.h"
 #include "modio/detail/ModioSDKSessionData.h"
+#include "modio/detail/ops/compression/ExtractAllToFolderOp.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/file/ModioFileService.h"
 #include "modio/detail/AsioWrapper.h"
@@ -143,7 +144,7 @@ namespace Modio
 						return;
 					}
 
-					yield Modio::Detail::ComposedOps::ExtractAllFilesAsync(DownloadPath, InstallPath, ModProgress,
+					yield Modio::Detail::ExtractAllFilesAsync(DownloadPath, InstallPath, ModProgress,
 																			std::move(Self));
 
 					if (ec)

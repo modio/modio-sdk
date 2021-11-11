@@ -1,19 +1,19 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
 #include "ModioGeneratedVariables.h"
 #include "http/HttpImplementation.h"
-#include "modio/detail/ModioOperationQueue.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioOperationQueue.h"
 #include <iostream>
 #include <memory>
 
@@ -38,28 +38,27 @@ namespace Modio
 			MODIO_IMPL void move_construct(implementation_type& Implementation, implementation_type& Other);
 
 			MODIO_IMPL void move_assign(implementation_type& Implementation, Modio::Detail::HttpService& OtherService,
-							 implementation_type& Other);
+										implementation_type& Other);
 
 			MODIO_IMPL void converting_move_construct(implementation_type& impl, Modio::Detail::HttpService&,
-										   implementation_type& other_impl);
+													  implementation_type& other_impl);
 
 			MODIO_IMPL void converting_move_assign(implementation_type& impl, Modio::Detail::HttpService& other_service,
-										implementation_type& other_impl);
+												   implementation_type& other_impl);
 
 			MODIO_IMPL void destroy(implementation_type& Implementation);
 
 			template<typename CompletionHandler>
 			auto InitializeAsync(CompletionHandler Handler)
 			{
-				return PlatformImplementation->InitializeHTTPAsync(
-					std::forward<CompletionHandler>(std::move(Handler)));
+				return PlatformImplementation->InitializeHTTPAsync(std::forward<CompletionHandler>(std::move(Handler)));
 			}
 
 			template<typename CompletionHandler>
 			auto SendRequestAsync(implementation_type& PlatformIOObject, CompletionHandler Handler)
 			{
 				return PlatformImplementation->SendRequestAsync(PlatformIOObject,
-																 std::forward<CompletionHandler>(std::move(Handler)));
+																std::forward<CompletionHandler>(std::move(Handler)));
 			}
 
 			template<typename CompletionHandler>
@@ -71,10 +70,26 @@ namespace Modio
 
 			template<typename CompletionHandler>
 			auto ReadSomeFromResponseBodyAsync(implementation_type& PlatformIOObject,
-												DynamicBuffer DynamicBufferInstance, CompletionHandler&& Handler)
+											   DynamicBuffer DynamicBufferInstance, CompletionHandler&& Handler)
 			{
 				return PlatformImplementation->ReadSomeFromResponseBodyAsync(
 					PlatformIOObject, DynamicBufferInstance, std::forward<CompletionHandler>(std::move(Handler)));
+			}
+
+			template<typename CompletionHandler>
+			auto BeginWriteAsync(implementation_type& PlatformIOObject, Modio::FileSize TotalSize,
+								 CompletionHandler&& Handler)
+			{
+				return PlatformImplementation->BeginWriteAsync(PlatformIOObject, TotalSize,
+															   std::forward<CompletionHandler>(Handler));
+			}
+
+			template<typename CompletionHandler>
+			auto WriteSomeAsync(implementation_type& PlatformIOObject, Modio::Detail::Buffer Data,
+								CompletionHandler&& Handler)
+			{
+				return PlatformImplementation->WriteSomeAsync(PlatformIOObject, std::move(Data),
+															  std::forward<CompletionHandler>(Handler));
 			}
 
 			MODIO_IMPL Modio::Detail::OperationQueue::Ticket GetAPIRequestTicket();
@@ -83,7 +98,10 @@ namespace Modio
 
 			MODIO_IMPL void Shutdown();
 
-			MODIO_IMPL Modio::ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string> Overrides) { return {};}
+			MODIO_IMPL Modio::ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string> Overrides)
+			{
+				return {};
+			}
 
 		private:
 			MODIO_IMPL void shutdown_service();
@@ -93,5 +111,5 @@ namespace Modio
 } // namespace Modio
 
 #ifndef MODIO_SEPARATE_COMPILATION
-#include "ModioHttpService.ipp"
+	#include "ModioHttpService.ipp"
 #endif

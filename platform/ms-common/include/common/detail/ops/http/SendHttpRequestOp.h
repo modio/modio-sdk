@@ -24,7 +24,7 @@ class SendHttpRequestOp
 	std::shared_ptr<HttpRequestImplementation> Request;
 	std::weak_ptr<HttpSharedStateBase> SharedState;
 	std::unique_ptr<asio::steady_timer> SendTimer;
-
+	std::unique_ptr<std::string> Payload;
 public:
 	SendHttpRequestOp(std::shared_ptr<HttpRequestImplementation> Request,
 					  std::weak_ptr<HttpSharedStateBase> SharedState)
@@ -68,11 +68,11 @@ public:
 				}
 			}
 
-			if (Request->Parameters.GetPayload())
+			if (Request->Parameters.GetUrlEncodedPayload())
 			{
-				const std::string& Payload = Request->Parameters.GetPayload().value();
+				Payload = std::make_unique<std::string>(Request->Parameters.GetUrlEncodedPayload().value());
 				if (!WinHttpSendRequest(Request->RequestHandle, WINHTTP_NO_ADDITIONAL_HEADERS, 0,
-										(void*) Payload.c_str(), (DWORD) Payload.length(), (DWORD) Payload.length(),
+										(void*) Payload->c_str(), (DWORD) Payload->length(), (DWORD) Payload->length(),
 										(DWORD_PTR) ContextPtr))
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
@@ -85,7 +85,7 @@ public:
 			else
 			{
 				if (!WinHttpSendRequest(Request->RequestHandle, WINHTTP_NO_ADDITIONAL_HEADERS, 0,
-										WINHTTP_NO_REQUEST_DATA, 0, 0, (DWORD_PTR) ContextPtr))
+										WINHTTP_NO_REQUEST_DATA, 0, Request->Parameters.GetPayloadSize(), (DWORD_PTR) ContextPtr))
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
 												"sending request received system error code {}", GetLastError());

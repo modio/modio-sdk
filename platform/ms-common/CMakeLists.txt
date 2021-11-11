@@ -19,7 +19,7 @@ if(MODIO_PLATFORM STREQUAL "WIN" OR MODIO_FORCE_MS_COMMON)
 		target_compile_options(platform INTERFACE /bigobj)
 		target_compile_options(platform INTERFACE /permissive-)
 	elseif(GCC)
-		target_compile_options(platform INTERFACE -Wa,-mbig-obj)
+		target_compile_options(platform INTERFACE -Wa,-mbig-obj -Og)
 	endif()
 
 	target_include_directories(platform INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)

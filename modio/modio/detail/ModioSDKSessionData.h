@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -14,11 +14,15 @@
 
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioModCollectionEntry.h"
+#include "modio/core/ModioCreateModFileParams.h"
 #include "modio/detail/ModioAuthenticatedUser.h"
 #include "modio/detail/userdata/ModioUserDataContainer.h"
 #include "modio/detail/userdata/ModioUserProfile.h"
 
 #include <chrono>
+#include <map>
+#include <memory>
+#include <vector>
 
 namespace Modio
 {
@@ -91,6 +95,12 @@ namespace Modio
 			MODIO_IMPL static std::vector<FieldError> GetLastValidationError();
 			MODIO_IMPL static void ClearLastValidationError();
 
+			MODIO_IMPL static void AddPendingModfileUpload(Modio::ModID ID, Modio::CreateModFileParams Params);
+
+			/// @brief Retrieves the next pending modfile upload from the queue. *Removes the element from the queue*.
+			/// @return The pending upload information, or empty Optional if nothing pending
+			MODIO_IMPL static Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>> GetNextPendingModfileUpload();
+
 			/// @brief Initializes a ModProgressInfo for the specified mod, storing it in the global state. This method
 			/// is only intended for use by InstallOrUpdateModOp
 			/// @param ID Mod ID for the mod to begin reporting progress on
@@ -108,6 +118,11 @@ namespace Modio
 			/// @return Copy of the progress data for the current download/update, or an empty Optional if no such
 			/// operation is in progress
 			MODIO_IMPL static Modio::Optional<const Modio::ModProgressInfo> GetModProgress();
+
+			MODIO_IMPL static Modio::ModCreationHandle GetNextModCreationHandle();
+
+			MODIO_IMPL static Modio::Optional<Modio::ModID> ResolveModCreationHandle(Modio::ModCreationHandle Handle);
+			MODIO_IMPL static void LinkModCreationHandle(Modio::ModCreationHandle Handle, Modio::ModID ID);
 
 		private:
 			enum class InitializationState
@@ -142,6 +157,8 @@ namespace Modio
 			Modio::ModEventLog EventLog;
 			bool bRateLimited = false;
 			std::chrono::system_clock::time_point RateLimitedStart;
+			std::map<Modio::ModCreationHandle, Modio::Optional<Modio::ModID>> CreationHandles;
+			std::map<Modio::ModID, Modio::CreateModFileParams> PendingModUploads;
 		};
 	} // namespace Detail
 } // namespace Modio

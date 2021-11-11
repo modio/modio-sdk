@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -13,6 +13,7 @@
 #include "common/detail/ops/http/ReadHttpResponseHeadersOp.h"
 #include "common/detail/ops/http/ReadSomeResponseBodyOp.h"
 #include "common/detail/ops/http/SendHttpRequestOp.h"
+#include "common/detail/ops/http/WriteSomeToRequestOp.h"
 #include "common/http/HttpRequestImplementation.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioServices.h"
@@ -59,12 +60,8 @@ namespace Modio
 				Implementation = std::move(OtherImplementation);
 			}
 
-			HttpImplementationBase(asio::io_context::service& OwningService) : OwningService(OwningService)
-			{
-			}
-			virtual ~HttpImplementationBase()
-			{
-			}
+			HttpImplementationBase(asio::io_context::service& OwningService) : OwningService(OwningService) {}
+			virtual ~HttpImplementationBase() {}
 
 			template<typename CompletionToken>
 			auto InitializeHTTPAsync(CompletionToken&& Token)
@@ -103,11 +100,28 @@ namespace Modio
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 
+			template<typename CompletionToken>
+			auto BeginWriteAsync(IOObjectImplementationType PlatformIOObjectInstance, Modio::FileSize TotalLength,
+								 CompletionToken&& Token)
+			{
+				/*return asio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
+					BeginHttpRequestForWriteOp(PlatformIOObjectInstance, HttpState, TotalLength), Token,
+					Modio::Detail::Services::GetGlobalContext().get_executor());*/
+			}
+
+			template<typename CompletionToken>
+			auto WriteSomeAsync(IOObjectImplementationType PlatformIOObjectInstance, Modio::Detail::Buffer Data,
+								CompletionToken&& Token)
+			{
+				return asio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
+					WriteSomeToRequestOp(PlatformIOObjectInstance, std::move(Data), HttpState), Token,
+					Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
+
 			void Shutdown()
 			{
 				HttpState->Close();
 			}
-
 		};
 	} // namespace Detail
 } // namespace Modio

@@ -70,16 +70,6 @@ namespace Modio
 						{}),
 					Token, Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
-
-			template<typename CompletionTokenType>
-			auto ExtractAllFilesAsync(Modio::filesystem::path ArchiveFile, Modio::filesystem::path DestinationPath,
-									   Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo,
-									   CompletionTokenType&& Token)
-			{
-				return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode, Modio::FileSize)>(
-					ExtractAllToFolderOp(ArchiveFile, DestinationPath, ProgressInfo), Token,
-					Modio::Detail::Services::GetGlobalContext().get_executor());
-			}
 		} // namespace ComposedOps
 	} // namespace Detail
 } // namespace Modio

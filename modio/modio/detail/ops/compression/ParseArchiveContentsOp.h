@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -31,9 +31,8 @@ namespace Modio
 			std::uintmax_t CurrentFixupEntryIndex = 0;
 
 		public:
-			ParseArchiveContentsOp(std::shared_ptr<ArchiveFileImplementation> ArchiveState) : ArchiveState(ArchiveState)
-			{
-			};
+			ParseArchiveContentsOp(std::shared_ptr<ArchiveFileImplementation> ArchiveState)
+				: ArchiveState(ArchiveState) {};
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {},
@@ -44,7 +43,7 @@ namespace Modio
 					{
 						ArchiveFileOnDisk = std::make_shared<Modio::Detail::File>(ArchiveState->FilePath, false);
 						std::size_t FileSize = ArchiveFileOnDisk->GetFileSize();
-						CurrentSearchOffset = FileSize - (std::min((uint64_t) FileSize, (uint64_t)(64 * 1024)));
+						CurrentSearchOffset = FileSize - (std::min((uint64_t) FileSize, (uint64_t) (64 * 1024)));
 					}
 
 					while (ArchiveState->ZipMagicOffset == 0)
@@ -128,13 +127,14 @@ namespace Modio
 						ArchiveState->CentralDirectoryOffset =
 							Modio::Detail::TypedBufferRead<std::uint32_t>(FileChunk.value(), 16);
 						yield ArchiveFileOnDisk->ReadSomeAtAsync(ArchiveState->CentralDirectoryOffset,
-																  ArchiveState->CentralDirectorySize, std::move(Self));
+																 ArchiveState->CentralDirectorySize, std::move(Self));
 						if (FileChunk.has_value() && FileChunk->GetSize() != ArchiveState->CentralDirectorySize)
 						{
 							// Could not read full central directory
-							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression, "Could not read full central directory");
+							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression,
+														"Could not read full central directory");
 
-							Self.complete(Modio::make_error_code(Modio::FilesystemError::ReadError));
+							Self.complete(Modio::make_error_code(Modio::ArchiveError::InvalidHeader));
 							return;
 						}
 
@@ -144,7 +144,8 @@ namespace Modio
 						{
 							std::uint16_t CompressionMethod = Modio::Detail::TypedBufferRead<std::uint16_t>(
 								FileChunk.value(), CurrentRecordOffset + 10);
-
+							std::uint32_t InputCRC = Modio::Detail::TypedBufferRead<std::uint32_t>(
+								FileChunk.value(), CurrentRecordOffset + 16);
 							std::uint32_t CompressedSize = Modio::Detail::TypedBufferRead<std::uint32_t>(
 								FileChunk.value(), CurrentRecordOffset + 20);
 							std::uint32_t UncompressedSize = Modio::Detail::TypedBufferRead<std::uint32_t>(
@@ -158,6 +159,9 @@ namespace Modio
 							std::uint16_t CommentLength = Modio::Detail::TypedBufferRead<std::uint16_t>(
 								FileChunk.value(), CurrentRecordOffset + 32);
 
+							std::uint32_t ExternalAttributes = Modio::Detail::TypedBufferRead<std::uint32_t>(
+								FileChunk.value(), CurrentRecordOffset + 36);
+
 							std::uint32_t LocalHeaderOffset = Modio::Detail::TypedBufferRead<std::uint32_t>(
 								FileChunk.value(), CurrentRecordOffset + 42);
 
@@ -166,7 +170,7 @@ namespace Modio
 							PendingEntries.push_back(ArchiveFileImplementation::ArchiveEntry {
 								static_cast<ArchiveFileImplementation::CompressionMethod>(CompressionMethod),
 								std::string((const char*) FileChunk->Data() + CurrentRecordOffset + 46, FileNameLength),
-								LocalHeaderOffset, CompressedSize});
+								LocalHeaderOffset, CompressedSize, UncompressedSize, InputCRC, ((ExternalAttributes & 0x10)== 0x10)});
 
 							CurrentRecordOffset += (46 + FileNameLength + ExtraFieldLength + CommentLength);
 						}
@@ -176,7 +180,7 @@ namespace Modio
 							 CurrentFixupEntryIndex++)
 						{
 							yield ArchiveFileOnDisk->ReadSomeAtAsync(PendingEntries[CurrentFixupEntryIndex].FileOffset,
-																	  30, std::move(Self));
+																	 30, std::move(Self));
 
 							if (ec && ec != Modio::GenericError::EndOfFile)
 							{

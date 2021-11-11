@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -156,6 +156,37 @@ namespace Modio
 			Modio::MutableBufferView DestBufferView(&Destination, sizeof(Destination));
 			asio::buffer_copy(DestBufferView, SourceBufferView);
 			return Destination;
+		}
+		
+		struct TypedWriteHelper;
+
+		template<typename SourceType>
+		TypedWriteHelper TypedBufferWrite(const SourceType& Source, Modio::Detail::Buffer& BufferToWrite,
+										  std::uintmax_t Offset);
+		
+
+		/// @brief Helper struct to make repeated calls to TypedBufferWrite less verbose if they are writing to
+		/// sequential memory
+		struct TypedWriteHelper
+		{
+			Modio::Detail::Buffer& Target;
+			std::uintmax_t Offset;
+
+			template<typename SourceType>
+			TypedWriteHelper FollowedBy(const SourceType& Source) &&
+			{
+				return TypedBufferWrite<SourceType>(Source, Target, Offset);
+			}
+		};
+
+		template<typename SourceType>
+		TypedWriteHelper TypedBufferWrite(const SourceType& Source, Modio::Detail::Buffer& BufferToWrite,
+										  std::uintmax_t Offset)
+		{
+			Modio::ConstBufferView SourceBufferView(&Source, sizeof(SourceType));
+			Modio::MutableBufferView DestinationBufferView(BufferToWrite.Data() + Offset, sizeof(SourceType));
+			asio::buffer_copy(DestinationBufferView, SourceBufferView);
+			return {BufferToWrite, Offset + sizeof(SourceType)};
 		}
 
 		/// @brief Copies a Modio::Detail::DynamicBuffer into a Modio::Detail::Buffer with no error checking

@@ -256,7 +256,8 @@ namespace Modio
 		{
 			Installed, /** Mod installation to local storage */
 			Uninstalled, /** Mod uninstallation from local storage*/
-			Updated /** Mod local installation updated to latest version*/
+			Updated, /** Mod local installation updated to latest version*/
+			Uploaded
 		};
 
 		/// @brief ID for the mod that the event occurred on

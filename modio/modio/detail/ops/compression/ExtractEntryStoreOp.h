@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "modio/compression/zlib/inflate_stream.hpp"
-#include "modio/compression/zlib/zlib.hpp"
+#include "modio/detail/compression/zlib/inflate_stream.hpp"
+#include "modio/detail/compression/zlib/zlib.hpp"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"

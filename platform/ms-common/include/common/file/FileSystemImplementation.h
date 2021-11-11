@@ -219,6 +219,17 @@ namespace Modio
 				return RootLocalStoragePath / fmt::format("{}/cache/users/{}/avatars/", CurrentGameID, UserId);
 			}
 
+			bool DirectoryExists(const Modio::filesystem::path& DirectoryPath) const override { 
+				
+				Modio::ErrorCode ec;
+				if (Modio::filesystem::exists(DirectoryPath, ec) && !ec)
+				{
+					return Modio::filesystem::is_directory(DirectoryPath, ec) && !ec;
+				}
+
+				return false;
+			}
+
 			bool CreateFolder(const Modio::filesystem::path& FolderPath) const
 			{
 				std::error_code ec;

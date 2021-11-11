@@ -31,10 +31,6 @@ target_sources(${MODIO_TARGET_NAME} INTERFACE
 add_public_header(${MODIO_TARGET_NAME} modio/ModioSDK.h)
 
 
-# Ensure that everythingin boost beast can be compiled as a header only library
-target_compile_definitions(${MODIO_TARGET_NAME} INTERFACE 
-    BOOST_BEAST_DECL=inline)
-
 target_include_directories(${MODIO_TARGET_NAME} INTERFACE ${ModioGeneratedHeaderPath})
 
 target_link_libraries(${MODIO_TARGET_NAME} INTERFACE asio ghc_filesystem fmt-header-only tl::optional platform nlohmann_json)

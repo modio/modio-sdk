@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -15,6 +15,8 @@
 #include "modio/detail/ModioDefines.h"
 
 #include "modio/core/ModioCoreTypes.h"
+#include "modio/core/ModioCreateModFileParams.h"
+#include "modio/core/ModioCreateModParams.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioFilterParams.h"
 #include "modio/core/ModioInitializeOptions.h"
@@ -51,15 +53,16 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Provide a callback to handle log messages emitted by the SDK.
-	/// @param LogCallback Callback invoked by the SDK during xref:RunPendingHandlers[Modio::RunPendingHandlers] for each log emitted
-	/// during that invocation
+	/// @param LogCallback Callback invoked by the SDK during xref:RunPendingHandlers[Modio::RunPendingHandlers] for
+	/// each log emitted during that invocation
 	MODIOSDK_API void SetLogCallback(std::function<void(Modio::LogLevel, const std::string&)> LogCallback);
 
 	/// @docpublic
 	/// @brief Runs any pending SDK work on the calling thread, including invoking any callbacks passed to asynchronous
 	/// operations.
-	/// NOTE: This should be called while xref:InitializeAsync[Modio::InitializeAsync] and xref:ShutdownAsync[Modio::ShutdownAsync] are running,
-	/// as they both utilize the internal event loop for functionality.
+	/// NOTE: This should be called while xref:InitializeAsync[Modio::InitializeAsync] and
+	/// xref:ShutdownAsync[Modio::ShutdownAsync] are running, as they both utilize the internal event loop for
+	/// functionality.
 	MODIOSDK_API void RunPendingHandlers();
 
 	/// @docpublic
@@ -127,13 +130,15 @@ namespace Modio
 	/// @brief Enables the automatic management of installed mods on the system based on the user's subscriptions.
 	/// Does nothing if mod management is currently enabled. Note: this function does not behave like other "async"
 	/// methods, given that its name does not include the word async.
-	/// @param ModManagementHandler This callback handler will be invoked with a ModManagementEvent for each mod operation performed by the SDK
+	/// @param ModManagementHandler This callback handler will be invoked with a ModManagementEvent for each mod
+	/// operation performed by the SDK
 	///
 	/// @return Modio::ErrorCode indicating if mod management was enabled successfully
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error ModManagementError::ModManagementAlreadyEnabled|Mod management was already enabled. The mod management
 	/// callback has not been changed
-	MODIOSDK_API Modio::ErrorCode EnableModManagement(std::function<void(Modio::ModManagementEvent)> ModManagementHandler);
+	MODIOSDK_API Modio::ErrorCode EnableModManagement(
+		std::function<void(Modio::ModManagementEvent)> ModManagementHandler);
 
 	/// @docpublic
 	/// @brief Disables automatic installation or uninstallation of mods based on the user's subscriptions. Allows
@@ -216,9 +221,43 @@ namespace Modio
 	/// @requires initialized-sdk
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
-	MODIOSDK_API void GetTermsOfUseAsync(
-		Modio::AuthenticationProvider Provider, Modio::Language Locale,
-		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms> Terms)> Callback);
+	MODIOSDK_API void GetTermsOfUseAsync(Modio::AuthenticationProvider Provider, Modio::Language Locale,
+										 std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)> Callback);
+
+	/// @docpublic
+	/// @brief Returns a handle for use with SubmitNewModAsync
+	/// @return The handle to use in a call to SubmitNewModAsync
+	MODIOSDK_API Modio::ModCreationHandle GetModCreationHandle();
+
+	/// @docpublic
+	/// @brief Requests a new mod be created with the specified properties
+	/// @param Handle Handle returned by xref:GetModCreationHandle[Modio::GetModCreationHandle]. Each successful call to
+	/// SubmitNewModAsync requires a new ModCreationHandle.
+	/// @param Params Information about the mod to be created
+	/// @param Callback Callback invoked with the ID of the created mod once the parameters are validated by the server
+	/// and the mod is created
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @requires authenticated-user
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @errorcategory InvalidArgsError|Some of the information in the ModCreateParams did not pass validation
+	/// @error UserDataError::InvalidUser|No authenticated user
+	MODIOSDK_API void SubmitNewModAsync(
+		Modio::ModCreationHandle Handle, Modio::CreateModParams Params,
+		std::function<void(Modio::ErrorCode ec, Modio::Optional<Modio::ModID>)> Callback);
+
+	/// @docpublic
+	/// @brief Queues a modfile submission. The submission process creates an archive using the information specified in
+	/// the parameters, then uploads that file to the server as a new modfile release for the specified mod. When the
+	/// modfile submission completes, a Mod Management Event will be triggered.
+	/// @param Mod The mod to attach the modfile to
+	/// @param Params Descriptor containing information regarding the modfile
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @requires authenticated-user
+	/// @requires management-enabled
+	MODIOSDK_API void SubmitNewModFileForMod(Modio::ModID Mod, Modio::CreateModFileParams Params);
 
 	/// @docpublic
 	/// @brief Provides a list of mods for the current game, that match the parameters specified in the filter
@@ -307,9 +346,8 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod could not be found
 	/// @error UserDataError::InvalidUser|No authenticated user
-	MODIOSDK_API void SubmitModRatingAsync(Modio::ModID ModID, Modio::Rating Rating, std::function<void(Modio::ErrorCode)> Callback);
-
-
+	MODIOSDK_API void SubmitModRatingAsync(Modio::ModID ModID, Modio::Rating Rating,
+										   std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
 	/// @brief Fetches the available tags used on mods for the current game. These tags can them be used in conjunction
@@ -334,9 +372,7 @@ namespace Modio
 	/// @experimental
 	MODIOSDK_API void GetModDependenciesAsync(
 		Modio::ModID ModID,
-		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)>
-			Callback);
-
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback);
 
 	/// @docpublic
 	/// @brief Begins email authentication for the current session by requesting a one-time code be sent to the

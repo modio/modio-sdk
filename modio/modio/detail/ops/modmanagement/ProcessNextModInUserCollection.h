@@ -15,6 +15,7 @@
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/SaveModCollectionToStorage.h"
+#include "modio/detail/ops/mod/SubmitNewModFileOp.h"
 #include "modio/detail/ops/modmanagement/InstallOrUpdateMod.h"
 #include "modio/detail/ops/modmanagement/UninstallMod.h"
 #include "modio/userdata/ModioUserDataService.h"
@@ -37,11 +38,12 @@ namespace Modio
 						EntryToProcess = nullptr;
 
 						// Note: because we aren't `yield`ing in these loops, we're safe to use range-based for. If we
-						// needed to `yield` in the loop, we'd need to store the iterator so we can pick up where we left
-						// off when we return from `yield`.
+						// needed to `yield` in the loop, we'd need to store the iterator so we can pick up where we
+						// left off when we return from `yield`.
 
 						// Check for pending uninstallations regardless of user
-						for (auto ModEntry : Modio::Detail::SDKSessionData::GetSystemModCollection().SortEntriesByRetryPriority())
+						for (auto ModEntry :
+							 Modio::Detail::SDKSessionData::GetSystemModCollection().SortEntriesByRetryPriority())
 						{
 							if (ModEntry->GetModState() == Modio::ModState::UninstallPending)
 							{
@@ -52,9 +54,19 @@ namespace Modio
 							}
 						}
 
-						// If no pending uninstallations, check for this users installs or updates
+						// If no pending uninstallations, check for this users uploads, installs or updates
 						if (!EntryToProcess)
 						{
+							// if we have a pending upload, process that immediately before bothering with iterating the
+							// user subscriptions
+							if ((PendingUpload = Modio::Detail::SDKSessionData::GetNextPendingModfileUpload()))
+							{
+								yield SubmitNewModFileAsync(PendingUpload->first, PendingUpload->second,
+															std::move(Self));
+								Self.complete(ec);
+								return;
+							}
+
 							Modio::ModCollection UserModCollection =
 								Modio::Detail::SDKSessionData::FilterSystemModCollectionByUserSubscriptions();
 							for (auto ModEntry : UserModCollection.SortEntriesByRetryPriority())
@@ -127,6 +139,7 @@ namespace Modio
 		private:
 			asio::coroutine CoroutineState;
 			std::shared_ptr<Modio::ModCollectionEntry> EntryToProcess;
+			Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>> PendingUpload;
 		};
 
 		template<typename ProcessNextCallback>

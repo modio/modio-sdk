@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -20,6 +20,7 @@
 #include "modio/detail/ModioOperationQueue.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/http/ResponseError.h"
+#include "modio/file/ModioFile.h"
 #include "modio/http/ModioHttpRequest.h"
 #include "modio/http/ModioHttpService.h"
 #include <memory>
@@ -56,6 +57,11 @@ class PerformRequestAndGetResponseOp : public Modio::Detail::BaseOperation<Perfo
 	struct PerformRequestImpl
 	{
 		Modio::Detail::OperationQueue::Ticket RequestTicket;
+		std::unique_ptr<Modio::Detail::File> CurrentPayloadFile;
+		Modio::Detail::DynamicBuffer PayloadFileBuffer;
+		Modio::FileSize CurrentPayloadFileBytesRead;
+		Modio::Optional<std::pair<std::string, Modio::Detail::PayloadContent>> PayloadElement;
+		std::unique_ptr<Modio::Detail::Buffer> HeaderBuf;
 
 	public:
 		PerformRequestImpl(Modio::Detail::OperationQueue::Ticket RequestTicket)
@@ -130,6 +136,91 @@ public:
 				return;
 			}
 
+			if (Request->Parameters().ContainsFormData())
+			{
+				while (Impl->PayloadElement = Request->Parameters().TakeNextPayloadElement())
+				{
+					// Write the header for the field in the form data
+					{
+						{
+							std::string PayloadContentFilename = "";
+							if (Impl->PayloadElement->second.bIsFile)
+							{
+								PayloadContentFilename = fmt::format("; filename=\"{}\"", Impl->PayloadElement->second.PathToFile->filename().u8string());
+							}
+							std::string PayloadContentHeader = fmt::format(
+								"\r\n--{}\r\nContent-Disposition: form-data; name=\"{}\"{}\r\n\r\n",
+								Modio::Detail::HttpRequestParams::GetBoundaryHash(), Impl->PayloadElement->first, PayloadContentFilename);
+							Impl->HeaderBuf = std::make_unique<Modio::Detail::Buffer>(PayloadContentHeader.size());
+							std::copy(PayloadContentHeader.begin(), PayloadContentHeader.end(),
+									  Impl->HeaderBuf->begin());
+						}
+
+						yield Request->WriteSomeAsync(std::move(*Impl->HeaderBuf), std::move(Self));
+						if (ec)
+						{
+							Self.complete(ec);
+							return;
+						}
+					}
+
+					// Write the form data itself to the connection, either looping through the file data (for a file field) or just writing the in-memory data (for string fields)
+					if (Impl->PayloadElement->second.bIsFile)
+					{
+						Impl->CurrentPayloadFileBytesRead = Modio::FileSize(0);
+
+						Impl->CurrentPayloadFile =
+							std::make_unique<Modio::Detail::File>(Impl->PayloadElement->second.PathToFile.value());
+						while (Impl->CurrentPayloadFileBytesRead < Impl->CurrentPayloadFile->GetFileSize())
+						{
+							yield Impl->CurrentPayloadFile->ReadAsync(64 * 1024, Impl->PayloadFileBuffer,
+																	  std::move(Self));
+							Impl->CurrentPayloadFileBytesRead += Modio::FileSize(Impl->PayloadFileBuffer.size());
+							if (ec)
+							{
+								Self.complete(ec);
+								return;
+							}
+							while (Impl->PayloadFileBuffer.size())
+							{
+								yield Request->WriteSomeAsync(
+									std::move(Impl->PayloadFileBuffer.TakeInternalBuffer().value()), std::move(Self));
+								if (ec)
+								{
+									Self.complete(ec);
+									return;
+								}
+							}
+							
+						}
+					}
+					else
+					{
+						yield Request->WriteSomeAsync(std::move(*Impl->PayloadElement->second.RawBuffer),
+													  std::move(Self));
+						if (ec)
+						{
+							Self.complete(ec);
+							return;
+						}
+					}
+				}
+
+				/// Write the final boundary onto the wire
+				{
+					std::string FinalPayloadBoundary =
+						fmt::format("\r\n--{}\r\n", Modio::Detail::HttpRequestParams::GetBoundaryHash());
+					Impl->HeaderBuf = std::make_unique<Modio::Detail::Buffer>(FinalPayloadBoundary.size());
+					std::copy(FinalPayloadBoundary.begin(), FinalPayloadBoundary.end(), Impl->HeaderBuf->begin());
+				}
+				yield Request->WriteSomeAsync(std::move(*Impl->HeaderBuf), std::move(Self));
+				if (ec)
+				{
+					Self.complete(ec);
+					return;
+				}
+			}
+
 			yield Request->ReadResponseHeadersAsync(std::move(Self));
 
 			if (ec)
@@ -147,7 +238,7 @@ public:
 					return;
 				}
 
-				//Some implementations of ReadSomeFromResponseBodyAsync may store multiple buffers in a single call
+				// Some implementations of ReadSomeFromResponseBodyAsync may store multiple buffers in a single call
 				// so make sure we steal all of them
 				while ((CurrentBuffer = State.ResponseBodyBuffer.TakeInternalBuffer()))
 				{
@@ -218,9 +309,9 @@ public:
 				}
 				else
 				{
-					//we have a raw HTTP response error but no error ref (ie probably we have a cloudflare error)
-					//Self.complete(Modio::make_error_code(static_cast<Modio::RawHttpError>(ResponseCode);
-					//return;
+					// we have a raw HTTP response error but no error ref (ie probably we have a cloudflare error)
+					// Self.complete(Modio::make_error_code(static_cast<Modio::RawHttpError>(ResponseCode);
+					// return;
 					Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
 					return;
 				}

@@ -1,18 +1,18 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioServices.h"
-#include "modio/file/ModioFileService.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/file/ModioFileService.h"
 
 namespace Modio
 {
@@ -82,41 +82,46 @@ namespace Modio
 				get_implementation()->Seek(Offset, Direction);
 			}
 
+			Modio::FileOffset Tell()
+			{
+				return get_implementation()->Tell();
+			}
+
 			template<typename CompletionTokenType>
 			auto WriteSomeAtAsync(std::uintmax_t Offset, Modio::Detail::Buffer Buffer, CompletionTokenType&& Token)
 			{
 				return get_service().WriteSomeAtAsync(get_implementation(), Offset, std::move(Buffer),
-														 std::forward<CompletionTokenType>(std::move(Token)));
+													  std::forward<CompletionTokenType>(std::move(Token)));
 			}
 
 			template<typename CompletionTokenType>
 			auto ReadSomeAtAsync(std::uintmax_t Offset, std::uintmax_t Length, CompletionTokenType&& Token)
 			{
 				return get_service().ReadSomeAtAsync(get_implementation(), Offset, Length,
-														std::forward<CompletionTokenType>(std::move(Token)));
+													 std::forward<CompletionTokenType>(std::move(Token)));
 			}
 
 			template<typename CompletionTokenType>
 			auto ReadSomeAtAsync(std::uintmax_t Offset, std::uintmax_t MaxBytesToRead,
-								  Modio::Detail::DynamicBuffer Destination, CompletionTokenType&& Token)
+								 Modio::Detail::DynamicBuffer Destination, CompletionTokenType&& Token)
 			{
 				return get_service().ReadSomeAtAsync(get_implementation(), Offset, MaxBytesToRead, Destination,
-														std::forward<CompletionTokenType>(std::move(Token)));
+													 std::forward<CompletionTokenType>(std::move(Token)));
 			}
 
 			template<typename CompletionTokenType>
 			auto ReadAsync(std::uintmax_t MaxBytesToRead, Modio::Detail::DynamicBuffer Destination,
-							CompletionTokenType&& Token)
+						   CompletionTokenType&& Token)
 			{
 				return get_service().ReadAsync(get_implementation(), MaxBytesToRead, Destination,
-												std::forward<CompletionTokenType>(std::move(Token)));
+											   std::forward<CompletionTokenType>(std::move(Token)));
 			}
 
 			template<typename CompletionTokenType>
 			auto WriteAsync(Modio::Detail::Buffer Buffer, CompletionTokenType&& Token)
 			{
 				return get_service().WriteAsync(get_implementation(), std::move(Buffer),
-												 std::forward<CompletionTokenType>(std::move(Token)));
+												std::forward<CompletionTokenType>(std::move(Token)));
 			}
 		};
 	} // namespace Detail

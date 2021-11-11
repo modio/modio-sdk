@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-Files under modio/modio/compression/zlib 
+Files under modio/modio/detail/compression/zlib 
 Copyright (c) 2016-2019 Vinnie Falco
 License: Boost Software License 1.0
 License text is attached below

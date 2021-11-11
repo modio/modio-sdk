@@ -1,4 +1,4 @@
-:gitplant: http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/modio/modio-sdk/doc/chapters/diagrams/general-overview/
+:gitplant: http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/modio/modio-sdk/main/doc/chapters/diagrams/general-overview/
 
 == Getting started
 

@@ -33,6 +33,7 @@ namespace Modio
 			virtual Modio::filesystem::path MakeAvatarFolderPath(Modio::UserID ID) const = 0;
 
 			virtual bool CheckSpaceAvailable(const Modio::filesystem::path& Destination, Modio::FileSize DesiredSize) = 0;
+			virtual bool DirectoryExists(const Modio::filesystem::path& PathToCheck) const = 0;
 			virtual bool CreateFolder(const Modio::filesystem::path& FolderPath) const = 0;
 			virtual bool FileExists(const Modio::filesystem::path& FilePath) const = 0;
 			virtual bool DeleteFile(const Modio::filesystem::path& FilePath) const = 0;

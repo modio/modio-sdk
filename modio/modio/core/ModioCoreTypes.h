@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -77,7 +77,6 @@ namespace Modio
 		UnderlyingIntegerType Value = 0;
 
 	public:
-
 		using UnderlyingType = UnderlyingIntegerType;
 		// Force explicit use of the constructor when we need a StrongInteger (ie this means you must construct a
 		// StrongInteger to pass into a function)
@@ -230,6 +229,7 @@ namespace Modio
 	struct UserID : public StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
+		UserID() : StrongInteger(-1) {};
 	};
 
 	/// @docpublic
@@ -237,7 +237,8 @@ namespace Modio
 	struct ModID : public StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
-		
+		ModID() : StrongInteger(-1) {};
+
 		constexpr bool IsValid() const
 		{
 			return *this != InvalidModID();
@@ -288,7 +289,8 @@ namespace Modio
 	struct GameID : public StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
-
+		GameID() : StrongInteger(-1) {};
+		
 		constexpr bool IsValid() const
 		{
 			return *this != InvalidGameID();
@@ -302,6 +304,12 @@ namespace Modio
 		}
 	};
 
+	/// @docpublic
+	/// @brief Strong type wrapping a handle to an as-yet-uncreated mod
+	struct ModCreationHandle : public StrongInteger<std::int64_t>
+	{
+		using StrongInteger::StrongInteger;
+	};
 	// TODO: @Modio-core strong type for filesystem::paths that are directories?
 
 	/// @docpublic
@@ -378,7 +386,7 @@ namespace Modio
 	};
 
 	/// @docpublic
-	/// @brief A rating for a mod. 
+	/// @brief A rating for a mod.
 	enum class Rating : int8_t
 	{
 		Neutral = 0,
