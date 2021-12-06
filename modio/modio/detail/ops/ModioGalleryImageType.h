@@ -20,7 +20,7 @@ namespace Modio
 	{
 		struct GalleryImageType
 		{
-			GalleryImageType(Modio::ModID ModId, const Modio::Detail::GalleryList& GalleryList,
+			GalleryImageType(Modio::ModID ModId, const Modio::GalleryList& GalleryList,
 							 Modio::GallerySize GallerySize, Modio::GalleryIndex ImageIndex)
 				: ModId(ModId),
 				  GallerySize(GallerySize),

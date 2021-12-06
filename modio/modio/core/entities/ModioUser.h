@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -20,18 +20,23 @@ namespace Modio
 	/// @brief Object representing a mod.io user profile
 	struct User
 	{
-		
 		/// @brief Unique id for the user
-		Modio::UserID UserId;
+		Modio::UserID UserId = Modio::UserID(0);
 
 		/// @brief Username of the user
-		std::string Username;
+		std::string Username = "";
 
 		/// @brief Unix timestamp the user was last online
-		std::int64_t DateOnline;
+		std::int64_t DateOnline = 0;
 
 		/// @brief URL of the user's mod.io profile
-		std::string ProfileUrl;
+		std::string ProfileUrl = "";
+
+		friend bool operator==(const Modio::User& A, const Modio::User& B)
+		{
+			return (A.UserId == B.UserId && A.Username == B.Username && A.DateOnline == B.DateOnline &&
+					A.ProfileUrl == B.ProfileUrl);
+		}
 	};
 
 	inline void from_json(const nlohmann::json& Json, Modio::User& User)

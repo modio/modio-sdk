@@ -8,8 +8,7 @@
  *   
  */
 
-// Configures the library in a header only fashion so developers can just drop in the library in their project
-#pragma once
+// Provides library-wide defines controlling configuration of third-party libraries, etc. 
 
 // We have custom DEBUG_RELEASE flags, as in unreal, we can't define DEBUG/_DEBUG as
 // unreal has modified the allocator in debug, so we can't allocate all our objects with

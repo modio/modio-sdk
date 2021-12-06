@@ -11,27 +11,12 @@
 #pragma once
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/FilesystemWrapper.h"
+#include "modio/core/ModioLogger.h"
 #include <nlohmann/json.hpp>
 
 namespace Modio
 {
-	// Has to live here for ADL to work
-	namespace ghc
-	{
-		namespace filesystem
-		{
-			inline void to_json(nlohmann::json& Json, const Modio::filesystem::path& Path)
-			{
-				using nlohmann::to_json;
-				return to_json(Json, Path.u8string());
-			}
-
-			inline void from_json(const nlohmann::json& Json, Modio::filesystem::path& Path)
-			{
-				Path = Modio::filesystem::path(Json.get<std::string>());
-			}
-		} // namespace filesystem
-	} // namespace ghc
+	
 
 	namespace Detail
 	{
@@ -48,6 +33,8 @@ namespace Modio
 			}
 			else
 			{
+				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
+											"Failed to deserialize json Key: {}", Key);
 				return false;
 			}
 		}
@@ -64,6 +51,8 @@ namespace Modio
 			}
 			else
 			{
+				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
+											"Failed to deserialize json Key: {}", Key);
 				return false;
 			}
 		}
@@ -89,6 +78,16 @@ namespace Modio
 				{
 					ParseSafe(Subobject, OutVar, Key);
 				}
+				else
+				{
+					Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
+												"Subobject is null for SubobjectKey: {}", SubobjectKey);
+				}
+			}
+			else
+			{
+				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
+											"Json does not contain SubobjectKey: {}", SubobjectKey);
 			}
 		}
 
@@ -150,6 +149,24 @@ namespace Modio
 		}
 	} // namespace Detail
 } // namespace Modio
+
+// Moved to here for ADL
+namespace ghc
+{
+	namespace filesystem
+	{
+		inline void to_json(nlohmann::json& Json, const Modio::filesystem::path& Path)
+		{
+			using nlohmann::to_json;
+			return to_json(Json, Path.u8string());
+		}
+
+		inline void from_json(const nlohmann::json& Json, Modio::filesystem::path& Path)
+		{
+			Path = Modio::filesystem::path(Json.get<std::string>());
+		}
+	} // namespace filesystem
+} // namespace ghc
 
 #ifndef MODIO_SEPARATE_COMPILATION
 #include "modio/detail/ModioJsonHelpers.ipp"

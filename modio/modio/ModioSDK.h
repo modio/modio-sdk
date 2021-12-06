@@ -87,6 +87,7 @@ namespace Modio
 	/// @requires initialized-sdk
 	/// @requires authenticated-user
 	/// @requires no-rate-limiting
+	/// @requires management-enabled
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
@@ -103,6 +104,7 @@ namespace Modio
 	/// @requires initialized-sdk
 	/// @requires authenticated-user
 	/// @requires no-rate-limiting
+	/// @requires management-enabled
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted

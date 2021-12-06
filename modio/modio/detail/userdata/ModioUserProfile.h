@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -101,6 +101,12 @@ namespace Modio
 
 		private:
 			OAuthTokenState State = OAuthTokenState::Invalid;
+
+			friend bool operator==(const Modio::Detail::OAuthToken& A, const Modio::Detail::OAuthToken& B)
+			{
+				return (A.Token == B.Token && A.ExpireDate == B.ExpireDate && A.State == B.State &&
+						A.NoToken == B.NoToken);
+			}
 		};
 
 		struct ProfileData
@@ -128,10 +134,15 @@ namespace Modio
 		private:
 			Modio::Detail::AuthenticatedUser User;
 			Modio::Detail::OAuthToken Token;
+
+			friend bool operator==(const Modio::Detail::ProfileData& A, const Modio::Detail::ProfileData& B)
+			{
+				return (A.User == B.User && A.Token == B.Token);
+			}
 		};
 	} // namespace Detail
 } // namespace Modio
 
 #ifndef MODIO_SEPARATE_COMPILATION
-#include "ModioUserProfile.ipp"
+	#include "ModioUserProfile.ipp"
 #endif

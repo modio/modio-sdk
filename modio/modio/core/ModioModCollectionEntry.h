@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -67,8 +67,23 @@ namespace Modio
 
 		uint8_t RetriesRemainingThisSession;
 
-	public:
+		friend bool operator==(const Modio::ModCollectionEntry& A, const Modio::ModCollectionEntry& B)
+		{
+			// Note: Operator==()  ignores transient fields ShouldNotRetry and RetriesRemainingThisSession
+			if ((A.ID == B.ID) && (A.CurrentState == B.CurrentState) && (A.RollbackState == B.RollbackState) &&
+				(A.ModProfile == B.ModProfile) && (A.LocalUserSubscriptionCount == B.LocalUserSubscriptionCount) &&
+				(A.LocalUserSubscriptions == B.LocalUserSubscriptions) && (A.PathOnDisk == B.PathOnDisk) &&
+				(A.SizeOnDisk == B.SizeOnDisk) && (A.NeverRetryReason == B.NeverRetryReason))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 
+	public:
 		ModCollectionEntry() = default;
 
 		/// @docinternal
@@ -115,7 +130,8 @@ namespace Modio
 		MODIO_IMPL void MarkModNoRetryThisSession();
 
 		/// @docinternal
-		/// @brief Updates the error status on this mod and internal variables determining if the mod should have the relevant operation retried
+		/// @brief Updates the error status on this mod and internal variables determining if the mod should have the
+		/// relevant operation retried
 		MODIO_IMPL void SetLastError(Modio::ErrorCode Reason);
 
 		/// @docinternal
@@ -238,11 +254,28 @@ namespace Modio
 		}
 		friend void from_json(const nlohmann::json& j, UserSubscriptionList& List)
 		{
-			j.get_to(List.InternalList);
+			if (j.is_array())
+			{
+				using nlohmann::from_json;
+				from_json(j, List.InternalList);
+			}
+			else
+			{
+				Modio::Detail::Logger().Log(
+					Modio::LogLevel::Warning, Modio::LogCategory::Core,
+					"from_json failed for UserSubscriptionList. List must be an array.");
+			}
 		}
 
 	private:
 		std::set<Modio::ModID> InternalList;
+
+		friend bool operator==(const Modio::UserSubscriptionList& A, const Modio::UserSubscriptionList& B)
+		{
+			// Written for Test_JsonToAndFrom.cpp, re-check functionality before using in actual code. This operator
+			// enforces ordering.
+			return (A.InternalList == B.InternalList);
+		}
 	};
 
 	// vector of these for the log
@@ -307,6 +340,32 @@ namespace Modio
 
 	private:
 		std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> ModEntries;
+
+		friend bool operator==(const Modio::ModCollection& A, const Modio::ModCollection& B)
+		{
+			// redo. check length, and every pair in A, range based for, check keys are the same, deref shared pointer
+			// and compare
+			if (A.ModEntries.size() != B.ModEntries.size())
+			{
+				return false;
+			}
+			if (A.ModEntries.empty() && B.ModEntries.empty())
+			{
+				return true;
+			}
+			for (auto It = A.ModEntries.begin(); It != A.ModEntries.end(); It++)
+			{
+				if (B.ModEntries.find(It->first) == B.ModEntries.end())
+				{
+					return false;
+				}
+				else if (!(*(A.ModEntries.at(It->first)) == *(B.ModEntries.at(It->first))))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
 	};
 
 	class ModEventLog

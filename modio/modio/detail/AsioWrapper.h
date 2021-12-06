@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -15,15 +15,7 @@
 
 #ifdef MODIO_PLATFORM_UNREAL
 
-	#include "Misc/AssertionMacros.h"
-
-	#if PLATFORM_WINDOWS
-		#include <SDKDDKVer.h>
-		// Wrap asio in the UE4 windows platform support headers.
-		#include "Windows/AllowWindowsPlatformTypes.h"
-		#include "Windows/PreWindowsApi.h"
-		#include "Windows/AllowWindowsPlatformAtomics.h"
-	#endif
+	#include MODIO_UNREAL_PLATFORM_PREAMBLE
 
 	namespace asio
 	{
@@ -42,13 +34,9 @@
 	#define ASIO_NO_EXCEPTIONS 1
 	#include <asio.hpp>
 	#pragma pop_macro("ASIO_NO_EXCEPTIONS")
-	#if PLATFORM_WINDOWS
-		#include "Windows/PostWindowsApi.h"
-		#include "Windows/HideWindowsPlatformTypes.h"
-		#include "Windows/HideWindowsPlatformAtomics.h"
-  // Ensure that we are linking against Winhttp that we require on Windows
-		#pragma comment(lib, "Winhttp.lib")
-	#endif
+
+	#include MODIO_UNREAL_PLATFORM_EPILOGUE
+
 #elif defined(_WIN32)
 	// Set the proper SDK version before including asio
 	#include <SDKDDKVer.h>

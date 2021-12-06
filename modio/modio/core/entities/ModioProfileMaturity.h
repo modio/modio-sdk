@@ -41,18 +41,28 @@ namespace Modio
 		{
 			Value = Convert(MaturityOption::None);
 		};
+		using Modio::FlagImpl<MaturityOption>::FlagImpl;
 	};
 
 	inline void from_json(const nlohmann::json& Json, Modio::ProfileMaturity& ProfileMaturity)
 	{
 		std::uint8_t maturity = 0;
-		Detail::ParseSafe(Json, maturity, "maturity_option");
+		if (Json.is_number_integer())
+		{
+			using nlohmann::from_json;
+			from_json(Json, maturity);
+		}
+		else
+		{
+			Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
+										"ProfileMaturity from_json requires an integer.  Using default ProfileMaturity 0");
+		}
 		ProfileMaturity.Value = maturity;
 	}
 	inline void to_json(nlohmann::json& Json, const Modio::ProfileMaturity& ProfileMaturity)
 	{
 		// In case the Value inside ProfileMaturity is Optional::None, then it matches MaturityOption::None
 		std::uint8_t DefaultMaturity = static_cast<uint8_t>(MaturityOption::None);
-		Json = nlohmann::json {ProfileMaturity.Value.value_or(DefaultMaturity)};
+		Json = ProfileMaturity.Value.value_or(DefaultMaturity);
 	}
 } // namespace Modio

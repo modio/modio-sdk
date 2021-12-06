@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -23,7 +23,7 @@ namespace Modio
 		{
 		public:
 			GetModMediaGalleryOp(Modio::GameID GameID, Modio::ApiKey ApiKey, Modio::ModID ModId,
-							   Modio::GallerySize GallerySize, Modio::GalleryIndex ImageIndex)
+								 Modio::GallerySize GallerySize, Modio::GalleryIndex ImageIndex)
 				: GameID(GameID),
 				  ApiKey(ApiKey),
 				  ModId(ModId),
@@ -57,15 +57,22 @@ namespace Modio
 						return;
 					}
 
-					if (auto ParsedGalleryList = Modio::Detail::MarshalSubobjectResponse<Modio::Detail::GalleryList>(
-						"media", OpState.ResponseBodyBuffer))
 					{
-						OpState.GalleryList = ParsedGalleryList.value();
-					}
-					else
-					{
-						Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse), {});
-						return;
+						nlohmann::json ResponseJson = ToJson(OpState.ResponseBodyBuffer);
+						if (ResponseJson.is_discarded())
+						{
+							Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse), {});
+							return;
+						}
+						if (ResponseJson.contains("media"))
+						{
+							Modio::Detail::ParseSubobjectSafe(ResponseJson, OpState.GalleryList, "media", "images");
+						}
+						else
+						{
+							Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse), {});
+							return;
+						}
 					}
 
 					if (ImageIndex >= OpState.GalleryList.Size())
@@ -74,7 +81,7 @@ namespace Modio
 						Self.complete(Modio::make_error_code(Modio::GenericError::IndexOutOfRange), {});
 						return;
 					}
-					
+
 					yield Modio::Detail::DownloadImageAsync(
 						GalleryImageType(ModId, OpState.GalleryList, GallerySize, ImageIndex), OpState.DestinationPath,
 						std::move(Self));
@@ -103,7 +110,7 @@ namespace Modio
 			{
 				Modio::Detail::DynamicBuffer ResponseBodyBuffer;
 				Modio::StableStorage<Modio::filesystem::path> DestinationPath;
-				Modio::Detail::GalleryList GalleryList;
+				Modio::GalleryList GalleryList;
 			} OpState;
 		};
 	} // namespace Detail

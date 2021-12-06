@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -28,6 +28,11 @@ namespace Modio
 			std::string Thumb50x50;
 			/** URL to the medium avatar thumbnail. */
 			std::string Thumb100x100;
+
+			friend bool operator==(const Modio::Detail::Avatar& A, const Modio::Detail::Avatar& B)
+			{
+				return (A.Filename == B.Filename && A.Original == B.Original && A.Thumb50x50 == B.Thumb50x50 && A.Thumb100x100 == B.Thumb100x100);
+			}
 		};
 
 		static void from_json(const nlohmann::json& Json, Avatar& Avatar)

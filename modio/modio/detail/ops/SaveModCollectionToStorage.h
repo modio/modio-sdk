@@ -33,6 +33,7 @@ namespace Modio
 					{
 						nlohmann::json ModCollectionData =
 							nlohmann::json::object({Modio::Detail::SDKSessionData::GetSystemModCollection()});
+						ModCollectionData["version"] = 1;
 						auto teststring = ModCollectionData.dump();
 						DestinationFile = std::make_unique<Modio::Detail::File>(
 							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()

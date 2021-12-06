@@ -1,0 +1,21 @@
+{
+  "Platforms": {
+    "Win64": {
+      "IncludeDirectories": [],
+      "PlatformSpecificDefines": [],
+      "ModuleDependencies": []
+    }
+  },
+  "IncludeDirectories": [
+    "win32/win32",
+    "ms-common/include"
+  ],
+  "PlatformSpecificDefines": [
+    "MODIO_TARGET_PLATFORM_ID=\"WIN\"",
+    "MODIO_UNREAL_PLATFORM_PREAMBLE=\"win32/detail/ModioUEPlatformPreamble.h\"",
+    "MODIO_UNREAL_PLATFORM_EPILOGUE=\"win32/detail/ModioUEPlatformEpilogue.h\""
+  ],
+  "ModuleDependencies": [
+    "WinHttp"
+  ]
+}

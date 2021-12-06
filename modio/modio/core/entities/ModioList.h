@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -14,7 +14,6 @@
 
 namespace Modio
 {
-
 	/// @brief Templated helper class to wrap a dynamic collection of elements
 	/// @tparam ContainerType the internal collection type to use
 	/// @tparam ValueType the value type the collection will hold
@@ -24,6 +23,12 @@ namespace Modio
 	protected:
 		using ListType = ContainerType<ValueType>;
 		ListType InternalList;
+
+		friend bool operator==(const List& A, const List& B)
+		{
+			// Written for Test_JsonToAndFrom.cpp, re-check functionality before using in actual code.
+			return (A.InternalList == B.InternalList);
+		}
 
 	public:
 		using iterator = typename ListType::iterator;
