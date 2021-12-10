@@ -237,7 +237,7 @@ namespace Modio
 				Params.RootDirectory /= "";
 				Modio::Detail::Logger().Log(
 					Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
-					"Modfile directory path {} does not end in a path separator. Adding manually", Params.RootDirectory);
+					"Modfile directory path {} does not end in a path separator. Adding manually", Params.RootDirectory.u8string());
 			}
 
 			auto ExistingEntry = Get().PendingModUploads.find(ID);

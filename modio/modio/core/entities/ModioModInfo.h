@@ -88,7 +88,7 @@ namespace Modio
 		/// @brief Metadata stored by the game developer.
 		std::string MetadataBlob = "";
 		/// @brief Information about the mod's most recent public release
-		Modio::FileMetadata FileInfo = {};
+		Modio::Optional<Modio::FileMetadata> FileInfo = {};
 		/// @brief Arbitrary key-value metadata set for this mod
 		std::vector<Modio::Metadata> MetadataKvp;
 		/// @brief Tags this mod has set
@@ -113,10 +113,24 @@ namespace Modio
 				(A.ProfileDescriptionPlaintext == B.ProfileDescriptionPlaintext) && (A.ProfileURL == B.ProfileURL) &&
 				(A.ProfileSubmittedBy == B.ProfileSubmittedBy) && (A.ProfileDateAdded == B.ProfileDateAdded) &&
 				(A.ProfileDateUpdated == B.ProfileDateUpdated) && (A.ProfileDateLive == B.ProfileDateLive) &&
-				(A.MetadataBlob == B.MetadataBlob) && (A.FileInfo == B.FileInfo) && (A.MetadataKvp == B.MetadataKvp) &&
-				(A.Tags == B.Tags) && (A.YoutubeURLs == B.YoutubeURLs) && (A.Stats == B.Stats))
+				(A.MetadataBlob == B.MetadataBlob) && (A.MetadataKvp == B.MetadataKvp) && (A.Tags == B.Tags) &&
+				(A.YoutubeURLs == B.YoutubeURLs) && (A.Stats == B.Stats))
 			{
-				return true;
+				if (A.FileInfo.has_value() && B.FileInfo.has_value())
+				{
+					if ((A.FileInfo.value() == B.FileInfo.value()))
+					{
+						return true;
+					}
+					else
+					{
+						return false;
+					}
+				}
+				else
+				{
+					return true;
+				}
 			}
 			else
 			{

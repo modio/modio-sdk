@@ -84,7 +84,7 @@ namespace Modio
 					yield ConfigFile->WriteAsync(std::move(*DefaultConfigBuffer), std::move(Self));
 					if (ec)
 					{
-						Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File, "Error code after write async {}", ec);
+						Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File, "Error code after write async {}", ec.value());
 					}
 					FileBuffer.Clear();
 					Self.complete(Modio::make_error_code(Modio::FilesystemError::FileNotFound));

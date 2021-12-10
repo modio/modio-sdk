@@ -42,7 +42,11 @@ namespace Modio
 		Detail::ParseSafe(Json, ModInfo.ModId, "id");
 
 		{
-			Detail::ParseSafe(Json, ModInfo.FileInfo, "modfile");
+			Modio::FileMetadata FileInfo;
+			if (Detail ::ParseSafe(Json, FileInfo, "modfile"))
+			{
+				ModInfo.FileInfo = FileInfo;
+			}
 			Detail::ParseSafe(Json, ModInfo.MetadataBlob, "metadata_blob");
 			Detail::ParseSafe(Json, ModInfo.MetadataKvp, "metadata_kvp");
 			Detail::ParseSafe(Json, ModInfo.Tags, "tags");
@@ -76,7 +80,6 @@ namespace Modio
 	void to_json(nlohmann::json& Json, const Modio::ModInfo& Info)
 	{
 		Json = nlohmann::json {{"id", Info.ModId},
-							   {"modfile", Info.FileInfo},
 							   {"metadata_blob", Info.MetadataBlob},
 							   {"metadata_kvp", Info.MetadataKvp},
 							   {"tags", Info.Tags},
@@ -94,6 +97,10 @@ namespace Modio
 							   {"media", nlohmann::json::object({{"youtube", Info.YoutubeURLs.GetRawList()},
 																 {"sketchfab", Info.SketchfabURLs.GetRawList()},
 																 {"images", Info.GalleryImages}})}};
+		if (Info.FileInfo.has_value())
+		{
+			Json["modfile"] = Info.FileInfo.value();
+		}
 	}
 
 } // namespace Modio
