@@ -32,6 +32,33 @@
       "name": "win64-dbginfo",
       "inherits": "win64",
       "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
+    },
+    {
+      "name": "linux64",
+      "displayName": "linux64",
+      "description": "Linux native x64",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/linux64",
+      "cacheVariables": {
+        "MODIO_PLATFORM": {
+          "type": "STRING",
+          "value": "LINUX"
+        },
+        "CMAKE_INSTALL_PREFIX": {
+          "type": "STRING",
+          "value": "${sourceDir}/out/install/linux64"
+        }
+      }
+    },
+    {
+      "name": "linux64-debug",
+      "inherits": "linux64",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    },
+    {
+      "name": "linux64-dbginfo",
+      "inherits": "linux64",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
     }
   ]
 }

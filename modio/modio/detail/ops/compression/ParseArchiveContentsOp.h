@@ -38,17 +38,27 @@ namespace Modio
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {},
 							Modio::Optional<Modio::Detail::Buffer> FileChunk = {})
 			{
+				constexpr std::size_t ChunkOfBytes = 64 * 1024;
+				std::size_t FileSize = 0;
+				std::size_t MaxBytesToRead = 0;
+
 				reenter(CoroutineState)
-				{
+				{	
 					{
 						ArchiveFileOnDisk = std::make_shared<Modio::Detail::File>(ArchiveState->FilePath, false);
-						std::size_t FileSize = ArchiveFileOnDisk->GetFileSize();
-						CurrentSearchOffset = FileSize - (std::min((uint64_t) FileSize, (uint64_t) (64 * 1024)));
+						FileSize = ArchiveFileOnDisk->GetFileSize();
+						CurrentSearchOffset = FileSize - (std::min((uint64_t) FileSize, (uint64_t) (ChunkOfBytes)));
 					}
 
 					while (ArchiveState->ZipMagicOffset == 0)
 					{
-						yield ArchiveFileOnDisk->ReadSomeAtAsync(CurrentSearchOffset, 64 * 1024, std::move(Self));
+						// In case the file to read is smaller than 65K bytes (rare but possible), the linux implementation
+						// would repeat the operation at least 5 times before realizing that the uring would not continue
+						// reading because it is the end of file. In some other times, it is possible to have two read/write
+						// operations that intersect witht the same file descriptor. To be the least disruptive with other 
+						// platforms, the line below checks if the FileSize is smaller than those 65K.
+						MaxBytesToRead = (FileSize < ChunkOfBytes ? FileSize : ChunkOfBytes);
+						yield ArchiveFileOnDisk->ReadSomeAtAsync(CurrentSearchOffset, MaxBytesToRead, std::move(Self));
 						if (ec && ec != Modio::GenericError::EndOfFile)
 						{
 							Self.complete(ec);
@@ -86,6 +96,9 @@ namespace Modio
 							}
 						}
 
+						// If the ec is "EndOfFile", the line below should reset its state in case it is used later on.
+						ec = {};
+
 						// If we haven't found the signature and we're at the end of the file, bail
 						if (ArchiveState->ZipMagicOffset == 0 && CurrentSearchOffset == 0)
 						{
@@ -95,9 +108,9 @@ namespace Modio
 							Self.complete(Modio::make_error_code(Modio::ArchiveError::InvalidHeader));
 							return;
 						}
-						if (CurrentSearchOffset >= 64 * 1024)
+						if (CurrentSearchOffset >= ChunkOfBytes)
 						{
-							CurrentSearchOffset -= 64 * 1024;
+							CurrentSearchOffset -= ChunkOfBytes;
 						}
 						else
 						{

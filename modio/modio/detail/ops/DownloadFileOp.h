@@ -220,7 +220,7 @@ public:
 					else
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Http,
-													"Download of {} completed", File->GetPath().u8string());
+													"Download of {} completed with size: {}", File->GetPath().u8string(), File->GetFileSize());
 						// Clean up
 						File.reset();
 						Self.complete(Modio::ErrorCode {});

@@ -88,6 +88,10 @@ namespace Modio
 							Self.complete(ec);
 							return;
 						}
+
+						// If the ec is "EndOfFile", the line below should reset its state in case it is used later on.
+						ec = {};
+						
 						Impl->BytesProcessed += Impl->FileData.size();
 						// Checking for size here means we can assume there will be an internal buffer to take from
 						// filedata

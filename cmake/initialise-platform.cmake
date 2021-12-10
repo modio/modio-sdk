@@ -1,12 +1,12 @@
-# 
+#
 #  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
-#  
+#
 #  This file is part of the mod.io SDK.
-#  
-#  Distributed under the MIT License. (See accompanying file LICENSE or 
+#
+#  Distributed under the MIT License. (See accompanying file LICENSE or
 #   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
-#   
-# 
+#
+#
 
 include_guard(GLOBAL)
 include(platform-defines)
@@ -22,9 +22,6 @@ macro(list_subdirs result curdir)
   SET(${result} ${dirlist})
 endmacro()
 
-
-set (MODIO_PLATFORM "WIN" CACHE STRING "Which platform to build the SDK for")
-   
 message("Fetching platform dependencies...")
 
 #iterate through all the currently installed platform directories

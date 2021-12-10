@@ -92,6 +92,8 @@ public:
 		using namespace Modio::Detail;
 		// Temporary storage for the request so we don't invoke undefined behaviour via Move
 		Modio::Optional<Modio::Detail::Buffer> CurrentBuffer;
+		constexpr std::size_t ChunkOfBytes = 64 * 1024;
+		std::size_t MaxBytesToRead = 0;
 
 		reenter(Coroutine)
 		{
@@ -171,9 +173,14 @@ public:
 
 						Impl->CurrentPayloadFile =
 							std::make_unique<Modio::Detail::File>(Impl->PayloadElement->second.PathToFile.value());
+						
 						while (Impl->CurrentPayloadFileBytesRead < Impl->CurrentPayloadFile->GetFileSize())
 						{
-							yield Impl->CurrentPayloadFile->ReadAsync(64 * 1024, Impl->PayloadFileBuffer,
+							// In case a file is less than ChunkOfBytes, it will read only the necessary number of bytes.
+							MaxBytesToRead = (ChunkOfBytes + Impl->CurrentPayloadFileBytesRead < Impl->CurrentPayloadFile->GetFileSize())
+												? ChunkOfBytes 
+												: Impl->CurrentPayloadFile->GetFileSize() - Impl->CurrentPayloadFileBytesRead;
+							yield Impl->CurrentPayloadFile->ReadAsync(MaxBytesToRead, Impl->PayloadFileBuffer,
 																	  std::move(Self));
 							Impl->CurrentPayloadFileBytesRead += Modio::FileSize(Impl->PayloadFileBuffer.size());
 							if (ec)

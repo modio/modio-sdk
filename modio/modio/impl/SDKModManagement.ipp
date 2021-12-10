@@ -19,6 +19,7 @@
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioSDKSessionData.h"
+#include "modio/detail/ops/AddOrUpdateModLogoOp.h"
 #include "modio/detail/ops/ModManagementLoop.h"
 #include "modio/detail/ops/SubscribeToModOp.h"
 #include "modio/detail/ops/UnsubscribeFromMod.h"
@@ -207,11 +208,22 @@ namespace Modio
 
 	MODIOSDK_API void SubmitNewModFileForMod(Modio::ModID Mod, Modio::CreateModFileParams Params)
 	{
-		//TODO: @modio-core we should return the error code from this function so we can do our precondition checks
+		// TODO: @modio-core we should return the error code from this function so we can do our precondition checks
 		Modio::Detail::SDKSessionData::AddPendingModfileUpload(Mod, Params);
 
-		//(Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireUserIsAuthenticated(Callback)) && RequireModManagementEnabled
-		
+		//(Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireUserIsAuthenticated(Callback)) &&
+		// RequireModManagementEnabled
+	}
+
+	void AddOrUpdateModLogoAsync(Modio::ModID ModID, Modio::filesystem::path LogoPath, std::function<void(Modio::ErrorCode)> Callback)
+	{
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+			Modio::Detail::RequireUserIsAuthenticated(Callback))
+		{
+			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
+				Modio::Detail::AddOrUpdateModLogoOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID, LogoPath),
+				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	}
 
 } // namespace Modio

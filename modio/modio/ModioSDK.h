@@ -92,6 +92,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
 	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void SubscribeToModAsync(Modio::ModID ModToSubscribeTo,
 										  std::function<void(Modio::ErrorCode)> OnSubscribeComplete);
 
@@ -109,6 +110,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
 	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void UnsubscribeFromModAsync(Modio::ModID ModToUnsubscribeFrom,
 											  std::function<void(Modio::ErrorCode)> OnUnsubscribeComplete);
 
@@ -126,6 +128,7 @@ namespace Modio
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void FetchExternalUpdatesAsync(std::function<void(Modio::ErrorCode)> OnFetchDone);
 
 	/// @docpublic
@@ -210,6 +213,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserAuthError::AlreadyAuthenticated|Authenticated user already signed-in. Call ClearUserDataAsync to
 	/// de-authenticate the old user, then Shutdown() and reinitialize the SDK first.
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void AuthenticateUserExternalAsync(Modio::AuthenticationParams User,
 													Modio::AuthenticationProvider Provider,
 													std::function<void(Modio::ErrorCode)> Callback);
@@ -223,6 +227,7 @@ namespace Modio
 	/// @requires initialized-sdk
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void GetTermsOfUseAsync(Modio::AuthenticationProvider Provider, Modio::Language Locale,
 										 std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)> Callback);
 
@@ -269,6 +274,7 @@ namespace Modio
 	/// @requires no-rate-limiting
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void ListAllModsAsync(
 		Modio::FilterParams Filter,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback);
@@ -284,6 +290,7 @@ namespace Modio
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void GetModInfoAsync(Modio::ModID ModId,
 									  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)> Callback);
 
@@ -299,6 +306,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
 	/// @error FilesystemError::InsufficientSpace|Not enough space for the file
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void GetModMediaAsync(
 		Modio::ModID ModId, Modio::LogoSize LogoSize,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)> Callback);
@@ -316,6 +324,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
 	/// @error FilesystemError::InsufficientSpace|Not enough space for the file
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void GetModMediaAsync(
 		Modio::ModID ModId, Modio::GallerySize GallerySize, Modio::GalleryIndex Index,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)> Callback);
@@ -333,6 +342,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
 	/// @error FilesystemError::InsufficientSpace|Not enough space for the file
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void GetModMediaAsync(
 		Modio::ModID ModId, Modio::AvatarSize AvatarSize,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)> Callback);
@@ -348,6 +358,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod could not be found
 	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void SubmitModRatingAsync(Modio::ModID ModID, Modio::Rating Rating,
 										   std::function<void(Modio::ErrorCode)> Callback);
 
@@ -360,6 +371,7 @@ namespace Modio
 	/// @requires no-rate-limiting
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void GetModTagOptionsAsync(
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)> Callback);
 
@@ -372,6 +384,7 @@ namespace Modio
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @experimental
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void GetModDependenciesAsync(
 		Modio::ModID ModID,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback);
@@ -388,6 +401,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserAuthError::AlreadyAuthenticated|Authenticated user already signed-in. Call ClearUserDataAsync to
 	/// de-authenticate the old user, then Shutdown() and reinitialize the SDK first.
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void RequestEmailAuthCodeAsync(Modio::EmailAddress EmailAddress,
 												std::function<void(Modio::ErrorCode)> Callback);
 
@@ -403,6 +417,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserAuthError::AlreadyAuthenticated|Authenticated user already signed-in. Call ClearUserDataAsync to
 	/// de-authenticate the old user, then Shutdown() and reinitialize the SDK first.
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void AuthenticateUserEmailAsync(Modio::EmailAuthCode AuthenticationCode,
 												 std::function<void(Modio::ErrorCode)> Callback);
 
@@ -417,6 +432,7 @@ namespace Modio
 	/// @requires authenticated-user
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void ClearUserDataAsync(std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
@@ -430,6 +446,7 @@ namespace Modio
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void GetUserMediaAsync(
 		Modio::AvatarSize AvatarSize,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)> Callback);
@@ -451,7 +468,25 @@ namespace Modio
 	/// @requires initialized-sdk
 	/// @errorcategory NetworkError|Couldn't Connect to mod.io servers
 	/// @errorcategory InvalidArgsError|Required information in the report did not pass validation
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void ReportContentAsync(Modio::ReportParams Report, std::function<void(Modio::ErrorCode)> Callback);
+
+	/// @docpublic
+	/// @brief Submit a new logo for an existing mod, overriding any existing image currently stored on the server. The
+	/// logo must be gif, jpg, or png format and cannot exceed 8MB in filesize. Dimensions must be at least 512x288. We
+	/// recommended you supply a high resolution image with a 16:9 ratio. mod.io will use this logo to create three
+	/// thumbnails with the dimensions of 320x180, 640x360 and 1280x720.
+	/// @param ModID ID of the mod whose logo will be added or updated
+	/// @param LogoPath Path to the new image file of the logo to be uploaded.
+	/// @param Callback Callback providing a status code indicating the outcome of the request
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @requires authenticated-user
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	MODIOSDK_API void AddOrUpdateModLogoAsync(Modio::ModID ModID, Modio::filesystem::path LogoPath,
+											  std::function<void(Modio::ErrorCode)> Callback);
 
 } // namespace Modio
 

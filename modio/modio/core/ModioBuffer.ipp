@@ -63,7 +63,12 @@ namespace Modio
 
 		Buffer Buffer::Clone() const
 		{
-			Buffer MyClone = Buffer(Size, Alignment);
+			return this->Clone(this->GetAlignment());
+		}
+
+		Buffer Buffer::Clone(std::size_t DiffAlignment) const
+		{
+			Buffer MyClone = Buffer(Size, DiffAlignment);
 			std::copy(begin(), end(), MyClone.begin());
 			return MyClone;
 		}
@@ -136,7 +141,7 @@ namespace Modio
 				NewBuffer.AppendBuffer(OriginalBuffer.Clone());
 			}
 
-			return std::move(NewBuffer);
+			return NewBuffer;
 		}
 
 		void DynamicBuffer::CopyBufferConfiguration(const DynamicBuffer& Other)
@@ -180,7 +185,7 @@ namespace Modio
 
 		std::unique_lock<std::mutex> DynamicBuffer::Lock()
 		{
-			return std::move(std::unique_lock<std::mutex>(*BufferLock));
+			return std::unique_lock<std::mutex>(*BufferLock);
 		}
 
 		void DynamicBuffer::Clear()

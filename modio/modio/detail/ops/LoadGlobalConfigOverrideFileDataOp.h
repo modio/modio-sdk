@@ -84,7 +84,7 @@ namespace Modio
 					yield ConfigFile->WriteAsync(std::move(*DefaultConfigBuffer), std::move(Self));
 					if (ec)
 					{
-						// warn about not being able to write out the default configuration
+						Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File, "Error code after write async {}", ec);
 					}
 					FileBuffer.Clear();
 					Self.complete(Modio::make_error_code(Modio::FilesystemError::FileNotFound));

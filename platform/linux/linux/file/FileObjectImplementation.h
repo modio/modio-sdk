@@ -1,14 +1,13 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
-// MIRRORED TO gdk/file/FileObjectImplementation.h, UPDATE THAT FILE IF THIS IS UPDATED
 #pragma once
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioStdTypes.h"
@@ -16,16 +15,16 @@
 #include "modio/detail/file/IFileObjectImplementation.h"
 #include <atomic>
 #include <chrono>
-#include <fileapi.h>
 namespace Modio
 {
 	namespace Detail
 	{
 		class FileObjectImplementation : public Modio::Detail::IFileObjectImplementation
 		{
+			constexpr static int InvalidFileDescriptor = -1;
 			Modio::filesystem::path FilePath;
 			Modio::filesystem::path BasePath;
-			HANDLE FileHandle;
+			int FileDescriptor;
 			// Strand so that IO ops don't get performed simultaneously
 			asio::strand<asio::io_context::executor_type>* Strand;
 			std::atomic<bool> OperationInProgress {false};
@@ -38,7 +37,7 @@ namespace Modio
 			FileObjectImplementation(asio::io_context& ParentContext, Modio::filesystem::path BasePath)
 				: FilePath(),
 				  BasePath(BasePath),
-				  FileHandle(INVALID_HANDLE_VALUE),
+				  FileDescriptor(InvalidFileDescriptor),
 				  Strand(nullptr),
 				  OperationQueue(ParentContext, std::chrono::steady_clock::time_point::max()),
 				  CurrentSeekOffset(0)
@@ -50,10 +49,10 @@ namespace Modio
 			}
 			void Destroy()
 			{
-				if (FileHandle != INVALID_HANDLE_VALUE)
+				if (FileDescriptor != InvalidFileDescriptor)
 				{
-					CloseHandle(FileHandle);
-					FileHandle = INVALID_HANDLE_VALUE;
+					close(FileDescriptor);
+					FileDescriptor = InvalidFileDescriptor;
 				}
 			}
 			void Close()
@@ -70,8 +69,8 @@ namespace Modio
 			{
 				return CancelRequested;
 			}
-
-			template<typename OperationType>
+			// TODO: refactor this to live on the file service and remove from other FileObjectImplementations
+			/*template<typename OperationType>
 			void BeginExclusiveOperation(OperationType&& Operation)
 			{
 				if (OperationInProgress.exchange(true))
@@ -96,7 +95,7 @@ namespace Modio
 					--NumWaiters;
 					OperationQueue.cancel_one();
 				}
-			}
+			}*/
 
 			Modio::filesystem::path GetPath()
 			{
@@ -106,9 +105,9 @@ namespace Modio
 			virtual Modio::ErrorCode Rename(Modio::filesystem::path NewPath) override
 			{
 				Modio::ErrorCode ec;
-				if (FileHandle != INVALID_HANDLE_VALUE)
+				if (FileDescriptor != InvalidFileDescriptor)
 				{
-					CloseHandle(FileHandle);
+					close(FileDescriptor);
 				}
 				Modio::filesystem::rename(FilePath, NewPath, ec);
 				if (ec)
@@ -123,21 +122,14 @@ namespace Modio
 
 			virtual void Truncate(Modio::FileOffset Offset) override
 			{
-				LARGE_INTEGER Length;
-				Length.QuadPart = Offset;
-				SetFilePointerEx(FileHandle, Length, NULL, FILE_BEGIN);
-				SetEndOfFile(FileHandle);
+				Modio::ErrorCode ec;
+				Modio::filesystem::resize_file(FilePath, Offset, ec);
 			}
 
 			virtual std::size_t GetSize() override
 			{
-				if (FileHandle != INVALID_HANDLE_VALUE)
-				{
-					LARGE_INTEGER FileSize;
-					GetFileSizeEx(FileHandle, &FileSize);
-					return FileSize.QuadPart;
-				}
-				return INVALID_FILE_SIZE;
+				Modio::ErrorCode ec;
+				return Modio::filesystem::file_size(FilePath, ec);
 			}
 
 			virtual void Seek(Modio::FileOffset Offset, Modio::Detail::SeekDirection Direction) override
@@ -177,39 +169,51 @@ namespace Modio
 				return *Strand;
 			}
 
-			Modio::ErrorCode CreateFile(filesystem::path FilePath)
+			Modio::ErrorCode CreateFile(Modio::filesystem::path NewFilePath)
 			{
-				return OpenFile(FilePath, true);
+				return OpenFile(NewFilePath, true);
 			}
 
-			Modio::ErrorCode OpenFile(filesystem::path FilePath, bool bOverwrite = false)
+			Modio::ErrorCode OpenFile(Modio::filesystem::path Path, bool bOverwrite = false)
 			{
 				Modio::ErrorCode ec;
-				filesystem::create_directories(FilePath.parent_path(), ec);
+				filesystem::create_directories(Path.parent_path(), ec);
 				if (ec)
 				{
+					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+												"Could not create parent directories for file {}", Path.u8string());
 					return ec;
 				}
 
-				this->FilePath = FilePath;
-				FileHandle = ::CreateFileW(this->FilePath.generic_wstring().c_str(), GENERIC_READ | GENERIC_WRITE,
-										   FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-										   bOverwrite ? CREATE_ALWAYS : OPEN_ALWAYS, FILE_FLAG_OVERLAPPED, NULL);
-				if (FileHandle != INVALID_HANDLE_VALUE)
+				this->FilePath = Path;
+				FileDescriptor = open(this->FilePath.generic_u8string().c_str(),
+									  O_RDWR | O_CREAT | O_NONBLOCK | (bOverwrite ? O_TRUNC : 0), S_IRUSR | S_IWUSR);
+		
+				if (FileDescriptor != InvalidFileDescriptor)
 				{
 					return std::error_code {};
 				}
 				else
 				{
-					DWORD Error = GetLastError();
-					// post failure
-					return Modio::ErrorCode(Error, std::system_category());
+					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
+												"Re-attempting open of file {} in read-only mode", Path.u8string());
+					FileDescriptor =
+						open(this->FilePath.generic_u8string().c_str(),
+							 O_RDONLY | O_NONBLOCK, S_IRUSR);
+					if (FileDescriptor != InvalidFileDescriptor)
+					{
+						return std::error_code {};
+					}
+					else
+					{
+						return Modio::ErrorCode(errno, std::system_category());
+					}
 				}
 			}
 
-			HANDLE GetFileHandle()
+			int GetFileHandle()
 			{
-				return FileHandle;
+				return FileDescriptor;
 			}
 		};
 	} // namespace Detail

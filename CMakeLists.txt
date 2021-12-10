@@ -7,9 +7,14 @@
 #   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
 # 
 
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.20)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+
+if (NOT MODIO_PLATFORM)
+    ## The MODIO_PLATFORM variable is required to compile the mod.io SDK
+    message(FATAL_ERROR "Variable 'MODIO_PLATFORM' must be defined to compile the SDK. For example: '-D MODIO_PLATFORM=WIN'")
+endif()
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)

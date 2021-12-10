@@ -51,6 +51,7 @@ namespace Modio
 			MODIO_IMPL Buffer CopyRange(const_iterator Start, const_iterator End);
 
 			MODIO_IMPL Buffer Clone() const;
+			MODIO_IMPL Buffer Clone(std::size_t DiffAlignment) const;
 
 			MODIO_IMPL unsigned char* const Data() const;
 			MODIO_IMPL unsigned char* const begin() const;

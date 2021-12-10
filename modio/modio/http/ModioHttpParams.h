@@ -219,6 +219,8 @@ namespace Modio
 				return "modio_sdk_multipart_boundary"_hash;
 			}
 
+			MODIO_IMPL void SetUserAgentOverride(std::string UserAgentHeader);
+
 		private:
 			MODIO_IMPL HttpRequestParams(std::string Server, std::string ResourcePath);
 			MODIO_IMPL std::string GetAPIVersionString() const;
@@ -267,6 +269,8 @@ namespace Modio
 
 			Modio::Optional<Modio::FileOffset> StartOffset;
 			Modio::Optional<Modio::FileOffset> EndOffset;
+
+			Modio::Optional<std::string> UserAgentOverride;
 		};
 
 // TODO: @Modio-core implement comparison operator for HttpRequestParams and maybe IsValid()?

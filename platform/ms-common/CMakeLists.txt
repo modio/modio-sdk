@@ -27,6 +27,7 @@ if(MODIO_PLATFORM STREQUAL "WIN" OR MODIO_FORCE_MS_COMMON)
 	add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/include/common/HttpSharedState.ipp)
 
 	if (MODIO_BUILD_TESTS)
+		set(MODIO_TEST_RENAME_ISATTY ON CACHE STRING "")
 		add_subdirectory(tests EXCLUDE_FROM_ALL)
 	endif()
 
