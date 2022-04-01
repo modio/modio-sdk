@@ -58,7 +58,7 @@ namespace Modio
 		inline uint32_t CRC32(Modio::Detail::Buffer& Data, uint32_t PreviousCRC32 = 0)
 		{
 			uint32_t CRC = ~PreviousCRC32;
-			for (const char& CurrentByte : Data)
+			for (const unsigned char& CurrentByte : Data)
 			{
 				CRC = (CRC >> 8) ^ Crc32Lookup[(CRC ^ CurrentByte) & 0xff];
 			}

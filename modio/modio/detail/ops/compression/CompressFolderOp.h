@@ -54,7 +54,11 @@ namespace Modio
 					Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
 					return;
 				}
-
+				if (!Modio::Detail::SDKSessionData::IsModManagementEnabled())
+				{
+					Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
+					return;
+				}
 				reenter(CoroutineState)
 				{
 					if (SourceDirectoryRootPath.has_filename())

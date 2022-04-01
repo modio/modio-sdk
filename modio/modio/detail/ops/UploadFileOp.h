@@ -82,13 +82,18 @@ namespace Modio
 				using namespace Modio::Detail;
 				// Temporary storage for the request so we don't invoke undefined behaviour via Move
 				Modio::Optional<Modio::Detail::Buffer> CurrentBuffer;
+				size_t BytesToRead = 0;
 
 				if (Impl->ProgressInfo.lock() == nullptr)
 				{
 					Self.complete(Modio::make_error_code(Modio::ModManagementError::UploadCancelled));
 					return;
 				}
-
+				if (!Modio::Detail::SDKSessionData::IsModManagementEnabled())
+				{
+					Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
+					return;
+				}
 				reenter(Coroutine)
 				{
 					yield Impl->RequestTicket.WaitForTurnAsync(std::move(Self));
@@ -109,7 +114,7 @@ namespace Modio
 
 					if (Request->Parameters().ContainsFormData())
 					{
-						while (Impl->PayloadElement = Request->Parameters().TakeNextPayloadElement())
+						while ((Impl->PayloadElement = Request->Parameters().TakeNextPayloadElement()))
 						{
 							// Write the header for the field in the form data
 							{
@@ -153,15 +158,26 @@ namespace Modio
 									std::shared_ptr<Modio::ModProgressInfo> Progress = Impl->ProgressInfo.lock();
 									if (Progress)
 									{
-										Progress->TotalDownloadSize = Modio::FileSize(Impl->CurrentPayloadFile->GetFileSize());
+										Progress->TotalDownloadSize =
+											Modio::FileSize(Impl->CurrentPayloadFile->GetFileSize());
 									}
 								}
 								while (Impl->CurrentPayloadFileBytesRead < Impl->CurrentPayloadFile->GetFileSize())
 								{
-									yield Impl->CurrentPayloadFile->ReadAsync(64 * 1024, Impl->PayloadFileBuffer,
+									{
+										// Limitting the number of bytes to what is necessary for the file size
+										// is required in macOS to correctly send data over the WriteStream
+										constexpr size_t MaxBytesBuffer = 64 * 1024;
+										size_t FileSize = Impl->CurrentPayloadFile->GetFileSize();
+										size_t RemainingBytes = FileSize - Impl->CurrentPayloadFileBytesRead;
+										BytesToRead = std::min(MaxBytesBuffer, RemainingBytes);
+									}
+
+									yield Impl->CurrentPayloadFile->ReadAsync(BytesToRead, Impl->PayloadFileBuffer,
 																			  std::move(Self));
 									Impl->CurrentPayloadFileBytesRead +=
 										Modio::FileSize(Impl->PayloadFileBuffer.size());
+
 									if (ec)
 									{
 										Self.complete(ec);

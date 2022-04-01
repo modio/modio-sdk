@@ -59,6 +59,15 @@ wget http://mirrors.kernel.org/ubuntu/pool/main/libu/liburing/liburing1_0.7-3ubu
 sudo apt install ./liburing*deb
 ----
 
+=== macOS Dependencies
+
+The mod.io SDK for development on macOS requires Clang 10 or GCC 10, which come included in the XCode 12 installation. To install CMake 3.20 or Ninja 1.10, it is recommended to use https://brew.sh[brew] as follows:
+
+[source,bash]
+----
+brew install cmake ninja
+----
+
 === Inside a CMake project
 
 . Clone the repository, or add it as a submodule
@@ -109,6 +118,9 @@ To simplify the SDK compilation, the file `CMakePresets.json` includes the most 
 |Linux    | linux64         | Release      | Ninja
 |Linux    | linux64-debug   | Debug        | Ninja
 |Linux    | linux64-dbginfo | Pre-Release  | Ninja
+|macOS    | macOS           | Release      | Ninja or XCode
+|macOS    | macOS-debug     | Debug        | Ninja or XCode
+|macOS    | macOS-dbginfo   | Pre-Release  | Ninja or XCode
 |===
 
 Debug presets have the `-debug` suffix, and Release-with-debug-info is `-dbginfo`. For example, if you want to build the SDK in debug configuration specify `win64-debug` as the preset name.
@@ -165,7 +177,7 @@ cmake --install <modio-sdk folder>/out/install/win64
 |Nintendo Switch| ✔ <<contact-us,(Contact Us)>> | Vendor-provided
 |XBox (GDK)     | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
 |Linux          | ✔                             | Clang 10
-|macOS          | Q1 2022                       |
+|macOS          | ✔                             | Clang 10
 |===
 
 ==== Compiler Feature Support
@@ -257,10 +269,10 @@ The plugin stores mods in a game-specific directory in the following path by def
 
 |===
 | Windows                    | Linux                    | OSX
-|`${FolderID_Public}/mod.io` | `${USER_HOME}/mod.io`    | TBD
+|`${FolderID_Public}/mod.io` | `${USER_HOME}/mod.io`    | `${USER_HOME}/Library/Application Support/mod.io`
 |===
 
-NOTE: In Linux, mods and data binds to a single user. Every other client would have their own instance in their home directory.
+NOTE: In Linux and macOS, mods and data binds to a single user. Every other client would have their own instance in their home directory.
 
 However, this value can be overridden in one of two ways:
 

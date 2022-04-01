@@ -65,6 +65,8 @@ namespace Modio
 							Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
 							return;
 						}
+
+						Services::GetGlobalService<CacheService>().AddToCache(ProfileData.value());
 						Modio::Detail::SDKSessionData::GetSystemModCollection().AddOrUpdateMod(
 							ProfileData.value(),
 							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MakeModPath(

@@ -13,8 +13,8 @@
 #include "modio/cache/ModioCacheService.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCoreTypes.h"
+#include "modio/core/entities/ModioUser.h"
 #include "modio/detail/CoreOps.h"
-#include "modio/detail/ModioAuthenticatedUser.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/schema/AccessTokenObject.h"
 #include "modio/http/ModioHttpParams.h"
@@ -82,8 +82,8 @@ namespace Modio
 					}
 					
 					{
-						Modio::Optional<Modio::Detail::AuthenticatedUser> User =
-							Detail::TryMarshalResponse<Modio::Detail::AuthenticatedUser>(Local.ResponseBodyBuffer);
+						Modio::Optional<Modio::User> User =
+							Detail::TryMarshalResponse<Modio::User>(Local.ResponseBodyBuffer);
 						if (User.has_value())
 						{
 							Local.NewlyAuthenticatedUser = User.value();
@@ -96,8 +96,8 @@ namespace Modio
 					}
 					Local.ResponseBodyBuffer.Clear();
 
-					Modio::Detail::SDKSessionData::InitializeForAuthenticatedUser(
-						std::move(Local.NewlyAuthenticatedUser), Modio::Detail::OAuthToken(Local.AuthResponse));
+					Modio::Detail::SDKSessionData::InitializeForUser(std::move(Local.NewlyAuthenticatedUser),
+																	 Modio::Detail::OAuthToken(Local.AuthResponse));
 
 					Detail::Services::GetGlobalService<Detail::CacheService>().ClearCache();
 					yield UserDataService.SaveUserDataToStorageAsync(std::move(Self));
@@ -114,7 +114,7 @@ namespace Modio
 			{
 				Modio::Detail::DynamicBuffer ResponseBodyBuffer;
 				Modio::Detail::Schema::AccessTokenObject AuthResponse;
-				Modio::Detail::AuthenticatedUser NewlyAuthenticatedUser;
+				Modio::User NewlyAuthenticatedUser;
 			} Local;
 		};
 	} // namespace Detail

@@ -488,6 +488,21 @@ namespace Modio
 	MODIOSDK_API void AddOrUpdateModLogoAsync(Modio::ModID ModID, Modio::filesystem::path LogoPath,
 											  std::function<void(Modio::ErrorCode)> Callback);
 
+	/// @docpublic
+	/// @brief Archives a mod. This mod will no longer be able to be viewed or retrieved via the SDK, but it will still
+	/// exist should you choose to restore it at a later date. Archiving is restricted to team managers and
+	/// administrators only. Note that restoration and permanent deletion of a mod is possible only via web interface.
+	/// @param ModID The mod to be archived.
+	/// @requires authenticated-user
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @error ApiError::InsufficientPermission|The authenticated user does not have permission to archive this mod. This action
+	/// is restricted to team managers and administrators only.
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
+	MODIOSDK_API void ArchiveModAsync(Modio::ModID ModID, std::function<void(Modio::ErrorCode)> Callback);
+
 } // namespace Modio
 
 // Implementation headers

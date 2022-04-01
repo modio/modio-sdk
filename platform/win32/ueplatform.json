@@ -13,7 +13,8 @@
   "PlatformSpecificDefines": [
     "MODIO_TARGET_PLATFORM_ID=\"WIN\"",
     "MODIO_UNREAL_PLATFORM_PREAMBLE=\"win32/detail/ModioUEPlatformPreamble.h\"",
-    "MODIO_UNREAL_PLATFORM_EPILOGUE=\"win32/detail/ModioUEPlatformEpilogue.h\""
+    "MODIO_UNREAL_PLATFORM_EPILOGUE=\"win32/detail/ModioUEPlatformEpilogue.h\"",
+    "MODIO_TARGET_PLATFORM_HEADER=\"Windows\""
   ],
   "ModuleDependencies": [
     "WinHttp"

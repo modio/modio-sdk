@@ -28,6 +28,7 @@ namespace Modio
 			Modio::ModID ModId;
 
 			asio::coroutine CoroutineState;
+
 		public:
 			GetModInfoOp(Modio::GameID GameID, Modio::ApiKey ApiKey, Modio::ModID ModId)
 				: GameID(GameID),
@@ -39,8 +40,19 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
-				reenter (CoroutineState)
+				reenter(CoroutineState)
 				{
+					{
+						Modio::Optional<Modio::ModInfo> CachedModInfo =
+							Services::GetGlobalService<CacheService>().FetchFromCache(ModId);
+
+						if (CachedModInfo.has_value() == true)
+						{
+							Self.complete({}, CachedModInfo);
+							return;
+						}
+					}
+
 					yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer,
 						Modio::Detail::GetModRequest.SetGameID(GameID).SetModID(ModId),
@@ -51,10 +63,12 @@ namespace Modio
 						Self.complete(ec, {});
 						return;
 					}
+
 					{
 						auto ModInfoData = TryMarshalResponse<Modio::ModInfo>(ResponseBodyBuffer);
 						if (ModInfoData.has_value())
 						{
+							Services::GetGlobalService<CacheService>().AddToCache(ModInfoData.value());
 							Self.complete(ec, ModInfoData);
 						}
 						else

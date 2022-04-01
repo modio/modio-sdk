@@ -10,4 +10,5 @@
 
 if(MODIO_PLATFORM STREQUAL "LINUX")
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR})
+set(MODIO_TARGET_PLATFORM_HEADER "Linux")
 endif()

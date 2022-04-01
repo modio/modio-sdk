@@ -13,9 +13,9 @@
 #include "ModioGeneratedVariables.h"
 
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/ModioCreateModFileParams.h"
-#include "modio/detail/ModioAuthenticatedUser.h"
+#include "modio/core/ModioModCollectionEntry.h"
+#include "modio/core/entities/ModioUser.h"
 #include "modio/detail/userdata/ModioUserDataContainer.h"
 #include "modio/detail/userdata/ModioUserProfile.h"
 
@@ -60,8 +60,7 @@ namespace Modio
 			MODIO_IMPL static ModCollection& GetSystemModCollection();
 
 			MODIO_IMPL static ModCollection FilterSystemModCollectionByUserSubscriptions();
-			MODIO_IMPL static void InitializeForAuthenticatedUser(Modio::Detail::AuthenticatedUser AuthenticatedUser,
-																  Modio::Detail::OAuthToken AuthToken);
+			MODIO_IMPL static void InitializeForUser(Modio::User User, Modio::Detail::OAuthToken AuthToken);
 			MODIO_IMPL static const Modio::Optional<Modio::Detail::OAuthToken> GetAuthenticationToken();
 
 			MODIO_IMPL static Modio::UserSubscriptionList& GetUserSubscriptions();
@@ -73,8 +72,8 @@ namespace Modio
 			MODIO_IMPL static void ClearUserData();
 
 			MODIO_IMPL static const Modio::Optional<Modio::User> GetAuthenticatedUser();
-
 			MODIO_IMPL static const Modio::Optional<Modio::Detail::Avatar> GetAuthenticatedUserAvatar();
+
 			MODIO_IMPL static void AddToDeferredUnsubscriptions(Modio::ModID Mod);
 			MODIO_IMPL static bool HasDeferredUnsubscriptions();
 
@@ -99,7 +98,8 @@ namespace Modio
 
 			/// @brief Retrieves the next pending modfile upload from the queue. *Removes the element from the queue*.
 			/// @return The pending upload information, or empty Optional if nothing pending
-			MODIO_IMPL static Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>> GetNextPendingModfileUpload();
+			MODIO_IMPL static Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>>
+				GetNextPendingModfileUpload();
 
 			/// @brief Initializes a ModProgressInfo for the specified mod, storing it in the global state. This method
 			/// is only intended for use by InstallOrUpdateModOp

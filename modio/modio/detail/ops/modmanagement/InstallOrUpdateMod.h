@@ -1,22 +1,22 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 #include "modio/core/ModioServices.h"
+#include "modio/detail/AsioWrapper.h"
 #include "modio/detail/CoreOps.h"
 #include "modio/detail/ModioObjectTrack.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/compression/ExtractAllToFolderOp.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/file/ModioFileService.h"
-#include "modio/detail/AsioWrapper.h"
 #include <nlohmann/json.hpp>
 
 #include <asio/yield.hpp>
@@ -41,7 +41,11 @@ namespace Modio
 					Self.complete(Modio::make_error_code(Modio::ModManagementError::InstallOrUpdateCancelled));
 					return;
 				}
-
+				if (!Modio::Detail::SDKSessionData::IsModManagementEnabled())
+				{
+					Self.complete(Modio::make_error_code(Modio::ModManagementError::InstallOrUpdateCancelled));
+					return;
+				}
 				reenter(CoroutineState)
 				{
 					Transaction =
@@ -71,14 +75,21 @@ namespace Modio
 					}
 
 					{
+						std::string Filename;
+						if (!Detail::ParseSubobjectSafe(ModInfoResponse, Filename, "modfile", "filename"))
+						{
+							Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
+							return;
+						}
+
 						Modio::Optional<Modio::filesystem::path> TempFilePath =
 							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MakeTempFilePath(
-								ModInfoResponse["modfile"]["filename"]);
+								Filename);
 
 						if (!TempFilePath)
 						{
 							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-														"couldn't create temp file {}", ModInfoResponse["modfile"]["filename"]);
+														"couldn't create temp file {}", Filename);
 
 							Self.complete(Modio::make_error_code(FilesystemError::UnableToCreateFile));
 							return;
@@ -91,10 +102,21 @@ namespace Modio
 					if (std::shared_ptr<Modio::ModProgressInfo> MPI = ModProgress.lock())
 					{
 						Detail::ParseSubobjectSafe(ModInfoResponse, MPI->TotalDownloadSize, "modfile", "filesize");
-						if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CheckSpaceAvailable(DownloadPath, MPI->TotalDownloadSize))
+						if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+								 .CheckSpaceAvailable(DownloadPath, MPI->TotalDownloadSize))
 						{
 							Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
 							return;
+						}
+						// check if a fully downloaded file exists to prevent unnecessary redownloads
+						if (Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().FileExists(
+								DownloadPath))
+						{
+							Modio::Detail::File DownloadedFile(DownloadPath);
+							if (DownloadedFile.GetFileSize() == MPI->TotalDownloadSize)
+							{
+								bFileDownloadComplete = true;
+							}
 						}
 					}
 					else
@@ -103,22 +125,24 @@ namespace Modio
 						Self.complete(Modio::make_error_code(Modio::ModManagementError::InstallOrUpdateCancelled));
 						return;
 					}
-
-					Modio::Detail::Logger().Log(
-						LogLevel::Info, LogCategory::Http, "Starting download of modfile {} for mod {} \"{}\"",
-						ModInfoResponse["modfile"]["filename"].get<std::string>(),
-						ModInfoResponse["id"].get<Modio::ModID>(), ModInfoResponse["name"].get<std::string>());
-
-					yield Modio::Detail::ComposedOps::DownloadFileAsync(
-						Modio::Detail::HttpRequestParams::FileDownload(
-							ModInfoResponse["modfile"]["download"]["binary_url"])
-							.value(),
-						DownloadPath, ModProgress, std::move(Self));
-					if (ec)
+					if (!bFileDownloadComplete)
 					{
-						Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
-						Self.complete(ec);
-						return;
+						Modio::Detail::Logger().Log(
+							LogLevel::Info, LogCategory::Http, "Starting download of modfile {} for mod {} \"{}\"",
+							ModInfoResponse["modfile"]["filename"].get<std::string>(),
+							ModInfoResponse["id"].get<Modio::ModID>(), ModInfoResponse["name"].get<std::string>());
+
+						yield Modio::Detail::ComposedOps::DownloadFileAsync(
+							Modio::Detail::HttpRequestParams::FileDownload(
+								ModInfoResponse["modfile"]["download"]["binary_url"])
+								.value(),
+							DownloadPath, ModProgress, std::move(Self));
+						if (ec)
+						{
+							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
+							Self.complete(ec);
+							return;
+						}
 					}
 					Modio::Detail::SDKSessionData::GetSystemModCollection().Entries().at(Mod)->SetModState(
 						ModState::Extracting);
@@ -127,8 +151,8 @@ namespace Modio
 
 					if (Modio::filesystem::exists(InstallPath, ec) && !ec)
 					{
-						yield Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
-							.DeleteFolderAsync(InstallPath, std::move(Self));
+						yield Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFolderAsync(
+							InstallPath, std::move(Self));
 						if (ec)
 						{
 							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
@@ -144,8 +168,7 @@ namespace Modio
 						return;
 					}
 
-					yield Modio::Detail::ExtractAllFilesAsync(DownloadPath, InstallPath, ModProgress,
-																			std::move(Self));
+					yield Modio::Detail::ExtractAllFilesAsync(DownloadPath, InstallPath, ModProgress, std::move(Self));
 
 					if (ec)
 					{
@@ -179,13 +202,15 @@ namespace Modio
 			nlohmann::json ModInfoResponse;
 			Modio::Detail::Transaction<Modio::ModCollectionEntry> Transaction;
 			std::weak_ptr<Modio::ModProgressInfo> ModProgress;
+			bool bFileDownloadComplete = false;
 		};
 
 		template<typename InstallDoneCallback>
 		auto InstallOrUpdateModAsync(Modio::ModID Mod, InstallDoneCallback&& OnInstallComplete)
 		{
 			return asio::async_compose<InstallDoneCallback, void(Modio::ErrorCode)>(
-				InstallOrUpdateModOp(Mod), OnInstallComplete, Modio::Detail::Services::GetGlobalContext().get_executor());
+				InstallOrUpdateModOp(Mod), OnInstallComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	} // namespace Detail
 } // namespace Modio

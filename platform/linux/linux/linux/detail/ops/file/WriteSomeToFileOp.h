@@ -53,7 +53,7 @@ namespace Modio
 
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, 
 												"Begin write for {}, File Descriptor {}, expected size: {}, Offset: {}", 
-												FileImpl->GetPath(), FileImpl->GetFileHandle(), 
+												FileImpl->GetPath().string(), FileImpl->GetFileHandle(), 
 												BufferSize, FileOffset.has_value() ? FileOffset.value() : 0);
 					
 					// SubmitWrite could fail with system errors. 

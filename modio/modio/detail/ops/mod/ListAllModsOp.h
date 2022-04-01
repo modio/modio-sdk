@@ -39,10 +39,24 @@ namespace Modio
 			{
 				reenter(CoroutineState)
 				{
+					// In case there is no filter, it could be possible to get all cached ModInfo
+					if (Filter.ToString().length() == 0)
+					{
+						Modio::Optional<Modio::ModInfoList> CachedModInfo =
+							Services::GetGlobalService<CacheService>().FetchFromCache(GameID);
+
+						if (CachedModInfo.has_value() == true)
+						{
+							Self.complete({}, std::move(CachedModInfo));
+							return;
+						}
+					}
+
 					yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer,
 						Modio::Detail::GetModsRequest.SetGameID(GameID).SetFilterString(Filter.ToString()),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
+					
 					if (ec)
 					{
 						// Marshal all raw HTTP errors into generic RequestError
@@ -62,6 +76,7 @@ namespace Modio
 						// Marshalled OK
 						if (List.has_value())
 						{
+							Services::GetGlobalService<CacheService>().AddToCache(GameID, List.value());
 							Self.complete(ec, std::move(List));
 						}
 						else

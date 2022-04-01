@@ -32,8 +32,8 @@ namespace Modio
 									   std::shared_ptr<Modio::Detail::FileSharedState> SharedState,
 									   Modio::Optional<Modio::FileOffset> Offset, Modio::FileSize MaxBytesToRead,
 									   Modio::Detail::DynamicBuffer Destination)
-				: MaxBytesToRead(MaxBytesToRead),
-				  FileImpl(IOObject),
+				: FileImpl(IOObject),
+				  MaxBytesToRead(MaxBytesToRead),
 				  FileOffset(Offset),
 				  SharedState(SharedState),
 				  Destination(Destination) {};
@@ -56,7 +56,7 @@ namespace Modio
 					Modio::Detail::Logger().Log(
 						Modio::LogLevel::Trace, Modio::LogCategory::File,
 						"Begin buffered read for {}, File Descriptor {}, expected size: {}, Offset: {}",
-						FileImpl->GetPath(), FileImpl->GetFileHandle(), MaxBytesToRead,
+						FileImpl->GetPath().string(), FileImpl->GetFileHandle(), MaxBytesToRead,
 						FileOffset.has_value() ? FileOffset.value() : 0);
 					CurrentErrorCode = PinnedState->SubmitRead(FileImpl->GetFileHandle(), MaxBytesToRead,
 															   FileOffset.value_or(FileImpl->Tell()));

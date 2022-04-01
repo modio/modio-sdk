@@ -59,6 +59,33 @@
       "name": "linux64-dbginfo",
       "inherits": "linux64",
       "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
+    },
+    {
+    "name": "macOS",
+    "displayName": "macOS",
+    "description": "macOS native x64",
+    "generator": "Ninja",
+    "binaryDir": "${sourceDir}/out/build/macOS",
+    "cacheVariables": {
+      "MODIO_PLATFORM": {
+        "type": "STRING",
+        "value": "MACOS"
+      },
+      "CMAKE_INSTALL_PREFIX": {
+        "type": "STRING",
+        "value": "${sourceDir}/out/install/macOS"
+      }
+    }
+    },
+    {
+    "name": "macOS-debug",
+    "inherits": "macOS",
+    "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    },
+    {
+    "name": "macOS-dbginfo",
+    "inherits": "macOS",
+    "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
     }
   ]
 }

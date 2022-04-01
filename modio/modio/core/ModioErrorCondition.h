@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "ModioErrorCondition.generated.h"
+//#include "ModioErrorCondition.generated.h"
 
 UENUM(BlueprintType)
 enum class EModioErrorCondition: uint8

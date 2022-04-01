@@ -18,11 +18,10 @@
 #include "modio/core/entities/ModioURLList.h"
 #include "modio/core/entities/ModioUser.h"
 #include "modio/detail/entities/ModioGalleryList.h"
+#include "modio/detail/entities/ModioLogo.h"
 #include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
-
-#include <iostream>
 
 namespace Modio
 {
@@ -55,6 +54,13 @@ namespace Modio
 
 	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::Metadata& Metadata);
 	MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::Metadata& Metadata);
+
+	enum class ModServerSideStatus : std::uint8_t
+	{
+		NotAccepted = 0,
+		Accepted = 1,
+		Deleted = 3
+	};
 
 	/// @docpublic
 	/// @brief Full mod profile including current release information, media links, and stats
@@ -103,6 +109,12 @@ namespace Modio
 		Modio::SketchfabURLList SketchfabURLs;
 		/// @brief Stats and rating information for the mod
 		Modio::ModStats Stats;
+		/// @brief Media data related to the mod logo
+		Modio::Detail::Logo ModLogo;
+		/// @brief The current ModInfo version. This property is updated when changes to the class happen.
+		std::string Version = "1.0";
+		/// @brief The current ModStatus on the server: Accepted, NotAccepted, or Deleted.
+		Modio::ModServerSideStatus ModStatus = Modio::ModServerSideStatus::NotAccepted;
 
 		friend bool operator==(const Modio::ModInfo& A, const Modio::ModInfo& B)
 		{
@@ -114,7 +126,8 @@ namespace Modio
 				(A.ProfileSubmittedBy == B.ProfileSubmittedBy) && (A.ProfileDateAdded == B.ProfileDateAdded) &&
 				(A.ProfileDateUpdated == B.ProfileDateUpdated) && (A.ProfileDateLive == B.ProfileDateLive) &&
 				(A.MetadataBlob == B.MetadataBlob) && (A.MetadataKvp == B.MetadataKvp) && (A.Tags == B.Tags) &&
-				(A.YoutubeURLs == B.YoutubeURLs) && (A.Stats == B.Stats))
+				(A.YoutubeURLs == B.YoutubeURLs) && (A.Stats == B.Stats) && (A.ModLogo == B.ModLogo) &&
+				(A.ModStatus == B.ModStatus))
 			{
 				if (A.FileInfo.has_value() && B.FileInfo.has_value())
 				{
@@ -126,6 +139,11 @@ namespace Modio
 					{
 						return false;
 					}
+				}
+				else if ((A.FileInfo.has_value() && !B.FileInfo.has_value()) ||
+						 (!A.FileInfo.has_value() && B.FileInfo.has_value()))
+				{
+					return false;
 				}
 				else
 				{

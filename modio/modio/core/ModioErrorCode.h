@@ -604,6 +604,57 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
+	enum class ModValidationError
+	{
+		ModDirectoryNotFound = 22529,
+		NoFilesFoundForMod = 22530
+	};
+
+	struct ModValidationErrorCategoryImpl : std::error_category
+	{
+		inline const char* name() const noexcept override { return "Modio::ModValidationError"; }
+		inline std::string message(int ErrorValue) const override
+		{
+			switch (static_cast<Modio::ModValidationError>(ErrorValue))
+			{
+				case ModValidationError::ModDirectoryNotFound:
+						return "Mod directory does not exist";
+					break;
+				case ModValidationError::NoFilesFoundForMod:
+						return "Mod directory does not contain any files";
+					break;
+				default:
+					return "Unknown ModValidationError error";
+			}
+		}
+	};
+
+	inline const std::error_category& ModValidationErrorCategory()
+	{
+		static ModValidationErrorCategoryImpl CategoryInstance;
+		return CategoryInstance;
+	}
+
+	inline std::error_code make_error_code(ModValidationError e)
+	{
+		return { static_cast<int>(e), ModValidationErrorCategory() };
+	}
+
+	inline bool operator==(std::error_code A, ModValidationError B)
+	{
+		return A.category() == ModValidationErrorCategory() && A.value() == static_cast<int>(B);
+	}
+
+	inline bool operator!=(std::error_code A, ModValidationError B)
+	{
+		return ! (A == B);
+	}
+
+	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, ModValidationError RawErrorValue )
+	{
+		return ec == RawErrorValue;
+	}
+
 	enum class ApiError
 	{
 		AlreadySubscribed = 15004,
@@ -615,6 +666,7 @@ namespace Modio
 		CrossOriginForbidden = 10001,
 		ExpiredOrRevokedAccessToken = 11005,
 		FailedToCompleteTheRequest = 10002,
+		InsufficientPermission = 15019,
 		InvalidAPIKey = 11002,
 		InvalidApiVersion = 10003,
 		InvalidJSON = 13004,
@@ -676,6 +728,9 @@ namespace Modio
 					break;
 				case ApiError::FailedToCompleteTheRequest:
 						return "mod.io failed to complete the request, please try again. (rare)";
+					break;
+				case ApiError::InsufficientPermission:
+						return "The authenticated user does not have permission to delete this mod. This action is restricted to team managers and administrators only.";
 					break;
 				case ApiError::InvalidAPIKey:
 						return "api_key supplied is invalid.";
@@ -822,6 +877,9 @@ namespace Modio
 					return ModManagementErrorCategory();
 				break;
 				case 9:
+					return ModValidationErrorCategory();
+				break;
+				case 10:
 					return ApiErrorCategory();
 				break;
 				default:
@@ -865,9 +923,13 @@ namespace Modio
 			{
 					return 8;
 			}
-			if (Category ==  ApiErrorCategory())
+			if (Category ==  ModValidationErrorCategory())
 			{
 					return 9;
+			}
+			if (Category ==  ApiErrorCategory())
+			{
+					return 10;
 			}
 			return 0;
 		}

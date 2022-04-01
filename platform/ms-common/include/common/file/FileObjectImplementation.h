@@ -177,21 +177,21 @@ namespace Modio
 				return *Strand;
 			}
 
-			Modio::ErrorCode CreateFile(filesystem::path FilePath)
+			Modio::ErrorCode CreateFile(Modio::filesystem::path NewFilePath)
 			{
-				return OpenFile(FilePath, true);
+				return OpenFile(NewFilePath, true);
 			}
 
-			Modio::ErrorCode OpenFile(filesystem::path FilePath, bool bOverwrite = false)
+			Modio::ErrorCode OpenFile(Modio::filesystem::path NewFilePath, bool bOverwrite = false)
 			{
 				Modio::ErrorCode ec;
-				filesystem::create_directories(FilePath.parent_path(), ec);
+				filesystem::create_directories(NewFilePath.parent_path(), ec);
 				if (ec)
 				{
 					return ec;
 				}
 
-				this->FilePath = FilePath;
+				this->FilePath = NewFilePath;
 				FileHandle = ::CreateFileW(this->FilePath.generic_wstring().c_str(), GENERIC_READ | GENERIC_WRITE,
 										   FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
 										   bOverwrite ? CREATE_ALWAYS : OPEN_ALWAYS, FILE_FLAG_OVERLAPPED, NULL);

@@ -12,7 +12,7 @@
 
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioModInfoList.h"
-#include "modio/detail/ModioAuthenticatedUser.h"
+#include "modio/core/entities/ModioUser.h"
 #include "modio/detail/schema/AccessTokenObject.h"
 
 #include <memory>
@@ -65,32 +65,34 @@ namespace Modio
 			}
 
 			static MODIO_IMPL Modio::Optional<std::string> NoToken;
-			friend void from_json(const nlohmann::json& Json, Modio::Detail::OAuthToken& Token)
+			
+			friend void from_json(const nlohmann::json& Json, Modio::Detail::OAuthToken& InToken)
 			{
-				Detail::ParseSafe(Json, Token.ExpireDate, "expiry");
-				Detail::ParseSafe(Json, Token.State, "status");
+				Detail::ParseSafe(Json, InToken.ExpireDate, "expiry");
+				Detail::ParseSafe(Json, InToken.State, "status");
 				std::string TokenString = "";
 
 				if (Detail::ParseSafe(Json, TokenString, "token"))
 				{
-					Token.Token = TokenString;
+					InToken.Token = TokenString;
 				}
 				else
 				{
-					Token.State = OAuthTokenState::Invalid;
+					InToken.State = OAuthTokenState::Invalid;
 				}
 			}
-			friend void to_json(nlohmann::json& Json, const Modio::Detail::OAuthToken& Token)
+
+			friend void to_json(nlohmann::json& Json, const Modio::Detail::OAuthToken& InToken)
 			{
-				if (Token.State == OAuthTokenState::Valid && Token.Token.has_value())
+				if (InToken.State == OAuthTokenState::Valid && InToken.Token.has_value())
 				{
-					Json = nlohmann::json {{"expiry", Token.ExpireDate},
-										   {"status", Token.State},
-										   {"token", Token.Token.value()}};
+					Json = nlohmann::json {{"expiry", InToken.ExpireDate},
+										   {"status", InToken.State},
+										   {"token", InToken.Token.value()}};
 				}
 				else
 				{
-					Json = nlohmann::json {{"expiry", Token.ExpireDate}, {"status", OAuthTokenState::Invalid}};
+					Json = nlohmann::json {{"expiry", InToken.ExpireDate}, {"status", OAuthTokenState::Invalid}};
 				}
 			}
 
@@ -111,14 +113,14 @@ namespace Modio
 
 		struct ProfileData
 		{
-			ProfileData(Modio::Detail::AuthenticatedUser InUser, Modio::Detail::OAuthToken AccessToken)
+			ProfileData(Modio::User InUser, Modio::Detail::OAuthToken AccessToken)
 				: User(InUser),
 				  Token(AccessToken)
 			{}
 
 			const Modio::User& GetUser() const
 			{
-				return User.User;
+				return User;
 			}
 
 			const Modio::Detail::Avatar GetAvatar() const
@@ -132,7 +134,7 @@ namespace Modio
 			}
 
 		private:
-			Modio::Detail::AuthenticatedUser User;
+			Modio::User User;
 			Modio::Detail::OAuthToken Token;
 
 			friend bool operator==(const Modio::Detail::ProfileData& A, const Modio::Detail::ProfileData& B)

@@ -12,7 +12,7 @@
 #include "ModioGeneratedVariables.h"
 #include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/ModioStdTypes.h"
-#include "modio/detail/ModioAuthenticatedUser.h"
+#include "modio/core/entities/ModioUser.h"
 #include "modio/detail/userdata/ModioUserProfile.h"
 #include <vector>
 
@@ -33,8 +33,7 @@ namespace Modio
 		public:
 			MODIO_IMPL void ResetUserData();
 
-			MODIO_IMPL void InitializeForAuthenticatedUser(Modio::Detail::AuthenticatedUser AuthenticatedUser,
-														   Modio::Detail::OAuthToken AuthToken);
+			MODIO_IMPL void InitializeForUser(Modio::User AuthenticatedUser, Modio::Detail::OAuthToken AuthToken);
 
 			// @todo: Making copy of user object
 			MODIO_IMPL const Modio::Optional<Modio::User> GetAuthenticatedUser() const;
@@ -71,16 +70,16 @@ namespace Modio
 			}
 			friend void from_json(const nlohmann::json& Json, Modio::Detail::UserDataContainer& UserData)
 			{
-				Modio::Detail::AuthenticatedUser AuthenticatedUser;
-				bool ParseStatus = Modio::Detail::ParseSafe(Json, AuthenticatedUser.User,
-															Modio::Detail::Constants::JSONKeys::UserProfile);
+				Modio::User AuthenticatedUser;
+				bool ParseStatus =
+					Modio::Detail::ParseSafe(Json, AuthenticatedUser, Modio::Detail::Constants::JSONKeys::UserProfile);
 				ParseStatus &= Modio::Detail::ParseSafe(Json, AuthenticatedUser.Avatar,
 														Modio::Detail::Constants::JSONKeys::Avatar);
 				Modio::Detail::OAuthToken Token;
 				ParseStatus &= Modio::Detail::ParseSafe(Json, Token, Modio::Detail::Constants::JSONKeys::OAuth);
 				if (ParseStatus)
 				{
-					UserData.InitializeForAuthenticatedUser(AuthenticatedUser, Token);
+					UserData.InitializeForUser(AuthenticatedUser, Token);
 				}
 
 				Modio::Detail::ParseSafe(Json, UserData.UserSubscriptions,

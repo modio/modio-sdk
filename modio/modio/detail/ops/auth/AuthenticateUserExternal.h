@@ -70,11 +70,11 @@ namespace Modio
 					}
 
 					{
-						Modio::Optional<Modio::Detail::AuthenticatedUser> User =
-							Detail::TryMarshalResponse<Modio::Detail::AuthenticatedUser>(LocalState->ResponseBuffer);
+						Modio::Optional<Modio::User> User =
+							Detail::TryMarshalResponse<Modio::User>(LocalState->ResponseBuffer);
 						if (User.has_value())
 						{
-							LocalState->AuthenticatedUserData = User.value();
+							LocalState->AuthUser = User.value();
 						}
 						else
 						{
@@ -85,16 +85,14 @@ namespace Modio
 					LocalState->ResponseBuffer.Clear();
 
 					if (!Modio::Detail::SDKSessionData::GetAuthenticatedUser() ||
-						LocalState->AuthenticatedUserData.User.UserId !=
-							Modio::Detail::SDKSessionData::GetAuthenticatedUser()->UserId)
+						LocalState->AuthUser.UserId != Modio::Detail::SDKSessionData::GetAuthenticatedUser()->UserId)
 					{
 						yield UserDataService.ClearUserDataAsync(std::move(Self));
 						Modio::Detail::Services::GetGlobalService<Modio::Detail::CacheService>().ClearCache();
 					}
 
-					Modio::Detail::SDKSessionData::InitializeForAuthenticatedUser(
-						std::move(LocalState->AuthenticatedUserData),
-						Modio::Detail::OAuthToken(LocalState->AuthResponse));
+					Modio::Detail::SDKSessionData::InitializeForUser(
+						std::move(LocalState->AuthUser), Modio::Detail::OAuthToken(LocalState->AuthResponse));
 					yield UserDataService.SaveUserDataToStorageAsync(std::move(Self));
 					Self.complete({});
 					return;
@@ -108,7 +106,7 @@ namespace Modio
 				Modio::Detail::DynamicBuffer ResponseBuffer;
 				Modio::Detail::HttpRequestParams AuthenticationParams;
 				Modio::Detail::Schema::AccessTokenObject AuthResponse;
-				Modio::Detail::AuthenticatedUser AuthenticatedUserData;
+				Modio::User AuthUser;
 			};
 			Modio::StableStorage<Impl> LocalState;
 		};

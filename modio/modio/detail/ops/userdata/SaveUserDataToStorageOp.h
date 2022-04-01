@@ -31,7 +31,7 @@ namespace Modio
 				LocalState = std::make_shared<Impl>();
 
 				LocalState->UserDataBuffer = std::make_unique<Modio::Detail::Buffer>(
-					std::move(Modio::Detail::SDKSessionData::SerializeUserData()));
+					Modio::Detail::SDKSessionData::SerializeUserData());
 			}
 
 			SaveUserDataToStorageOp(SaveUserDataToStorageOp&& Other)

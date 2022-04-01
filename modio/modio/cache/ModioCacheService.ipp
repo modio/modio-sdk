@@ -75,6 +75,31 @@ namespace Modio
 			}
 		}
 
+		void CacheService::AddToCache(Modio::ModInfo ModInfoDetails)
+		{
+			Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::Http, "Adding ModID {} to cache", ModInfoDetails.ModId);
+			// The ModInfoCache would clean only when the mod.io SDK session ends. For that reason there is no
+			// timer for this case. Another way to remove this is by calling "ClearCache"
+			CacheInstance->ModInfoCache.emplace(ModInfoDetails.ModId, ModInfoDetails);
+		}
+
+		void CacheService::AddToCache(Modio::GameID GameIDDetail, Modio::ModInfoList ModInfoDetails)
+		{
+			Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::Http, "Adding ModIDList to cache with GameID: {}",
+										GameIDDetail);
+			std::vector<Modio::ModID> ModIDVec;
+			
+			// Instead of keeping the whole list (with possible data replications), it adds single elements to the cache.
+			for_each(ModInfoDetails.begin(), ModInfoDetails.end(),
+					 [this, &ModIDVec](Modio::ModInfo ModInfoData) 
+				{ 
+					this->AddToCache(ModInfoData); 
+					ModIDVec.push_back(ModInfoData.ModId);
+				});
+
+			CacheInstance->ModInfoListCache.emplace(GameIDDetail, ModIDVec);
+		}
+
 		Modio::Optional<Modio::Detail::DynamicBuffer> CacheService::FetchFromCache(std::string ResourceURL) const
 		{
 			auto Hasher = std::hash<std::string>();
@@ -89,6 +114,52 @@ namespace Modio
 			{
 				return {};
 			}
+		}
+
+		Modio::Optional<Modio::ModInfo> CacheService::FetchFromCache(Modio::ModID ModIDDetail) const
+		{
+			auto CacheEntryIterator = CacheInstance->ModInfoCache.find(ModIDDetail);
+			if (CacheEntryIterator != CacheInstance->ModInfoCache.end())
+			{
+				return CacheEntryIterator->second;
+			}
+			else
+			{
+				return {};
+			}
+		}
+
+		Modio::Optional<Modio::ModInfoList> CacheService::FetchFromCache(Modio::GameID GameIDDetails) const 
+		{
+			auto CacheEntryIterator = CacheInstance->ModInfoListCache.find(GameIDDetails);
+			if (CacheEntryIterator == CacheInstance->ModInfoListCache.end())
+			{
+				return {};
+			}
+
+			Modio::ModInfoList ModElems = {};
+
+			for (Modio::ModID ModIDDetail : CacheEntryIterator->second) 
+			{
+				Modio::Optional<Modio::ModInfo> OpModInfo = FetchFromCache(ModIDDetail);
+				if (OpModInfo.has_value() == false) 
+				{
+					// In case at least one of the ModID requested is not found in the ModInfoCache, then it should
+					// perform a server request. When it returns, it would store it and next time that ModID
+					// would be retrieable.
+					return {};
+				}
+
+				ModElems.Append(OpModInfo.value());
+			}
+
+			if (ModElems.Size() <= 0) 
+			{ 
+				// In case ModElems does not have any ModInfo, it should return the "empty" from optional
+				return {};
+			}
+
+			return ModElems;
 		}
 
 		void CacheService::ClearCache()

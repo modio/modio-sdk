@@ -12,6 +12,8 @@
 #include "ModioGeneratedVariables.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/ModioBuffer.h"
+#include "modio/core/entities/ModioModInfo.h"
+#include "modio/core/entities/ModioModInfoList.h"
 #include "modio/detail/AsioWrapper.h"
 #include <chrono>
 #include <memory>
@@ -42,7 +44,15 @@ namespace Modio
 
 			MODIO_IMPL void AddToCache(std::string ResourceURL, class Modio::Detail::DynamicBuffer ResponseData);
 
+			MODIO_IMPL void AddToCache(Modio::ModInfo ModInfoDetail);
+
+			MODIO_IMPL void AddToCache(Modio::GameID GameIDDetail, Modio::ModInfoList ModInfoDetails);
+
 			MODIO_IMPL Modio::Optional<Modio::Detail::DynamicBuffer> FetchFromCache(std::string ResourceURL) const;
+
+			MODIO_IMPL Modio::Optional<Modio::ModInfo> FetchFromCache(Modio::ModID ModIDDetail) const;
+
+			MODIO_IMPL Modio::Optional<Modio::ModInfoList> FetchFromCache(Modio::GameID GameIDDetail) const;
 
 			MODIO_IMPL void ClearCache();
 
@@ -56,6 +66,8 @@ namespace Modio
 			struct Cache
 			{
 				std::unordered_map<std::uint32_t, CacheEntry> CacheEntries;
+				std::unordered_map<std::int64_t, Modio::ModInfo> ModInfoCache;
+				std::unordered_map<std::int64_t, std::vector<Modio::ModID>> ModInfoListCache;
 			};
 
 			std::shared_ptr<Cache> CacheInstance;

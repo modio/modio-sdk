@@ -184,6 +184,11 @@ namespace Modio
 			}
 			else
 			{
+#ifdef MODIO_SERVER_SIDE_TEST
+				Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+											"Using MODIO_SERVER_SIDE_TEST");
+				return MODIO_SERVER_SIDE_TEST;
+#else
 				// @todo: Break this out so that we don't need to use this class in conjunction with the SessionData
 				switch (Modio::Detail::SDKSessionData::GetEnvironment())
 				{
@@ -193,6 +198,7 @@ namespace Modio
 						return "api.test.mod.io";
 				}
 				return "";
+#endif
 			}
 		}
 
@@ -299,6 +305,14 @@ namespace Modio
 			{
 				return Modio::FileSize(0);
 			}
+
+			if (ContentType.has_value() && ContentType.value() == "application/x-www-form-urlencoded" &&
+				GetUrlEncodedPayload().has_value() == true)
+			{
+				// In case the body of an HTTP request is URL encoded, it should
+				// only return the value of that payload.
+				return Modio::FileSize(GetUrlEncodedPayload().value().size());
+			}
 			else
 			{
 				const std::string BoundaryString =
@@ -346,7 +360,7 @@ namespace Modio
 		Modio::Detail::HttpRequestParams::HeaderList HttpRequestParams::GetHeaders() const
 		{
 			// Default headers
-			HeaderList Headers = {{"x-modio-platform", MODIO_TARGET_PLATFORM_ID}};
+			HeaderList Headers = {{"x-modio-platform", MODIO_TARGET_PLATFORM_HEADER}};
 
 			switch (Modio::Detail::SDKSessionData::GetPortal())
 			{
@@ -409,7 +423,6 @@ namespace Modio
 			{
 				Headers.push_back({"User-Agent", "Modio-SDKv2-" MODIO_COMMIT_HASH});
 			}
-
 
 			const Modio::Optional<std::string>& AuthToken = GetAuthToken();
 			if (AuthToken)

@@ -53,6 +53,25 @@ namespace Modio
 
 		/// @brief The plaintext version of the mod.io terms of use
 		std::string TermsText;
+
+		friend bool operator==(const Modio::Terms& A, const Modio::Terms& B)
+		{
+			if (A.Buttons.AgreeText == B.Buttons.AgreeText && A.Buttons.DisagreeText == B.Buttons.DisagreeText &&
+				A.Links.Website.Text == B.Links.Website.Text && A.Links.Website.URL == B.Links.Website.URL &&
+				A.Links.Website.bRequired == B.Links.Website.bRequired && A.Links.Terms.Text == B.Links.Terms.Text &&
+				A.Links.Terms.URL == B.Links.Terms.URL && A.Links.Terms.bRequired == B.Links.Terms.bRequired &&
+				A.Links.Privacy.Text == B.Links.Privacy.Text && A.Links.Privacy.URL == B.Links.Privacy.URL &&
+				A.Links.Privacy.bRequired == B.Links.Privacy.bRequired && A.Links.Manage.Text == B.Links.Manage.Text &&
+				A.Links.Manage.URL == B.Links.Manage.URL && A.Links.Manage.bRequired == B.Links.Manage.bRequired &&
+				A.TermsText == B.TermsText)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 	};
 
 	inline void from_json(const nlohmann::json& Json, Modio::Terms& OutTerms)

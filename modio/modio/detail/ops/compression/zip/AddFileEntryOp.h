@@ -81,7 +81,7 @@ namespace Modio
 						BytesProcessed += Modio::FileSize(InputFileBuffer.size());
 						PinnedProgressInfo->CurrentlyExtractedBytes += Modio::FileSize(InputFileBuffer.size());
 						// Doing this in a loop in case ReadAsync stored multiple sub-buffers
-						while (NextBuf = InputFileBuffer.TakeInternalBuffer())
+						while ((NextBuf = InputFileBuffer.TakeInternalBuffer()))
 						{
 							// Compress the current sub-buffer
 							CompressionState.avail_in = NextBuf->GetSize();
@@ -195,7 +195,8 @@ namespace Modio
 		private:
 			boost::beast::zlib::z_params CompressionState;
 			boost::beast::zlib::deflate_stream CompressionStream;
-			constexpr static uint32_t LocalHeaderMagic = 0x04034b50;
+            // This variable had troubles as a constexpr when compiling on macOS + g++11
+			const uint32_t LocalHeaderMagic = 0x04034b50;
 			std::shared_ptr<Modio::Detail::ArchiveFileImplementation> ArchiveFile;
 			std::unique_ptr<Modio::Detail::File> InputFile;
 			std::unique_ptr<Modio::Detail::File> OutputFile;

@@ -30,10 +30,16 @@
 		} // namespace detail
 	} // namespace asio
 
+	#pragma push_macro("ASIO_NO_TYPEID")
+	#define ASIO_NO_TYPEID 1
+	
 	#pragma push_macro("ASIO_NO_EXCEPTIONS")
 	#define ASIO_NO_EXCEPTIONS 1
+	
+
 	#include <asio.hpp>
 	#pragma pop_macro("ASIO_NO_EXCEPTIONS")
+	#pragma pop_macro("ASIO_NO_TYPEID")
 
 	#include MODIO_UNREAL_PLATFORM_EPILOGUE
 

@@ -47,6 +47,11 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
+				if (!Modio::Detail::SDKSessionData::IsModManagementEnabled())
+				{
+					Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
+					return;
+				}
 				reenter(CoroutineState)
 				{
 					Modio::Detail::Logger().Log(

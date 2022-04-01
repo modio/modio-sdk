@@ -28,6 +28,12 @@ namespace Modio
 		{
 			InternalList.insert(InternalList.end(), std::begin(Other.InternalList), std::end(Other.InternalList));
 		}
+
+		void Append(const ModInfo& ModInfoData) 
+		{
+			InternalList.push_back(ModInfoData);
+		}
+
 		friend inline void from_json(const nlohmann::json& Json, Modio::ModInfoList& OutModInfoList);
 	};
 

@@ -44,34 +44,47 @@ namespace Modio
 						return;
 					}
 
-					// Fetch the details about the request from the server. Let's hope it's in the cache (would be nice
-					// if we could extend the cache for this call)
-					yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
-						OpState.ResponseBodyBuffer, Modio::Detail::GetModRequest.SetGameID(GameID).SetModID(ModId),
-						Modio::Detail::CachedResponse::Allow, std::move(Self));
-
-					if (ec)
 					{
-						// FAILED
-						Self.complete(ec, {});
-						return;
+						Modio::Optional<Modio::ModInfo> CachedModInfo =
+							Services::GetGlobalService<CacheService>().FetchFromCache(ModId);
+
+						if (CachedModInfo.has_value() == true)
+						{
+							OpState.GalleryList = CachedModInfo.value().GalleryImages;
+						}
 					}
 
+					if (OpState.GalleryList.Size() == 0)
 					{
-						nlohmann::json ResponseJson = ToJson(OpState.ResponseBodyBuffer);
-						if (ResponseJson.is_discarded())
+						// Fetch the details about the request from the server. Let's hope it's in the cache (would be
+						// nice if we could extend the cache for this call)
+						yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
+							OpState.ResponseBodyBuffer, Modio::Detail::GetModRequest.SetGameID(GameID).SetModID(ModId),
+							Modio::Detail::CachedResponse::Allow, std::move(Self));
+
+						if (ec)
 						{
-							Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse), {});
+							// FAILED
+							Self.complete(ec, {});
 							return;
 						}
-						if (ResponseJson.contains("media"))
+
 						{
-							Modio::Detail::ParseSubobjectSafe(ResponseJson, OpState.GalleryList, "media", "images");
-						}
-						else
-						{
-							Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse), {});
-							return;
+							nlohmann::json ResponseJson = ToJson(OpState.ResponseBodyBuffer);
+							if (ResponseJson.is_discarded())
+							{
+								Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse), {});
+								return;
+							}
+							if (ResponseJson.contains("media"))
+							{
+								Modio::Detail::ParseSubobjectSafe(ResponseJson, OpState.GalleryList, "media", "images");
+							}
+							else
+							{
+								Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse), {});
+								return;
+							}
 						}
 					}
 
@@ -85,6 +98,7 @@ namespace Modio
 					yield Modio::Detail::DownloadImageAsync(
 						GalleryImageType(ModId, OpState.GalleryList, GallerySize, ImageIndex), OpState.DestinationPath,
 						std::move(Self));
+
 					if (ec)
 					{
 						Self.complete(ec, {});

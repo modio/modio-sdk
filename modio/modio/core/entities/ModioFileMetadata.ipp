@@ -32,6 +32,14 @@ namespace Modio
 	void from_json(const nlohmann::json& Json, Modio::FileMetadata& FileMetadata)
 	{
 		std::string debug = Json.dump();
+
+		if (debug == "{}")
+		{
+			// If for some reason the debug is an empty object, it should also
+			// return an empty FileMetadata
+			return;
+		}
+
 		Detail::ParseSafe(Json, FileMetadata.MetadataId, "id");
 		Detail::ParseSafe(Json, FileMetadata.ModId, "mod_id");
 		Detail::ParseSafe(Json, FileMetadata.DateAdded, "date_added");

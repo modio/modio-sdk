@@ -68,7 +68,7 @@ namespace Modio
 
 		
 		template<typename T>
-		inline void ParseSubobjectSafe(const nlohmann::json& Json, T& OutVar, const std::string& SubobjectKey,
+		inline bool ParseSubobjectSafe(const nlohmann::json& Json, T& OutVar, const std::string& SubobjectKey,
 									   const std::string& Key)
 		{
 			if (Json.contains(SubobjectKey))
@@ -76,7 +76,7 @@ namespace Modio
 				const nlohmann::json& Subobject = Json.at(SubobjectKey);
 				if (!Subobject.is_null())
 				{
-					ParseSafe(Subobject, OutVar, Key);
+					return ParseSafe(Subobject, OutVar, Key);
 				}
 				else
 				{
@@ -89,6 +89,7 @@ namespace Modio
 				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
 											"Json does not contain SubobjectKey: {}", SubobjectKey);
 			}
+			return false;
 		}
 
 		

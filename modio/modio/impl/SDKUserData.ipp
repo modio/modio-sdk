@@ -8,11 +8,11 @@
  *  
  */
 
-#pragma once
 // Implementation header - do not include directly
-
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "modio/ModioSDK.h"
+#else
+	#pragma once
 #endif
 
 #include "modio/core/ModioCoreTypes.h"

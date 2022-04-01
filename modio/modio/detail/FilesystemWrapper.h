@@ -22,11 +22,14 @@ extern "C" inline int lstat(const char* path, struct stat* outStat)
 #ifdef MODIO_PLATFORM_UNREAL
 
 	#include MODIO_UNREAL_PLATFORM_PREAMBLE
+	#include "modio/detail/ModioCompilerMacros.h"
 
-	#pragma warning(push)
-	#pragma warning(disable : 4191)
+	DISABLE_WARNING_PUSH
+	DISABLE_WARNING_OPERATOR_OPERATION
+
 	#include "ghc/filesystem.hpp"
-	#pragma warning(pop)
+
+	DISABLE_WARNING_POP
 
 	#include MODIO_UNREAL_PLATFORM_EPILOGUE
 

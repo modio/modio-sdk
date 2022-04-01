@@ -13,3 +13,4 @@ doc/scripts/vendor/
 .ccls-cache/
 .vscode
 .DS_Store
+xcuserdata

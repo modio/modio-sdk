@@ -30,8 +30,8 @@ namespace Modio
 			ReadSomeFromFileOp(std::shared_ptr<Modio::Detail::FileObjectImplementation> IOObject,
 							   std::shared_ptr<Modio::Detail::FileSharedState> SharedState,
 							   Modio::Optional<Modio::FileOffset> Offset, Modio::FileSize MaxBytesToRead)
-				: MaxBytesToRead(MaxBytesToRead),
-				  FileImpl(IOObject),
+				: FileImpl(IOObject),
+				  MaxBytesToRead(MaxBytesToRead),
 				  FileOffset(Offset),
 				  SharedState(SharedState) {};
 
@@ -52,7 +52,7 @@ namespace Modio
 					yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
 												"Begin read for {}, File Descriptor {}, expected size: {}, Offset: {}",
-												FileImpl->GetPath(), FileImpl->GetFileHandle(), MaxBytesToRead,
+												FileImpl->GetPath().string(), FileImpl->GetFileHandle(), MaxBytesToRead,
 												FileOffset.has_value() ? FileOffset.value() : 0);
 
 					// SubmitRead could fail with system errors.

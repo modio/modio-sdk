@@ -14,6 +14,11 @@ if (NOT TARGET ${MODIO_TARGET_NAME})
 add_library (${MODIO_TARGET_NAME} INTERFACE)
 endif()
 
+if (MODIO_SERVER_SIDE_TEST)
+        target_compile_definitions(${MODIO_TARGET_NAME} INTERFACE MODIO_SERVER_SIDE_TEST="${MODIO_SERVER_SIDE_TEST}")
+        message(DEBUG "Setting MODIO_SERVER_SIDE_TEST")
+endif()
+
 target_include_directories(${MODIO_TARGET_NAME} INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/modio/cache)

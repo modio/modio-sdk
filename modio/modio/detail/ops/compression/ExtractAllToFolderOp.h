@@ -57,6 +57,12 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
+				if (!Modio::Detail::SDKSessionData::IsModManagementEnabled())
+				{
+					Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled),
+								  Modio::FileSize(0));
+					return;
+				}
 				reenter(Impl->CoroutineState)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Compression,

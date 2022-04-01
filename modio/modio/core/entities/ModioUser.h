@@ -12,6 +12,7 @@
 #include "ModioGeneratedVariables.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/entities/ModioAvatar.h"
 #include <string>
 
 namespace Modio
@@ -32,10 +33,13 @@ namespace Modio
 		/// @brief URL of the user's mod.io profile
 		std::string ProfileUrl = "";
 
+		/// @brief Cached information about the avatar
+		Modio::Detail::Avatar Avatar;
+
 		friend bool operator==(const Modio::User& A, const Modio::User& B)
 		{
 			return (A.UserId == B.UserId && A.Username == B.Username && A.DateOnline == B.DateOnline &&
-					A.ProfileUrl == B.ProfileUrl);
+					A.ProfileUrl == B.ProfileUrl && A.Avatar == B.Avatar);
 		}
 	};
 
@@ -45,13 +49,19 @@ namespace Modio
 		Detail::ParseSafe(Json, User.Username, "username");
 		Detail::ParseSafe(Json, User.DateOnline, "date_online");
 		Detail::ParseSafe(Json, User.ProfileUrl, "profile_url");
+		nlohmann::json AvatarJson;
+		if (Detail::GetSubobjectSafe(Json, "avatar", AvatarJson))
+		{
+			Modio::Detail::from_json(AvatarJson, User.Avatar);
+		}
 	}
 	inline void to_json(nlohmann::json& Json, const Modio::User& User)
 	{
 		Json = nlohmann::json {{"id", User.UserId},
 							   {"username", User.Username},
 							   {"date_online", User.DateOnline},
-							   {"profile_url", User.ProfileUrl}};
+							   {"profile_url", User.ProfileUrl},
+							   {"avatar", User.Avatar}};
 	}
 
 } // namespace Modio

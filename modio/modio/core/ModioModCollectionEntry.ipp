@@ -407,7 +407,7 @@ namespace Modio
 	{
 		std::vector<std::shared_ptr<Modio::ModCollectionEntry>> SortedEntries;
 		// Copy the entries to the vector
-		for (const std::pair<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& Elem : ModEntries)
+		for (const std::pair<const Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& Elem : ModEntries)
 		{
 			SortedEntries.push_back(Elem.second);
 		}

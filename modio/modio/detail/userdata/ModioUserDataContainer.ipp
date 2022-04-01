@@ -23,8 +23,7 @@ namespace Modio
 			AuthenticatedProfile = {};
 		}
 
-		void UserDataContainer::InitializeForAuthenticatedUser(Modio::Detail::AuthenticatedUser AuthenticatedUser,
-															   Modio::Detail::OAuthToken AuthToken)
+		void UserDataContainer::InitializeForUser(Modio::User AuthenticatedUser, Modio::Detail::OAuthToken AuthToken)
 		{
 			ResetUserData();
 			AuthenticatedProfile = Modio::Detail::ProfileData {AuthenticatedUser, AuthToken};

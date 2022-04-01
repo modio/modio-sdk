@@ -8,10 +8,10 @@
  *
  */
 
-#pragma once
-
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "modio/ModioSDK.h"
+#else
+	#pragma once
 #endif
 
 #include "modio/core/ModioCoreTypes.h"
@@ -23,6 +23,7 @@
 #include "modio/detail/ops/ModManagementLoop.h"
 #include "modio/detail/ops/SubscribeToModOp.h"
 #include "modio/detail/ops/UnsubscribeFromMod.h"
+#include "modio/detail/ops/mod/ArchiveModOp.h"
 #include "modio/detail/ops/mod/SubmitNewModFileOp.h"
 #include "modio/detail/ops/mod/SubmitNewModOp.h"
 #include "modio/detail/ops/modmanagement/ForceUninstallModOp.h"
@@ -215,7 +216,8 @@ namespace Modio
 		// RequireModManagementEnabled
 	}
 
-	void AddOrUpdateModLogoAsync(Modio::ModID ModID, Modio::filesystem::path LogoPath, std::function<void(Modio::ErrorCode)> Callback)
+	void AddOrUpdateModLogoAsync(Modio::ModID ModID, Modio::filesystem::path LogoPath,
+								 std::function<void(Modio::ErrorCode)> Callback)
 	{
 		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
 			Modio::Detail::RequireUserIsAuthenticated(Callback))
@@ -223,6 +225,17 @@ namespace Modio
 			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
 				Modio::Detail::AddOrUpdateModLogoOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID, LogoPath),
 				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
+	}
+
+	void ArchiveModAsync(Modio::ModID ModID, std::function<void(Modio::ErrorCode)> Callback)
+	{
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+			Modio::Detail::RequireUserIsAuthenticated(Callback))
+		{
+			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
+				Modio::Detail::ArchiveModOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID), Callback,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	}
 

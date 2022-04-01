@@ -69,34 +69,7 @@ namespace Modio
 			{
 				return CancelRequested;
 			}
-			// TODO: refactor this to live on the file service and remove from other FileObjectImplementations
-			/*template<typename OperationType>
-			void BeginExclusiveOperation(OperationType&& Operation)
-			{
-				if (OperationInProgress.exchange(true))
-				{
-					++NumWaiters;
-					OperationQueue.async_wait(
-						asio::bind_executor(Modio::Detail::Services::GetGlobalContext().get_executor(),
-											[Op = std::move(Operation)](asio::error_code ec) mutable { Op(); }));
-				}
-				else
-				{
-					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Operation));
-				}
-			}
-
-			void FinishExclusiveOperation()
-			{
-				OperationInProgress.exchange(false);
-
-				if (NumWaiters > 0)
-				{
-					--NumWaiters;
-					OperationQueue.cancel_one();
-				}
-			}*/
-
+			
 			Modio::filesystem::path GetPath()
 			{
 				return FilePath;
@@ -188,7 +161,7 @@ namespace Modio
 				this->FilePath = Path;
 				FileDescriptor = open(this->FilePath.generic_u8string().c_str(),
 									  O_RDWR | O_CREAT | O_NONBLOCK | (bOverwrite ? O_TRUNC : 0), S_IRUSR | S_IWUSR);
-		
+
 				if (FileDescriptor != InvalidFileDescriptor)
 				{
 					return std::error_code {};

@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -19,6 +19,7 @@
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/LoadGlobalConfigOverrideFileDataOp.h"
 #include "modio/detail/ops/LoadModCollectionFromStorage.h"
+#include "modio/detail/ops/ValidateAllInstalledModsOp.h"
 #include "modio/file/ModioFile.h"
 #include "modio/file/ModioFileService.h"
 #include "modio/http/ModioHttpService.h"
@@ -37,9 +38,7 @@ class ServiceInitializationOp
 	std::map<std::string, std::string> ConfigurationValues;
 
 public:
-	ServiceInitializationOp(Modio::InitializeOptions InitParams)
-		: InitParams(InitParams)
-	{}
+	ServiceInitializationOp(Modio::InitializeOptions InitParams) : InitParams(InitParams) {}
 
 	template<typename CoroType>
 	void operator()(CoroType& self, std::error_code ec = {})
@@ -145,6 +144,11 @@ public:
 			// initialized. We do have to make sure that QueryUserSubscriptions etc fail if we're still initializing,
 			// just to be on the safe side
 			yield Modio::Detail::LoadModCollectionFromStorageAsync(std::move(self));
+
+			// Validates all user's mods marked as ModState::Installed.  Any mods that fail validation will have
+			// ModState set to InstallationPending.  Will NOT return an error code even on validation failure to prevent
+			// killing initialization.
+			yield Modio::Detail::ValidateAllInstalledModsAsync(std::move(self));
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Core,
 										"mod.io service initialization complete");

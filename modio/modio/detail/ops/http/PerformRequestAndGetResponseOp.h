@@ -140,7 +140,7 @@ public:
 
 			if (Request->Parameters().ContainsFormData())
 			{
-				while (Impl->PayloadElement = Request->Parameters().TakeNextPayloadElement())
+				while ((Impl->PayloadElement = Request->Parameters().TakeNextPayloadElement()))
 				{
 					// Write the header for the field in the form data
 					{
@@ -252,6 +252,11 @@ public:
 					if (CurrentBuffer.has_value())
 					{
 						ResultBuffer.AppendBuffer(std::move(CurrentBuffer.value()));
+					}
+					else
+					{
+						// In case the current buffer does not have a value, break the loop
+						break;
 					}
 				}
 			}

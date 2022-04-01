@@ -83,7 +83,8 @@ namespace Modio
 			}
 
 		private:
-			constexpr static uint32_t LocalHeaderMagic = 0x04034b50;
+            // This variable had troubles as a constexpr when compiling on macOS + g++11
+			const uint32_t LocalHeaderMagic = 0x04034b50;
 			std::shared_ptr<Modio::Detail::ArchiveFileImplementation> ArchiveFile;
 			std::unique_ptr<Modio::Detail::File> OutputFile;
 			Modio::filesystem::path DirectoryPath;

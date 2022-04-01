@@ -8,11 +8,12 @@
  *
  */
 
-#pragma once
-
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "modio/ModioSDK.h"
+#else
+	#pragma once
 #endif
+
 
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioModDetails.h"

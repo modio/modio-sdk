@@ -54,29 +54,46 @@ namespace Modio
 			{
 				reenter(CoroState)
 				{
-					// Fetch the details about the request from the server. Let's hope it's in the cache (would be
-					// nice if we could extend the cache for this call)
-					yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
-						OpState.ResponseBodyBuffer, Modio::Detail::GetModRequest.SetGameID(GameID).SetModID(ModId),
-						Modio::Detail::CachedResponse::Allow, std::move(Self));
-
-					if (ec)
 					{
-						// FAILED
-						Self.complete(ec, {});
-						return;
+						// This case would signal that the OpState.Logo has not been set
+						if (OpState.Logo.Filename == "")
+						{
+							Modio::Optional<Modio::ModInfo> CachedModInfo =
+								Services::GetGlobalService<CacheService>().FetchFromCache(ModId);
+
+							if (CachedModInfo.has_value() == true)
+							{
+								OpState.Logo = CachedModInfo.value().ModLogo;
+							}
+						}
 					}
 
-					// Marshall the result of the request
-					if (auto ParsedLogo = Modio::Detail::MarshalSubobjectResponse<Modio::Detail::Logo>(
-							"logo", OpState.ResponseBodyBuffer))
+					if (OpState.Logo.Filename == "")
 					{
-						OpState.Logo = ParsedLogo.value();
-					}
-					else
-					{
-						Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse), {});
-						return;
+						// Fetch the details about the request from the server. Let's hope it's in the cache (would be
+						// nice if we could extend the cache for this call)
+						yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
+							OpState.ResponseBodyBuffer, Modio::Detail::GetModRequest.SetGameID(GameID).SetModID(ModId),
+							Modio::Detail::CachedResponse::Allow, std::move(Self));
+
+						if (ec)
+						{
+							// FAILED
+							Self.complete(ec, {});
+							return;
+						}
+
+						// Marshall the result of the request
+						if (auto ParsedLogo = Modio::Detail::MarshalSubobjectResponse<Modio::Detail::Logo>(
+								"logo", OpState.ResponseBodyBuffer))
+						{
+							OpState.Logo = ParsedLogo.value();
+						}
+						else
+						{
+							Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse), {});
+							return;
+						}
 					}
 
 					yield Modio::Detail::DownloadImageAsync(LogoImageType(ModId, LogoSize, OpState.Logo),

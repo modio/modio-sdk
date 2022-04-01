@@ -108,8 +108,9 @@ namespace Modio
 			asio::coroutine CoroutineState;
 			std::unique_ptr<Modio::Detail::Buffer> RecordBuffer;
 			std::vector<Modio::Detail::ArchiveFileImplementation::ArchiveEntry>::const_iterator CurrentArchiveEntry;
-			constexpr static std::uint32_t CentralDirectoryMagic = 0x02014b50;
-			constexpr static std::uint32_t EndOfCentralDirectoryMagic = 0x06054b50;
+            // These variable had troubles as a constexpr when compiling on macOS + g++11
+			const std::uint32_t CentralDirectoryMagic = 0x02014b50;
+			const std::uint32_t EndOfCentralDirectoryMagic = 0x06054b50;
 			Modio::FileOffset StartOfCentralDirectory;
 		};
 #include <asio/unyield.hpp>

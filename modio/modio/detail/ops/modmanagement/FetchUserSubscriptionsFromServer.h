@@ -72,8 +72,11 @@ namespace Modio
 									return;
 								}
 							}
+							
 							SubscriptionBuffer = Modio::Detail::DynamicBuffer();
 							CollatedResults->Append(CurrentModInfoPage.value());
+							Services::GetGlobalService<CacheService>().AddToCache(
+								Modio::Detail::SDKSessionData::CurrentGameID(), CurrentModInfoPage.value());
 						}
 						CurrentResultIndex += 100;
 					} while (CurrentResultIndex < PageInfo.GetTotalResultCount());

@@ -12,9 +12,9 @@
 
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioStdTypes.h"
-#include "modio/detail/ops/ModioDownloadImage.h"
 #include "modio/detail/CoreOps.h"
 #include "modio/detail/ops/ModioAvatarImageType.h"
+#include "modio/detail/ops/ModioDownloadImage.h"
 #include <asio/yield.hpp>
 
 namespace Modio
@@ -37,18 +37,17 @@ namespace Modio
 			{
 				reenter(CoroutineState)
 				{
-					OpState.Avatar = Modio::Detail::SDKSessionData::GetAuthenticatedUserAvatar();
 					OpState.User = Modio::Detail::SDKSessionData::GetAuthenticatedUser();
 
-					if (!OpState.Avatar || !OpState.User)
+					if (!OpState.User)
 					{
 						Self.complete(Modio::make_error_code(Modio::UserDataError::InvalidUser), {});
 						return;
 					}
 
 					yield Modio::Detail::DownloadImageAsync(
-						AvatarImageType(OpState.User->UserId, AvatarSize, *OpState.Avatar), OpState.DestinationPath,
-						std::move(Self));
+						AvatarImageType(OpState.User->UserId, AvatarSize, OpState.User->Avatar),
+						OpState.DestinationPath, std::move(Self));
 
 					if (ec)
 					{
@@ -71,7 +70,6 @@ namespace Modio
 			// State that might get mutated during the corutine
 			struct
 			{
-				Modio::Optional<Modio::Detail::Avatar> Avatar;
 				Modio::Optional<Modio::User> User;
 				Modio::StableStorage<Modio::filesystem::path> DestinationPath;
 			} OpState;

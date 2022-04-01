@@ -24,10 +24,37 @@ namespace Modio
 		using ListType = ContainerType<ValueType>;
 		ListType InternalList;
 
+		// operator==() Written for Test_JsonToAndFrom.cpp and Server Side tests, re-check functionality before using in actual code.
 		friend bool operator==(const List& A, const List& B)
 		{
-			// Written for Test_JsonToAndFrom.cpp, re-check functionality before using in actual code.
-			return (A.InternalList == B.InternalList);
+			if (A.InternalList.size() != B.InternalList.size())
+			{
+				return false;
+			}
+			if (A.InternalList.empty() && B.InternalList.empty())
+			{
+				return true;
+			}
+			// loop through to ensure equality even if elements are stored in a different order
+			int MatchCount = 0;
+			for (int i = 0; i < A.InternalList.size(); i++)
+			{
+				for (int j = 0; j < B.InternalList.size(); j++)
+				{
+					if (A.InternalList.at(i) == B.InternalList.at(j))
+					{
+						MatchCount++;
+					}
+				}
+			}
+			if (MatchCount == A.InternalList.size())
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 	public:

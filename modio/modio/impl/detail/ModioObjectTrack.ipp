@@ -1,17 +1,19 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *  
+ *
  */
 
-#pragma once
 #ifdef MODIO_SEPARATE_COMPILATION
-#include "modio/detail/ModioObjectTrack.h"
+	#include "modio/detail/ModioObjectTrack.h"
+#else
+	#pragma once
 #endif
+
 #include "modio/core/ModioLogger.h"
 
 namespace Modio
@@ -23,7 +25,7 @@ namespace Modio
 		BaseOperation<Base>::BaseOperation()
 		{
 			++BaseOperation<Base>::Count;
-			
+
 			char output[512];
 			sprintf(output, "%s %d\n", __FUNCTION__, Count);
 			OutputDebugStringA(output);
@@ -31,7 +33,7 @@ namespace Modio
 
 		template<typename Base>
 		BaseOperation<Base>::BaseOperation(BaseOperation<Base>&& Other)
-		{			
+		{
 			Other.bMovedFrom = true;
 		}
 
@@ -44,7 +46,7 @@ namespace Modio
 			}
 
 			--BaseOperation<Base>::Count;
-			
+
 			char output[512];
 			sprintf(output, "%s %d\n", __FUNCTION__, Count);
 			OutputDebugStringA(output);

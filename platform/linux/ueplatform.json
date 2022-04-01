@@ -1,0 +1,21 @@
+{
+  "Platforms": {
+    "Linux": {
+      "IncludeDirectories": [],
+      "PlatformSpecificDefines": [],
+      "ModuleDependencies": []
+    }
+  },
+  "IncludeDirectories": [
+    "linux/linux"
+  ],
+  "PlatformSpecificDefines": [
+    "MODIO_TARGET_PLATFORM_ID=\"LINUX\"",
+    "MODIO_UNREAL_PLATFORM_PREAMBLE=\"linux/detail/ModioUEPlatformPreamble.h\"",
+    "MODIO_UNREAL_PLATFORM_EPILOGUE=\"linux/detail/ModioUEPlatformEpilogue.h\"",
+    "MODIO_TARGET_PLATFORM_HEADER=\"Linux\""
+  ],
+  "ModuleDependencies": [
+    "uring", "mbedtls"
+  ]
+}
