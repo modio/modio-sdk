@@ -36,6 +36,7 @@ namespace Modio
 		  LocalUserSubscriptionCount(Other.LocalUserSubscriptionCount.load()),
 		  LocalUserSubscriptions(Other.LocalUserSubscriptions),
 		  PathOnDisk(Other.PathOnDisk),
+		  SizeOnDisk(Other.SizeOnDisk),
 		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries) {};
 
 	uint8_t ModCollectionEntry::GetRetriesRemaining()
@@ -180,6 +181,18 @@ namespace Modio
 		return PathOnDisk;
 	}
 
+	Modio::Optional<Modio::FileSize> ModCollectionEntry::GetSizeOnDisk() const
+	{
+		if (CurrentState == ModState::Installed)
+		{
+			return SizeOnDisk;
+		}
+		else
+		{
+			return {};
+		}
+	}
+
 	void ModCollectionEntry::UpdateSizeOnDisk(Modio::FileSize NewSize)
 	{
 		SizeOnDisk = NewSize;
@@ -225,6 +238,7 @@ namespace Modio
 		LocalUserSubscriptions = Other.LocalUserSubscriptions;
 		LocalUserSubscriptionCount.store(Other.LocalUserSubscriptionCount.load());
 		PathOnDisk = Other.PathOnDisk;
+		SizeOnDisk = Other.SizeOnDisk;
 		RetriesRemainingThisSession = Other.RetriesRemainingThisSession;
 		return *this;
 	};

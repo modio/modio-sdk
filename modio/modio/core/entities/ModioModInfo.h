@@ -67,7 +67,7 @@ namespace Modio
 	struct ModInfo
 	{
 		/// @brief Unique Mod ID
-		Modio::ModID ModId = Modio::ModID(0);
+		Modio::ModID ModId = Modio::ModID::InvalidModID();
 		/// @brief Name of the mod
 		std::string ProfileName = "";
 		/// @brief Summary of the mod

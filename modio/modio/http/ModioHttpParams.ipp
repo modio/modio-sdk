@@ -185,8 +185,6 @@ namespace Modio
 			else
 			{
 #ifdef MODIO_SERVER_SIDE_TEST
-				Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
-											"Using MODIO_SERVER_SIDE_TEST");
 				return MODIO_SERVER_SIDE_TEST;
 #else
 				// @todo: Break this out so that we don't need to use this class in conjunction with the SessionData

@@ -165,6 +165,10 @@ namespace Modio
 		MODIO_IMPL Modio::filesystem::path GetPath() const;
 
 		/// @docpublic
+		/// @return Size on disk if the mod has been installed, or empty optional if installation is in progress
+		MODIO_IMPL Modio::Optional<Modio::FileSize> GetSizeOnDisk() const;
+
+		/// @docpublic
 		/// @brief Updates the size of the mod on disk in the collection entry. Called by the archive extraction code on
 		/// successful extraction/installation
 		/// @param NewSize The total size on disk of all files in the mod

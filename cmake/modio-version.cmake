@@ -13,6 +13,16 @@ find_package(Git)
 
 function(GetVersionInfo _MainBranchName _MainCommitCount _BranchID _BranchCommitCount _CountDirtyChanges)
 	
+	if (NOT GIT_EXECUTABLE)
+		message (STATUS "Cannot find git, falling back to version file")
+		file (STRINGS "${MODIO_ROOT_DIR}/.modio" MainCommitCount)
+		set ("${_MainCommitCount}" "${MainCommitCount}" PARENT_SCOPE)
+        #Empty default values
+        set ("${_BranchID}" "" PARENT_SCOPE)
+		set ("${_BranchCommitCount}" "" PARENT_SCOPE)
+        return()
+	endif()
+
 	#Abuse GetGitRevisionDescription commit detection to ensure commits are in sync
 	get_git_head_revision(DummyRefSpec DummyHeadHash)
 

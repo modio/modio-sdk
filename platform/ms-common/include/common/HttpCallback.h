@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #include "common/HttpSharedState.h"
@@ -33,6 +33,14 @@ static void __stdcall ModioWinhttpStatusCallback(HINTERNET InternetHandle, DWORD
 		}
 		else
 		{
+			if (StatusCode == WinHTTPCallbackStatus::RequestError)
+			{
+				WINHTTP_ASYNC_RESULT* Result = static_cast<WINHTTP_ASYNC_RESULT*>(StatusInformation);
+				Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+											"Function {:x} returned error code {:x}\r\n",
+											(unsigned long) Result->dwResult, (unsigned long) Result->dwError);
+			}
+
 			// Got crash on shared state is nullptr
 			SharedState->SetHandleStatus(InternetHandle, StatusCode, StatusInformation, StatusInformationLength);
 		}

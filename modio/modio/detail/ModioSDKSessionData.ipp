@@ -117,8 +117,7 @@ namespace Modio
 			return Get().SystemModCollection.FilterByUserSubscriptions(Get().UserData.UserSubscriptions);
 		}
 
-		void SDKSessionData::InitializeForUser(Modio::User AuthenticatedUser,
-											   Modio::Detail::OAuthToken AuthToken)
+		void SDKSessionData::InitializeForUser(Modio::User AuthenticatedUser, Modio::Detail::OAuthToken AuthToken)
 		{
 			Get().UserData.InitializeForUser(std::move(AuthenticatedUser), std::move(AuthToken));
 		}
@@ -237,7 +236,8 @@ namespace Modio
 				Params.RootDirectory /= "";
 				Modio::Detail::Logger().Log(
 					Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
-					"Modfile directory path {} does not end in a path separator. Adding manually", Params.RootDirectory.u8string());
+					"Modfile directory path {} does not end in a path separator. Adding manually",
+					Params.RootDirectory.u8string());
 			}
 
 			auto ExistingEntry = Get().PendingModUploads.find(ID);
@@ -306,6 +306,13 @@ namespace Modio
 			}
 			else
 			{
+				// Workaround : Don't tell consumers that a mod operation is in progress until we've resolved how much
+				// work there is to do This should eventually be replaced with a more robust check for the mod
+				// operation's state
+				if (Get().CurrentModInProgress->TotalDownloadSize == 0)
+				{
+					return {};
+				}
 				return *(Get().CurrentModInProgress);
 			}
 		}

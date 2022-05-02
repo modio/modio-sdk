@@ -968,7 +968,9 @@ namespace Modio
 		/// @brief When this condition is true, the error code indicates that the user has not yet accepted the mod.io Terms of Use.
 		UserTermsOfUseError = 13,
 		/// @brief When this condition is true, the error code indicates that a report for the specified content could not be submitted.
-		SubmitReportError = 14
+		SubmitReportError = 14,
+		/// @brief When this condition is true, the error code indicates that a user is not authenticated.
+		UserNotAuthenticatedError = 15
 	};
 
 	struct ErrorConditionCategoryImpl : std::error_category
@@ -1019,6 +1021,9 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::SubmitReportError:
 					return "When this condition is true, the error code indicates that a report for the specified content could not be submitted.";
+				break;
+				case ErrorConditionTypes::UserNotAuthenticatedError:
+					return "When this condition is true, the error code indicates that a user is not authenticated.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -1684,6 +1689,29 @@ namespace Modio
 					}
 
 					if (ec == Modio::ApiError::RequestedResourceNotFound)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::UserNotAuthenticatedError:
+					if (ec == Modio::UserAuthError::NoAuthToken)
+					{
+						return true;
+					}
+
+					if (ec == Modio::UserAuthError::StatusAuthTokenInvalid)
+					{
+						return true;
+					}
+
+					if (ec == Modio::UserAuthError::StatusAuthTokenMissing)
+					{
+						return true;
+					}
+
+					if (ec == Modio::UserAuthError::UnableToInitStorage)
 					{
 						return true;
 					}

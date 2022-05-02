@@ -209,11 +209,36 @@ namespace Modio
 
 	MODIOSDK_API void SubmitNewModFileForMod(Modio::ModID Mod, Modio::CreateModFileParams Params)
 	{
+		// @TODO: Right now we don't have a pattern for returning Modio::ErrorCode from a method if we don't have a callback
+		// For now, we're just going to log if this fails so developers have some way to track it
+		if (!Modio::Detail::SDKSessionData::IsInitialized())
+		{
+			Modio::Detail::Logger().Log(
+				Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
+				"Attempted to call SubmitNewModFileForMod but the SDK was not initialized.");
+
+			return;
+		}
+
+		if (!Modio::Detail::SDKSessionData::GetAuthenticatedUser().has_value())
+		{
+			Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
+										"Attempted to call SubmitNewModFileForMod but there was no authenticated user.");
+
+			return;
+		}
+
+		if (!Modio::Detail::SDKSessionData::IsModManagementEnabled())
+		{
+			Modio::Detail::Logger().Log(
+				Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
+				"Attempted to call SubmitNewModFileForMod but there was no authenticated user.");
+
+			return;
+		}
+
 		// TODO: @modio-core we should return the error code from this function so we can do our precondition checks
 		Modio::Detail::SDKSessionData::AddPendingModfileUpload(Mod, Params);
-
-		//(Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireUserIsAuthenticated(Callback)) &&
-		// RequireModManagementEnabled
 	}
 
 	void AddOrUpdateModLogoAsync(Modio::ModID ModID, Modio::filesystem::path LogoPath,

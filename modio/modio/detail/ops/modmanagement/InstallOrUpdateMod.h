@@ -116,6 +116,7 @@ namespace Modio
 							if (DownloadedFile.GetFileSize() == MPI->TotalDownloadSize)
 							{
 								bFileDownloadComplete = true;
+								MPI->CurrentlyDownloadedBytes = MPI->TotalDownloadSize;
 							}
 						}
 					}

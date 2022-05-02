@@ -125,6 +125,7 @@ namespace Modio
 	/// @requires initialized-sdk
 	/// @requires authenticated-user
 	/// @requires no-rate-limiting
+	/// @requires management-enabled
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserDataError::InvalidUser|No authenticated user
