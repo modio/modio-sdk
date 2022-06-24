@@ -29,9 +29,6 @@ namespace asio
 
 namespace Modio
 {
-	template<typename Rep, typename Period = std::ratio<1>>
-	using Duration = std::chrono::duration<Rep, Period>;
-
 	/// @docpublic
 	/// @brief Trivial wrapper around link:https://en.cppreference.com/w/cpp/error/error_code[std::error_code].
 	/// Implemented as a class instead of a type alias to allow it to be forward-declared in wrappers, eg the UE4

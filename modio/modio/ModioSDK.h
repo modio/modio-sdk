@@ -118,7 +118,7 @@ namespace Modio
 	/// @brief Synchronises the local list of the current user's subscribed mods with the server. Any mods that have
 	/// been externally subscribed will be automatically marked for installation, and mods that have been externally
 	/// removed from the user's subscriptions may be uninstalled if no other local users have a current subscription.
-	/// Calling this before you call <<QueryUserSubscriptions>>, <<QueryUserInstallations>> or
+	/// Calling this before you call <<QueryUserSubscriptions>>, <<QueryUserInstallations>> or 
 	/// <<QuerySystemInstallations>> will ensure that if the system mod directory has been moved or relocated, those
 	/// functions will still return correct values.
 	/// @param OnFetchDone Callback invoked when the external state has been retrieved and merged with the local data
@@ -195,6 +195,21 @@ namespace Modio
 	/// @error UserDataError::InvalidUser|No authenticated user
 	/// @error ModManagementError::AlreadySubscribed|User is still subscribed to the specified mod
 	MODIOSDK_API void ForceUninstallModAsync(Modio::ModID ModToRemove, std::function<void(Modio::ErrorCode)> Callback);
+
+
+	/// @docpublic
+	/// @brief Queries the server to verify the state of the currently authenticated user if there is one present. An
+	/// empty ErrorCode passed to the callback indicates successful verification, i.e. the mod.io server was contactable
+	/// and the user's authentication remains valid.
+	/// @param Callback Callback invoked once the server-side state has been queried
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @requires authenticated-user
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	MODIOSDK_API void VerifyUserAuthenticationAsync(std::function<void(Modio::ErrorCode)> Callback);
+
 
 	/// @docpublic
 	/// @brief Fetches the currently authenticated Mod.io user profile if there is one associated with the current

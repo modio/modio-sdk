@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *  
+ *
  */
 
 // Implementation header - do not include directly
@@ -26,6 +26,7 @@
 #include "modio/detail/ops/auth/AuthenticateUserByXBoxLive.h"
 #include "modio/detail/ops/auth/ModioGetTermsOfUseOp.h"
 #include "modio/detail/ops/user/GetUserMediaOp.h"
+#include "modio/detail/ops/userdata/VerifyUserAuthenticationOp.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 #include "modio/userdata/ModioUserDataService.h"
 
@@ -39,11 +40,12 @@ namespace Modio
 	}
 
 	void GetTermsOfUseAsync(Modio::AuthenticationProvider Provider, Modio::Language Locale,
-					   std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms> Terms)> Callback)
+							std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms> Terms)> Callback)
 	{
 		if (Modio::Detail::RequireSDKIsInitialized(Callback))
 		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)>, void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)>(
+			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)>,
+									   void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)>(
 				Modio::Detail::GetTermsOfUseOp(Provider, Locale), Callback,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
@@ -101,6 +103,17 @@ namespace Modio
 		{
 			return Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>().ClearUserDataAsync(
 				Callback);
+		}
+	}
+
+	void VerifyUserAuthenticationAsync(std::function<void(Modio::ErrorCode)> Callback)
+	{
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+			Modio::Detail::RequireUserIsAuthenticated(Callback))
+		{
+			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
+				Modio::Detail::VerifyUserAuthenticationOp(), Callback,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	}
 

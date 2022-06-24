@@ -52,6 +52,8 @@ namespace Modio
 				return "User";
 			case LogCategory::ModManagement:
 				return "ModManagement";
+			case LogCategory::Test:
+				return "Test";
 			default:
 				return "UNKNKOWN";
 		}

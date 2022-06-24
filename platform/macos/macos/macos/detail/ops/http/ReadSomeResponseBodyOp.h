@@ -1,8 +1,10 @@
 /*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
  *
- *  This file is part of the mod.io SDK. All rights reserved.
- *  Redistribution prohibited without prior written consent of mod.io Pty Ltd.
+ *  This file is part of the mod.io SDK.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
  *
  */
 
@@ -15,6 +17,7 @@
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioJsonHelpers.h"
 #include <cstdlib>
 #include <memory>
 #include <vector>
@@ -78,8 +81,14 @@ namespace Modio
 						ResponseBuffer.Clear();
 						// While we have any prebuffered response data from when we were looking for the response
 						// headers, stuff that data into the response
+                        
+                        // When the server returns a "error" in json format, the response does not have "Content-Length"
+                        // in it, so the line below tries to parse it as json, if it happens, it will make sure
+                        // to append the buffer to the ResponseBuffer.
+                        nlohmann::json json = Modio::Detail::ToJson(Request->ResponseDataBuffer);
 
-						if (Modio::Optional<std::size_t> ExpectedLength = Request->GetContentLength())
+						if (Modio::Optional<std::size_t> ExpectedLength = Request->GetContentLength()
+                            || json.size() > 0)
 						{
 							while (Modio::Optional<Buffer> PrebufferedResponseData =
 									   Request->ResponseDataBuffer.TakeInternalBuffer())

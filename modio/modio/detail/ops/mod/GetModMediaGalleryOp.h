@@ -13,6 +13,7 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/ops/ModioGalleryImageType.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include <asio/yield.hpp>
 
 namespace Modio
@@ -58,7 +59,7 @@ namespace Modio
 					{
 						// Fetch the details about the request from the server. Let's hope it's in the cache (would be
 						// nice if we could extend the cache for this call)
-						yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
+						yield Modio::Detail::PerformRequestAndGetResponseAsync(
 							OpState.ResponseBodyBuffer, Modio::Detail::GetModRequest.SetGameID(GameID).SetModID(ModId),
 							Modio::Detail::CachedResponse::Allow, std::move(Self));
 

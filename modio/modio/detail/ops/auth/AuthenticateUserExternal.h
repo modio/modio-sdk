@@ -1,18 +1,21 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
+
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/http/ModioHttpParams.h"
 #include "modio/userdata/ModioUserDataService.h"
 #include <memory>
+
 namespace Modio
 {
 	namespace Detail
@@ -32,7 +35,7 @@ namespace Modio
 				auto& UserDataService = Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>();
 				reenter(LocalState->CoroutineState)
 				{
-					yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
+					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						LocalState->ResponseBuffer, LocalState->AuthenticationParams, Detail::CachedResponse::Disallow,
 						std::move(Self));
 					if (ec)
@@ -57,7 +60,7 @@ namespace Modio
 
 					LocalState->ResponseBuffer.Clear();
 
-					yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
+					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						LocalState->ResponseBuffer,
 						Modio::Detail::GetAuthenticatedUserRequest.SetAuthTokenOverride(
 							LocalState->AuthResponse.AccessToken),

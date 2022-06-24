@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -14,7 +14,7 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioFilterParams.h"
 #include "modio/core/entities/ModioModInfoList.h"
-#include "modio/detail/CoreOps.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include <asio/coroutine.hpp>
 
 #include <asio/yield.hpp>
@@ -22,7 +22,8 @@ namespace Modio
 {
 	namespace Detail
 	{
-		/// @brief Asynchronous operation that contacts the mod.io REST API and marshals the filtered results into public-facing data types
+		/// @brief Asynchronous operation that contacts the mod.io REST API and marshals the filtered results into
+		/// public-facing data types
 		class ListAllModsOp
 		{
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
@@ -52,11 +53,11 @@ namespace Modio
 						}
 					}
 
-					yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
+					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer,
 						Modio::Detail::GetModsRequest.SetGameID(GameID).SetFilterString(Filter.ToString()),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
-					
+
 					if (ec)
 					{
 						// Marshal all raw HTTP errors into generic RequestError
@@ -70,7 +71,7 @@ namespace Modio
 					}
 
 					{
-						//Got the response OK, try to marshal to the expected type
+						// Got the response OK, try to marshal to the expected type
 						Modio::Optional<Modio::ModInfoList> List =
 							TryMarshalResponse<Modio::ModInfoList>(ResponseBodyBuffer);
 						// Marshalled OK
@@ -81,7 +82,7 @@ namespace Modio
 						}
 						else
 						{
-							//Marshalling failed
+							// Marshalling failed
 							Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse), {});
 						}
 						return;

@@ -1,19 +1,19 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/entities/ModioModInfo.h"
-#include "modio/detail/CoreOps.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 
 #include <asio/yield.hpp>
 namespace Modio
@@ -32,10 +32,9 @@ namespace Modio
 		public:
 			GetModInfoOp(Modio::GameID GameID, Modio::ApiKey ApiKey, Modio::ModID ModId)
 				: GameID(GameID),
-				ApiKey(ApiKey),
-				ModId(ModId)
-			{
-			}
+				  ApiKey(ApiKey),
+				  ModId(ModId)
+			{}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
@@ -53,9 +52,8 @@ namespace Modio
 						}
 					}
 
-					yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
-						ResponseBodyBuffer,
-						Modio::Detail::GetModRequest.SetGameID(GameID).SetModID(ModId),
+					yield Modio::Detail::PerformRequestAndGetResponseAsync(
+						ResponseBodyBuffer, Modio::Detail::GetModRequest.SetGameID(GameID).SetModID(ModId),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 
 					if (ec)
@@ -80,6 +78,6 @@ namespace Modio
 				}
 			}
 		};
-	}
-}
+	} // namespace Detail
+} // namespace Modio
 #include <asio/unyield.hpp>

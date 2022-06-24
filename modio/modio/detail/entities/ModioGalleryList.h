@@ -28,6 +28,7 @@ namespace Modio
 			using nlohmann::to_json;
 			to_json(Json, GalleryList.InternalList);
 		}
+		// Written for use in tests.  Recheck functionality if using in other code.
 		friend bool operator==(const Modio::GalleryList& A, const Modio::GalleryList& B)
 		{
 			if (A.InternalList.size() != B.InternalList.size())
@@ -38,21 +39,7 @@ namespace Modio
 			{
 				return true;
 			}
-			// loop through to ensure equality even if images are stored in a different order
-			int ImageMatchCount = 0;
-			for (int i = 0; i < A.InternalList.size(); i++)
-			{
-				for (int j = 0; j < B.InternalList.size(); j++)
-				{
-					if (A.InternalList.at(i).Filename == B.InternalList.at(j).Filename &&
-						A.InternalList.at(i).Original == B.InternalList.at(j).Original &&
-						A.InternalList.at(i).Thumb320x180 == B.InternalList.at(j).Thumb320x180)
-					{
-						ImageMatchCount++;
-					}
-				}
-			}
-			if (ImageMatchCount == A.InternalList.size())
+			if (A.InternalList == B.InternalList)
 			{
 				return true;
 			}

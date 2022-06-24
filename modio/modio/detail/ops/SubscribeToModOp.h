@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -15,6 +15,7 @@
 #include "modio/core/ModioServices.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/SaveModCollectionToStorage.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/file/ModioFileService.h"
 #include "modio/userdata/ModioUserDataService.h"
 #include <asio/coroutine.hpp>
@@ -40,7 +41,7 @@ namespace Modio
 				{
 					Modio::Detail::SDKSessionData::RemoveDeferredUnsubscription(ModId);
 
-					yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
+					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer, Modio::Detail::SubscribeToModRequest.SetGameID(GameID).SetModID(ModId),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 

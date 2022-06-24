@@ -75,6 +75,10 @@ namespace Modio
 			Detail::ParseSafe(Json, ModInfo.ProfileSubmittedBy, "submitted_by");
 			Detail::ParseSafe(Json, ModInfo.ProfileSummary, "summary");
 			Detail::ParseSafe(Json, ModInfo.ModStatus, "status");
+			uint8_t Visibility;
+			Detail::ParseSafe(Json, Visibility, "visible");
+			ModInfo.bVisible = bool(Visibility);
+			
 		}
 
 		{
@@ -107,6 +111,8 @@ namespace Modio
 							   {"profile_url", Info.ProfileURL},
 							   {"submitted_by", Info.ProfileSubmittedBy},
 							   {"summary", Info.ProfileSummary},
+							   {"status", Info.ModStatus},
+							   {"visible", Info.bVisible ? 1 : 0},
 							   {"stats", Info.Stats},
 							   {"logo", Info.ModLogo},
 							   {"media", nlohmann::json::object({{"youtube", Info.YoutubeURLs.GetRawList()},

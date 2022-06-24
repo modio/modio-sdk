@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -14,6 +14,7 @@
 #include "modio/detail/entities/ModioLogo.h"
 #include "modio/detail/ops/ModioDownloadImage.h"
 #include "modio/detail/ops/ModioLogoImageType.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include <asio/coroutine.hpp>
 #include <asio/yield.hpp>
 
@@ -72,7 +73,7 @@ namespace Modio
 					{
 						// Fetch the details about the request from the server. Let's hope it's in the cache (would be
 						// nice if we could extend the cache for this call)
-						yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
+						yield Modio::Detail::PerformRequestAndGetResponseAsync(
 							OpState.ResponseBodyBuffer, Modio::Detail::GetModRequest.SetGameID(GameID).SetModID(ModId),
 							Modio::Detail::CachedResponse::Allow, std::move(Self));
 

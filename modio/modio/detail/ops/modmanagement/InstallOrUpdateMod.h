@@ -11,9 +11,9 @@
 #pragma once
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
-#include "modio/detail/CoreOps.h"
 #include "modio/detail/ModioObjectTrack.h"
 #include "modio/detail/ModioSDKSessionData.h"
+#include "modio/detail/ops/DownloadFileOp.h"
 #include "modio/detail/ops/compression/ExtractAllToFolderOp.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/file/ModioFileService.h"
@@ -51,7 +51,7 @@ namespace Modio
 					Transaction =
 						BeginTransaction(Modio::Detail::SDKSessionData::GetSystemModCollection().Entries().at(Mod));
 
-					yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
+					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ModInfoBuffer,
 						Modio::Detail::GetModRequest.SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
 							.SetModID(Mod),
@@ -133,11 +133,10 @@ namespace Modio
 							ModInfoResponse["modfile"]["filename"].get<std::string>(),
 							ModInfoResponse["id"].get<Modio::ModID>(), ModInfoResponse["name"].get<std::string>());
 
-						yield Modio::Detail::ComposedOps::DownloadFileAsync(
-							Modio::Detail::HttpRequestParams::FileDownload(
-								ModInfoResponse["modfile"]["download"]["binary_url"])
-								.value(),
-							DownloadPath, ModProgress, std::move(Self));
+						yield Modio::Detail::DownloadFileAsync(Modio::Detail::HttpRequestParams::FileDownload(
+																   ModInfoResponse["modfile"]["download"]["binary_url"])
+																   .value(),
+															   DownloadPath, ModProgress, std::move(Self));
 						if (ec)
 						{
 							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();

@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -14,8 +14,8 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/entities/ModioUser.h"
-#include "modio/detail/CoreOps.h"
 #include "modio/detail/ModioSDKSessionData.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/schema/AccessTokenObject.h"
 #include "modio/http/ModioHttpParams.h"
 #include "modio/userdata/ModioUserDataService.h"
@@ -42,7 +42,7 @@ namespace Modio
 
 				reenter(CoroutineState)
 				{
-					yield Detail::ComposedOps::PerformRequestAndGetResponseAsync(
+					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						Local.ResponseBodyBuffer,
 						ExchangeEmailSecurityCodeRequest.AppendPayloadValue(
 							Modio::Detail::Constants::APIStrings::SecurityCode, EmailCode.InternalCode),
@@ -70,7 +70,7 @@ namespace Modio
 
 					Local.ResponseBodyBuffer.Clear();
 
-					yield Detail::ComposedOps::PerformRequestAndGetResponseAsync(
+					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						Local.ResponseBodyBuffer,
 						Modio::Detail::GetAuthenticatedUserRequest.SetAuthTokenOverride(Local.AuthResponse.AccessToken),
 						Detail::CachedResponse::Disallow, std::move(Self));
@@ -80,7 +80,7 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
-					
+
 					{
 						Modio::Optional<Modio::User> User =
 							Detail::TryMarshalResponse<Modio::User>(Local.ResponseBodyBuffer);

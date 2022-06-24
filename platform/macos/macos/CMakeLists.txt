@@ -15,4 +15,7 @@ target_compile_features(platform INTERFACE cxx_std_14)
 
 target_include_directories(platform INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 
-target_link_libraries(platform INTERFACE httpparser pthread)
+find_library(FOUNDATION Foundation)
+find_library(CFNETWORK CFNetwork)
+
+target_link_libraries(platform INTERFACE httpparser pthread ${FOUNDATION} ${CFNETWORK})

@@ -42,6 +42,23 @@ namespace Modio
 	};
 
 	/// @docpublic
+	/// @brief Enum representing the platform(s) that a modfile is enabled for
+	enum class ModfilePlatform
+	{
+		Windows,
+		Mac,
+		Linux,
+		Android,
+		iOS,
+		XboxOne,
+		XboxSeriesX,
+		PS4, 
+		PS5, 
+		Switch, 
+		Oculus
+	};
+
+	/// @docpublic
 	/// @brief Enum representing mod logo sizes
 	enum class LogoSize : std::uint8_t
 	{
@@ -382,7 +399,8 @@ namespace Modio
 		Http,
 		Compression,
 		User,
-		ModManagement
+		ModManagement,
+		Test
 	};
 
 	/// @docpublic

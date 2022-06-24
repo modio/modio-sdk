@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -13,9 +13,9 @@
 #include "modio/core/entities/ModioModInfoList.h"
 #include "modio/core/entities/ModioPagedResult.h"
 #include "modio/detail/AsioWrapper.h"
-#include "modio/detail/CoreOps.h"
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 
 namespace Modio
 {
@@ -35,7 +35,7 @@ namespace Modio
 						// Because we're making a raw request here, manually add the filter to paginate 100 results at a
 						// time We're going to gather all the results together at the end of this anyways so the biggest
 						// pages give the best results because it means fewer REST calls
-						yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
+						yield Modio::Detail::PerformRequestAndGetResponseAsync(
 							SubscriptionBuffer,
 							Modio::Detail::GetUserSubscriptionsRequest.SetFilterString(
 								fmt::format("_limit=100&_offset={}&game_id={}", CurrentResultIndex,
@@ -72,7 +72,7 @@ namespace Modio
 									return;
 								}
 							}
-							
+
 							SubscriptionBuffer = Modio::Detail::DynamicBuffer();
 							CollatedResults->Append(CurrentModInfoPage.value());
 							Services::GetGlobalService<CacheService>().AddToCache(

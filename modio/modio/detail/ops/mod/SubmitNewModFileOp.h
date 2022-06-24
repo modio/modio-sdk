@@ -10,13 +10,13 @@
 
 #pragma once
 #include "modio/core/ModioBuffer.h"
+#include "modio/core/ModioLogger.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
-#include "modio/detail/CoreOps.h"
+#include "modio/detail/ModioConstants.h"
 #include "modio/detail/ops/UploadFileOp.h"
 #include "modio/detail/ops/compression/CompressFolderOp.h"
 #include "modio/file/ModioFileService.h"
-#include "modio/core/ModioLogger.h"
 
 namespace Modio
 {
@@ -36,11 +36,76 @@ namespace Modio
 						.AppendPayloadValue("metadata_blob", Params.MetadataBlob);
 				if (Params.bSetAsActive)
 				{
-					SubmitParams.AppendPayloadValue("active", Params.bSetAsActive ? "true" : "false");
+					SubmitParams = SubmitParams.AppendPayloadValue("active", *Params.bSetAsActive ? "true" : "false");
+				}
+				if (Params.Platforms)
+				{
+					// sort Platforms vector and remove duplicates
+					std::sort(Params.Platforms.value().begin(), Params.Platforms.value().end());
+					auto Last = std::unique(Params.Platforms.value().begin(), Params.Platforms.value().end());
+					Params.Platforms.value().erase(Last, Params.Platforms.value().end());
+
+					// loop through vector to append appropriate value to request
+					std::size_t i = 0;
+					for (const Modio::ModfilePlatform Platform : *Params.Platforms)
+					{
+						switch (Platform)
+						{
+							case (Modio::ModfilePlatform::Windows):
+								SubmitParams =
+									SubmitParams.AppendPayloadValue(fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::Windows);
+								break;
+							case (Modio::ModfilePlatform::Mac):
+								SubmitParams = SubmitParams.AppendPayloadValue(fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::Mac);
+								break;
+							case (Modio::ModfilePlatform::Linux):
+								SubmitParams =
+									SubmitParams.AppendPayloadValue(fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::Linux);
+								break;
+							case (Modio::ModfilePlatform::Android):
+								SubmitParams =
+									SubmitParams.AppendPayloadValue(fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::Android);
+								break;
+							case (Modio::ModfilePlatform::iOS):
+								SubmitParams = SubmitParams.AppendPayloadValue(fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::iOS);
+								break;
+							case (Modio::ModfilePlatform::XboxOne):
+								SubmitParams =
+									SubmitParams.AppendPayloadValue(fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::XboxOne);
+								break;
+							case (Modio::ModfilePlatform::XboxSeriesX):
+								SubmitParams =
+									SubmitParams.AppendPayloadValue(fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::XboxSeriesX);
+								break;
+							case (Modio::ModfilePlatform::PS4):
+								SubmitParams = SubmitParams.AppendPayloadValue(
+									fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::PS4);
+								break;
+							case (Modio::ModfilePlatform::PS5):
+								SubmitParams = SubmitParams.AppendPayloadValue(fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::PS5);
+								break;
+							case (Modio::ModfilePlatform::Switch):
+								SubmitParams =
+									SubmitParams.AppendPayloadValue(fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::Switch);
+								break;
+							case (Modio::ModfilePlatform::Oculus):
+								SubmitParams =
+									SubmitParams.AppendPayloadValue(fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::Oculus);
+								break;
+							default:
+								Modio::Detail::Logger().Log(
+									LogLevel::Warning, LogCategory::File,
+									"Platform {} does not match any Modio::ModfilePlatform values. "
+									"Unable to append to SubmitNewModFileForMod request.",
+									Platform);
+						}
+						i++;
+					}
 				}
 				ModRootDirectory = Params.RootDirectory;
-				ArchivePath = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MakeTempFilePath(
-					fmt::format("modfile_{}.zip", ModID)).value_or("");
+				ArchivePath = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+								  .MakeTempFilePath(fmt::format("modfile_{}.zip", ModID))
+								  .value_or("");
 				ProgressInfo = Modio::Detail::SDKSessionData::StartModDownloadOrUpdate(CurrentModID);
 			}
 
@@ -54,11 +119,11 @@ namespace Modio
 				}
 				reenter(CoroutineState)
 				{
-					Modio::Detail::Logger().Log(
-						Modio::LogLevel::Info, Modio::LogCategory::ModManagement,
-						"Beginning submission of mod {}", CurrentModID);
+					Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::ModManagement,
+												"Beginning submission of mod {}", CurrentModID);
 					if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DirectoryExists(
-							ModRootDirectory) || ArchivePath.empty())
+							ModRootDirectory) ||
+						ArchivePath.empty())
 					{
 						Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(Modio::ModManagementEvent {
 							CurrentModID, Modio::ModManagementEvent::EventType::Uploaded,

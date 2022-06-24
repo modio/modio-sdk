@@ -10,7 +10,7 @@
 
 #pragma once
 
-//#include "ModioErrorCondition.generated.h"
+#include "ModioErrorCondition.generated.h"
 
 UENUM(BlueprintType)
 enum class EModioErrorCondition: uint8
@@ -25,4 +25,5 @@ enum class EModioErrorCondition: uint8
 	UserTermsOfUseError = 13 UMETA(ToolTip="When this condition is true, the error code indicates that the user has not yet accepted the mod.io Terms of Use.") ,
 	SubmitReportError = 14 UMETA(ToolTip="When this condition is true, the error code indicates that a report for the specified content could not be submitted.") ,
 	UserNotAuthenticatedError = 15 UMETA(ToolTip="When this condition is true, the error code indicates that a user is not authenticated.") ,
+	SDKNotInitialized = 16 UMETA(ToolTip="When this condition is true, the error code indicates that the SDK has not been initialized.") ,
 };

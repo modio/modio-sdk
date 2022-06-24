@@ -13,8 +13,8 @@
 #include "modio/core/ModioCreateModParams.h"
 #include "modio/core/entities/ModioModInfo.h"
 #include "modio/detail/AsioWrapper.h"
-#include "modio/detail/CoreOps.h"
 #include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 
 namespace Modio
 {
@@ -37,12 +37,12 @@ namespace Modio
 
 				if (Params.bVisible)
 				{
-					SubmitParams.AppendPayloadValue("visible", Params.bVisible.value() ? "1" : "0");
+					SubmitParams = SubmitParams.AppendPayloadValue("visible", Params.bVisible.value() ? "1" : "0");
 				}
 
 				if (Params.Stock)
 				{
-					SubmitParams.AppendPayloadValue("stock", fmt::format("{}", Params.Stock.value()));
+					SubmitParams = SubmitParams.AppendPayloadValue("stock", fmt::format("{}", Params.Stock.value()));
 				}
 
 				if (Params.Tags)
@@ -50,14 +50,14 @@ namespace Modio
 					std::size_t Index = 0;
 					for (const auto& Tag : Params.Tags.value())
 					{
-						SubmitParams.AppendPayloadValue(fmt::format("tags[{}]", Index), Tag);
+						SubmitParams = SubmitParams.AppendPayloadValue(fmt::format("tags[{}]", Index), Tag);
 						Index++;
 					}
 				}
 
 				if (Params.MaturityRating)
 				{
-					SubmitParams.AppendPayloadValue(
+					SubmitParams = SubmitParams.AppendPayloadValue(
 						"maturity_option", fmt::format("{}", static_cast<std::uint8_t>(Params.MaturityRating.value())));
 				}
 			}
@@ -67,8 +67,8 @@ namespace Modio
 			{
 				reenter(CoroutineState)
 				{
-					yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
-						ResponseBuffer, SubmitParams, CachedResponse::Disallow, std::move(Self));
+					yield Modio::Detail::PerformRequestAndGetResponseAsync(ResponseBuffer, SubmitParams,
+																		   CachedResponse::Disallow, std::move(Self));
 					if (ec)
 					{
 						Self.complete(ec, {});

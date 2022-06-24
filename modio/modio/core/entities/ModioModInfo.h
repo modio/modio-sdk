@@ -115,6 +115,8 @@ namespace Modio
 		std::string Version = "1.0";
 		/// @brief The current ModStatus on the server: Accepted, NotAccepted, or Deleted.
 		Modio::ModServerSideStatus ModStatus = Modio::ModServerSideStatus::NotAccepted;
+		/// @brief The visibility status of the mod
+		bool bVisible = true;
 
 		friend bool operator==(const Modio::ModInfo& A, const Modio::ModInfo& B)
 		{
@@ -127,7 +129,7 @@ namespace Modio
 				(A.ProfileDateUpdated == B.ProfileDateUpdated) && (A.ProfileDateLive == B.ProfileDateLive) &&
 				(A.MetadataBlob == B.MetadataBlob) && (A.MetadataKvp == B.MetadataKvp) && (A.Tags == B.Tags) &&
 				(A.YoutubeURLs == B.YoutubeURLs) && (A.Stats == B.Stats) && (A.ModLogo == B.ModLogo) &&
-				(A.ModStatus == B.ModStatus))
+				(A.ModStatus == B.ModStatus) && A.bVisible == B.bVisible)
 			{
 				if (A.FileInfo.has_value() && B.FileInfo.has_value())
 				{

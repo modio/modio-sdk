@@ -12,7 +12,7 @@
 
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioStdTypes.h"
-#include "modio/detail/CoreOps.h"
+#include "modio/detail/ops/DownloadFileOp.h"
 #include "modio/detail/ModioObjectTrack.h"
 
 #include <asio/yield.hpp>
@@ -91,7 +91,7 @@ namespace Modio
 					}
 
 					// Download the file
-					yield Modio::Detail::ComposedOps::DownloadImageAsync(
+					yield Modio::Detail::DownloadFileAsApiRequestAsync(
 						OpState.DownloadRequestParams.value(),
 						OpState.DestinationTempPath, std::move(Self));
 

@@ -9,56 +9,57 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioBuffer.h"
+#include "modio/core/entities/ModioUser.h"
 #include "modio/detail/AsioWrapper.h"
-#include "modio/detail/ModioJsonHelpers.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/http/ModioHttpParams.h"
 
-#include "asio/yield.hpp"
 namespace Modio
 {
 	namespace Detail
 	{
-		class GetModDependenciesOp
+#include <asio/yield.hpp>
+		class VerifyUserAuthenticationOp
 		{
 		public:
-			GetModDependenciesOp(Modio::ModID ModID, Modio::GameID GameID) : ModID(ModID), GameID(GameID) {};
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
 				reenter(CoroutineState)
 				{
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
-						ResponseBodyBuffer, Modio::Detail::GetModDependenciesRequest.SetGameID(GameID).SetModID(ModID),
-						Modio::Detail::CachedResponse::Allow, std::move(Self));
+						ResponseBodyBuffer, GetAuthenticatedUserRequest, CachedResponse::Allow, std::move(Self));
 					if (ec)
 					{
-						Self.complete(ec, {});
+						Self.complete(ec);
 						return;
 					}
-					else
+
 					{
-						Modio::Optional<Modio::ModDependencyList> List =
-							TryMarshalResponse<Modio::ModDependencyList>(ResponseBodyBuffer);
-						if (List.has_value())
+						Modio::Optional<Modio::User> User =
+							Detail::TryMarshalResponse<Modio::User>(ResponseBodyBuffer);
+
+						if (User.has_value())
 						{
-							Self.complete({}, List);
+							Self.complete({});
+							return;
 						}
 						else
 						{
-							Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse), {});
+							Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
+							return;
 						}
 					}
 				}
 			}
 
 		private:
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
 			asio::coroutine CoroutineState;
-			Modio::ModID ModID;
-			Modio::GameID GameID;
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
 		};
+#include <asio/unyield.hpp>
 	} // namespace Detail
+
 } // namespace Modio
-#include "asio/unyield.hpp"

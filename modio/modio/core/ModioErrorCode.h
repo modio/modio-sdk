@@ -970,7 +970,9 @@ namespace Modio
 		/// @brief When this condition is true, the error code indicates that a report for the specified content could not be submitted.
 		SubmitReportError = 14,
 		/// @brief When this condition is true, the error code indicates that a user is not authenticated.
-		UserNotAuthenticatedError = 15
+		UserNotAuthenticatedError = 15,
+		/// @brief When this condition is true, the error code indicates that the SDK has not been initialized.
+		SDKNotInitialized = 16
 	};
 
 	struct ErrorConditionCategoryImpl : std::error_category
@@ -1024,6 +1026,9 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::UserNotAuthenticatedError:
 					return "When this condition is true, the error code indicates that a user is not authenticated.";
+				break;
+				case ErrorConditionTypes::SDKNotInitialized:
+					return "When this condition is true, the error code indicates that the SDK has not been initialized.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -1712,6 +1717,14 @@ namespace Modio
 					}
 
 					if (ec == Modio::UserAuthError::UnableToInitStorage)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::SDKNotInitialized:
+					if (ec == Modio::GenericError::SDKNotInitialized)
 					{
 						return true;
 					}

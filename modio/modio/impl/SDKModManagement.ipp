@@ -36,10 +36,14 @@ namespace Modio
 	{
 		if (!Modio::Detail::SDKSessionData::IsInitialized())
 		{
+			Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
+										"SDK is not initialized. Cannot Enable Mod Management.");
 			return Modio::make_error_code(Modio::GenericError::SDKNotInitialized);
 		}
 		if (Modio::Detail::SDKSessionData::IsModManagementEnabled())
 		{
+			Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
+										"Mod Management is already enabled");
 			return Modio::make_error_code(Modio::ModManagementError::ModManagementAlreadyEnabled);
 		}
 		Modio::Detail::SDKSessionData::SetUserModManagementCallback(ModManagementHandler);

@@ -192,7 +192,8 @@ cmake --install <modio-sdk folder>/out/install/win64
 
 === SDK structure and concepts
 
-The following diagram provides an overview of the mod.io SDK initialization procedure, its asynchronous nature.
+The following diagram provides an overview of the mod.io SDK initialization procedure and its asynchronous nature.
+
 image:{gitplant}modio_sdk_flow-init.puml[alt:"mod.io SDK Initialization flow"]
 
 ==== Flat API
@@ -528,15 +529,14 @@ Modio::EnableModManagement([](Modio::ModManagementEvent ModEvent)
 {
     if (ModEvent.Status && ModEvent.Event == Modio::ModManagementEvent::EventType::Installed)
     {
-        std::cout << "Mod with ID: << ModEvent.ID << " is installed" << std::endl;
+        std::cout << "Mod with ID: " << ModEvent.ID << " is installed" << std::endl;
     }
     else {
-        std::cout << "Mod with ID: << ModEvent.ID << " failed to install: " << ModEvent.Status.message() << std::endl;
+        std::cout << "Mod with ID: " << ModEvent.ID << " failed to install: " << ModEvent.Status.message() << std::endl;
     }
 });
 
-//////////
-//Sometime later: check if there's a mod being installed, or more mods that require installation pending
+//Some time later: check if there's a mod being installed, or more mods that require installation pending
 if (!Modio::IsModManagementBusy())
 {
     //This will reset any in-progress installations to pending, so we're only calling it if nothing's being processed
@@ -595,6 +595,7 @@ Modio::FetchExternalUpdatesAsync([](Modio::ErrorCode ec)
     {
         //Couldn't fetch external subscription data, handle error
     }
+    else
     {
         //The SDK's internal state synchronised. This is an acknowledgment of success
     }

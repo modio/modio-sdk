@@ -12,7 +12,6 @@
 
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioStdTypes.h"
-#include "modio/detail/CoreOps.h"
 #include "modio/detail/ops/ModioAvatarImageType.h"
 #include "modio/detail/ops/ModioDownloadImage.h"
 #include <asio/yield.hpp>

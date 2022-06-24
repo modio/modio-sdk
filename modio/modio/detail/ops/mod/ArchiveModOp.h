@@ -14,7 +14,7 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/AsioWrapper.h"
-#include "modio/detail/CoreOps.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/http/ModioHttpParams.h"
 
 #include <asio/yield.hpp>
@@ -61,7 +61,7 @@ namespace Modio
 						else
 						{
 							// Make archive request
-							yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
+							yield Modio::Detail::PerformRequestAndGetResponseAsync(
 								ResponseBodyBuffer, Modio::Detail::DeleteModRequest.SetGameID(GameID).SetModID(ModID),
 								Modio::Detail::CachedResponse::Disallow, std::move(Self));
 

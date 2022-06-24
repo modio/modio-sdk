@@ -38,5 +38,9 @@ namespace Modio
 		/// @docpublic
 		/// @brief Optional metadata blob for this mod
 		Modio::Optional<std::string> MetadataBlob;
+
+		/// @docpublic
+		/// @brief Optional vector of platforms for this modfile
+		Modio::Optional<std::vector<Modio::ModfilePlatform>> Platforms;
 	};
 } // namespace Modio

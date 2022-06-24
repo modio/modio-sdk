@@ -11,8 +11,8 @@
 #pragma once
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/AsioWrapper.h"
-#include "modio/detail/CoreOps.h"
 #include "modio/detail/FmtWrapper.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 
 #include <asio/yield.hpp>
 namespace Modio
@@ -32,7 +32,7 @@ namespace Modio
 			{
 				reenter(CoroutineState)
 				{
-					yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
+					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer,
 						Modio::Detail::AddModRatingRequest.SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
 							.SetModID(Mod)

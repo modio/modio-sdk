@@ -154,7 +154,7 @@ protected:
         ct_data const*      static_tree;// static tree or NULL
         std::uint8_t const* extra_bits; // extra bits for each code or NULL
         std::uint16_t       extra_base; // base index for extra_bits
-        std::uint16_t       elems;      //  max number of elements in the tree
+        std::uint16_t       elems = 0;      //  max number of elements in the tree
         std::uint8_t        max_length; // max bit length for the codes
     };
 
@@ -180,6 +180,8 @@ protected:
         // lengths for unused bit length codes.
         std::uint8_t const bl_order[blCodes] = {
             16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15
+        };
+        constexpr lut_type() : dist_code(), length_code(), base_length(), base_dist() {
         };
 
         ct_data ltree[lCodes + 2];
@@ -214,7 +216,7 @@ protected:
     struct tree_desc
     {
         ct_data *dyn_tree;           /* the dynamic tree */
-        int     max_code;            /* largest code with non zero frequency */
+        int     max_code = 0;            /* largest code with non zero frequency */
         static_desc const* stat_desc; /* the corresponding static tree */
     };
 
@@ -343,18 +345,18 @@ protected:
     int nice_match_;                // Stop searching when current match exceeds this
 
     ct_data dyn_ltree_[
-        HEAP_SIZE];                 // literal and length tree
+        HEAP_SIZE] = { 0 };                 // literal and length tree
     ct_data dyn_dtree_[
-        2*dCodes+1];                // distance tree
+        2 * dCodes + 1] = { 0 };                // distance tree
     ct_data bl_tree_[
-        2*blCodes+1];               // Huffman tree for bit lengths
+        2 * blCodes + 1] = { 0 };               // Huffman tree for bit lengths
 
     tree_desc l_desc_;              // desc. for literal tree
     tree_desc d_desc_;              // desc. for distance tree
     tree_desc bl_desc_;             // desc. for bit length tree
 
     // number of codes at each bit length for an optimal tree
-    std::uint16_t bl_count_[maxBits+1];
+    std::uint16_t bl_count_[maxBits + 1] = { 0 };
 
     // Index within the heap array of least frequent node in the Huffman tree
     static std::size_t constexpr kSmallest = 1;
@@ -363,12 +365,12 @@ protected:
         heap[0] is not used. The same heap array is used to build all trees.
     */
 
-    int heap_[2*lCodes+1];          // heap used to build the Huffman trees
-    int heap_len_;                  // number of elements in the heap
-    int heap_max_;                  // element of largest frequency
+    int heap_[2 * lCodes + 1] = { 0 };          // heap used to build the Huffman trees
+    int heap_len_ = 0;                  // number of elements in the heap
+    int heap_max_ = 0;                  // element of largest frequency
 
     // Depth of each subtree used as tie breaker for trees of equal frequency
-    std::uint8_t depth_[2*lCodes+1];
+    std::uint8_t depth_[2 * lCodes + 1] = { 0 };
 
     std::uint8_t *l_buf_;           // buffer for literals or lengths
 

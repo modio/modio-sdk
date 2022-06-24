@@ -158,6 +158,11 @@ namespace Modio
 			case SortFieldType::ID:
 				SortStr = "id";
 				break;
+			case SortFieldType::DownloadsTotal:
+				SortStr = "downloads";
+				bInvertedSort = true;
+				break;
+
 			default:
 				break;
 		}

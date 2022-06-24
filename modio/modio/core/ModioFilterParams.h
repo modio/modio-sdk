@@ -1,19 +1,19 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
 #include "ModioGeneratedVariables.h"
 
-#include "modio/detail/ModioDefines.h"
 #include "modio/core/ModioCoreTypes.h"
+#include "modio/detail/ModioDefines.h"
 #include <chrono>
 #include <string>
 #include <vector>
@@ -26,15 +26,16 @@ namespace Modio
 	{
 	public:
 		/// @docpublic
-		/// @brief Enum indicating which field should be used to sort the results
+		/// @brief Enum indicating which field should be used to sort the results.  
 		enum class SortFieldType
 		{
 			ID, /** use mod ID (default) */
-			DownloadsToday, /** use number of downloads in last 24 (exposed in REST API as 'popular' */
+			DownloadsToday, /** use number of downloads in last 24 (exposed in REST API as 'popular') */
 			SubscriberCount, /** use number of subscribers */
 			Rating, /** use mod rating */
 			DateMarkedLive, /** use date mod was marked live */
-			DateUpdated /** use date mod was last updated */
+			DateUpdated, /** use date mod was last updated */
+			DownloadsTotal /** use total downloads */
 		};
 
 		/// @docpublic

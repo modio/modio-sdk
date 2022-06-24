@@ -13,7 +13,7 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/AsioWrapper.h"
-#include "modio/detail/CoreOps.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/http/ModioHttpParams.h"
 
 #include <asio/yield.hpp>
@@ -42,7 +42,7 @@ namespace Modio
 			{
 				reenter(CoroState)
 				{
-					yield Modio::Detail::ComposedOps::PerformRequestAndGetResponseAsync(
+					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer, Modio::Detail::AddModMediaRequest.SetGameID(GameID).SetModID(ModID).AppendPayloadFile("logo", LogoPath),
 						Modio::Detail::CachedResponse::Disallow, std::move(Self));
 
@@ -59,3 +59,4 @@ namespace Modio
 		};
 	} // namespace Detail
 } // namespace Modio
+#include <asio/unyield.hpp>

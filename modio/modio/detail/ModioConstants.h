@@ -56,6 +56,20 @@ namespace Modio
 			{
 				constexpr uint8_t DefaultNumberOfRetries = 3;
 			}
+			namespace PlatformNames
+			{
+				constexpr const char* Windows = "windows";
+				constexpr const char* Mac = "mac";
+				constexpr const char* Linux = "linux";
+				constexpr const char* Android = "android";
+				constexpr const char* iOS = "ios";
+				constexpr const char* XboxOne = "xboxone";
+				constexpr const char* XboxSeriesX = "xboxseriesx";
+				constexpr const char* PS4 = "ps4";
+				constexpr const char* PS5 = "ps5";
+				constexpr const char* Switch = "switch";
+				constexpr const char* Oculus = "oculus";
+			}
 		}
 	}
 }
