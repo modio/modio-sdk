@@ -345,11 +345,11 @@ protected:
     int nice_match_;                // Stop searching when current match exceeds this
 
     ct_data dyn_ltree_[
-        HEAP_SIZE] = { 0 };                 // literal and length tree
+        HEAP_SIZE] = { {0} };                 // literal and length tree
     ct_data dyn_dtree_[
-        2 * dCodes + 1] = { 0 };                // distance tree
+        2 * dCodes + 1] = { {0} };                // distance tree
     ct_data bl_tree_[
-        2 * blCodes + 1] = { 0 };               // Huffman tree for bit lengths
+        2 * blCodes + 1] = { {0} };               // Huffman tree for bit lengths
 
     tree_desc l_desc_;              // desc. for literal tree
     tree_desc d_desc_;              // desc. for distance tree
