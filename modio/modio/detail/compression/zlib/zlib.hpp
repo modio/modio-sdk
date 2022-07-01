@@ -96,11 +96,11 @@ struct z_params
 
         If there is no more input, this should be set to zero.
     */
-    std::size_t avail_in;
+    std::uint64_t avail_in;
 
     /** The total number of input bytes read so far.
     */
-    std::size_t total_in = 0;
+    std::uint64_t total_in = 0;
 
     /** A pointer to the next output byte.
     */
@@ -108,11 +108,11 @@ struct z_params
 
     /** The remaining bytes of space at `next_out`.
     */
-    std::size_t avail_out;
+    std::uint64_t avail_out;
 
     /** The total number of bytes output so far.
     */
-    std::size_t total_out = 0;
+    std::uint64_t total_out = 0;
 
     int data_type = unknown;  // best guess about the data type: binary or text
 };

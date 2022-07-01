@@ -96,12 +96,13 @@ namespace Modio
 					if (EntryToProcess->GetModState() == Modio::ModState::InstallationPending ||
 						EntryToProcess->GetModState() == Modio::ModState::UpdatePending)
 					{
+						PendingModState = EntryToProcess->GetModState();
 						// Does this need to be a separate operation or could we provide a parameter to specify
 						// we only want to update if it's already installed or something?
 						yield Modio::Detail::InstallOrUpdateModAsync(EntryToProcess->GetID(), std::move(Self));
 						Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(Modio::ModManagementEvent {
 							EntryToProcess->GetID(),
-							EntryToProcess->GetModState() == Modio::ModState::InstallationPending
+							PendingModState.value() == Modio::ModState::InstallationPending
 								? Modio::ModManagementEvent::EventType::Installed
 								: Modio::ModManagementEvent::EventType::Updated,
 							ec});
@@ -145,6 +146,7 @@ namespace Modio
 			asio::coroutine CoroutineState;
 			std::shared_ptr<Modio::ModCollectionEntry> EntryToProcess;
 			Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>> PendingUpload;
+			Modio::Optional<Modio::ModState> PendingModState;
 		};
 
 		template<typename ProcessNextCallback>

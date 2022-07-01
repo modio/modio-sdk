@@ -63,6 +63,9 @@ namespace Modio
 		{
 			if (CurrentState == Modio::ModState::UninstallPending)
 			{
+				Modio::Detail::Logger().Log(
+					Modio::LogLevel::Info, Modio::LogCategory::ModManagement,
+					"User has subscribed to mod {} with ModState UninstallPending.  Updating ModState to Installed.", ID);
 				CurrentState.store(ModState::Installed);
 			}
 

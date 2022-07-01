@@ -41,6 +41,7 @@ namespace Modio
 			{
 				InputFile = std::make_unique<Modio::Detail::File>(SourceFilePath, false);
 				OutputFile = std::make_unique<Modio::Detail::File>(ArchiveFile->FilePath, false);
+                CompressionStream = std::make_unique<boost::beast::zlib::deflate_stream>();
 			};
 
 			template<typename CoroType>
@@ -89,7 +90,7 @@ namespace Modio
 							CompressedOutputBuffer = Modio::Detail::Buffer(MaxBytesToRead);
 							CompressionState.avail_out = CompressedOutputBuffer.GetSize();
 							CompressionState.next_out = CompressedOutputBuffer.Data();
-							CompressionStream.write(CompressionState, boost::beast::zlib::Flush::none, ec);
+							CompressionStream->write(CompressionState, boost::beast::zlib::Flush::none, ec);
 							if (ec && ec != Modio::ZlibError::EndOfStream)
 							{
 								Self.complete(ec);
@@ -127,7 +128,7 @@ namespace Modio
 						CompressedOutputBuffer = Modio::Detail::Buffer(ChunkOfBytes);
 						CompressionState.avail_out = CompressedOutputBuffer.GetSize();
 						CompressionState.next_out = CompressedOutputBuffer.Data();
-						CompressionStream.write(CompressionState, boost::beast::zlib::Flush::finish, ec);
+						CompressionStream->write(CompressionState, boost::beast::zlib::Flush::finish, ec);
 						if (ec && ec != Modio::ZlibError::EndOfStream)
 						{
 							Self.complete(ec);
@@ -194,7 +195,7 @@ namespace Modio
 
 		private:
 			boost::beast::zlib::z_params CompressionState;
-			boost::beast::zlib::deflate_stream CompressionStream;
+            std::unique_ptr<boost::beast::zlib::deflate_stream> CompressionStream;
             // This variable had troubles as a constexpr when compiling on macOS + g++11
 			const uint32_t LocalHeaderMagic = 0x04034b50;
 			std::shared_ptr<Modio::Detail::ArchiveFileImplementation> ArchiveFile;

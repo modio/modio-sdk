@@ -181,7 +181,7 @@ protected:
         std::uint8_t const bl_order[blCodes] = {
             16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15
         };
-        constexpr lut_type() : dist_code(), length_code(), base_length(), base_dist() {
+		lut_type() :ltree(), dtree(), dist_code(), length_code(), base_length(), base_dist() {
         };
 
         ct_data ltree[lCodes + 2];
@@ -252,15 +252,15 @@ protected:
     lut_type const& lut_;
 
     bool inited_ = false;
-    std::size_t buf_size_;
+    std::uint64_t buf_size_;
     std::unique_ptr<std::uint8_t[]> buf_;
 
     int status_;                    // as the name implies
     Byte* pending_buf_;             // output still pending
-    std::uint32_t
+    std::uint64_t
         pending_buf_size_;          // size of pending_buf
     Byte* pending_out_;             // next pending byte to output to the stream
-    uInt pending_;                  // nb of bytes in the pending buffer
+    uint64_t pending_;                  // nb of bytes in the pending buffer
     Modio::Optional<Flush>
         last_flush_;                // value of flush param for previous deflate call
 
@@ -372,7 +372,7 @@ protected:
     // Depth of each subtree used as tie breaker for trees of equal frequency
     std::uint8_t depth_[2 * lCodes + 1] = { 0 };
 
-    std::uint8_t *l_buf_;           // buffer for literals or lengths
+    std::uint8_t *sym_buf_;           // buffer for literals or lengths
 
     /*  Size of match buffer for literals/lengths.
         There are 4 reasons for limiting lit_bufsize to 64K:
@@ -393,13 +393,8 @@ protected:
           - I can't count above 4
     */
     uInt lit_bufsize_;
-    uInt last_lit_;                 // running index in l_buf_
-
-    /*  Buffer for distances. To simplify the code, d_buf_ and l_buf_
-        have the same number of elements. To use different lengths, an
-        extra flag array would be necessary.
-    */
-    std::uint16_t* d_buf_;
+    uInt sym_next_;                 // running index in l_buf_
+    uInt sym_end_;                 /* symbol table full when sym_next reaches this */
 
     std::uint32_t opt_len_;         // bit length of current block with optimal trees
     std::uint32_t static_len_;      // bit length of current block with static trees
@@ -428,6 +423,7 @@ protected:
     deflate_stream()
         : lut_(get_lut())
     {
+
     }
 
     /*  In order to simplify the code, particularly on 16 bit machines, match
@@ -620,13 +616,13 @@ protected:
     MODIO_IMPL void doReset             (int level, int windowBits, int memLevel, Strategy strategy);
     MODIO_IMPL void doReset             ();
     MODIO_IMPL void doClear             ();
-    MODIO_IMPL std::size_t doUpperBound (std::size_t sourceLen) const;
+    MODIO_IMPL std::uint64_t doUpperBound (std::uint64_t sourceLen) const;
     MODIO_IMPL void doTune              (int good_length, int max_lazy, int nice_length, int max_chain);
     MODIO_IMPL void doParams            (z_params& zs, int level, Strategy strategy, Modio::ErrorCode& ec);
     MODIO_IMPL void doWrite             (z_params& zs, Modio::Optional<Flush> flush, Modio::ErrorCode& ec);
     MODIO_IMPL void doDictionary        (Byte const* dict, uInt dictLength, Modio::ErrorCode& ec);
     MODIO_IMPL void doPrime             (int bits, int value, Modio::ErrorCode& ec);
-    MODIO_IMPL void doPending           (unsigned* value, int* bits);
+    MODIO_IMPL void doPending           (uint64_t* value, int* bits);
 
     MODIO_IMPL void init                ();
     MODIO_IMPL void lm_init             ();

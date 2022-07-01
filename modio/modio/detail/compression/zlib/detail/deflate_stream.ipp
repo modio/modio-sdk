@@ -285,12 +285,12 @@ doClear()
     buf_.reset();
 }
 
-std::size_t
+std::uint64_t
 deflate_stream::
-doUpperBound(std::size_t sourceLen) const
+doUpperBound(std::uint64_t sourceLen) const
 {
-    std::size_t complen;
-    std::size_t wraplen;
+    std::uint64_t complen;
+    std::uint64_t wraplen;
 
     /* conservative upper bound for compressed data */
     complen = sourceLen +
@@ -469,7 +469,7 @@ doWrite(z_params& zs, Modio::Optional<Flush> flush, Modio::ErrorCode& ec)
             else if(flush != Flush::block)
             {
                 /* FULL_FLUSH or SYNC_FLUSH */
-                tr_stored_block((char*)0, 0L, 0);
+                tr_stored_block(nullptr, 0L, 0);
                 /* For a full flush, this empty block will be recognized
                  * as a special marker by inflate_sync().
                  */
@@ -561,7 +561,7 @@ doPrime(int bits, int value, Modio::ErrorCode& ec)
 {
     maybe_init();
 
-    if((Byte *)(d_buf_) < pending_out_ + ((Buf_size + 7) >> 3))
+    if((Byte *)(sym_buf_) < pending_out_ + ((Buf_size + 7) >> 3))
     {
         ec = Modio::make_error_code(Modio::ZlibError::NeedBuffers);
         return;
@@ -583,7 +583,7 @@ doPrime(int bits, int value, Modio::ErrorCode& ec)
 
 void
 deflate_stream::
-doPending(unsigned* value, int* bits)
+doPending(uint64_t* value, int* bits)
 {
     if(value != 0)
         *value = pending_;
@@ -627,26 +627,51 @@ init()
 
     window_ = reinterpret_cast<Byte*>(buf_.get());
     prev_   = reinterpret_cast<std::uint16_t*>(buf_.get() + nwindow);
+    std::memset(prev_, 0, nprev);
     head_   = reinterpret_cast<std::uint16_t*>(buf_.get() + nwindow + nprev);
-
-    /*  We overlay pending_buf_ and d_buf_ + l_buf_. This works
-        since the average output size for(length, distance)
-        codes is <= 24 bits.
-    */
-    auto overlay = reinterpret_cast<std::uint16_t*>(
-        buf_.get() + nwindow + nprev + nhead);
 
     // nothing written to window_ yet
     high_water_ = 0;
 
-    pending_buf_ =
-        reinterpret_cast<std::uint8_t*>(overlay);
-    pending_buf_size_ =
-        static_cast<std::uint32_t>(lit_bufsize_) *
-            (sizeof(std::uint16_t) + 2L);
+    /* We overlay pending_buf and sym_buf. This works since the average size
+	   for length/distance pairs over any compressed block is assured to be 31
+	   bits or less.
+	   Analysis: The longest fixed codes are a length code of 8 bits plus 5
+	   extra bits, for lengths 131 to 257. The longest fixed distance codes are
+	   5 bits plus 13 extra bits, for distances 16385 to 32768. The longest
+	   possible fixed-codes length/distance pair is then 31 bits total.
+	   sym_buf starts one-fourth of the way into pending_buf. So there are
+	   three bytes in sym_buf for every four bytes in pending_buf. Each symbol
+	   in sym_buf is three bytes -- two for the distance and one for the
+	   literal/length. As each symbol is consumed, the pointer to the next
+	   sym_buf value to read moves forward three bytes. From that symbol, up to
+	   31 bits are written to pending_buf. The closest the written pending_buf
+	   bits gets to the next sym_buf symbol to read is just before the last
+	   code is written. At that time, 31*(n-2) bits have been written, just
+	   after 24*(n-2) bits have been consumed from sym_buf. sym_buf starts at
+	   8*n bits into pending_buf. (Note that the symbol buffer fills when n-1
+	   symbols are written.) The closest the writing gets to what is unread is
+	   then n+14 bits. Here n is lit_bufsize, which is 16384 by default, and
+	   can range from 128 to 32768.
+	   Therefore, at a minimum, there are 142 bits of space between what is
+	   written and what is read in the overlain buffers, so the symbols cannot
+	   be overwritten by the compressed data. That space is actually 139 bits,
+	   due to the three-bit fixed-code block header.
+	   That covers the case where either Z_FIXED is specified, forcing fixed
+	   codes, or when the use of fixed codes is chosen, because that choice
+	   results in a smaller compressed block than dynamic codes. That latter
+	   condition then assures that the above analysis also covers all dynamic
+	   blocks. A dynamic-code block will only be chosen to be emitted if it has
+	   fewer bits than a fixed-code block would for the same set of symbols.
+	   Therefore its average symbol length is assured to be less than 31. So
+	   the compressed data for a dynamic block also cannot overwrite the
+	   symbols from which it is being constructed.
+	 */
+	pending_buf_ = buf_.get() + nwindow + nprev + nhead;
+	pending_buf_size_ = static_cast<std::uint64_t>(lit_bufsize_) * 4;
 
-    d_buf_ = overlay + lit_bufsize_ / sizeof(std::uint16_t);
-    l_buf_ = pending_buf_ + (1 + sizeof(std::uint16_t)) * lit_bufsize_;
+	sym_buf_ = pending_buf_ + lit_bufsize_;
+	sym_end_ = (lit_bufsize_ - 1) * 3;
 
     pending_ = 0;
     pending_out_ = pending_buf_;
@@ -702,7 +727,7 @@ init_block()
     dyn_ltree_[END_BLOCK].fc = 1;
     opt_len_ = 0L;
     static_len_ = 0L;
-    last_lit_ = 0;
+    sym_next_ = 0;
     matches_ = 0;
 }
 
@@ -1159,16 +1184,17 @@ compress_block(
 {
     unsigned dist;      /* distance of matched string */
     int lc;             /* match length or unmatched char (if dist == 0) */
-    unsigned lx = 0;    /* running index in l_buf */
+	unsigned sx = 0; /* running index in sym_buf */
     unsigned code;      /* the code to send */
     int extra;          /* number of extra bits to send */
 
-    if(last_lit_ != 0)
+    if(sym_next_ != 0)
     {
         do
         {
-            dist = d_buf_[lx];
-            lc = l_buf_[lx++];
+			dist = sym_buf_[sx++] & 0xff;
+			dist += (unsigned) (sym_buf_[sx++] & 0xff) << 8;
+			lc = sym_buf_[sx++];
             if(dist == 0)
             {
                 send_code(lc, ltree); /* send a literal byte */
@@ -1198,9 +1224,9 @@ compress_block(
             } /* literal or match pair ? */
 
             /* Check that the overlay between pending_buf and d_buf+l_buf is ok: */
-            assert((uInt)(pending_) < lit_bufsize_ + 2*lx);
+            assert((uint64_t)(pending_) < lit_bufsize_ + sx);
         }
-        while(lx < last_lit_);
+        while(sx < sym_next_);
     }
 
     send_code(END_BLOCK, ltree);
@@ -1299,9 +1325,9 @@ copy_block(
         put_short((std::uint16_t)len);
         put_short((std::uint16_t)~len);
     }
-    // VFALCO Use memcpy?
-    while (len--)
-        put_byte(*buf++);
+    if(buf)
+        std::memcpy(&pending_buf_[pending_], buf, len);
+    pending_ += len;
 }
 
 //------------------------------------------------------------------------------
@@ -1366,22 +1392,24 @@ void
 deflate_stream::
 tr_tally_dist(std::uint16_t dist, std::uint8_t len, bool& flush)
 {
-    d_buf_[last_lit_] = dist;
-    l_buf_[last_lit_++] = len;
+    sym_buf_[sym_next_++] = dist;
+    sym_buf_[sym_next_++] = dist >> 8;
+    sym_buf_[sym_next_++] = len;
     dist--;
     dyn_ltree_[lut_.length_code[len]+literals+1].fc++;
     dyn_dtree_[d_code(dist)].fc++;
-    flush = (last_lit_ == lit_bufsize_-1);
+    flush = (sym_next_ == sym_end_);
 }
 
 void
 deflate_stream::
 tr_tally_lit(std::uint8_t c, bool& flush)
 {
-    d_buf_[last_lit_] = 0;
-    l_buf_[last_lit_++] = c;
+    sym_buf_[sym_next_++] = 0;
+    sym_buf_[sym_next_++] = 0;
+    sym_buf_[sym_next_++] = c;
     dyn_ltree_[c].fc++;
-    flush = (last_lit_ == lit_bufsize_-1);
+    flush = (sym_next_ == sym_end_);
 }
 
 //------------------------------------------------------------------------------
@@ -1526,6 +1554,8 @@ fill_window(z_params& zs)
             match_start_ -= wsize;
             strstart_    -= wsize; // we now have strstart >= max_dist
             block_start_ -= (long) wsize;
+			if (insert_ > strstart_)
+				insert_ = strstart_;
 
             /* Slide the hash table (could be avoided with 32 bit values
                at the expense of memory usage). We slide even when level == 0
@@ -1826,11 +1856,11 @@ f_stored(z_params& zs, Flush flush) ->
     /* Stored blocks are limited to 0xffff bytes, pending_buf is limited
      * to pending_buf_size, and each stored block has a 5 byte header:
      */
-    std::uint32_t max_block_size = 0xffff;
-    std::uint32_t max_start;
+    std::uint64_t max_block_size = 0xffffffff;
+    std::uint64_t max_start;
 
     if(max_block_size > pending_buf_size_ - 5) {
-        max_block_size = pending_buf_size_ - 5;
+        max_block_size = (std::uint64_t)pending_buf_size_ - 5;
     }
 
     /* Copy as much as possible from input to output: */
@@ -1854,7 +1884,7 @@ f_stored(z_params& zs, Flush flush) ->
 
         /* Emit a stored block if pending_buf will be full: */
         max_start = block_start_ + max_block_size;
-        if(strstart_ == 0 || (std::uint32_t)strstart_ >= max_start) {
+        if(strstart_ == 0 || (std::uint64_t)strstart_ >= max_start) {
             /* strstart == 0 is possible when wraparound on 16-bit machine */
             lookahead_ = (uInt)(strstart_ - max_start);
             strstart_ = (uInt)max_start;
@@ -1994,7 +2024,7 @@ f_fast(z_params& zs, Flush flush) ->
             return finish_started;
         return finish_done;
     }
-    if(last_lit_)
+    if(sym_next_)
     {
         flush_block(zs, false);
         if(zs.avail_out == 0)
@@ -2139,7 +2169,7 @@ f_slow(z_params& zs, Flush flush) ->
             return finish_started;
         return finish_done;
     }
-    if(last_lit_)
+    if(sym_next_)
     {
         flush_block(zs, false);
         if(zs.avail_out == 0)
@@ -2225,7 +2255,7 @@ f_rle(z_params& zs, Flush flush) ->
             return finish_started;
         return finish_done;
     }
-    if(last_lit_)
+    if(sym_next_)
     {
         flush_block(zs, false);
         if(zs.avail_out == 0)
@@ -2279,7 +2309,7 @@ f_huff(z_params& zs, Flush flush) ->
             return finish_started;
         return finish_done;
     }
-    if(last_lit_)
+    if(sym_next_)
     {
         flush_block(zs, false);
         if(zs.avail_out == 0)

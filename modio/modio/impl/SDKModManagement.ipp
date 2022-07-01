@@ -236,7 +236,7 @@ namespace Modio
 		{
 			Modio::Detail::Logger().Log(
 				Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
-				"Attempted to call SubmitNewModFileForMod but there was no authenticated user.");
+				"Attempted to call SubmitNewModFileForMod but mod management was not enabled.");
 
 			return;
 		}

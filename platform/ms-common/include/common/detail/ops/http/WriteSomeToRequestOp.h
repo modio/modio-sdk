@@ -53,10 +53,10 @@ namespace Modio
 						if (Timer == nullptr)
 						{
 							Timer = std::make_unique<asio::steady_timer>(Modio::Detail::Services::GetGlobalContext());
-							Timer->expires_after(std::chrono::milliseconds(1));
-							yield Timer->async_wait(std::move(Self));
+							
 						}
-
+						Timer->expires_after(std::chrono::milliseconds(1));
+						yield Timer->async_wait(std::move(Self));
 					}
 
 					switch (PinnedState->FetchAndClearHandleStatus(Request->RequestHandle))

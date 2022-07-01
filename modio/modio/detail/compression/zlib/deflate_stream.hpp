@@ -146,8 +146,8 @@ public:
 
         @return The maximum number of resulting compressed bytes.
     */
-    std::size_t
-    upper_bound(std::size_t sourceLen) const
+    std::uint64_t
+    upper_bound(std::uint64_t sourceLen) const
     {
         return doUpperBound(sourceLen);
     }
@@ -334,7 +334,7 @@ public:
         stream state was inconsistent.
     */
     void
-    pending(unsigned *value, int *bits)
+    pending(uint64_t *value, int *bits)
     {
         doPending(value, bits);
     }
@@ -370,8 +370,8 @@ public:
 
     @return The maximum number of resulting compressed bytes.
 */
-std::size_t
-deflate_upper_bound(std::size_t bytes);
+std::uint64_t
+deflate_upper_bound(std::uint64_t bytes);
 
 /*  For the default windowBits of 15 and memLevel of 8, this function returns
     a close to exact, as well as small, upper bound on the compressed size.
@@ -390,8 +390,8 @@ deflate_upper_bound(std::size_t bytes);
     allocation.
 */
 inline
-std::size_t
-deflate_upper_bound(std::size_t bytes)
+std::uint64_t
+deflate_upper_bound(std::uint64_t bytes)
 {
     return bytes +
         ((bytes + 7) >> 3) +

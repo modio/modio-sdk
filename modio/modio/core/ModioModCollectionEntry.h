@@ -265,9 +265,8 @@ namespace Modio
 			}
 			else
 			{
-				Modio::Detail::Logger().Log(
-					Modio::LogLevel::Warning, Modio::LogCategory::Core,
-					"from_json failed for UserSubscriptionList. List must be an array.");
+				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
+											"from_json failed for UserSubscriptionList. List must be an array.");
 			}
 		}
 
@@ -347,8 +346,6 @@ namespace Modio
 
 		friend bool operator==(const Modio::ModCollection& A, const Modio::ModCollection& B)
 		{
-			// redo. check length, and every pair in A, range based for, check keys are the same, deref shared pointer
-			// and compare
 			if (A.ModEntries.size() != B.ModEntries.size())
 			{
 				return false;
@@ -380,6 +377,9 @@ namespace Modio
 		/// @param Entry The entry to add
 		void AddEntry(Modio::ModManagementEvent Entry)
 		{
+			Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::ModManagement,
+										"Adding ModManagementEvent {} with status {} to ModEventLog for ModID {}",
+										Entry.Event, Entry.Status.value(), Entry.ID);
 			InternalData.push_back(std::move(Entry));
 		}
 
