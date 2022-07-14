@@ -44,7 +44,9 @@ namespace Modio
 				{
 					if (!WinHttpWriteData(Request->RequestHandle, DataToWrite.Data(), (DWORD)DataToWrite.GetSize(), NULL))
 					{
-						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http, "http write data returned system error code {}", GetLastError());
+						DWORD LastError = GetLastError();
+						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+													"http write data returned system error code {}", LastError);
 						Self.complete(Modio::make_error_code(Modio::HttpError::RequestError));
 						return;
 					}
@@ -53,7 +55,6 @@ namespace Modio
 						if (Timer == nullptr)
 						{
 							Timer = std::make_unique<asio::steady_timer>(Modio::Detail::Services::GetGlobalContext());
-							
 						}
 						Timer->expires_after(std::chrono::milliseconds(1));
 						yield Timer->async_wait(std::move(Self));
@@ -62,7 +63,7 @@ namespace Modio
 					switch (PinnedState->FetchAndClearHandleStatus(Request->RequestHandle))
 					{
 						case WinHTTPCallbackStatus::RequestError:
-						//TODO: @modio-core Log the error here?
+							// TODO: @modio-core Log the error here?
 							Self.complete(Modio::make_error_code(Modio::HttpError::RequestError));
 							return;
 						default:

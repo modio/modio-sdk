@@ -26,4 +26,5 @@ enum class EModioErrorCondition: uint8
 	SubmitReportError = 14 UMETA(ToolTip="When this condition is true, the error code indicates that a report for the specified content could not be submitted.") ,
 	UserNotAuthenticatedError = 15 UMETA(ToolTip="When this condition is true, the error code indicates that a user is not authenticated.") ,
 	SDKNotInitialized = 16 UMETA(ToolTip="When this condition is true, the error code indicates that the SDK has not been initialized.") ,
+	UserAlreadyAuthenticatedError = 17 UMETA(ToolTip="When this condition is true, the error code indicates that the user is already authenticated.") ,
 };

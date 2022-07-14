@@ -690,7 +690,7 @@ namespace Modio
 		SubmitReportRightsRevoked = 15029,
 		UnsupportedContentTypeHeader = 13006,
 		UserExistingModRating = 15028,
-		UserNoAcceptTermsOfUse = 11051,
+		UserNoAcceptTermsOfUse = 11074,
 		UserNoModRating = 15043,
 		ValidationErrors = 13009
 	};
@@ -972,7 +972,9 @@ namespace Modio
 		/// @brief When this condition is true, the error code indicates that a user is not authenticated.
 		UserNotAuthenticatedError = 15,
 		/// @brief When this condition is true, the error code indicates that the SDK has not been initialized.
-		SDKNotInitialized = 16
+		SDKNotInitialized = 16,
+		/// @brief When this condition is true, the error code indicates that the user is already authenticated.
+		UserAlreadyAuthenticatedError = 17
 	};
 
 	struct ErrorConditionCategoryImpl : std::error_category
@@ -1029,6 +1031,9 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::SDKNotInitialized:
 					return "When this condition is true, the error code indicates that the SDK has not been initialized.";
+				break;
+				case ErrorConditionTypes::UserAlreadyAuthenticatedError:
+					return "When this condition is true, the error code indicates that the user is already authenticated.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -1725,6 +1730,14 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::SDKNotInitialized:
 					if (ec == Modio::GenericError::SDKNotInitialized)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::UserAlreadyAuthenticatedError:
+					if (ec == Modio::UserAuthError::AlreadyAuthenticated)
 					{
 						return true;
 					}

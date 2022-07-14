@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 // MIRRORED TO gdk/file/FileSystemImplementation.h, UPDATE THAT FILE IF THIS IS UPDATED
@@ -17,6 +17,7 @@
 #include "common/detail/ops/file/StreamWriteOp.h"
 #include "common/detail/ops/file/WriteSomeToFileOp.h"
 #include "common/file/FileObjectImplementation.h"
+#include "modio/core/ModioInitializeOptions.h"
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioSDKSessionData.h"
@@ -219,8 +220,8 @@ namespace Modio
 				return RootLocalStoragePath / fmt::format("{}/cache/users/{}/avatars/", CurrentGameID, UserId);
 			}
 
-			bool DirectoryExists(const Modio::filesystem::path& DirectoryPath) const override { 
-				
+			bool DirectoryExists(const Modio::filesystem::path& DirectoryPath) const override
+			{
 				Modio::ErrorCode ec;
 				if (Modio::filesystem::exists(DirectoryPath, ec) && !ec)
 				{
