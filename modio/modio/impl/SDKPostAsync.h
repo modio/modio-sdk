@@ -21,10 +21,22 @@ namespace Modio
 		{
 			return std::function<void(Modio::ErrorCode, CallbackArgs&&...)> (
 			[Callback = std::forward<std::function<void(Modio::ErrorCode, CallbackArgs && ...)>>(Callback)](
-								   Modio::ErrorCode ec, CallbackArgs&&... Args) {
-				//handle error code adaptor here			
-				Callback(ec, std::forward<CallbackArgs>(Args)...);
-						});
+								   Modio::ErrorCode ec, CallbackArgs&&... Args) 
+			{
+				// If the category is "system_category", log it and signal a system-wide error
+				if (ec && ModioErrorCategoryID(ec.category()) == 0)
+                {
+                    Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::System,
+                                                "System Error detected with number: {} and message: {}", ec.value(), ec.message());
+                    // To avoid delivery to the end user of a cryptic system error, replace it with a "UnknownSystemError"
+                    Modio::ErrorCode UpdateEC = Modio::make_error_code(Modio::SystemError::UnknownSystemError);
+                    Callback(UpdateEC, std::forward<CallbackArgs>(Args)...);
+                }
+                else
+                {
+                    Callback(ec, std::forward<CallbackArgs>(Args)...);
+                }
+			});
 		}
 	} // namespace Detail
 

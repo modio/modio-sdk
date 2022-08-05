@@ -43,6 +43,8 @@ namespace Modio
 
 			MODIO_IMPL const Modio::Optional<Modio::Detail::OAuthToken> GetAuthenticationToken() const;
 
+			MODIO_IMPL void InvalidateOAuthToken();
+
 			MODIO_IMPL const bool IsValid() const;
 
 			Modio::UserSubscriptionList UserSubscriptions;

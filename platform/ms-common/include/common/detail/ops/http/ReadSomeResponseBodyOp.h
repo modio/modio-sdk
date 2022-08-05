@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -14,6 +14,8 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/FmtWrapper.h"
+#include "modio/detail/ModioConstants.h"
+#include "modio/detail/ModioProfiling.h"
 #include <memory>
 
 #include <asio/yield.hpp>
@@ -42,6 +44,7 @@ public:
 	template<typename CoroType>
 	void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 	{
+		MODIO_PROFILE_SCOPE(ReadSomeResponseBody);
 		std::shared_ptr<HttpSharedStateBase> PinnedState = SharedState.lock();
 		if (PinnedState == nullptr || PinnedState->IsClosing())
 		{
@@ -62,11 +65,13 @@ public:
 				SendTimer = std::make_unique<asio::steady_timer>(Modio::Detail::Services::GetGlobalContext());
 			}
 
+			MODIO_PROFILE_PUSH("WaitForDataAvailable");
 			while (PinnedState->PeekHandleStatus(Request->RequestHandle) == WinHTTPCallbackStatus::Waiting)
 			{
-				SendTimer->expires_after(std::chrono::milliseconds(1));
+				SendTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
 				yield SendTimer->async_wait(std::move(Self));
 			}
+			MODIO_PROFILE_POP();
 
 			{
 				Status = PinnedState->FetchAndClearHandleStatus(Request->RequestHandle);
@@ -83,11 +88,13 @@ public:
 						BufferSize = std::max<std::uintmax_t>(ExtendedStatus.first, 512 * 1024);
 						ResponseChunkBuffer = std::make_unique<Modio::Detail::Buffer>(BufferSize);
 						WinHttpReadData(Request->RequestHandle, ResponseChunkBuffer->begin(), BufferSize, NULL);
+						MODIO_PROFILE_PUSH("WaitForDataRead");
 						while (PinnedState->PeekHandleStatus(Request->RequestHandle) == WinHTTPCallbackStatus::Waiting)
 						{
-							SendTimer->expires_after(std::chrono::milliseconds(1));
+							SendTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
 							yield SendTimer->async_wait(std::move(Self));
 						}
+						MODIO_PROFILE_POP();
 						if (PinnedState->PeekHandleStatus(Request->RequestHandle) ==
 							WinHTTPCallbackStatus::ReadComplete)
 						{

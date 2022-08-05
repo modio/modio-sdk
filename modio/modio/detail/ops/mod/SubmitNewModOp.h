@@ -69,6 +69,11 @@ namespace Modio
 				{
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(ResponseBuffer, SubmitParams,
 																		   CachedResponse::Disallow, std::move(Self));
+
+					if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))
+					{
+						Modio::Detail::SDKSessionData::InvalidateOAuthToken();
+					}
 					if (ec)
 					{
 						Self.complete(ec, {});

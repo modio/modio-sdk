@@ -13,6 +13,7 @@
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/FmtWrapper.h"
+#include "modio/detail/ModioProfiling.h"
 #include <winhttp.h>
 
 static void __stdcall ModioWinhttpStatusCallback(HINTERNET InternetHandle, DWORD_PTR Context, DWORD InternetStatus,
@@ -24,6 +25,7 @@ static void __stdcall ModioWinhttpStatusCallback(HINTERNET InternetHandle, DWORD
 	auto err = GetLastError();
 	if (Context)
 	{
+		MODIO_PROFILE_SCOPE(WinhttpCallback);
 		HttpSharedStateBase* SharedState = reinterpret_cast<HttpSharedStateBase*>(Context);
 		WinHTTPCallbackStatus StatusCode = static_cast<WinHTTPCallbackStatus>(InternetStatus);
 		if (StatusCode == WinHTTPCallbackStatus::DataAvailable)

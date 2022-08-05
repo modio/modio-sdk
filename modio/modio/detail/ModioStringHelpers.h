@@ -12,6 +12,7 @@
 
 #include "modio/core/ModioStdTypes.h"
 #include <string>
+#include <algorithm>
 
 namespace Modio
 {
@@ -32,6 +33,12 @@ namespace Modio
 				return false;
 			}
 
+			inline bool MatchesCaseInsensitive(const std::string& a, const std::string& b)
+			{
+				return std::equal(a.begin(), a.end(), b.begin(), b.end(),
+								  [](unsigned char a, unsigned char b) { return tolower(a) == tolower(b); });
+			}
+
 			/// @brief URL-encodes a string
 			/// @param String The input to encode
 			/// @return The URL-encoded output
@@ -41,8 +48,8 @@ namespace Modio
 				Result.reserve(String.size() * 3);
 				// @todo: Support UTF8
 				auto IsValidCharacter = [](char Character) {
-					return (Character >= '0' && Character < '9') || (Character >= 'a' && Character < 'z') ||
-						   (Character >= 'A' && Character < 'Z') || Character == '-' || Character == '_' ||
+					return (Character >= '0' && Character <= '9') || (Character >= 'a' && Character <= 'z') ||
+						   (Character >= 'A' && Character <= 'Z') || Character == '-' || Character == '_' ||
 						   Character == '.' || Character == '~';
 				};
 

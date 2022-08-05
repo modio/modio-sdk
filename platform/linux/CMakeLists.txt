@@ -9,6 +9,8 @@
 
 if(MODIO_PLATFORM STREQUAL "LINUX")
 
+	# This line is required to force the MBedTLS to use the "-fPIC" compiler option
+	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
     cmake_policy(SET CMP0077 NEW)
 	set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake;${CMAKE_MODULE_PATH}")
 	set (MODIO_PLATFORM_LINUX ON INTERNAL "building for linux")
@@ -19,9 +21,10 @@ if(MODIO_PLATFORM STREQUAL "LINUX")
 	add_subdirectory(linux)
 	set(ENABLE_PROGRAMS OFF)
 	set(ENABLE_TESTING OFF)
+
 	execute_process(COMMAND make generated_files WORKING_DIRECTORY ${MODIO_ROOT_DIR}/ext/mbedtls)
 	add_subdirectory(${MODIO_ROOT_DIR}/ext/mbedtls mbedtls EXCLUDE_FROM_ALL)
-
+	
 	if (MODIO_BUILD_TESTS)
 		add_subdirectory(tests EXCLUDE_FROM_ALL)
 	endif()

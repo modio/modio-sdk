@@ -70,6 +70,7 @@ namespace Modio
 			MODIO_IMPL static bool DeserializeUserDataFromBuffer(Modio::Detail::Buffer UserDataBuffer);
 
 			MODIO_IMPL static void ClearUserData();
+			MODIO_IMPL static void InvalidateOAuthToken();
 
 			MODIO_IMPL static const Modio::Optional<Modio::User> GetAuthenticatedUser();
 			MODIO_IMPL static const Modio::Optional<Modio::Detail::Avatar> GetAuthenticatedUserAvatar();
@@ -100,6 +101,11 @@ namespace Modio
 			/// @return The pending upload information, or empty Optional if nothing pending
 			MODIO_IMPL static Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>>
 				GetNextPendingModfileUpload();
+			MODIO_IMPL static Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>> GetPriorityModfileUpload();
+			MODIO_IMPL static bool PrioritizeModfileUpload(Modio::ModID IdToPrioritize);
+			MODIO_IMPL static bool PrioritizeModfileDownload(Modio::ModID IdToPrioritize);
+
+			MODIO_IMPL static Modio::Optional<Modio::ModID> GetPriorityModID() {return Get().ModIDToPrioritize;};
 
 			/// @brief Initializes a ModProgressInfo for the specified mod, storing it in the global state. This method
 			/// is only intended for use by InstallOrUpdateModOp
@@ -158,6 +164,7 @@ namespace Modio
 			bool bRateLimited = false;
 			std::chrono::system_clock::time_point RateLimitedStart;
 			std::map<Modio::ModCreationHandle, Modio::Optional<Modio::ModID>> CreationHandles;
+			Modio::Optional<Modio::ModID> ModIDToPrioritize;
 			std::map<Modio::ModID, Modio::CreateModFileParams> PendingModUploads;
 		};
 	} // namespace Detail

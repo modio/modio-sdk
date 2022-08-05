@@ -119,6 +119,7 @@ namespace Modio
 							// Write the header for the field in the form data
 							{
 								{
+									MODIO_PROFILE_SCOPE(UploadFileFormatHeader);
 									std::string PayloadContentFilename = "";
 									if (Impl->PayloadElement->second.bIsFile)
 									{
@@ -198,12 +199,14 @@ namespace Modio
 										std::shared_ptr<Modio::ModProgressInfo> Progress = Impl->ProgressInfo.lock();
 										if (Progress)
 										{
-											Progress->CurrentlyDownloadedBytes = Modio::FileSize(Impl->CurrentPayloadFileBytesRead);
+											Progress->CurrentlyDownloadedBytes =
+												Modio::FileSize(Impl->CurrentPayloadFileBytesRead);
 										}
 									}
 								}
 							}
-							else
+							else if (Impl->PayloadElement->second.RawBuffer.has_value() &&
+									 (*(Impl->PayloadElement->second.RawBuffer)).GetSize())
 							{
 								yield Request->WriteSomeAsync(std::move(*Impl->PayloadElement->second.RawBuffer),
 															  std::move(Self));

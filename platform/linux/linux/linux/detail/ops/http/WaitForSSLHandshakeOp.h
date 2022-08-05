@@ -14,6 +14,7 @@
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioConstants.h"
 #include <memory>
 
 namespace Modio
@@ -24,10 +25,10 @@ namespace Modio
 		class WaitForSSLHandshakeOp
 		{
 		public:
-			WaitForSSLHandshakeOp(std::shared_ptr<HttpRequestImplementation> Request, std::weak_ptr<HttpSharedState> SharedState)
+			WaitForSSLHandshakeOp(std::shared_ptr<HttpRequestImplementation> Request,
+								  std::weak_ptr<HttpSharedState> SharedState)
 				: Request(Request),
-				  SharedState(SharedState)
-			{};
+				  SharedState(SharedState) {};
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
@@ -51,7 +52,7 @@ namespace Modio
 								PollTimer = std::make_unique<asio::steady_timer>(
 									Modio::Detail::Services::GetGlobalContext().get_executor());
 							}
-							PollTimer->expires_after(std::chrono::milliseconds(1));
+							PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
 							yield PollTimer->async_wait(std::move(Self));
 						}
 						else

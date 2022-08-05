@@ -14,6 +14,7 @@
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/file/ModioFileService.h"
 
 namespace Modio
@@ -57,10 +58,10 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
+				MODIO_PROFILE_SCOPE(ExtractAllToFolder);
 				if (!Modio::Detail::SDKSessionData::IsModManagementEnabled())
 				{
-					Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled),
-								  Modio::FileSize(0));
+					Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled), Modio::FileSize(0));
 					return;
 				}
 				reenter(Impl->CoroutineState)

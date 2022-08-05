@@ -21,7 +21,7 @@ namespace Modio
 			Modio::Detail::HttpRequestParams Params =
 				Modio::Detail::AuthenticateViaDiscordRequest
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::DiscordToken, User.AuthToken)
-					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
+					.EncodeAndAppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed,
 										User.bUserHasAcceptedTerms ? "true" : "false");
 			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(

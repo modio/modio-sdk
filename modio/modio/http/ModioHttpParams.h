@@ -14,6 +14,7 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/FmtWrapper.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioStringHash.h"
 #include "modio/detail/ModioStringHelpers.h"
 #include "modio/detail/http/ModioRequestBodyKVPContainer.h"
@@ -90,6 +91,13 @@ namespace Modio
 				}
 			}
 
+			// Overload "EncodeAndAppendPayloadValue" to silently drop nulled keys.
+			MODIO_IMPL HttpRequestParams EncodeAndAppendPayloadValue(std::string Key,
+																	 Modio::Optional<std::string> Value) const;
+
+			// This function will URL encode the "value" string before adding it to HttpRequestParams
+			MODIO_IMPL HttpRequestParams EncodeAndAppendPayloadValue(std::string Key, std::string Value) const;
+
 			MODIO_IMPL HttpRequestParams AppendPayloadValue(std::string Key, std::string Value) const;
 
 			MODIO_IMPL HttpRequestParams AppendPayloadValue(std::string Key,
@@ -117,6 +125,7 @@ namespace Modio
 			template<typename T>
 			HttpRequestParams& SetPayload(T RawPayload)
 			{
+				MODIO_PROFILE_SCOPE(HttpParamsSetPayload);
 				// Get requests can't have payloads
 				if (GetTypedVerb() == Verb::GET)
 				{

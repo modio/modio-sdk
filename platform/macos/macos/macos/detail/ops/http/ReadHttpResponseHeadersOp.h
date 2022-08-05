@@ -18,6 +18,7 @@
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioConstants.h"
 #include <memory>
 #include <regex>
 #include <vector>
@@ -32,7 +33,7 @@ namespace Modio
 			asio::coroutine CoroutineState;
 			std::shared_ptr<HttpRequestImplementation> Request;
 			std::weak_ptr<HttpSharedState> SharedState;
-            std::unique_ptr<asio::steady_timer> PollTimer;
+			std::unique_ptr<asio::steady_timer> PollTimer;
 
 			/**
 			 * https://stackoverflow.com/questions/28860033/convert-from-cfurlref-or-cfstringref-to-stdstring
@@ -123,25 +124,25 @@ namespace Modio
 						if (Request->ReadStreamStatus() == kCFStreamStatusError ||
 							Request->ReadStreamStatus() == kCFStreamStatusNotOpen)
 						{
-                            // A defensive conditional for a case that might occur when the CFStream
-                            // is deallocated between async calls.
-                            if (Request->ReadStream != NULL)
-                            {
-                                CFStreamError StreamError = CFReadStreamGetError(Request->ReadStream);
-                                Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
-                                                            "CFStream open failure, error code {0}", StreamError.error);
-                            }
-                            else
-                            {
-                                Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
-                                                            "CFStream was deallocated during request");
-                            }
-                            
+							// A defensive conditional for a case that might occur when the CFStream
+							// is deallocated between async calls.
+							if (Request->ReadStream != NULL)
+							{
+								CFStreamError StreamError = CFReadStreamGetError(Request->ReadStream);
+								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+															"CFStream open failure, error code {0}", StreamError.error);
+							}
+							else
+							{
+								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+															"CFStream was deallocated during request");
+							}
+
 							Self.complete(Modio::make_error_code(Modio::HttpError::CannotOpenConnection));
 							return;
 						}
 
-                        PollTimer->expires_after(std::chrono::milliseconds(1));
+						PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
 						yield PollTimer->async_wait(std::move(Self));
 					}
 
@@ -149,31 +150,31 @@ namespace Modio
 					// it has bytes because last while was true
 					while (Request->ReadStreamStatus() != kCFStreamStatusAtEnd)
 					{
-                        // In some cases, it is possible that the ReadStream has not "ended" but the Stream
-                        // remains open. If the CFReadStreamRead is called without bytes, it would wait for
-                        // a looooong time
-                        if (Request->ReadStreamHasBytes() == true)
+						// In some cases, it is possible that the ReadStream has not "ended" but the Stream
+						// remains open. If the CFReadStreamRead is called without bytes, it would wait for
+						// a looooong time
+						if (Request->ReadStreamHasBytes() == true)
 						{
-                            // Read bytes into the ResponseDataBuffer
-                            constexpr CFIndex MaxBuffer = 64 * 1024;
-                            Modio::Detail::Buffer LinearBuffer(MaxBuffer);
-                            CFIndex ReadBytes = CFReadStreamRead(Request->ReadStream, LinearBuffer.Data(), MaxBuffer);
-                            
-                            if (ReadBytes <= 0)
-                            {
-                                // The stream could not be read or an error has ocurred.
-                                break;
-                            }
+							// Read bytes into the ResponseDataBuffer
+							constexpr CFIndex MaxBuffer = 64 * 1024;
+							Modio::Detail::Buffer LinearBuffer(MaxBuffer);
+							CFIndex ReadBytes = CFReadStreamRead(Request->ReadStream, LinearBuffer.Data(), MaxBuffer);
 
-                            Request->ResponseDataBuffer.AppendBuffer(
-                                LinearBuffer.CopyRange(LinearBuffer.begin(), LinearBuffer.begin() + ReadBytes));
-                            BytesLastRead += ReadBytes;
-                        }
-                            
-                        // Yield execution to avoid taking too much processing while waiting for the ReadStream to
-                        // arrive
-                        PollTimer->expires_after(std::chrono::milliseconds(1));
-                        yield PollTimer->async_wait(std::move(Self));
+							if (ReadBytes <= 0)
+							{
+								// The stream could not be read or an error has ocurred.
+								break;
+							}
+
+							Request->ResponseDataBuffer.AppendBuffer(
+								LinearBuffer.CopyRange(LinearBuffer.begin(), LinearBuffer.begin() + ReadBytes));
+							BytesLastRead += ReadBytes;
+						}
+
+						// Yield execution to avoid taking too much processing while waiting for the ReadStream to
+						// arrive
+						PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
+						yield PollTimer->async_wait(std::move(Self));
 					}
 
 					// Check if any errors occured during read
@@ -193,28 +194,28 @@ namespace Modio
 					{
 						ParseHeadersInResponseBuffer();
 					}
-                    // With other HTTP verbs (ex. GET, DELETE), HTTPMessage parses the headers
-                    else
-                    {
-                        // From the stream, parse the Headers and StatusCode
-                        CFHTTPMessageRef HTTPResponse = (CFHTTPMessageRef) CFReadStreamCopyProperty(
-                            Request->ReadStream, kCFStreamPropertyHTTPResponseHeader);
-                        if (HTTPResponse == NULL)
-                        {
-                            // This case could happen when the connection did not establish.
-                            Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
-                                                        "ReadHTTPResponseHeadersOp failure with the connection");
-                            Self.complete(Modio::make_error_code(Modio::HttpError::CannotOpenConnection));
-                            return;
-                        }
+					// With other HTTP verbs (ex. GET, DELETE), HTTPMessage parses the headers
+					else
+					{
+						// From the stream, parse the Headers and StatusCode
+						CFHTTPMessageRef HTTPResponse = (CFHTTPMessageRef) CFReadStreamCopyProperty(
+							Request->ReadStream, kCFStreamPropertyHTTPResponseHeader);
+						if (HTTPResponse == NULL)
+						{
+							// This case could happen when the connection did not establish.
+							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+														"ReadHTTPResponseHeadersOp failure with the connection");
+							Self.complete(Modio::make_error_code(Modio::HttpError::CannotOpenConnection));
+							return;
+						}
 
-                        CFDictionaryRef Headers = CFHTTPMessageCopyAllHeaderFields(HTTPResponse);
-                        CFIndex StatusCode = CFHTTPMessageGetResponseStatusCode(HTTPResponse);
-                        // Use an auxiliary function to parse the HTTP Headers into the Request
-                        CFDictionaryApplyFunction(Headers, CopyHeaders, (void*) Request.get());
-                        Request->ResponseCode = StatusCode;
-                        Request->ParsedResponseHeaders.statusCode = StatusCode;
-                    }
+						CFDictionaryRef Headers = CFHTTPMessageCopyAllHeaderFields(HTTPResponse);
+						CFIndex StatusCode = CFHTTPMessageGetResponseStatusCode(HTTPResponse);
+						// Use an auxiliary function to parse the HTTP Headers into the Request
+						CFDictionaryApplyFunction(Headers, CopyHeaders, (void*) Request.get());
+						Request->ResponseCode = StatusCode;
+						Request->ParsedResponseHeaders.statusCode = StatusCode;
+					}
 
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
 												"Response Headers received OK");
@@ -231,7 +232,7 @@ namespace Modio
 				{
 					return false;
 				}
-                
+
 				Modio::Detail::Buffer LinearBuffer(Request->ResponseDataBuffer.size());
 				Modio::Detail::BufferCopy(LinearBuffer, Request->ResponseDataBuffer);
 				httpparser::HttpResponseParser Parser;

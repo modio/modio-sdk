@@ -55,6 +55,7 @@ namespace Modio
 			namespace Configuration
 			{
 				constexpr uint8_t DefaultNumberOfRetries = 3;
+				constexpr auto PollInterval = std::chrono::microseconds(100);
 			}
 			namespace PlatformNames
 			{

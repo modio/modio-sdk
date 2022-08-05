@@ -17,6 +17,7 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioCreateModFileParams.h"
 #include "modio/core/ModioCreateModParams.h"
+#include "modio/core/ModioEditModParams.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioFilterParams.h"
 #include "modio/core/ModioInitializeOptions.h"
@@ -118,7 +119,7 @@ namespace Modio
 	/// @brief Synchronises the local list of the current user's subscribed mods with the server. Any mods that have
 	/// been externally subscribed will be automatically marked for installation, and mods that have been externally
 	/// removed from the user's subscriptions may be uninstalled if no other local users have a current subscription.
-	/// Calling this before you call <<QueryUserSubscriptions>>, <<QueryUserInstallations>> or 
+	/// Calling this before you call <<QueryUserSubscriptions>>, <<QueryUserInstallations>> or
 	/// <<QuerySystemInstallations>> will ensure that if the system mod directory has been moved or relocated, those
 	/// functions will still return correct values.
 	/// @param OnFetchDone Callback invoked when the external state has been retrieved and merged with the local data
@@ -155,6 +156,13 @@ namespace Modio
 	/// @brief Checks if the automatic management process is currently installing or removing mods
 	/// @return True if automatic management is currently performing an operation
 	MODIOSDK_API bool IsModManagementBusy();
+
+	/// @docpublic
+	/// @brief Cancels or suspends the current mod update, installation, or upload, and begins processing a pending
+	/// operation for the specified mod ID
+	/// @param IDToPrioritize The ID for the mod to begin processing
+	/// @return Error code indicating the status of the prioritization request
+	MODIOSDK_API Modio::ErrorCode PrioritizeTransferForMod(Modio::ModID IDToPrioritize);
 
 	/// @docpublic
 	/// @brief Provides progress information for a mod installation or update operation if one is currently in progress.
@@ -196,7 +204,6 @@ namespace Modio
 	/// @error ModManagementError::AlreadySubscribed|User is still subscribed to the specified mod
 	MODIOSDK_API void ForceUninstallModAsync(Modio::ModID ModToRemove, std::function<void(Modio::ErrorCode)> Callback);
 
-
 	/// @docpublic
 	/// @brief Queries the server to verify the state of the currently authenticated user if there is one present. An
 	/// empty ErrorCode passed to the callback indicates successful verification, i.e. the mod.io server was contactable
@@ -209,7 +216,6 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserDataError::InvalidUser|No authenticated user
 	MODIOSDK_API void VerifyUserAuthenticationAsync(std::function<void(Modio::ErrorCode)> Callback);
-
 
 	/// @docpublic
 	/// @brief Fetches the currently authenticated Mod.io user profile if there is one associated with the current
@@ -269,6 +275,23 @@ namespace Modio
 	MODIOSDK_API void SubmitNewModAsync(
 		Modio::ModCreationHandle Handle, Modio::CreateModParams Params,
 		std::function<void(Modio::ErrorCode ec, Modio::Optional<Modio::ModID>)> Callback);
+
+	/// @docpublic
+	/// @brief Edits the parameters of a mod, by updating any fields set in the Params object to match the passed-in
+	/// values. Fields left empty on the Params object will not be updated.
+	/// @param Mod The mod to edit
+	/// @param Params Descriptor containing optional fields indicating what properties should be updated
+	/// @param Callback Callback invoked with the updated mod profile on success
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @requires authenticated-user
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @errorcategory InvalidArgsError|Some of the information in the EditModParams did not pass validation
+	/// @error UserDataError::InvalidUser|No authenticated user
+	MODIOSDK_API void SubmitModChangesAsync(
+		Modio::ModID Mod, Modio::EditModParams Params,
+		std::function<void(Modio::ErrorCode ec, Modio::Optional<Modio::ModInfo>)> Callback);
 
 	/// @docpublic
 	/// @brief Queues a modfile submission. The submission process creates an archive using the information specified in
@@ -512,8 +535,8 @@ namespace Modio
 	/// @requires authenticated-user
 	/// @requires initialized-sdk
 	/// @requires no-rate-limiting
-	/// @error ApiError::InsufficientPermission|The authenticated user does not have permission to archive this mod. This action
-	/// is restricted to team managers and administrators only.
+	/// @error ApiError::InsufficientPermission|The authenticated user does not have permission to archive this mod.
+	/// This action is restricted to team managers and administrators only.
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted

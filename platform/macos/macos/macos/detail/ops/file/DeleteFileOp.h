@@ -21,14 +21,19 @@ public:
 	template<typename CoroType>
 	void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 	{
-		Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Begin delete of {}",
-									FilePath.string());
-		Modio::ErrorCode RemoveStatus;
-		Modio::filesystem::remove(FilePath, RemoveStatus);
-		Self.complete(RemoveStatus);
+		reenter(CoroState)
+		{
+			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Begin delete of {}",
+										FilePath.string());
+			yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+			Modio::ErrorCode RemoveStatus;
+			Modio::filesystem::remove(FilePath, RemoveStatus);
+			Self.complete(RemoveStatus);
+		}
 	}
 
 private:
+	asio::coroutine CoroState;
 	Modio::filesystem::path FilePath;
 };
 #include <asio/unyield.hpp>

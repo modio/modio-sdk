@@ -58,16 +58,18 @@ nlohmann::json Modio::Detail::ToJson(const Modio::Detail::DynamicBuffer& Respons
 {
 	Modio::Detail::Buffer LinearBuffer(ResponseBuffer.size());
 	Modio::Detail::BufferCopy(LinearBuffer, ResponseBuffer);
-
+	MODIO_PROFILE_SCOPE(JsonParse);
 	return nlohmann::json::parse(LinearBuffer.Data(), nullptr, false);
 }
 
 nlohmann::json Modio::Detail::ToJson(const Modio::filesystem::path& Path)
 {
+	MODIO_PROFILE_SCOPE(JsonParse);
 	return nlohmann::json::parse(Path.string(), nullptr, false);
 }
 
 nlohmann::json Modio::Detail::ToJson(const Modio::Detail::Buffer& InBuffer)
 {
+	MODIO_PROFILE_SCOPE(JsonParse);
 	return nlohmann::json::parse(InBuffer.Data(), nullptr, false);
 }

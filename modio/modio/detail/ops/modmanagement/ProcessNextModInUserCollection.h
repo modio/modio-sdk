@@ -59,9 +59,42 @@ namespace Modio
 							}
 						}
 
-						// If no pending uninstallations, check for this users uploads, installs or updates
+						// If no pending uninstallations, get the pending priority upload if it exists
 						if (!EntryToProcess)
 						{
+							if ((PendingUpload = Modio::Detail::SDKSessionData::GetPriorityModfileUpload()))
+							{
+								yield SubmitNewModFileAsync(PendingUpload->first, PendingUpload->second,
+															std::move(Self));
+								Self.complete(ec);
+								return;
+							}
+
+							// No priority upload, get priority ID if it exists
+							if (Modio::Optional<Modio::ModID> PriorityID =
+									 Modio::Detail::SDKSessionData::GetPriorityModID())
+							{
+								Modio::ModCollection UserModCollection =
+									Modio::Detail::SDKSessionData::FilterSystemModCollectionByUserSubscriptions();
+								// If it is set, is it in the user's mod collection?
+								if (Modio::Optional<Modio::ModCollectionEntry&> FoundEntry =
+										 UserModCollection.GetByModID(*PriorityID))
+								{
+									// If it is, does it need an installation or update?
+									Modio::ModState CurrentState = FoundEntry->GetModState();
+									if (CurrentState == Modio::ModState::InstallationPending ||
+										CurrentState == Modio::ModState::UpdatePending)
+									{
+										// Has it already been retried too much for this session?
+										if (FoundEntry->ShouldRetry())
+										{
+											// If good to retry, prioritize specified mod download/install
+											EntryToProcess = UserModCollection.Entries().at(*PriorityID);
+										}
+									}
+								}
+							}
+
 							// if we have a pending upload, process that immediately before bothering with iterating the
 							// user subscriptions
 							if ((PendingUpload = Modio::Detail::SDKSessionData::GetNextPendingModfileUpload()))
@@ -72,17 +105,20 @@ namespace Modio
 								return;
 							}
 
-							Modio::ModCollection UserModCollection =
-								Modio::Detail::SDKSessionData::FilterSystemModCollectionByUserSubscriptions();
-							for (auto ModEntry : UserModCollection.SortEntriesByRetryPriority())
 							{
-								Modio::ModState CurrentState = ModEntry->GetModState();
-								if (CurrentState == Modio::ModState::InstallationPending ||
-									CurrentState == Modio::ModState::UpdatePending)
+								Modio::ModCollection UserModCollection =
+									Modio::Detail::SDKSessionData::FilterSystemModCollectionByUserSubscriptions();
+								// No prioritized mod, sort by normal retry priority
+								for (auto ModEntry : UserModCollection.SortEntriesByRetryPriority())
 								{
-									if (ModEntry->ShouldRetry())
+									Modio::ModState CurrentState = ModEntry->GetModState();
+									if (CurrentState == Modio::ModState::InstallationPending ||
+										CurrentState == Modio::ModState::UpdatePending)
 									{
-										EntryToProcess = ModEntry;
+										if (ModEntry->ShouldRetry())
+										{
+											EntryToProcess = ModEntry;
+										}
 									}
 								}
 							}
@@ -100,12 +136,12 @@ namespace Modio
 						// Does this need to be a separate operation or could we provide a parameter to specify
 						// we only want to update if it's already installed or something?
 						yield Modio::Detail::InstallOrUpdateModAsync(EntryToProcess->GetID(), std::move(Self));
-						Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(Modio::ModManagementEvent {
-							EntryToProcess->GetID(),
-							PendingModState.value() == Modio::ModState::InstallationPending
-								? Modio::ModManagementEvent::EventType::Installed
-								: Modio::ModManagementEvent::EventType::Updated,
-							ec});
+						Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(
+							Modio::ModManagementEvent {EntryToProcess->GetID(),
+													   PendingModState.value() == Modio::ModState::InstallationPending
+														   ? Modio::ModManagementEvent::EventType::Installed
+														   : Modio::ModManagementEvent::EventType::Updated,
+													   ec});
 						if (ec)
 						{
 							EntryToProcess->SetLastError(ec);

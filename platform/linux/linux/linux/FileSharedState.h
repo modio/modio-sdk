@@ -29,11 +29,12 @@ namespace Modio
 
 				while (io_uring_peek_cqe(&UringState, &CompletionInfo) == 0)
 				{
-					int FileDescriptorVal = (int) (uintptr_t)(io_uring_cqe_get_data(CompletionInfo));
+					int FileDescriptorVal = (int) (uintptr_t) (io_uring_cqe_get_data(CompletionInfo));
 					// When the value of IOResult is negative, it means uring had an error. A positive
 					// number refers to the number of bytes transacted
 					int IOResult = CompletionInfo->res;
 					auto IOStatus = PendingIO.find(FileDescriptorVal);
+					// Need to bail here if IOStatus == PendingIO.end();
 
 					if (IOStatus->second.DidFinish != true)
 					{
@@ -59,29 +60,49 @@ namespace Modio
 								IOStatus->second.DidFinish = TotalBytes == ExpectedBytes || IOResult == ExpectedBytes;
 								IOStatus->second.Result = Empty;
 
-								// // NOTE!! R005a-Linux-Uring-Stall: When doing this task, some higher levels of the
-								// SDK
-								// // require that a read returns an "EndOfFile" error (ex.
-								// ParseArchiveContentsOp.h@L52).
-								// // At the moment, ReadSomeFromFileBufferedOp & ReadSomeFromFileOp has comments to
-								// force
-								// // the MaxBytesToRead. At the moment, if ExpectedBytes are more than IOResult or
-								// TotalBytes
-								// // the FileSharedState will bail reading more after 5 trials.
-								// //
-								// // This condition happens when the caller wants to read more bytes than the file has.
-								// // The condition for a "64 * 1024" is related to file compression, which calls chunks
-								// // of that size.
-								// if (IOResult < ExpectedBytes && ExpectedBytes == (64 * 1024))
-								// {
-								// 	IOStatus->second.DidFinish = true;
-								// 	IOStatus->second.Result = Modio::make_error_code(Modio::GenericError::EndOfFile);
-								// }
+								// if we had a partial read...
+								if (!IOStatus->second.DidFinish)
+								{
+									// Check if we read to the end of the file
+									if (IOStatus->second.CachedFileSize == Modio::FileSize(0))
+									{
+										struct stat FileStat;
+										if (fstat(FileDescriptorVal, &FileStat) == -1)
+										{
+											int CachedErrno = errno;
+											Modio::Detail::Logger().Log(
+												LogLevel::Error, LogCategory::File,
+												"Could not retrieve file size via fstat for fd {}, errno {}",
+												FileDescriptorVal, CachedErrno);
+										}
+										else
+										{
+											IOStatus->second.CachedFileSize = Modio::FileSize(FileStat.st_size);
+										}
+									}
+									//If the offset into the file plus the amount of bytes that we just read equals the size of the file, we're EOF
+									if (Modio::FileSize(TotalBytes) == IOStatus->second.CachedFileSize)
+									{
+										IOStatus->second.DidFinish = true;
+										IOStatus->second.Result = Modio::make_error_code(Modio::GenericError::EndOfFile);
+									}
+								}
+							}
+							else if (IOResult == 0)
+							{
+								Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File,
+															"No bytes read for FileDescriptor {}",
+															IOResult, FileDescriptorVal);
+								IOStatus->second.DidFinish = true;
+								IOStatus->second.Result = Modio::make_error_code(Modio::GenericError::EndOfFile);;
 							}
 							else
 							{
+								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+															"Error code {} during read of FileDescriptor {}", IOResult,
+															FileDescriptorVal);
 								IOStatus->second.DidFinish = true;
-								IOStatus->second.Result = Modio::ErrorCode(IOResult * -1, std::system_category());
+								IOStatus->second.Result = Modio::make_error_code(Modio::FilesystemError::ReadError);
 							}
 						}
 						else
@@ -92,8 +113,11 @@ namespace Modio
 
 							if (IOResult < 0)
 							{
+								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+															"Error code {} during write of FileDescriptor {}", IOResult,
+															FileDescriptorVal);
 								IOStatus->second.DidFinish = true;
-								IOStatus->second.Result = Modio::ErrorCode(IOResult * -1, std::system_category());
+								IOStatus->second.Result = Modio::make_error_code(Modio::FilesystemError::WriteError);
 							}
 							else if (IOResult == 0)
 							{
@@ -125,9 +149,11 @@ namespace Modio
 
 									io_uring_submit(&UringState);
 								}
-
-								IOStatus->second.Result = Empty;
-								IOStatus->second.DidFinish = true;
+								else
+								{
+									IOStatus->second.Result = Empty;
+									IOStatus->second.DidFinish = true;
+								}
 							}
 						}
 					}
@@ -149,6 +175,7 @@ namespace Modio
 				int AssociatedDescriptor;
 				bool DidFinish = false;
 				int OpTrials = 0;
+				Modio::FileSize CachedFileSize = Modio::FileSize(0);
 				Modio::Optional<Modio::ErrorCode> Result;
 				/// @brief In theory we should be configuring uring to never perform partial writes but we definitely
 				/// need support for partial reads
@@ -176,7 +203,9 @@ namespace Modio
 			{
 				if (io_uring_queue_init(200, &UringState, 0))
 				{
-					return Modio::ErrorCode(errno, std::system_category());
+					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+												"FileSharedState::Initialize error code {}", errno);
+					return Modio::make_error_code(Modio::FilesystemError::NoPermission);
 				}
 				else
 				{
@@ -240,8 +269,8 @@ namespace Modio
 					io_uring_prep_read(NewOp, FileDescriptor, PendingOp.first->second.Data.Data(), AmountOfData,
 									   OffsetInFile);
 					// Solve error: cast to 'void *' from smaller integer type 'int'
-   	   				// With a cast to size_t
-   					io_uring_sqe_set_data(NewOp, (void*)(size_t)FileDescriptor);
+					// With a cast to size_t
+					io_uring_sqe_set_data(NewOp, (void*) (size_t) FileDescriptor);
 					if (!io_uring_submit(&UringState))
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
@@ -317,7 +346,7 @@ namespace Modio
 				// Calling this first so we don't have to worry about trying to access SourceData after we take
 				// ownership by move
 				io_uring_prep_write(NewOp, FileDescriptor, AlignedData.Data(), AlignedData.GetSize(), OffsetInFile);
-				io_uring_sqe_set_data(NewOp, (void*)(size_t)FileDescriptor);
+				io_uring_sqe_set_data(NewOp, (void*) (size_t) FileDescriptor);
 
 				if (InsidePendingIO == false)
 				{
@@ -348,18 +377,6 @@ namespace Modio
 			{
 				UringHandlePendingCompletions();
 				auto IOStatus = PendingIO.find(FileDescriptor);
-
-				// This is a safeguard to avoid a situation when the read/writes uring function ends but
-				// the IOStatus does not reach a "DidFinish == true" state
-				if (IOStatus->second.OpTrials == MAX_OP_TRIAL)
-				{
-					Modio::Optional<Modio::ErrorCode> EC = {Modio::make_error_code(Modio::GenericError::EndOfFile)};
-					return std::make_pair(true, EC);
-				}
-				else
-				{
-					IOStatus->second.OpTrials++;
-				}
 
 				if (IOStatus != PendingIO.end())
 				{

@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *  
+ *
  */
 
 #ifdef MODIO_SEPARATE_COMPILATION
@@ -25,6 +25,7 @@ namespace Modio
 
 		Buffer::Buffer(std::size_t Size, std::size_t Alignment /*= 1*/) : Alignment(Alignment), Size(Size)
 		{
+			MODIO_PROFILE_SCOPE(BufferConstructor);
 			// find how many 4k blocks we need to allocate
 			auto NumBlocks = ((Size / (4 * 1024)) + 1);
 			// Add worst case amount of alignment bytes
@@ -34,7 +35,10 @@ namespace Modio
 			auto TotalSize = NumBlocks * (4 * 1024) + HeaderSize;
 
 			InternalData = std::make_unique<unsigned char[]>(TotalSize);
-			std::fill_n(InternalData.get(), TotalSize, (unsigned char) 0);
+			{
+				MODIO_PROFILE_SCOPE(BufferFill);
+				std::fill_n(InternalData.get(), TotalSize, (unsigned char) 0);
+			} 
 			// Perform the alignment calculation to know where we should consider the start of the data buffer
 			void* RawBufferPtr = InternalData.get();
 			std::align(Alignment, Size, RawBufferPtr, TotalSize);
@@ -49,6 +53,7 @@ namespace Modio
 
 		Buffer Buffer::CopyRange(std::size_t BeginIndex, std::size_t EndIndex)
 		{
+			MODIO_PROFILE_SCOPE(BufferCopyRange);
 			Buffer RangedCopy = Buffer(EndIndex - BeginIndex, Alignment);
 			std::copy(begin() + BeginIndex, begin() + EndIndex, RangedCopy.begin());
 			return RangedCopy;
@@ -56,6 +61,7 @@ namespace Modio
 
 		Buffer Buffer::CopyRange(const_iterator Start, const_iterator End)
 		{
+			MODIO_PROFILE_SCOPE(BufferCopyRange);
 			Buffer RangedCopy = Buffer(End - Start, Alignment);
 			std::copy(Start, End, RangedCopy.begin());
 			return RangedCopy;
@@ -63,11 +69,13 @@ namespace Modio
 
 		Buffer Buffer::Clone() const
 		{
+			MODIO_PROFILE_SCOPE(BufferClone);
 			return this->Clone(this->GetAlignment());
 		}
 
 		Buffer Buffer::Clone(std::size_t DiffAlignment) const
 		{
+			MODIO_PROFILE_SCOPE(BufferClone);
 			Buffer MyClone = Buffer(Size, DiffAlignment);
 			std::copy(begin(), end(), MyClone.begin());
 			return MyClone;
@@ -134,6 +142,7 @@ namespace Modio
 
 		Modio::Detail::DynamicBuffer DynamicBuffer::Clone() const
 		{
+			MODIO_PROFILE_SCOPE(DynamicBufferClone);
 			DynamicBuffer NewBuffer(Alignment);
 			for (const Modio::Detail::Buffer& OriginalBuffer : *InternalBuffers)
 			{
@@ -320,6 +329,7 @@ namespace Modio
 
 		void DynamicBuffer::AppendBuffer(Modio::Detail::Buffer NewBuffer)
 		{
+			MODIO_PROFILE_SCOPE(DynamicBufferAppend);
 			if (NewBuffer.GetAlignment() == Alignment)
 			{
 				InternalBuffers->push_back(std::move(NewBuffer));

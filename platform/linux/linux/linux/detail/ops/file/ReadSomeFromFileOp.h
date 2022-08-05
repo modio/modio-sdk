@@ -15,6 +15,7 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioConstants.h"
 #include <memory>
 
 namespace Modio
@@ -74,14 +75,13 @@ namespace Modio
 							PollTimer = std::make_unique<asio::steady_timer>(
 								Modio::Detail::Services::GetGlobalContext().get_executor());
 						}
-						PollTimer->expires_after(std::chrono::milliseconds(1));
+						PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
 						yield PollTimer->async_wait(std::move(Self));
 					}
 
 					CurrentErrorCode = ReadResult.second;
 
-					if (CurrentErrorCode.has_value() == true &&
-						CurrentErrorCode.value() != Modio::GenericError::EndOfFile)
+					if (CurrentErrorCode.has_value() == true)
 					{
 						// If the caller makes a call with "out-of-bounds" parameters, like an offset larger than
 						// the file, it will return the error along a 0 buffer. This satisfies the

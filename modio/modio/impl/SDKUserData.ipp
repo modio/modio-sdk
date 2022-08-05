@@ -35,7 +35,7 @@ namespace Modio
 	void RequestEmailAuthCodeAsync(Modio::EmailAddress EmailAddress, std::function<void(Modio::ErrorCode)> Callback)
 	{
 		return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-			Modio::Detail::RequestEmailAuthCodeOp(std::move(EmailAddress.InternalAddress)), Callback,
+			Modio::Detail::RequestEmailAuthCodeOp(EmailAddress), Callback,
 			Modio::Detail::Services::GetGlobalContext().get_executor());
 	}
 
@@ -54,8 +54,7 @@ namespace Modio
 	void AuthenticateUserExternalAsync(Modio::AuthenticationParams User, Modio::AuthenticationProvider Provider,
 									   std::function<void(Modio::ErrorCode)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
-			Modio::Detail::RequireUserIsNOTAuthenticated(Callback))
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
 		{
 			switch (Provider)
 			{
@@ -88,7 +87,7 @@ namespace Modio
 	void AuthenticateUserEmailAsync(Modio::EmailAuthCode AuthenticationCode,
 									std::function<void(Modio::ErrorCode)> Callback)
 	{
-		if (Modio::Detail::RequireUserIsNOTAuthenticated(Callback))
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
 		{
 			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
 				Modio::Detail::AuthenticateUserByEmailOp(AuthenticationCode), Callback,
@@ -111,9 +110,7 @@ namespace Modio
 		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
 			Modio::Detail::RequireUserIsAuthenticated(Callback))
 		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-				Modio::Detail::VerifyUserAuthenticationOp(), Callback,
-				Modio::Detail::Services::GetGlobalContext().get_executor());
+			Modio::Detail::VerifyUserAuthenticationAsync(Callback);
 		}
 	}
 

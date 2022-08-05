@@ -17,6 +17,7 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioProfiling.h"
 #include <memory>
 
 namespace Modio
@@ -42,6 +43,7 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
+				MODIO_PROFILE_SCOPE(SendHttpRequest);
 				std::shared_ptr<HttpSharedState> PinnedState = SharedState.lock();
 				if (PinnedState == nullptr || PinnedState->IsClosing())
 				{

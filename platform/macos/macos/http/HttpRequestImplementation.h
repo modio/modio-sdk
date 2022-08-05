@@ -11,6 +11,7 @@
 #pragma once
 
 #include "httpparser/response.h"
+#include "modio/detail/ModioStringHelpers.h"
 #include "modio/detail/http/IHttpRequestImplementation.h"
 #include "modio/http/ModioHttpParams.h"
 
@@ -35,7 +36,7 @@ struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementat
 	{
 		for (httpparser::Response::HeaderItem& Hdr : ParsedResponseHeaders.headers)
 		{
-			if (Hdr.name.compare("Content-Length") == 0)
+			if (Modio::Detail::String::MatchesCaseInsensitive(Hdr.name,"Content-Length"))
 			{
 				return std::stoull(Hdr.value);
 			}
@@ -80,7 +81,7 @@ struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementat
 	{
 		for (httpparser::Response::HeaderItem& Hdr : ParsedResponseHeaders.headers)
 		{
-			if (Hdr.name.compare("location") == 0)
+			if (Modio::Detail::String::MatchesCaseInsensitive(Hdr.name,"location"))
 			{
 				return Hdr.value;
 			}

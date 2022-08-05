@@ -20,6 +20,7 @@
 #include "modio/http/ModioHttpRequest.h"
 #include <asio/yield.hpp>
 
+
 namespace Modio
 {
 	namespace Detail
@@ -72,6 +73,7 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
+				MODIO_PROFILE_SCOPE(DownloadFile);
 				// May need to manually check bDownloadingMod and lock progressinfo if this returns true when we never
 				// had a value in the pointer
 				if (ProgressInfo.has_value() && ProgressInfo->expired())
@@ -154,6 +156,8 @@ namespace Modio
 							else
 							{
 								// Got a 302 but we dont have a new location to go to
+								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+															"302 but no redirect target");
 								Self.complete(Modio::make_error_code(Modio::HttpError::ResourceNotAvailable));
 								return;
 							}
@@ -213,6 +217,7 @@ namespace Modio
 														 std::move(CurrentBuffer.value()), std::move(Self));
 						}
 
+						// Did we receive the entire response body?
 						if (*EndOfFileReached)
 						{
 							Modio::filesystem::path Destination = File->GetPath().replace_extension();

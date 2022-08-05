@@ -16,6 +16,8 @@
 #include "modio/file/ModioFile.h"
 #include "modio/file/ModioFileService.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioProfiling.h"
+
 #include <asio/yield.hpp>
 namespace Modio
 {
@@ -46,6 +48,7 @@ namespace Modio
 					{
 						if (DataBuffer.size() > 0)
 						{
+							MODIO_PROFILE_SCOPE(ModCollectionDeserialize);
 							nlohmann::json StateJson = Modio::Detail::ToJson(DataBuffer);
 							from_json(StateJson, Modio::Detail::SDKSessionData::GetSystemModCollection());
 						}

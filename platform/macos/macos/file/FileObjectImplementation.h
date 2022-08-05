@@ -177,7 +177,9 @@ namespace Modio
 					}
 					else
 					{
-						return Modio::ErrorCode(errno, std::system_category());
+						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+													"Error {} after Re-attempting open of file", errno);
+						return Modio::make_error_code(Modio::FilesystemError::ReadError);
 					}
 				}
 			}

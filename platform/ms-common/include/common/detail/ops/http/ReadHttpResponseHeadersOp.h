@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -15,6 +15,8 @@
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/FmtWrapper.h"
+#include "modio/detail/ModioConstants.h"
+#include "modio/detail/ModioProfiling.h"
 #include <memory>
 
 #include <asio/yield.hpp>
@@ -36,6 +38,8 @@ public:
 	template<typename CoroType>
 	void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 	{
+		MODIO_PROFILE_SCOPE(ReadHttpResponseHeaders);
+
 		std::shared_ptr<HttpSharedStateBase> PinnedState = SharedState.lock();
 		if (PinnedState == nullptr || PinnedState->IsClosing())
 		{
@@ -49,7 +53,7 @@ public:
 			{
 				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
 											"ReceiveResponse returned system error code {}", GetLastError());
-				
+
 				Self.complete(Modio::make_error_code(Modio::HttpError::RequestError));
 				return;
 			}
@@ -61,7 +65,7 @@ public:
 
 			while (PinnedState->PeekHandleStatus(Request->RequestHandle) == WinHTTPCallbackStatus::Waiting)
 			{
-				Timer->expires_after(std::chrono::milliseconds(1));
+				Timer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
 				yield Timer->async_wait(std::move(Self));
 			}
 

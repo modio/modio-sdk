@@ -16,6 +16,7 @@
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/LoadGlobalConfigOverrideFileDataOp.h"
 #include "modio/detail/ops/LoadModCollectionFromStorage.h"
@@ -43,6 +44,8 @@ public:
 	template<typename CoroType>
 	void operator()(CoroType& self, std::error_code ec = {})
 	{
+		MODIO_PROFILE_SCOPE(ServiceInitialization);
+
 		reenter(CoroutineState)
 		{
 			if (!Modio::Detail::SDKSessionData::Initialize(InitParams))

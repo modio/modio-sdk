@@ -15,6 +15,7 @@
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioSDKSessionData.h"
+#include "modio/detail/ModioProfiling.h"
 
 namespace Modio
 {
@@ -107,10 +108,29 @@ namespace Modio
 			return NewParamsInstance;
 		}
 
+		HttpRequestParams HttpRequestParams::EncodeAndAppendPayloadValue(std::string Key, Modio::Optional<std::string> Value) const
+		{
+			if (Value)
+			{
+				return EncodeAndAppendPayloadValue(Key, *Value);
+			}
+			else
+			{
+				return HttpRequestParams(*this);
+			}
+		}
+
+		HttpRequestParams HttpRequestParams::EncodeAndAppendPayloadValue(std::string Key, std::string Value) const
+		{
+			// This line makes sure that any string value appended to the HttpRequest is URL encoded
+            std::string StringValue = Modio::Detail::String::URLEncode(Value);
+            return AppendPayloadValue(Key, StringValue);
+		}
+
 		HttpRequestParams HttpRequestParams::AppendPayloadValue(std::string Key, std::string Value) const
 		{
-			Modio::Detail::Buffer ValueBuffer(Value.length());
-			std::copy(Value.begin(), Value.end(), ValueBuffer.begin());
+            Modio::Detail::Buffer ValueBuffer(Value.length());
+            std::copy(Value.begin(), Value.end(), ValueBuffer.begin());
 			return AppendPayloadValue(Key, std::move(ValueBuffer));
 		}
 
@@ -299,6 +319,7 @@ namespace Modio
 
 		Modio::FileSize HttpRequestParams::GetPayloadSize() const
 		{
+			MODIO_PROFILE_SCOPE(HttpRequestCalcPayloadSize);
 			if (PayloadMembers.size() == 0)
 			{
 				return Modio::FileSize(0);
@@ -316,24 +337,38 @@ namespace Modio
 				const std::string BoundaryString =
 					fmt::format("\r\n--{}\r\nContent-Disposition: form-data; name=\"\"\r\n\r\n", GetBoundaryHash());
 				Modio::FileSize PayloadSize = Modio::FileSize(0);
+				Modio::Detail::Logger Logger;
 				for (auto& ContentElement : PayloadMembers)
 				{
 					// Length of the name
 					PayloadSize += Modio::FileSize(ContentElement.first.size());
+					Logger.Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+							   "Payload element name {} calculated length {}", ContentElement.first,
+							   ContentElement.first.size());
 					// Length of the data
 					PayloadSize += ContentElement.second.Size;
+					Logger.Log(Modio::LogLevel::Trace, Modio::LogCategory::Http, "Payload element data size for {} is {}",
+							   ContentElement.first, ContentElement.second.Size);
 					if (ContentElement.second.bIsFile)
 					{
 						PayloadSize += Modio::FileSize(
 							fmt::format("; filename=\"{}\"", ContentElement.second.PathToFile->filename().u8string())
 								.size());
+						Logger.Log(
+							Modio::LogLevel::Trace, Modio::LogCategory::Http,
+							"Payload element is file, extra string size is {}",
+							fmt::format("; filename=\"{}\"", ContentElement.second.PathToFile->filename().u8string())
+								.size());
 					}
 					// Length of the boundary string
 					PayloadSize += Modio::FileSize(BoundaryString.size());
+					Logger.Log(Modio::LogLevel::Trace, Modio::LogCategory::Http, "boundary string size {}",
+							   BoundaryString.size());
 				}
 				// Add final boundary string
 				const std::string FinalBoundaryString = fmt::format("\r\n--{}\r\n", GetBoundaryHash());
 				PayloadSize += Modio::FileSize(FinalBoundaryString.size());
+				Logger.Log(Modio::LogLevel::Trace, Modio::LogCategory::Http, "final payload size {}", PayloadSize);
 				return PayloadSize;
 			}
 		}
@@ -357,6 +392,7 @@ namespace Modio
 
 		Modio::Detail::HttpRequestParams::HeaderList HttpRequestParams::GetHeaders() const
 		{
+			MODIO_PROFILE_SCOPE(HttpRequestGetHeaders);
 			// Default headers
 			HeaderList Headers = {{"x-modio-platform", MODIO_TARGET_PLATFORM_HEADER}};
 
@@ -458,6 +494,8 @@ namespace Modio
 
 		Modio::Detail::Buffer HttpRequestParams::GetRequestBuffer(bool bPerformURLEncoding) const
 		{
+			MODIO_PROFILE_SCOPE(HttpRequestBuildRawRequestBuffer);
+
 			std::string HeaderString = fmt::format("{0} {1} HTTP/1.1\r\n", GetVerb(), GetFormattedResourcePath());
 			HeaderString += fmt::format("Host: {0}\r\n", GetServerAddress());
 			for (auto& CurrentHeader : GetHeaders())

@@ -17,6 +17,8 @@
 #include "modio/file/ModioFile.h"
 #include "modio/file/ModioFileService.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioProfiling.h"
+
 #include <asio/yield.hpp>
 namespace Modio
 {
@@ -31,6 +33,7 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					{
+						MODIO_PROFILE_SCOPE(SerializeModCollection);
 						nlohmann::json ModCollectionData =
 							nlohmann::json::object({Modio::Detail::SDKSessionData::GetSystemModCollection()});
 						ModCollectionData["version"] = 1;

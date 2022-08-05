@@ -400,7 +400,8 @@ namespace Modio
 		Compression,
 		User,
 		ModManagement,
-		Test
+		Test,
+        System
 	};
 
 	/// @docpublic

@@ -13,6 +13,7 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/entities/ModioModInfo.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 
 #include <asio/yield.hpp>
@@ -39,6 +40,8 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
+				MODIO_PROFILE_SCOPE(GetModInfo);
+
 				reenter(CoroutineState)
 				{
 					{

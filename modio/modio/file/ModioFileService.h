@@ -15,6 +15,7 @@
 #include "modio/core/ModioLogEnum.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioStringHelpers.h"
 #include "modio/detail/entities/ModioAvatar.h"
 #include "modio/detail/entities/ModioImage.h"
@@ -275,6 +276,7 @@ namespace Modio
 			/// @return True if the path has a filename component and if that file exists
 			bool FileExists(const Modio::filesystem::path& FilePath) const
 			{
+				MODIO_PROFILE_SCOPE(FileExists);
 				return PlatformImplementation->FileExists(FilePath);
 			}
 
@@ -283,6 +285,7 @@ namespace Modio
 			/// @return True if the path has a filename component and we deleted it successfully
 			bool DeleteFile(const Modio::filesystem::path& FilePath) const
 			{
+				MODIO_PROFILE_SCOPE(DeleteFile);
 				return PlatformImplementation->DeleteFile(FilePath);
 			}
 
@@ -293,6 +296,7 @@ namespace Modio
 
 			bool CheckSpaceAvailable(const Modio::filesystem::path& Destination, Modio::FileSize DesiredSize)
 			{
+				MODIO_PROFILE_SCOPE(CheckSpaceAvailable);
 				return PlatformImplementation->CheckSpaceAvailable(Destination, DesiredSize);
 			}
 

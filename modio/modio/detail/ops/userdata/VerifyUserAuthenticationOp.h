@@ -31,15 +31,15 @@ namespace Modio
 				{
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer, GetAuthenticatedUserRequest, CachedResponse::Allow, std::move(Self));
-					if (ec)
+
+					if (ec && !Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::NetworkError))
 					{
+						Modio::Detail::SDKSessionData::InvalidateOAuthToken();
 						Self.complete(ec);
 						return;
 					}
-
 					{
-						Modio::Optional<Modio::User> User =
-							Detail::TryMarshalResponse<Modio::User>(ResponseBodyBuffer);
+						Modio::Optional<Modio::User> User = Detail::TryMarshalResponse<Modio::User>(ResponseBodyBuffer);
 
 						if (User.has_value())
 						{
@@ -60,6 +60,13 @@ namespace Modio
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
 		};
 #include <asio/unyield.hpp>
-	} // namespace Detail
 
+		template<typename VerifyUserAuthenticationCallback>
+		auto VerifyUserAuthenticationAsync(VerifyUserAuthenticationCallback&& OnVerifyComplete)
+		{
+			return asio::async_compose<VerifyUserAuthenticationCallback, void(Modio::ErrorCode)>(
+				Modio::Detail::VerifyUserAuthenticationOp(), OnVerifyComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
+	} // namespace Detail
 } // namespace Modio

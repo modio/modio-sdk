@@ -53,6 +53,14 @@ namespace Modio
 			return {};
 		}
 
+		void UserDataContainer::InvalidateOAuthToken()
+		{
+			if (AuthenticatedProfile.has_value())
+			{
+				AuthenticatedProfile->InvalidateOAuthToken();
+			}
+		}
+
 		const bool UserDataContainer::IsValid() const
 		{
 			return AuthenticatedProfile.has_value();

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "modio/core/ModioStdTypes.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/compression/zip/ArchiveFileImplementation.h"
 #include "modio/file/ModioFile.h"
 
@@ -41,9 +42,9 @@ namespace Modio
 				constexpr std::size_t ChunkOfBytes = 64 * 1024;
 				std::size_t FileSize = 0;
 				std::size_t MaxBytesToRead = 0;
-
+				MODIO_PROFILE_SCOPE(ParseArchiveContents);
 				reenter(CoroutineState)
-				{	
+				{
 					{
 						ArchiveFileOnDisk = std::make_shared<Modio::Detail::File>(ArchiveState->FilePath, false);
 						FileSize = ArchiveFileOnDisk->GetFileSize();
@@ -52,11 +53,12 @@ namespace Modio
 
 					while (ArchiveState->ZipMagicOffset == 0)
 					{
-						// In case the file to read is smaller than 65K bytes (rare but possible), the linux implementation
-						// would repeat the operation at least 5 times before realizing that the uring would not continue
-						// reading because it is the end of file. In some other times, it is possible to have two read/write
-						// operations that intersect witht the same file descriptor. To be the least disruptive with other 
-						// platforms, the line below checks if the FileSize is smaller than those 65K.
+						// In case the file to read is smaller than 65K bytes (rare but possible), the linux
+						// implementation would repeat the operation at least 5 times before realizing that the uring
+						// would not continue reading because it is the end of file. In some other times, it is possible
+						// to have two read/write operations that intersect witht the same file descriptor. To be the
+						// least disruptive with other platforms, the line below checks if the FileSize is smaller than
+						// those 65K.
 						MaxBytesToRead = (FileSize < ChunkOfBytes ? FileSize : ChunkOfBytes);
 						yield ArchiveFileOnDisk->ReadSomeAtAsync(CurrentSearchOffset, MaxBytesToRead, std::move(Self));
 						if (ec && ec != Modio::GenericError::EndOfFile)
@@ -183,7 +185,8 @@ namespace Modio
 							PendingEntries.push_back(ArchiveFileImplementation::ArchiveEntry {
 								static_cast<ArchiveFileImplementation::CompressionMethod>(CompressionMethod),
 								std::string((const char*) FileChunk->Data() + CurrentRecordOffset + 46, FileNameLength),
-								LocalHeaderOffset, CompressedSize, UncompressedSize, InputCRC, ((ExternalAttributes & 0x10)== 0x10)});
+								LocalHeaderOffset, CompressedSize, UncompressedSize, InputCRC,
+								((ExternalAttributes & 0x10) == 0x10)});
 
 							CurrentRecordOffset += (46 + FileNameLength + ExtraFieldLength + CommentLength);
 						}

@@ -14,6 +14,8 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioConstants.h"
+#include "modio/detail/ModioProfiling.h"
 #include <memory>
 
 namespace Modio
@@ -40,6 +42,7 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
+				MODIO_PROFILE_SCOPE(WriteSomeToFile);
 				Modio::Optional<Modio::ErrorCode> CreationEC = {};
 				// If the shared state goes out of scope for whatever reason, treat it as a cancellation
 				std::shared_ptr<Modio::Detail::FileSharedState> PinnedSharedState = SharedState.lock();
@@ -48,36 +51,40 @@ namespace Modio
 					Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
 					return;
 				}
-	
+
 				reenter(CoroutineState)
 				{
 					yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 
-					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, 
-												"Begin write for {}, File Descriptor {}, expected size: {}, Offset: {}", 
-												FileImpl->GetPath().string(), FileImpl->GetFileHandle(), 
-												BufferSize, FileOffset.has_value() ? FileOffset.value() : 0);
-					
-					// SubmitWrite could fail with system errors. 
-					CreationEC = PinnedSharedState->SubmitWrite(FileImpl->GetFileHandle(), 
-																std::move(Buffer),
+					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
+												"Begin write for {}, File Descriptor {}, expected size: {}, Offset: {}",
+												FileImpl->GetPath().string(), FileImpl->GetFileHandle(), BufferSize,
+												FileOffset.has_value() ? FileOffset.value() : 0);
+
+					// SubmitWrite could fail with system errors.
+					CreationEC = PinnedSharedState->SubmitWrite(FileImpl->GetFileHandle(), std::move(Buffer),
 																FileOffset.value_or(FileImpl->Tell()));
-					
+
 					if (CreationEC.has_value() == true)
 					{
 						Self.complete(CreationEC.value());
 						return;
 					}
-					
+
+					MODIO_PROFILE_PUSH("writesometofile_poll");
+
 					while ((WriteResult = PinnedSharedState->IOCompleted(FileImpl->GetFileHandle())).first == false)
 					{
 						if (PollTimer == nullptr)
 						{
-							PollTimer = std::make_unique<asio::steady_timer>(Modio::Detail::Services::GetGlobalContext().get_executor());
+							PollTimer = std::make_unique<asio::steady_timer>(
+								Modio::Detail::Services::GetGlobalContext().get_executor());
 						}
-						PollTimer->expires_after(std::chrono::milliseconds(1));
-						yield PollTimer->async_wait(std::move(Self));	
-					} 
+						PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
+						yield PollTimer->async_wait(std::move(Self));
+					}
+
+					MODIO_PROFILE_POP();
 
 					// If the result is falsey(ie no errors)
 					if (WriteResult.second.has_value() == false)

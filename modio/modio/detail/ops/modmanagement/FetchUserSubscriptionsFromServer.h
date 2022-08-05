@@ -41,6 +41,11 @@ namespace Modio
 								fmt::format("_limit=100&_offset={}&game_id={}", CurrentResultIndex,
 											Modio::Detail::SDKSessionData::CurrentGameID())),
 							Modio::Detail::CachedResponse::Allow, std::move(Self));
+
+						if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))
+						{
+							Modio::Detail::SDKSessionData::InvalidateOAuthToken();
+						}
 						if (ec)
 						{
 							Self.complete(ec, {});

@@ -13,15 +13,16 @@
 #include "http/HttpRequestImplementation.h"
 #include "httpparser/httpresponseparser.h"
 #include "httpparser/response.h"
+#include "linux/HttpSharedState.h"
+#include "linux/detail/ops/http/SSLConnectionReadSomeOp.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
-#include "linux/HttpSharedState.h"
-#include "linux/detail/ops/http/SSLConnectionReadSomeOp.h"
+#include "modio/detail/ModioProfiling.h"
 #include <memory>
-#include <vector>
 #include <regex>
+#include <vector>
 namespace Modio
 {
 	namespace Detail
@@ -36,7 +37,7 @@ namespace Modio
 
 		public:
 			ReadHttpResponseHeadersOp(std::shared_ptr<HttpRequestImplementation> Request,
-								  std::weak_ptr<HttpSharedState> SharedState)
+									  std::weak_ptr<HttpSharedState> SharedState)
 				: Request(Request),
 				  SharedState(SharedState)
 			{}
@@ -51,6 +52,8 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {}, std::size_t BytesLastRead = -1)
 			{
+				MODIO_PROFILE_SCOPE(ReadHttpResponseHeaders);
+
 				std::shared_ptr<HttpSharedState> PinnedState = SharedState.lock();
 				if (PinnedState == nullptr || PinnedState->IsClosing())
 				{
@@ -62,8 +65,8 @@ namespace Modio
 				{
 					while (!ec && !ParseHeadersInResponseBuffer() && BytesLastRead != 0)
 					{
-						yield SSLConnectionReadSomeAsync(Request, Request->ResponseDataBuffer,
-														 SharedState, std::move(Self));
+						yield SSLConnectionReadSomeAsync(Request, Request->ResponseDataBuffer, SharedState,
+														 std::move(Self));
 					}
 					if (ec)
 					{
@@ -93,19 +96,21 @@ namespace Modio
 				httpparser::Response ParsedResponse {};
 				httpparser::HttpResponseParser::ParseResult Result =
 					Parser.parse(ParsedResponse, (const char*) LinearBuffer.begin(), (const char*) LinearBuffer.end());
-				if (Result == httpparser::HttpResponseParser::ParsingCompleted ||( Result == httpparser::HttpResponseParser::ParsingIncompleted && ParsedResponse.content.size() > 0))
+				if (Result == httpparser::HttpResponseParser::ParsingCompleted ||
+					(Result == httpparser::HttpResponseParser::ParsingIncompleted && ParsedResponse.content.size() > 0))
 				{
-					
 					Request->ParsedResponseHeaders = ParsedResponse;
 					Request->ResponseCode = ParsedResponse.statusCode;
 					std::cmatch Matches;
 					std::regex doubleNewLine("\r\n\r\n");
-					std::regex_search((const char*) LinearBuffer.begin(), (const char*)LinearBuffer.end(),Matches, doubleNewLine);
+					std::regex_search((const char*) LinearBuffer.begin(), (const char*) LinearBuffer.end(), Matches,
+									  doubleNewLine);
 
 					// Consume amount of data the headers used up so ResponseDataBuffer is only the body
 					Request->ResponseDataBuffer.consume(LinearBuffer.GetSize() - Matches.suffix().length());
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
-												"expecting {0} bytes in response, total", Request->GetContentLength().value_or(0));
+												"expecting {0} bytes in response, total",
+												Request->GetContentLength().value_or(0));
 					return true;
 				}
 				else

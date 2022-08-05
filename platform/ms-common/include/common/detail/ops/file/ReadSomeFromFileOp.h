@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -14,6 +14,7 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
+#include "modio/detail/ModioConstants.h"
 
 #include <asio/yield.hpp>
 
@@ -30,7 +31,7 @@ class ReadSomeFromFileOp
 
 public:
 	ReadSomeFromFileOp(std::shared_ptr<Modio::Detail::FileObjectImplementation> IOObject, std::uintmax_t Offset,
-					 std::uintmax_t Length)
+					   std::uintmax_t Length)
 		: Buffer(Length, 4 * 1024),
 		  FileImpl(IOObject),
 		  Offset(Offset),
@@ -76,7 +77,8 @@ public:
 			yield FileImpl->BeginExclusiveOperation(std::move(self));
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
-								"Begin read of {} bytes from {} at {}", Length, FileImpl->GetPath().string(), Offset);
+										"Begin read of {} bytes from {} at {}", Length, FileImpl->GetPath().string(),
+										Offset);
 
 			ReadOpParams->hEvent = CreateEvent(NULL, false, false, NULL);
 
@@ -98,8 +100,9 @@ public:
 				if (Error != ERROR_IO_PENDING)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-										"Read from {} failed, error = {}", FileImpl->GetPath().string(), Error);
-					self.complete(std::error_code(static_cast<int>(Error), std::system_category()), {});
+												"ReadSomeFromFileOp ReadFile {} failed, error code = {}", 
+												FileImpl->GetPath().string(), Error);
+					self.complete(Modio::make_error_code(Modio::FilesystemError::ReadError), {});
 					FileImpl->FinishExclusiveOperation();
 
 					return;
@@ -108,7 +111,7 @@ public:
 			else
 			{
 				Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Finish read from {}",
-									FileImpl->GetPath().string());
+											FileImpl->GetPath().string());
 				*NumberOfBytesRead = ReadOpParams->InternalHigh;
 				if (*NumberOfBytesRead < Length)
 				{
@@ -129,12 +132,12 @@ public:
 				std::make_unique<asio::steady_timer>(Modio::Detail::Services::GetGlobalContext().get_executor());
 			while (!HasOverlappedIoCompleted(ReadOpParams.get()))
 			{
-				StatusTimer->expires_after(std::chrono::milliseconds(1));
+				StatusTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
 				yield StatusTimer->async_wait(std::move(self));
 			}
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Finish read from {}",
-								FileImpl->GetPath().string());
+										FileImpl->GetPath().string());
 			*NumberOfBytesRead = ReadOpParams->InternalHigh;
 			if (*NumberOfBytesRead < Length)
 			{

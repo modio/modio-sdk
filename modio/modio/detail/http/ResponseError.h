@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -24,28 +24,39 @@ namespace Modio
 			std::int32_t Code;
 			std::int32_t ErrorRef;
 			std::string Error;
-			Modio::Optional<std::vector<FieldError>> ExtendedErrorInformation;
+			Modio::Optional<std::vector<Modio::FieldError>> ExtendedErrorInformation;
 		};
 
 		static void from_json(const nlohmann::json& Json, Modio::Detail::ResponseError& Error)
 		{
-			const nlohmann::json& Subobject = Json.at("error");
-			if (Subobject.is_object())
+			if (Json.contains("error"))
 			{
-				Detail::ParseSafe(Subobject, Error.Code, "code");
-				Detail::ParseSafe(Subobject, Error.ErrorRef, "error_ref");
-				Detail::ParseSafe(Subobject, Error.Error, "message");
-
-#if 0
-				const nlohmann::json& ExtendedErrorMessage = Json.at("errors");
-				if(ExtendedErrorMessage.is_object())
+				const nlohmann::json& ErrorJson = Json.at("error");
+				if (ErrorJson.is_object())
 				{
-					Error.ExtendedErrorInformation.emplace();
-					std::vector<FieldError>& Var =
-						Error.ExtendedErrorInformation.value();
-					Detail::ParseSafe<std::vector<FieldError>>(Subobject, Var, "errors");
+					// Parse usual ResponseError variables
+					Detail::ParseSafe(ErrorJson, Error.Code, "code");
+					Detail::ParseSafe(ErrorJson, Error.ErrorRef, "error_ref");
+					Detail::ParseSafe(ErrorJson, Error.Error, "message");
+
+					// Check for optional ExtendedErrorInformation
+					if (ErrorJson.contains("errors"))
+					{
+						const nlohmann::json& ExtendedErrors = ErrorJson.at("errors");
+						if (ExtendedErrors.is_object())
+						{
+							std::vector<Modio::FieldError> FieldErrors;
+							Modio::FieldError FieldError;
+							for (auto& Item : ExtendedErrors.items())
+							{
+								FieldError.Field = Item.key();
+								FieldError.Error = Item.value();
+								FieldErrors.push_back(FieldError);
+							}
+							Error.ExtendedErrorInformation = FieldErrors;
+						}
+					}
 				}
-#endif
 			}
 		}
 	} // namespace Detail

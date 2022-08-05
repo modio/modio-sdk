@@ -14,6 +14,7 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioFilterParams.h"
 #include "modio/core/entities/ModioModInfoList.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include <asio/coroutine.hpp>
 
@@ -38,6 +39,7 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
+				MODIO_PROFILE_SCOPE(ListAllMods);
 				reenter(CoroutineState)
 				{
 					// In case there is no filter, it could be possible to get all cached ModInfo

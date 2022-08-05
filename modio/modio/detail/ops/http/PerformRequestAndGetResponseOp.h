@@ -18,6 +18,7 @@
 #include "modio/detail/ModioJsonHelpers.h"
 #include "modio/detail/ModioObjectTrack.h"
 #include "modio/detail/ModioOperationQueue.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/http/ResponseError.h"
 #include "modio/file/ModioFile.h"
@@ -60,7 +61,7 @@ namespace Modio
 				Modio::FileSize CurrentPayloadFileBytesRead;
 				Modio::Optional<std::pair<std::string, Modio::Detail::PayloadContent>> PayloadElement;
 				std::unique_ptr<Modio::Detail::Buffer> HeaderBuf;
-
+				//MODIO_PROFILE_OPERATION(PerformRequest);
 			public:
 				PerformRequestImpl(Modio::Detail::OperationQueue::Ticket RequestTicket)
 					: RequestTicket(std::move(RequestTicket)) {};
@@ -87,6 +88,7 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
+				MODIO_PROFILE_SCOPE(PerformRequest);
 				using namespace Modio::Detail;
 				// Temporary storage for the request so we don't invoke undefined behaviour via Move
 				Modio::Optional<Modio::Detail::Buffer> CurrentBuffer;
@@ -109,6 +111,7 @@ namespace Modio
 					// So that we don't even begin the operation if the cached response exists?
 					if (AllowCachedResponse == Modio::Detail::CachedResponse::Allow)
 					{
+						MODIO_PROFILE_SCOPE(RequestCache);
 						Modio::Optional<Modio::Detail::DynamicBuffer> CachedResponse =
 							Services::GetGlobalService<CacheService>().FetchFromCache(
 								Request->Parameters().GetFormattedResourcePath());
@@ -127,7 +130,7 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
-
+					
 					yield Request->SendAsync(std::move(Self));
 
 					if (ec)
@@ -136,29 +139,30 @@ namespace Modio
 						return;
 					}
 
-			if (Request->Parameters().ContainsFormData())
-			{
-				while ((Impl->PayloadElement = Request->Parameters().TakeNextPayloadElement()))
-				{
-					// Write the header for the field in the form data
+					if (Request->Parameters().ContainsFormData())
 					{
+						while ((Impl->PayloadElement = Request->Parameters().TakeNextPayloadElement()))
 						{
-							std::string PayloadContentFilename = "";
-							if (Impl->PayloadElement->second.bIsFile)
+							// Write the header for the field in the form data
 							{
-								PayloadContentFilename =
-									fmt::format("; filename=\"{}\"",
-												Impl->PayloadElement->second.PathToFile->filename().u8string());
-							}
-							std::string PayloadContentHeader =
-								fmt::format("\r\n--{}\r\nContent-Disposition: form-data; name=\"{}\"{}\r\n\r\n",
-											Modio::Detail::HttpRequestParams::GetBoundaryHash(),
-											Impl->PayloadElement->first, PayloadContentFilename);
-							Impl->HeaderBuf = std::make_unique<Modio::Detail::Buffer>(PayloadContentHeader.size());
-							std::copy(PayloadContentHeader.begin(), PayloadContentHeader.end(),
-									  Impl->HeaderBuf->begin());
-						}
-
+								{
+									std::string PayloadContentFilename = "";
+									if (Impl->PayloadElement->second.bIsFile)
+									{
+										PayloadContentFilename =
+											fmt::format("; filename=\"{}\"",
+														Impl->PayloadElement->second.PathToFile->filename().u8string());
+									}
+									std::string PayloadContentHeader =
+										fmt::format("\r\n--{}\r\nContent-Disposition: form-data; name=\"{}\"{}\r\n\r\n",
+													Modio::Detail::HttpRequestParams::GetBoundaryHash(),
+													Impl->PayloadElement->first, PayloadContentFilename);
+									Impl->HeaderBuf =
+										std::make_unique<Modio::Detail::Buffer>(PayloadContentHeader.size());
+									std::copy(PayloadContentHeader.begin(), PayloadContentHeader.end(),
+											  Impl->HeaderBuf->begin());
+								}
+								
 								yield Request->WriteSomeAsync(std::move(*Impl->HeaderBuf), std::move(Self));
 								if (ec)
 								{
@@ -167,36 +171,55 @@ namespace Modio
 								}
 							}
 
-					// Write the form data itself to the connection, either looping through the file data (for a file
-					// field) or just writing the in-memory data (for string fields)
-					if (Impl->PayloadElement->second.bIsFile)
-					{
-						Impl->CurrentPayloadFileBytesRead = Modio::FileSize(0);
-
-						Impl->CurrentPayloadFile =
-							std::make_unique<Modio::Detail::File>(Impl->PayloadElement->second.PathToFile.value());
-
-						while (Impl->CurrentPayloadFileBytesRead < Impl->CurrentPayloadFile->GetFileSize())
-						{
-							// In case a file is less than ChunkOfBytes, it will read only the necessary number of
-							// bytes.
-							MaxBytesToRead =
-								(ChunkOfBytes + Impl->CurrentPayloadFileBytesRead <
-								 Impl->CurrentPayloadFile->GetFileSize())
-									? ChunkOfBytes
-									: Impl->CurrentPayloadFile->GetFileSize() - Impl->CurrentPayloadFileBytesRead;
-							yield Impl->CurrentPayloadFile->ReadAsync(MaxBytesToRead, Impl->PayloadFileBuffer,
-																	  std::move(Self));
-							Impl->CurrentPayloadFileBytesRead += Modio::FileSize(Impl->PayloadFileBuffer.size());
-							if (ec)
+							// Write the form data itself to the connection, either looping through the file data (for a
+							// file field) or just writing the in-memory data (for string fields)
+							if (Impl->PayloadElement->second.bIsFile)
 							{
-								Self.complete(ec);
-								return;
+								Impl->CurrentPayloadFileBytesRead = Modio::FileSize(0);
+
+								Impl->CurrentPayloadFile = std::make_unique<Modio::Detail::File>(
+									Impl->PayloadElement->second.PathToFile.value());
+
+								while (Impl->CurrentPayloadFileBytesRead < Impl->CurrentPayloadFile->GetFileSize())
+								{
+									// In case a file is less than ChunkOfBytes, it will read only the necessary number
+									// of bytes.
+									MaxBytesToRead = (ChunkOfBytes + Impl->CurrentPayloadFileBytesRead <
+													  Impl->CurrentPayloadFile->GetFileSize())
+														 ? ChunkOfBytes
+														 : Impl->CurrentPayloadFile->GetFileSize() -
+															   Impl->CurrentPayloadFileBytesRead;
+									
+									yield Impl->CurrentPayloadFile->ReadAsync(MaxBytesToRead, Impl->PayloadFileBuffer,
+																			  std::move(Self));
+									Impl->CurrentPayloadFileBytesRead +=
+										Modio::FileSize(Impl->PayloadFileBuffer.size());
+									if (ec)
+									{
+										Self.complete(ec);
+										return;
+									}
+									while (Impl->PayloadFileBuffer.size())
+									{
+										
+										yield Request->WriteSomeAsync(
+											std::move(Impl->PayloadFileBuffer.TakeInternalBuffer().value()),
+											std::move(Self));
+										if (ec)
+										{
+											Self.complete(ec);
+											return;
+										}
+									}
+								}
 							}
-							while (Impl->PayloadFileBuffer.size())
+							else if (Impl->PayloadElement->second.RawBuffer.has_value() &&
+									 (*(Impl->PayloadElement->second.RawBuffer)).GetSize())
+
 							{
-								yield Request->WriteSomeAsync(
-									std::move(Impl->PayloadFileBuffer.TakeInternalBuffer().value()), std::move(Self));
+								
+								yield Request->WriteSomeAsync(std::move(*Impl->PayloadElement->second.RawBuffer),
+															  std::move(Self));
 								if (ec)
 								{
 									Self.complete(ec);
@@ -204,18 +227,6 @@ namespace Modio
 								}
 							}
 						}
-					}
-					else
-					{
-						yield Request->WriteSomeAsync(std::move(*Impl->PayloadElement->second.RawBuffer),
-													  std::move(Self));
-						if (ec)
-						{
-							Self.complete(ec);
-							return;
-						}
-					}
-				}
 
 						/// Write the final boundary onto the wire
 						{
@@ -225,6 +236,7 @@ namespace Modio
 							std::copy(FinalPayloadBoundary.begin(), FinalPayloadBoundary.end(),
 									  Impl->HeaderBuf->begin());
 						}
+						
 						yield Request->WriteSomeAsync(std::move(*Impl->HeaderBuf), std::move(Self));
 						if (ec)
 						{
@@ -232,7 +244,7 @@ namespace Modio
 							return;
 						}
 					}
-
+					
 					yield Request->ReadResponseHeadersAsync(std::move(Self));
 
 					if (ec)
@@ -242,6 +254,7 @@ namespace Modio
 					}
 					while (!ec)
 					{
+						
 						// Read in a chunk from the response
 						yield Request->ReadSomeFromResponseBodyAsync(State.ResponseBodyBuffer, std::move(Self));
 						if (ec && ec != make_error_code(Modio::GenericError::EndOfFile))
@@ -250,26 +263,26 @@ namespace Modio
 							return;
 						}
 
-				// Some implementations of ReadSomeFromResponseBodyAsync may store multiple buffers in a single call
-				// so make sure we steal all of them
-				while ((CurrentBuffer = State.ResponseBodyBuffer.TakeInternalBuffer()))
-				{
-					if (CurrentBuffer.has_value())
-					{
-						ResultBuffer.AppendBuffer(std::move(CurrentBuffer.value()));
+						// Some implementations of ReadSomeFromResponseBodyAsync may store multiple buffers in a single
+						// call so make sure we steal all of them
+						while ((CurrentBuffer = State.ResponseBodyBuffer.TakeInternalBuffer()))
+						{
+							if (CurrentBuffer.has_value())
+							{
+								ResultBuffer.AppendBuffer(std::move(CurrentBuffer.value()));
+							}
+							else
+							{
+								// In case the current buffer does not have a value, break the loop
+								break;
+							}
+						}
 					}
-					else
-					{
-						// In case the current buffer does not have a value, break the loop
-						break;
-					}
-				}
-			}
-			// After this State.ResponseBodyBuffer is considered dead
-			std::uint32_t ResponseCode = Request->GetResponseCode();
+					// After this State.ResponseBodyBuffer is considered dead
+					std::uint32_t ResponseCode = Request->GetResponseCode();
 
-			// Additional if guarding as this logging is extra slow, so don't want to incur any overhead if someone
-			// don't include this trace data
+					// Additional if guarding as this logging is extra slow, so don't want to incur any overhead if
+					// someone don't include this trace data
 #if MODIO_TRACE_DUMP_RESPONSE
 					if (Services::GetGlobalService<Modio::Detail::LogService>().GetLogLevel() <= Modio::LogLevel::Trace)
 					{

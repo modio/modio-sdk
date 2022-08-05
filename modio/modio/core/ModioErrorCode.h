@@ -125,7 +125,8 @@ namespace Modio
 		NoPermission = 20742,
 		ReadError = 20743,
 		UnableToCreateFile = 20744,
-		UnableToCreateFolder = 20745
+		UnableToCreateFolder = 20745,
+		WriteError = 20746
 	};
 
 	struct FilesystemErrorCategoryImpl : std::error_category
@@ -161,6 +162,9 @@ namespace Modio
 					break;
 				case FilesystemError::UnableToCreateFolder:
 						return "Could not create folder";
+					break;
+				case FilesystemError::WriteError:
+						return "Error writing file";
 					break;
 				default:
 					return "Unknown FilesystemError error";
@@ -367,9 +371,10 @@ namespace Modio
 		IndexOutOfRange = 21764,
 		NoDataAvailable = 21765,
 		OperationCanceled = 21766,
-		QueueClosed = 21767,
-		SDKAlreadyInitialized = 21768,
-		SDKNotInitialized = 21769
+		OperationError = 21767,
+		QueueClosed = 21768,
+		SDKAlreadyInitialized = 21769,
+		SDKNotInitialized = 21770
 	};
 
 	struct GenericErrorCategoryImpl : std::error_category
@@ -396,6 +401,9 @@ namespace Modio
 					break;
 				case GenericError::OperationCanceled:
 						return "The asynchronous operation was cancelled before it completed";
+					break;
+				case GenericError::OperationError:
+						return "The asynchronous operation produced an error before it completed";
 					break;
 				case GenericError::QueueClosed:
 						return "Operation could not be started as the service queue was missing or destroyed";
@@ -438,22 +446,69 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
+	enum class SystemError
+	{
+		UnknownSystemError = 22017
+	};
+
+	struct SystemErrorCategoryImpl : std::error_category
+	{
+		inline const char* name() const noexcept override { return "Modio::SystemError"; }
+		inline std::string message(int ErrorValue) const override
+		{
+			switch (static_cast<Modio::SystemError>(ErrorValue))
+			{
+				case SystemError::UnknownSystemError:
+						return "A low-level system error occured, refer to the logs for code and location";
+					break;
+				default:
+					return "Unknown SystemError error";
+			}
+		}
+	};
+
+	inline const std::error_category& SystemErrorCategory()
+	{
+		static SystemErrorCategoryImpl CategoryInstance;
+		return CategoryInstance;
+	}
+
+	inline std::error_code make_error_code(SystemError e)
+	{
+		return { static_cast<int>(e), SystemErrorCategory() };
+	}
+
+	inline bool operator==(std::error_code A, SystemError B)
+	{
+		return A.category() == SystemErrorCategory() && A.value() == static_cast<int>(B);
+	}
+
+	inline bool operator!=(std::error_code A, SystemError B)
+	{
+		return ! (A == B);
+	}
+
+	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, SystemError RawErrorValue )
+	{
+		return ec == RawErrorValue;
+	}
+
 	enum class ZlibError
 	{
-		EndOfStream = 22017,
-		IncompleteLengthSet = 22018,
-		InvalidBitLengthRepeat = 22019,
-		InvalidBlockType = 22020,
-		InvalidCodeLengths = 22021,
-		InvalidDistance = 22022,
-		InvalidDistanceCode = 22023,
-		InvalidLiteralLength = 22024,
-		InvalidStoredLength = 22025,
-		MissingEOB = 22026,
-		NeedBuffers = 22027,
-		OverSubscribedLength = 22028,
-		StreamError = 22029,
-		TooManySymbols = 22030
+		EndOfStream = 22273,
+		IncompleteLengthSet = 22274,
+		InvalidBitLengthRepeat = 22275,
+		InvalidBlockType = 22276,
+		InvalidCodeLengths = 22277,
+		InvalidDistance = 22278,
+		InvalidDistanceCode = 22279,
+		InvalidLiteralLength = 22280,
+		InvalidStoredLength = 22281,
+		MissingEOB = 22282,
+		NeedBuffers = 22283,
+		OverSubscribedLength = 22284,
+		StreamError = 22285,
+		TooManySymbols = 22286
 	};
 
 	struct ZlibErrorCategoryImpl : std::error_category
@@ -539,12 +594,12 @@ namespace Modio
 
 	enum class ModManagementError
 	{
-		AlreadySubscribed = 22273,
-		InstallOrUpdateCancelled = 22274,
-		ModManagementAlreadyEnabled = 22275,
-		ModManagementDisabled = 22276,
-		NoPendingWork = 22277,
-		UploadCancelled = 22278
+		AlreadySubscribed = 22529,
+		InstallOrUpdateCancelled = 22530,
+		ModManagementAlreadyEnabled = 22531,
+		ModManagementDisabled = 22532,
+		NoPendingWork = 22533,
+		UploadCancelled = 22534
 	};
 
 	struct ModManagementErrorCategoryImpl : std::error_category
@@ -606,8 +661,8 @@ namespace Modio
 
 	enum class ModValidationError
 	{
-		ModDirectoryNotFound = 22529,
-		NoFilesFoundForMod = 22530
+		ModDirectoryNotFound = 22785,
+		NoFilesFoundForMod = 22786
 	};
 
 	struct ModValidationErrorCategoryImpl : std::error_category
@@ -871,15 +926,18 @@ namespace Modio
 					return GenericErrorCategory();
 				break;
 				case 7:
-					return ZlibErrorCategory();
+					return SystemErrorCategory();
 				break;
 				case 8:
-					return ModManagementErrorCategory();
+					return ZlibErrorCategory();
 				break;
 				case 9:
-					return ModValidationErrorCategory();
+					return ModManagementErrorCategory();
 				break;
 				case 10:
+					return ModValidationErrorCategory();
+				break;
+				case 11:
 					return ApiErrorCategory();
 				break;
 				default:
@@ -915,21 +973,25 @@ namespace Modio
 			{
 					return 6;
 			}
-			if (Category ==  ZlibErrorCategory())
+			if (Category ==  SystemErrorCategory())
 			{
 					return 7;
 			}
-			if (Category ==  ModManagementErrorCategory())
+			if (Category ==  ZlibErrorCategory())
 			{
 					return 8;
 			}
-			if (Category ==  ModValidationErrorCategory())
+			if (Category ==  ModManagementErrorCategory())
 			{
 					return 9;
 			}
-			if (Category ==  ApiErrorCategory())
+			if (Category ==  ModValidationErrorCategory())
 			{
 					return 10;
+			}
+			if (Category ==  ApiErrorCategory())
+			{
+					return 11;
 			}
 			return 0;
 		}
@@ -974,7 +1036,9 @@ namespace Modio
 		/// @brief When this condition is true, the error code indicates that the SDK has not been initialized.
 		SDKNotInitialized = 16,
 		/// @brief When this condition is true, the error code indicates that the user is already authenticated.
-		UserAlreadyAuthenticatedError = 17
+		UserAlreadyAuthenticatedError = 17,
+		/// @brief When this condition is true, the error code indicates that a low-level system error occurred outside of mod.io SDK control.
+		SystemError = 18
 	};
 
 	struct ErrorConditionCategoryImpl : std::error_category
@@ -1034,6 +1098,9 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::UserAlreadyAuthenticatedError:
 					return "When this condition is true, the error code indicates that the user is already authenticated.";
+				break;
+				case ErrorConditionTypes::SystemError:
+					return "When this condition is true, the error code indicates that a low-level system error occurred outside of mod.io SDK control.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -1251,6 +1318,11 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::FilesystemError::WriteError)
+					{
+						return true;
+					}
+
 	
 				break;
 				case ErrorConditionTypes::InternalError:
@@ -1457,6 +1529,11 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::FilesystemError::WriteError)
+					{
+						return true;
+					}
+
 	
 				break;
 				case ErrorConditionTypes::ModDeleteDeferredError:
@@ -1528,6 +1605,11 @@ namespace Modio
 					}
 
 					if (ec == Modio::FilesystemError::UnableToCreateFolder)
+					{
+						return true;
+					}
+
+					if (ec == Modio::FilesystemError::WriteError)
 					{
 						return true;
 					}
@@ -1743,6 +1825,21 @@ namespace Modio
 					}
 
 
+				break;
+				case ErrorConditionTypes::SystemError:
+					if (ec == Modio::SystemError::UnknownSystemError)
+					{
+						return true;
+					}
+
+
+
+					if (ec == Modio::SystemError::UnknownSystemError)
+					{
+						return true;
+					}
+
+	
 				break;
 			}
 			return false;

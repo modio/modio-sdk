@@ -38,6 +38,13 @@ namespace Modio
 							.SetModID(Mod)
 							.AppendPayloadValue(Modio::Detail::Constants::APIStrings::Rating, RawRating),
 						Modio::Detail::CachedResponse::Disallow, std::move(Self));
+
+					if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))
+					{
+						Modio::Detail::SDKSessionData::InvalidateOAuthToken();
+						Self.complete(ec);
+						return;
+					}
 					// Treat an API error indicating a no-op as a success
 					if (ec && Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::ApiErrorRefSuccess))
 					{

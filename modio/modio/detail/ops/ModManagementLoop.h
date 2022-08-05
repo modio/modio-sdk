@@ -1,17 +1,17 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 #include "modio/detail/ModioSDKSessionData.h"
-#include "modio/detail/ops/modmanagement/ProcessNextModInUserCollection.h"
 #include "modio/detail/ops/FetchExternalUpdates.h"
+#include "modio/detail/ops/modmanagement/ProcessNextModInUserCollection.h"
 
 #include "modio/detail/AsioWrapper.h"
 #include <asio/yield.hpp>
@@ -20,7 +20,8 @@ namespace Modio
 {
 	namespace Detail
 	{
-		/// @brief Internal operation that processes the next mod entry in the current collection that requires some kind of action (update, installation, uninstallation)
+		/// @brief Internal operation that processes the next mod entry in the current collection that requires some
+		/// kind of action (update, installation, uninstallation)
 		class ModManagementLoop
 		{
 			std::unique_ptr<asio::steady_timer> IdleTimer = nullptr;
@@ -31,7 +32,6 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
-
 				if (ec == Modio::GenericError::OperationCanceled)
 				{
 					Self.complete(ec);
@@ -44,14 +44,19 @@ namespace Modio
 					{
 						if (ExternalUpdateCounter == 0)
 						{
-							//yield Modio::Detail::FetchExternalUpdatesAsync(std::move(Self));
+							// yield Modio::Detail::FetchExternalUpdatesAsync(std::move(Self));
 						}
-
-						if (ec) {
+						// When we get an authentication error, we should invalidate the current token to require reauth
+						if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))
+						{
+							Modio::Detail::SDKSessionData::InvalidateOAuthToken();
+						}
+						if (ec)
+						{
 							Self.complete(ec);
 							return;
 						}
-						
+
 						// This operation gets the user subscriptions, filters the system mod list based on those, then
 						// processes the next mod in that filtered list that requires some kind of management operation
 						// (installation, update, etc).
@@ -69,7 +74,7 @@ namespace Modio
 						// Sleep for one second
 						IdleTimer->expires_after(std::chrono::seconds(1));
 						yield IdleTimer->async_wait(std::move(Self));
-						
+
 						ExternalUpdateCounter++;
 						ExternalUpdateCounter = ExternalUpdateCounter % 15;
 					}

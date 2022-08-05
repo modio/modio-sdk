@@ -48,6 +48,13 @@ namespace Modio
 						ResponseBodyBuffer, Modio::Detail::UnsubscribeFromModRequest.SetGameID(GameID).SetModID(ModId),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 
+					if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))
+					{
+						Modio::Detail::SDKSessionData::InvalidateOAuthToken();
+						Self.complete(ec);
+						return;
+					}
+
 					if (ec == Modio::ErrorConditionTypes::ApiErrorRefSuccess)
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,

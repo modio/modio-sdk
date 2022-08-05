@@ -15,6 +15,7 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioLogEnum.h"
 #include "modio/core/ModioLogger.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioSDKSessionData.h"
 
 namespace Modio
@@ -47,6 +48,7 @@ namespace Modio
 
 		void CacheService::AddToCache(std::string ResourceURL, Modio::Detail::DynamicBuffer ResponseData)
 		{
+			MODIO_PROFILE_SCOPE(CacheAddURL);
 			auto Hasher = std::hash<std::string>();
 			std::uint32_t URLHash = (std::uint32_t) Hasher(ResourceURL);
 
@@ -107,6 +109,7 @@ namespace Modio
 
 		Modio::Optional<Modio::Detail::DynamicBuffer> CacheService::FetchFromCache(std::string ResourceURL) const
 		{
+			MODIO_PROFILE_SCOPE(CacheFetchURL);
 			auto Hasher = std::hash<std::string>();
 			std::uint32_t URLHash = (std::uint32_t) Hasher(ResourceURL);
 
@@ -123,6 +126,7 @@ namespace Modio
 
 		Modio::Optional<Modio::ModInfo> CacheService::FetchFromCache(Modio::ModID ModIDDetail) const
 		{
+			MODIO_PROFILE_SCOPE(CacheFetchMod);
 			auto CacheEntryIterator = CacheInstance->ModInfoCache.find(ModIDDetail);
 			if (CacheEntryIterator != CacheInstance->ModInfoCache.end())
 			{
@@ -135,8 +139,8 @@ namespace Modio
 				Modio::Detail::SDKSessionData::GetSystemModCollection().GetByModID(ModIDDetail);
 			if (CachedModInfo.has_value())
 			{
-				Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Retrieving mod {} from secondary cache",
-											ModIDDetail);
+				Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http,
+											"Retrieving mod {} from secondary cache", ModIDDetail);
 				return CachedModInfo->GetModProfile();
 			}
 
@@ -145,6 +149,7 @@ namespace Modio
 
 		Modio::Optional<Modio::ModInfoList> CacheService::FetchFromCache(Modio::GameID GameIDDetails) const
 		{
+			MODIO_PROFILE_SCOPE(CacheFetchGame);
 			auto CacheEntryIterator = CacheInstance->ModInfoListCache.find(GameIDDetails);
 			if (CacheEntryIterator == CacheInstance->ModInfoListCache.end())
 			{

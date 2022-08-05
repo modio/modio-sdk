@@ -13,6 +13,7 @@
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioDefines.h"
+#include "modio/detail/ModioProfiling.h"
 #include <memory>
 #include <mutex>
 
@@ -158,13 +159,12 @@ namespace Modio
 			asio::buffer_copy(DestBufferView, SourceBufferView);
 			return Destination;
 		}
-		
+
 		struct TypedWriteHelper;
 
 		template<typename SourceType>
 		TypedWriteHelper TypedBufferWrite(const SourceType& Source, Modio::Detail::Buffer& BufferToWrite,
 										  std::uintmax_t Offset);
-		
 
 		/// @brief Helper struct to make repeated calls to TypedBufferWrite less verbose if they are writing to
 		/// sequential memory
@@ -196,6 +196,7 @@ namespace Modio
 		/// @return The number of bytes copied
 		inline std::size_t BufferCopy(Modio::Detail::Buffer& Destination, const Modio::Detail::DynamicBuffer Source)
 		{
+			MODIO_PROFILE_SCOPE(DynamicBufferCopyToLinear);
 			return asio::buffer_copy(Modio::MutableBufferView(Destination.Data(), Destination.GetSize()),
 									 Source.data());
 		}
@@ -203,6 +204,7 @@ namespace Modio
 		inline std::size_t BufferCopy(Modio::Detail::DynamicBuffer& Destination,
 									  const Modio::Detail::DynamicBuffer Source)
 		{
+			MODIO_PROFILE_SCOPE(DynamicBufferCopyToDynamic);
 			Modio::Detail::DynamicBuffer::Sequence SourceBufferView = Source.data();
 			Modio::Detail::DynamicBuffer::Sequence DestinationBufferView = Destination.data();
 

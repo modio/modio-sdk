@@ -39,14 +39,19 @@ namespace Modio
 			OAuthToken(Modio::Detail::Schema::AccessTokenObject AccessToken)
 				: OAuthToken(AccessToken.AccessToken, AccessToken.DateExpires)
 			{}
+			void SetInvalidState()
+			{
+				Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::User, "Setting current user's OAuth token state to invalid");
+				State = OAuthTokenState::Invalid;
+			}
 			OAuthTokenState GetTokenState() const
 			{
-				auto Now = std::chrono::system_clock::now();
-				std::size_t CurrentUTCTime =
-					std::chrono::duration_cast<std::chrono::seconds>(Now.time_since_epoch()).count();
-
 				if (State == OAuthTokenState::Valid)
 				{
+					auto Now = std::chrono::system_clock::now();
+					std::size_t CurrentUTCTime =
+						std::chrono::duration_cast<std::chrono::seconds>(Now.time_since_epoch()).count();
+
 					return CurrentUTCTime <= ExpireDate ? OAuthTokenState::Valid : OAuthTokenState::Invalid;
 				}
 				return OAuthTokenState::Invalid;
@@ -65,7 +70,7 @@ namespace Modio
 			}
 
 			static MODIO_IMPL Modio::Optional<std::string> NoToken;
-			
+
 			friend void from_json(const nlohmann::json& Json, Modio::Detail::OAuthToken& InToken)
 			{
 				Detail::ParseSafe(Json, InToken.ExpireDate, "expiry");
@@ -113,10 +118,7 @@ namespace Modio
 
 		struct ProfileData
 		{
-			ProfileData(Modio::User InUser, Modio::Detail::OAuthToken AccessToken)
-				: User(InUser),
-				  Token(AccessToken)
-			{}
+			ProfileData(Modio::User InUser, Modio::Detail::OAuthToken AccessToken) : User(InUser), Token(AccessToken) {}
 
 			const Modio::User& GetUser() const
 			{
@@ -131,6 +133,10 @@ namespace Modio
 			const Modio::Detail::OAuthToken& GetToken() const
 			{
 				return Token;
+			}
+			void InvalidateOAuthToken()
+			{
+				Token.SetInvalidState();
 			}
 
 		private:

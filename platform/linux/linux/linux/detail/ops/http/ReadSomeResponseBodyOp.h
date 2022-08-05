@@ -11,13 +11,14 @@
 #pragma once
 
 #include "http/HttpRequestImplementation.h"
+#include "linux/HttpSharedState.h"
+#include "linux/detail/ops/http/SSLConnectionReadSomeOp.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
-#include "linux/HttpSharedState.h"
-#include "linux/detail/ops/http/SSLConnectionReadSomeOp.h"
+#include "modio/detail/ModioProfiling.h"
 #include <cstdlib>
 #include <memory>
 #include <vector>
@@ -53,6 +54,7 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {}, std::size_t BytesLastRead = -1)
 			{
+				MODIO_PROFILE_SCOPE(ReadSomeResponseBody);
 				std::shared_ptr<HttpSharedState> PinnedState = SharedState.lock();
 				if (PinnedState == nullptr || PinnedState->IsClosing())
 				{
@@ -108,7 +110,6 @@ namespace Modio
 						}
 						else
 						{
-							
 							Request->ResponseBodyReceivedLength += BytesLastRead;
 							if (Modio::Optional<std::size_t> ExpectedLength = Request->GetContentLength())
 							{
@@ -154,7 +155,7 @@ namespace Modio
 						std::regex ChunkSizePattern("^(\r\n)?([a-fA-f0-9]+)(;.*?)?\r\n");
 						std::cmatch ChunkSizeMatches;
 						// if the buffer begins with a chunk header
-						if (std::regex_search( (const char*) SearchBuffer.begin(), (const char*)SearchBuffer.end(),
+						if (std::regex_search((const char*) SearchBuffer.begin(), (const char*) SearchBuffer.end(),
 											  ChunkSizeMatches, ChunkSizePattern))
 						{
 							// extract the chunk size from the header
@@ -168,7 +169,6 @@ namespace Modio
 							// Advance/consume/skip past the chunk header so we're only copying actual response data
 							std::size_t ChunkHeaderLength = ChunkSizeMatches[0].second - ChunkSizeMatches[0].first;
 							InChunkedData.consume(ChunkHeaderLength);
-
 						}
 						else
 						{
@@ -185,7 +185,7 @@ namespace Modio
 					Modio::Detail::BufferCopy(AvailableData, InChunkedData);
 					ParsedData.AppendBuffer(std::move(AvailableData));
 					InChunkedData.consume(NumBytesToCopy);
-						Request->CurrentChunkSizeRemaining -= NumBytesToCopy;
+					Request->CurrentChunkSizeRemaining -= NumBytesToCopy;
 					if (Request->CurrentChunkSizeRemaining == 0)
 					{
 						InChunkedData.consume(2);

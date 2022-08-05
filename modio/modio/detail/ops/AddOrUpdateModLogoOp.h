@@ -46,10 +46,12 @@ namespace Modio
 						ResponseBodyBuffer, Modio::Detail::AddModMediaRequest.SetGameID(GameID).SetModID(ModID).AppendPayloadFile("logo", LogoPath),
 						Modio::Detail::CachedResponse::Disallow, std::move(Self));
 
-					// error checks
+					if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))
+					{
+						Modio::Detail::SDKSessionData::InvalidateOAuthToken();
+					}
 					if (ec)
 					{
-						//	Failure
 						Self.complete(ec);
 						return;
 					}

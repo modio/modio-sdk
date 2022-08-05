@@ -20,7 +20,7 @@ namespace Modio
 			Modio::Detail::HttpRequestParams Params =
 				Modio::Detail::AuthenticateViaGogGalaxyRequest
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::Appdata, User.AuthToken)
-					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
+					.EncodeAndAppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed,
 										User.bUserHasAcceptedTerms ? "true" : "false");
 			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(

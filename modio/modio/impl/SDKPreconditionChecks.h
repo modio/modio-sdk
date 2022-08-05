@@ -70,7 +70,8 @@ namespace Modio
 		template<typename... OtherArgs>
 		bool RequireUserIsNOTAuthenticated(std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
 		{
-			if (!Modio::Detail::SDKSessionData::GetAuthenticatedUser().has_value())
+			// Note that GetAuthenticationToken() checks token state, and only returns valid tokens. No need to re-check state here.  
+			if (!Modio::Detail::SDKSessionData::GetAuthenticationToken().has_value())
 			{
 				return true;
 			}

@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *  
+ *
  */
 
 #ifdef MODIO_SEPARATE_COMPILATION
@@ -15,9 +15,10 @@
 #endif
 
 #include "modio/cache/ModioCacheService.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioSDKSessionData.h"
-#include "modio/detail/ops/ServiceInitializationOp.h"
 #include "modio/detail/ops/ReportContentOp.h"
+#include "modio/detail/ops/ServiceInitializationOp.h"
 #include "modio/detail/ops/Shutdown.h"
 #include "modio/file/ModioFileService.h"
 #include "modio/http/ModioHttpService.h"
@@ -36,24 +37,36 @@ namespace Modio
 		{
 			auto WrappedCallback = Modio::Detail::ApplyPostAsyncChecks(OnInitComplete);
 			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-				ServiceInitializationOp(InitOptions),
-				WrappedCallback, Modio::Detail::Services::GetGlobalContext().get_executor());
+				ServiceInitializationOp(InitOptions), WrappedCallback,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	}
 
 	void RunPendingHandlers()
 	{
-		// Run any pending handlers on the global io_context
-		if (Modio::Detail::Services::GetGlobalContext().stopped())
+		MODIO_PROFILE_SCOPE(RunPendingHandlers);
 		{
-			Modio::Detail::Services::GetGlobalContext().restart();
-		}
-		Modio::Detail::Services::GetGlobalContext().poll();
+			MODIO_PROFILE_SCOPE(IOContext_Poll);
 
-		// invoke the mod management log callback if the user has set it
-		Modio::Detail::SDKSessionData::FlushModManagementLog();
-		// invoke log callback if the user has set it
-		Modio::Detail::Services::GetGlobalService<Modio::Detail::LogService>().FlushLogBuffer();
+			// Run any pending handlers on the global io_context
+			if (Modio::Detail::Services::GetGlobalContext().stopped())
+			{
+				Modio::Detail::Services::GetGlobalContext().restart();
+			}
+			Modio::Detail::Services::GetGlobalContext().poll();
+		}
+		
+		{
+			MODIO_PROFILE_SCOPE(FlushManagementLog);
+			// invoke the mod management log callback if the user has set it
+			Modio::Detail::SDKSessionData::FlushModManagementLog();
+		}
+
+		{
+			MODIO_PROFILE_SCOPE(FlushLogBuffer);
+			// invoke log callback if the user has set it
+			Modio::Detail::Services::GetGlobalService<Modio::Detail::LogService>().FlushLogBuffer();
+		}
 	}
 
 #ifndef MODIO_SEPARATE_COMPILATION
@@ -132,7 +145,6 @@ namespace Modio
 	{
 		if (Modio::Detail::RequireSDKIsInitialized(Callback))
 		{
-			
 			asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
 				Modio::Detail::ReportContentOp(Report), Callback,
 				Modio::Detail::Services::GetGlobalContext().get_executor());

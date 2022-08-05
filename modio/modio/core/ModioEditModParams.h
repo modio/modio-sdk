@@ -15,22 +15,18 @@
 namespace Modio
 {
 	/// @docpublic
-	/// @brief Class specifying the parameters to submit when creating a mod
-	class CreateModParams
+	/// @brief Class specifying fields to update for a mod
+	class EditModParams
 	{
 	public:
-		/// @docpublic
-		/// @brief Path to the logo for the mod. Must point to a valid file on disk or the mod will not be created on
-		/// the server.
-		Modio::filesystem::path PathToLogoFile;
 		
 		/// @docpublic
 		/// @brief The name of the mod
-		std::string Name;
+		Modio::Optional<std::string> Name;
 		
 		/// @docpublic
 		/// @brief A brief summary of what the mod is
-		std::string Summary;
+		Modio::Optional<std::string> Summary;
 		
 		/// @docpublic
 		/// @brief Optional override for the name 'slug' in the mod's URL
@@ -49,10 +45,6 @@ namespace Modio
 		Modio::Optional<std::string> HomepageURL;
 		
 		/// @docpublic
-		/// @brief Optional quantity limit on the mod
-		Modio::Optional<std::size_t> Stock;
-		
-		/// @docpublic
 		/// @brief Bitwise mask of flags indicating mature content
 		Modio::Optional<Modio::MaturityOption> MaturityRating;
 		
@@ -60,8 +52,5 @@ namespace Modio
 		/// @brief Optional metadata blob for this mod
 		Modio::Optional<std::string> MetadataBlob;
 		
-		/// @docpublic
-		/// @brief Optional list of mod tags. All tags must be supported by the parent game to be applied
-		Modio::Optional<std::vector<std::string>> Tags;
 	};
 } // namespace Modio

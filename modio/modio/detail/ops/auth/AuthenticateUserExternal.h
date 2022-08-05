@@ -12,6 +12,7 @@
 
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/ops/userdata/VerifyUserAuthenticationOp.h"
 #include "modio/http/ModioHttpParams.h"
 #include "modio/userdata/ModioUserDataService.h"
 #include <memory>
@@ -35,6 +36,14 @@ namespace Modio
 				auto& UserDataService = Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>();
 				reenter(LocalState->CoroutineState)
 				{
+					yield Modio::Detail::VerifyUserAuthenticationAsync(std::move(Self));
+					// No error during verification indicates the user is already authenticated
+					if (!ec)
+					{
+						Self.complete(Modio::make_error_code(Modio::UserAuthError::AlreadyAuthenticated));
+						return;
+					}
+
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						LocalState->ResponseBuffer, LocalState->AuthenticationParams, Detail::CachedResponse::Disallow,
 						std::move(Self));
@@ -43,7 +52,6 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
-
 					{
 						Modio::Optional<Modio::Detail::Schema::AccessTokenObject> Token =
 							Detail::TryMarshalResponse<Detail::Schema::AccessTokenObject>(LocalState->ResponseBuffer);
@@ -59,7 +67,6 @@ namespace Modio
 					}
 
 					LocalState->ResponseBuffer.Clear();
-
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						LocalState->ResponseBuffer,
 						Modio::Detail::GetAuthenticatedUserRequest.SetAuthTokenOverride(
@@ -71,7 +78,6 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
-
 					{
 						Modio::Optional<Modio::User> User =
 							Detail::TryMarshalResponse<Modio::User>(LocalState->ResponseBuffer);
@@ -86,14 +92,12 @@ namespace Modio
 						}
 					}
 					LocalState->ResponseBuffer.Clear();
-
 					if (!Modio::Detail::SDKSessionData::GetAuthenticatedUser() ||
 						LocalState->AuthUser.UserId != Modio::Detail::SDKSessionData::GetAuthenticatedUser()->UserId)
 					{
 						yield UserDataService.ClearUserDataAsync(std::move(Self));
 						Modio::Detail::Services::GetGlobalService<Modio::Detail::CacheService>().ClearCache();
 					}
-
 					Modio::Detail::SDKSessionData::InitializeForUser(
 						std::move(LocalState->AuthUser), Modio::Detail::OAuthToken(LocalState->AuthResponse));
 					yield UserDataService.SaveUserDataToStorageAsync(std::move(Self));

@@ -16,6 +16,8 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioConstants.h"
+#include "modio/detail/ModioProfiling.h"
 #include <memory>
 
 namespace Modio
@@ -43,6 +45,7 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
+				MODIO_PROFILE_SCOPE(SSLWriteSome);
 				std::shared_ptr<HttpSharedState> PinnedState = SharedState.lock();
 				if (PinnedState == nullptr || PinnedState->IsClosing())
 				{
@@ -53,10 +56,14 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					{
-						// Make things easier by writing only the contents of the first internal chunk of the
-						// dynamicBuffer
-						WriteCount = mbedtls_ssl_write(&Request->SSLContext, Payload.begin()->Data(),
-													   Payload.begin()->GetSize());
+						{
+							MODIO_PROFILE_SCOPE(mbedtls_ssl_write);
+							// Make things easier by writing only the contents of the first internal chunk of the
+							// dynamicBuffer
+							WriteCount = mbedtls_ssl_write(&Request->SSLContext, Payload.begin()->Data(),
+														   Payload.begin()->GetSize());
+						}
+						MODIO_PROFILE_PUSH(writesome_poll);
 						while (WriteCount == MBEDTLS_ERR_SSL_WANT_READ || WriteCount == MBEDTLS_ERR_SSL_WANT_WRITE)
 						{
 							if (!PollTimer)
@@ -64,12 +71,15 @@ namespace Modio
 								PollTimer = std::make_unique<asio::steady_timer>(
 									Modio::Detail::Services::GetGlobalContext().get_executor());
 							}
-							PollTimer->expires_after(std::chrono::milliseconds(1));
+							PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
 							yield PollTimer->async_wait(std::move(Self));
-							WriteCount = mbedtls_ssl_write(&Request->SSLContext, Payload.begin()->Data(),
-														   Payload.begin()->GetSize());
+							{
+								MODIO_PROFILE_SCOPE(mbedtls_ssl_write);
+								WriteCount = mbedtls_ssl_write(&Request->SSLContext, Payload.begin()->Data(),
+															   Payload.begin()->GetSize());
+							}
 						}
-
+						MODIO_PROFILE_POP();
 						if (WriteCount >= 0)
 						{
 							Self.complete({}, WriteCount);

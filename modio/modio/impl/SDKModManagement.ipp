@@ -15,6 +15,7 @@
 #endif
 
 #include "modio/core/ModioCoreTypes.h"
+#include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
@@ -24,6 +25,7 @@
 #include "modio/detail/ops/SubscribeToModOp.h"
 #include "modio/detail/ops/UnsubscribeFromMod.h"
 #include "modio/detail/ops/mod/ArchiveModOp.h"
+#include "modio/detail/ops/mod/SubmitModChangesOp.h"
 #include "modio/detail/ops/mod/SubmitNewModFileOp.h"
 #include "modio/detail/ops/mod/SubmitNewModOp.h"
 #include "modio/detail/ops/modmanagement/ForceUninstallModOp.h"
@@ -42,8 +44,7 @@ namespace Modio
 		}
 		if (Modio::Detail::SDKSessionData::IsModManagementEnabled())
 		{
-			Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
-										"Mod Management is already enabled");
+			Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core, "Mod Management is already enabled");
 			return Modio::make_error_code(Modio::ModManagementError::ModManagementAlreadyEnabled);
 		}
 		Modio::Detail::SDKSessionData::SetUserModManagementCallback(ModManagementHandler);
@@ -119,6 +120,28 @@ namespace Modio
 			}
 		}
 		return false;
+	}
+
+	Modio::ErrorCode PrioritizeTransferForMod(Modio::ModID IDToPrioritize)
+	{
+		// if ID is not present in the list of pending operations, return error
+		if (Modio::Optional<Modio::ModProgressInfo> CurrentOperationInfo =
+				Modio::Detail::SDKSessionData::GetModProgress())
+		{
+			if (CurrentOperationInfo->ID == IDToPrioritize)
+			{
+				return {};
+			}
+			//Check if the ID corresponds to an upload first, then check if it is a pending download
+			if (Modio::Detail::SDKSessionData::PrioritizeModfileUpload(IDToPrioritize) ||
+				Modio::Detail::SDKSessionData::PrioritizeModfileDownload(IDToPrioritize))
+			{
+				//If we have a valid prioritization, cancel the in-progress thing so we move onto the priority immediately
+				Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
+				return {};
+			}
+		}
+		return Modio::make_error_code(Modio::GenericError::BadParameter);
 	}
 
 	Modio::Optional<Modio::ModProgressInfo> QueryCurrentModUpdate()
@@ -206,6 +229,16 @@ namespace Modio
 			return Modio::Detail::SubmitNewModAsync(Handle, Params, Callback);
 		}
 	}
+
+	void SubmitModChangesAsync(Modio::ModID Mod, Modio::EditModParams Params,
+							   std::function<void(Modio::ErrorCode ec, Modio::Optional<Modio::ModInfo>)> Callback)
+	{
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireUserIsAuthenticated(Callback))
+		{
+			return Modio::Detail::SubmitModChangesAsync(Mod, Params, Callback);
+		}
+	}
+
 	Modio::ModCreationHandle GetModCreationHandle()
 	{
 		return Modio::Detail::SDKSessionData::GetNextModCreationHandle();
@@ -213,30 +246,29 @@ namespace Modio
 
 	MODIOSDK_API void SubmitNewModFileForMod(Modio::ModID Mod, Modio::CreateModFileParams Params)
 	{
-		// @TODO: Right now we don't have a pattern for returning Modio::ErrorCode from a method if we don't have a callback
-		// For now, we're just going to log if this fails so developers have some way to track it
+		// @TODO: Right now we don't have a pattern for returning Modio::ErrorCode from a method if we don't have a
+		// callback For now, we're just going to log if this fails so developers have some way to track it
 		if (!Modio::Detail::SDKSessionData::IsInitialized())
 		{
-			Modio::Detail::Logger().Log(
-				Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
-				"Attempted to call SubmitNewModFileForMod but the SDK was not initialized.");
+			Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
+										"Attempted to call SubmitNewModFileForMod but the SDK was not initialized.");
 
 			return;
 		}
 
 		if (!Modio::Detail::SDKSessionData::GetAuthenticatedUser().has_value())
 		{
-			Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
-										"Attempted to call SubmitNewModFileForMod but there was no authenticated user.");
+			Modio::Detail::Logger().Log(
+				Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
+				"Attempted to call SubmitNewModFileForMod but there was no authenticated user.");
 
 			return;
 		}
 
 		if (!Modio::Detail::SDKSessionData::IsModManagementEnabled())
 		{
-			Modio::Detail::Logger().Log(
-				Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
-				"Attempted to call SubmitNewModFileForMod but mod management was not enabled.");
+			Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
+										"Attempted to call SubmitNewModFileForMod but mod management was not enabled.");
 
 			return;
 		}

@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -14,6 +14,7 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
+#include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioObjectTrack.h"
 
 #include <asio/yield.hpp>
@@ -85,15 +86,17 @@ public:
 			// Wait for any existing and queued IO operations on this file
 			yield FileImpl->BeginExclusiveOperation(std::move(self));
 
-			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Begin write of {} bytes to {} at {}",
-								Buffer.GetSize(), FileImpl->GetPath().string(), FileOffset);
+			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
+										"Begin write of {} bytes to {} at {}", Buffer.GetSize(),
+										FileImpl->GetPath().string(), FileOffset);
 			WriteOpParams = std::make_shared<OVERLAPPED>();
 			WriteOpParams->hEvent = CreateEvent(NULL, false, false, NULL);
 			if (!WriteOpParams->hEvent)
 			{
 				WriteOpParams->hEvent = INVALID_HANDLE_VALUE;
 				// Notify the caller that we could not create an event handle
-				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File, "Could not create event handle");
+				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+											"Could not create event handle");
 				self.complete(Modio::make_error_code(Modio::GenericError::CouldNotCreateHandle));
 				FileImpl->FinishExclusiveOperation();
 				return;
@@ -109,10 +112,10 @@ public:
 				if (Error != ERROR_IO_PENDING)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-										"Write to file {} failed, error {}", FileImpl->GetPath().string(), Error);
-					self.complete(std::error_code(static_cast<int>(Error), std::system_category()));
+												"WriteSomeToFile to file {} failed, error code = {}",
+												FileImpl->GetPath().string(), Error);
+					self.complete(Modio::make_error_code(Modio::FilesystemError::WriteError));
 					FileImpl->FinishExclusiveOperation();
-
 					return;
 				}
 			}
@@ -120,7 +123,7 @@ public:
 			{
 				// File write completed synchronously so no need to wait, complete the operation
 				Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Finish write to {}",
-									FileImpl->GetPath().string());
+											FileImpl->GetPath().string());
 				self.complete(std::error_code {});
 				FileImpl->FinishExclusiveOperation();
 				return;
@@ -131,12 +134,12 @@ public:
 			// Poll the status of the write at the specified interval
 			while (!HasOverlappedIoCompleted(WriteOpParams.get()))
 			{
-				StatusTimer->expires_after(std::chrono::milliseconds(1));
+				StatusTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
 				yield StatusTimer->async_wait(std::move(self));
 			}
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Finish write to {}",
-								FileImpl->GetPath().string());
+										FileImpl->GetPath().string());
 
 			self.complete(std::error_code {});
 			FileImpl->FinishExclusiveOperation();

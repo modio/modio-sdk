@@ -14,6 +14,7 @@
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioConstants.h"
 #include <memory>
 
 #include <asio/yield.hpp>
@@ -99,7 +100,7 @@ namespace Modio
 									Modio::Detail::Services::GetGlobalContext().get_executor());
 							}
 
-							PollTimer->expires_after(std::chrono::milliseconds(1));
+							PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
 							yield PollTimer->async_wait(std::move(Self));
 						}
 					}

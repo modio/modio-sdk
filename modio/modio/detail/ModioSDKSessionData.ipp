@@ -114,6 +114,7 @@ namespace Modio
 
 		Modio::ModCollection SDKSessionData::FilterSystemModCollectionByUserSubscriptions()
 		{
+			MODIO_PROFILE_SCOPE(FilterSystemModsByUserSubs);
 			return Get().SystemModCollection.FilterByUserSubscriptions(Get().UserData.UserSubscriptions);
 		}
 
@@ -134,6 +135,7 @@ namespace Modio
 
 		Modio::Detail::Buffer SDKSessionData::SerializeUserData()
 		{
+			MODIO_PROFILE_SCOPE(SerializeUserData);
 			nlohmann::json Data(Get().UserData);
 			Data["version"] = 1;
 			std::string UserData = Data.dump();
@@ -144,6 +146,7 @@ namespace Modio
 
 		bool SDKSessionData::DeserializeUserDataFromBuffer(Modio::Detail::Buffer UserDataBuffer)
 		{
+			MODIO_PROFILE_SCOPE(DeserializeUserData);
 			nlohmann::json UserDataJson = Modio::Detail::ToJson(std::move(UserDataBuffer));
 			from_json(UserDataJson, Get().UserData);
 			return Get().UserData.IsValid();
@@ -152,6 +155,11 @@ namespace Modio
 		void SDKSessionData::ClearUserData()
 		{
 			Get().UserData.ResetUserData();
+		}
+
+		void SDKSessionData::InvalidateOAuthToken()
+		{
+			Get().UserData.InvalidateOAuthToken();
 		}
 
 		const Modio::Optional<Modio::User> SDKSessionData::GetAuthenticatedUser()
@@ -252,6 +260,24 @@ namespace Modio
 			Get().PendingModUploads.insert({ID, Params});
 		}
 
+		Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>> SDKSessionData::GetPriorityModfileUpload()
+		{
+			if (Get().ModIDToPrioritize.has_value())
+			{
+				if (Get().PendingModUploads.size())
+				{
+					auto Iterator = Get().PendingModUploads.find(*Get().ModIDToPrioritize);
+					if (Iterator != Get().PendingModUploads.end())
+					{
+						std::pair<Modio::ModID, Modio::CreateModFileParams> NextPending = *Iterator;
+						Get().PendingModUploads.erase(Iterator);
+						return NextPending;
+					}
+				}
+			}
+			return {};
+		}
+
 		Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>> SDKSessionData::
 			GetNextPendingModfileUpload()
 		{
@@ -265,6 +291,34 @@ namespace Modio
 			{
 				return {};
 			}
+		}
+		bool SDKSessionData::PrioritizeModfileUpload(Modio::ModID IdToPrioritize)
+		{
+			if (Get().PendingModUploads.size())
+			{
+				if (Get().PendingModUploads.find(IdToPrioritize) != Get().PendingModUploads.end())
+				{
+					Get().ModIDToPrioritize = IdToPrioritize;
+					return true;
+				}
+			}
+			return false;
+		}
+		bool SDKSessionData::PrioritizeModfileDownload(Modio::ModID IdToPrioritize)
+		{
+			// needs to check if the mod exists in the collection and if it requires an update or installation
+			if (Modio::Optional<Modio::ModCollectionEntry&> CollectionEntry =
+					FilterSystemModCollectionByUserSubscriptions().GetByModID(IdToPrioritize))
+			{
+				Modio::ModState CurrentState = (*CollectionEntry).GetModState();
+				if (CurrentState == Modio::ModState::InstallationPending ||
+					CurrentState == Modio::ModState::UpdatePending)
+				{
+					Get().ModIDToPrioritize = IdToPrioritize;
+					return true;
+				}
+			}
+			return false;
 		}
 
 		std::weak_ptr<Modio::ModProgressInfo> SDKSessionData::StartModDownloadOrUpdate(Modio::ModID ID)

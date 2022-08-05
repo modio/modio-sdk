@@ -164,7 +164,7 @@ namespace Modio
 
 				if (FileDescriptor != InvalidFileDescriptor)
 				{
-					return std::error_code {};
+					return {};
 				}
 				else
 				{
@@ -175,11 +175,13 @@ namespace Modio
 							 O_RDONLY | O_NONBLOCK, S_IRUSR);
 					if (FileDescriptor != InvalidFileDescriptor)
 					{
-						return std::error_code {};
+						return {};
 					}
 					else
 					{
-						return Modio::ErrorCode(errno, std::system_category());
+						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+												"Error {} after Re-attempting open of file", errno);
+						return Modio::make_error_code(Modio::FilesystemError::ReadError);
 					}
 				}
 			}

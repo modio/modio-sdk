@@ -12,6 +12,7 @@
 
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCoreTypes.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ops/ModioGalleryImageType.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include <asio/yield.hpp>
@@ -37,6 +38,8 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
+				MODIO_PROFILE_SCOPE(GetModMediaGallery);
+
 				reenter(CoroutineState)
 				{
 					if (ImageIndex < 0)

@@ -24,6 +24,11 @@ target_compile_definitions(${MODIO_TARGET_NAME} INTERFACE MODIO_TRACE_DUMP_RESPO
         message(STATUS "Setting MODIO_TRACE_DUMP_RESPONSE")
 endif()
 
+if (MODIO_CI)
+target_compile_definitions(${MODIO_TARGET_NAME} INTERFACE MODIO_CI=1)
+        message(STATUS "Setting MODIO_CI")
+endif()
+
 
 target_include_directories(${MODIO_TARGET_NAME} INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 

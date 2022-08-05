@@ -16,6 +16,7 @@
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioConstants.h"
 #include <memory>
 
 namespace Modio
@@ -76,7 +77,7 @@ namespace Modio
 							PollTimer = std::make_unique<asio::steady_timer>(
 								Modio::Detail::Services::GetGlobalContext().get_executor());
 						}
-						PollTimer->expires_after(std::chrono::milliseconds(1));
+						PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
 						yield PollTimer->async_wait(std::move(Self));
 					}
 

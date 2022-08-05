@@ -49,6 +49,7 @@
 
 
 #include "modio/detail/compression/zlib/detail/inflate_stream.hpp"
+#include "modio/detail/ModioProfiling.h"
 
 namespace boost {
 namespace beast {
@@ -218,6 +219,7 @@ public:
     void
     write(z_params& zs, Flush flush, Modio::ErrorCode& ec)
     {
+        MODIO_PROFILE_SCOPE(InflateStreamWrite);
         doWrite(zs, flush, ec);
     }
 };

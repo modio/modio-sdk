@@ -21,6 +21,7 @@
 #define BOOST_BEAST_ZLIB_DEFLATE_STREAM_HPP
 
 #include "modio/detail/compression/zlib/detail/deflate_stream.hpp"
+#include "modio/detail/ModioProfiling.h"
 
 namespace boost {
 namespace beast {
@@ -288,6 +289,7 @@ public:
         Flush flush,
         Modio::ErrorCode& ec)
     {
+        MODIO_PROFILE_SCOPE(DeflateStreamWrite);
         doWrite(zs, flush, ec);
     }
 

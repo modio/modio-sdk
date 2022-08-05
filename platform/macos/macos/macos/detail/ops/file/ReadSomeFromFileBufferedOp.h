@@ -16,6 +16,7 @@
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioConstants.h"
 #include <memory>
 
 namespace Modio
@@ -50,8 +51,8 @@ namespace Modio
 						Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File,
 													"Offset for file {} with File Descriptor {} requested larger "
 													"offset({}) than the current size({}). Offset set to 0",
-													FileImpl->GetPath().u8string(), FileImpl->GetFileHandle(), FileOffset.value(),
-													FileImpl->GetSize());
+													FileImpl->GetPath().u8string(), FileImpl->GetFileHandle(),
+													FileOffset.value(), FileImpl->GetSize());
 						FileOffset = Modio::FileOffset(0);
 					}
 				}
@@ -93,7 +94,7 @@ namespace Modio
 							PollTimer = std::make_unique<asio::steady_timer>(
 								Modio::Detail::Services::GetGlobalContext().get_executor());
 						}
-						PollTimer->expires_after(std::chrono::milliseconds(1));
+						PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
 						yield PollTimer->async_wait(std::move(Self));
 					}
 

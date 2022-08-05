@@ -12,6 +12,7 @@
 
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/ops/userdata/VerifyUserAuthenticationOp.h"
 #include "modio/http/ModioHttpParams.h"
 
 #include <asio/yield.hpp>
@@ -22,15 +23,24 @@ namespace Modio
 		class RequestEmailAuthCodeOp
 		{
 		public:
-			RequestEmailAuthCodeOp(std::string EmailAddress) : EmailAddress(EmailAddress) {};
+			RequestEmailAuthCodeOp(Modio::EmailAddress EmailAddress) : EmailAddress(EmailAddress) {};
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
 				reenter(CoroutineState)
 				{
+					yield Modio::Detail::VerifyUserAuthenticationAsync(std::move(Self));
+					// No error during verification indicates the user is already authenticated
+					if (!ec)
+					{
+						Self.complete(Modio::make_error_code(Modio::UserAuthError::AlreadyAuthenticated));
+						return;
+					}
+
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBuffer,
-						Modio::Detail::RequestEmailSecurityCodeRequest.AppendPayloadValue("email", EmailAddress),
+						Modio::Detail::RequestEmailSecurityCodeRequest.EncodeAndAppendPayloadValue(
+							Modio::Detail::Constants::APIStrings::EmailAddress, EmailAddress.InternalAddress),
 						CachedResponse::Disallow, std::move(Self));
 
 					Self.complete(ec);
@@ -41,7 +51,7 @@ namespace Modio
 		private:
 			asio::coroutine CoroutineState;
 			Modio::Detail::DynamicBuffer ResponseBuffer;
-			std::string EmailAddress;
+			Modio::EmailAddress EmailAddress;
 		};
 	} // namespace Detail
 } // namespace Modio

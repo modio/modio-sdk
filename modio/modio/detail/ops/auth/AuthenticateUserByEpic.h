@@ -25,7 +25,7 @@ namespace Modio
 						Modio::Detail::HttpRequestParams Params =
 								Modio::AuthenticateViaEpicRequest
 									.AppendPayloadValue(Modio::Detail::Constants::APIStrings::ItchToken, User.AuthToken)
-									.AppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress,
+									.EncodeAndAppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress,
 		   User.UserEmail) .AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed,
 															User.bUserHasAcceptedTerms ? "true" : "false");
 			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(

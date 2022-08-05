@@ -12,6 +12,7 @@
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioObjectTrack.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/DownloadFileOp.h"
 #include "modio/detail/ops/compression/ExtractAllToFolderOp.h"
@@ -34,8 +35,9 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {}, Modio::FileSize ExtractedSize = {})
 			{
-				// We dont care wether we couldnt start the download because something was blocking it or if its since
-				// been cancelled, bail anyways. null pointer ie the busy case should never happen
+				MODIO_PROFILE_SCOPE(InstallOrUpdateMod);
+				// We dont care whether we couldn't start the download because something was blocking it or if it's
+				// since been cancelled, bail anyways. null pointer ie the busy case should never happen
 				if (ModProgress.lock() == nullptr)
 				{
 					Self.complete(Modio::make_error_code(Modio::ModManagementError::InstallOrUpdateCancelled));

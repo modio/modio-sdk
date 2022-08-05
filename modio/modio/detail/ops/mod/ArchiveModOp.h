@@ -10,11 +10,11 @@
 
 #pragma once
 
-#include "modio/detail/ops/mod/GetModInfoOp.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/ops/mod/GetModInfoOp.h"
 #include "modio/http/ModioHttpParams.h"
 
 #include <asio/yield.hpp>
@@ -65,15 +65,17 @@ namespace Modio
 								ResponseBodyBuffer, Modio::Detail::DeleteModRequest.SetGameID(GameID).SetModID(ModID),
 								Modio::Detail::CachedResponse::Disallow, std::move(Self));
 
+							if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))
+							{
+								Modio::Detail::SDKSessionData::InvalidateOAuthToken();
+							}
 							if (ec)
 							{
-								// Failure
 								Self.complete(ec);
 								return;
 							}
 							else
 							{
-								// Success
 								Self.complete({});
 							}
 						}

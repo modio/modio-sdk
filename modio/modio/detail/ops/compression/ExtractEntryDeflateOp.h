@@ -1,22 +1,23 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
-#include "modio/detail/compression/zlib/inflate_stream.hpp"
-#include "modio/detail/compression/zlib/zlib.hpp"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioObjectTrack.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/compression/zip/ArchiveFileImplementation.h"
+#include "modio/detail/compression/zlib/inflate_stream.hpp"
+#include "modio/detail/compression/zlib/zlib.hpp"
 #include "modio/file/ModioFile.h"
 #include <asio/yield.hpp>
 #include <cstdint>
@@ -66,6 +67,7 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
+				MODIO_PROFILE_SCOPE(ExtractEntryDeflate);
 				reenter(CoroutineState)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Compression,
@@ -91,7 +93,7 @@ namespace Modio
 
 						// If the ec is "EndOfFile", the line below should reset its state in case it is used later on.
 						ec = {};
-						
+
 						Impl->BytesProcessed += Impl->FileData.size();
 						// Checking for size here means we can assume there will be an internal buffer to take from
 						// filedata

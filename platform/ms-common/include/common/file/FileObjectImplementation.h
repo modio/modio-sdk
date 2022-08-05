@@ -1,15 +1,16 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 // MIRRORED TO gdk/file/FileObjectImplementation.h, UPDATE THAT FILE IF THIS IS UPDATED
 #pragma once
+#include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
@@ -106,10 +107,9 @@ namespace Modio
 			virtual Modio::ErrorCode Rename(Modio::filesystem::path NewPath) override
 			{
 				Modio::ErrorCode ec;
-				if (FileHandle != INVALID_HANDLE_VALUE)
-				{
-					CloseHandle(FileHandle);
-				}
+
+				Close();
+
 				Modio::filesystem::rename(FilePath, NewPath, ec);
 				if (ec)
 				{
@@ -184,6 +184,13 @@ namespace Modio
 
 			Modio::ErrorCode OpenFile(Modio::filesystem::path NewFilePath, bool bOverwrite = false)
 			{
+				if (FileHandle != INVALID_HANDLE_VALUE)
+				{
+					Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::File,
+												"Attempted to open an already opened file");
+					return Modio::make_error_code(Modio::GenericError::CouldNotCreateHandle);
+				}
+
 				Modio::ErrorCode ec;
 				filesystem::create_directories(NewFilePath.parent_path(), ec);
 				if (ec)
@@ -203,7 +210,10 @@ namespace Modio
 				{
 					DWORD Error = GetLastError();
 					// post failure
-					return Modio::ErrorCode(Error, std::system_category());
+					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+												"FileObjectImplementation OpenFile {} failed, error code = {}",
+												NewFilePath.string(), Error);
+					return Modio::make_error_code(Modio::FilesystemError::NoPermission);
 				}
 			}
 

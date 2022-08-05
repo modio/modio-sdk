@@ -17,6 +17,8 @@
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioConstants.h"
+#include "modio/detail/ModioProfiling.h"
 #include <memory>
 
 namespace Modio
@@ -47,6 +49,7 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
+				MODIO_PROFILE_SCOPE(SSLReadSome);
 				std::shared_ptr<HttpSharedState> PinnedState = SharedState.lock();
 				if (PinnedState == nullptr || PinnedState->IsClosing())
 				{
@@ -57,7 +60,11 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					// Read into a dedicated pre-allocated buffer
-					ReadCount = mbedtls_ssl_read(&Request->SSLContext, ReadChunk.Data(), ReadChunk.GetSize());
+					{
+						MODIO_PROFILE_SCOPE(mbedtls_ssl_read);
+						ReadCount = mbedtls_ssl_read(&Request->SSLContext, ReadChunk.Data(), ReadChunk.GetSize());
+					}
+					MODIO_PROFILE_PUSH(readsome_poll);
 					while (ReadCount == MBEDTLS_ERR_SSL_WANT_READ || ReadCount == MBEDTLS_ERR_SSL_WANT_WRITE)
 					{
 						if (!PollTimer)
@@ -65,14 +72,17 @@ namespace Modio
 							PollTimer = std::make_unique<asio::steady_timer>(
 								Modio::Detail::Services::GetGlobalContext().get_executor());
 						}
-						PollTimer->expires_after(std::chrono::milliseconds(1));
+						PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
 						yield PollTimer->async_wait(std::move(Self));
-						ReadCount =
-							mbedtls_ssl_read(&Request->SSLContext, ReadChunk.Data(), ReadChunk.GetSize());
+						{
+							MODIO_PROFILE_SCOPE(mbedtls_ssl_read);
+							ReadCount = mbedtls_ssl_read(&Request->SSLContext, ReadChunk.Data(), ReadChunk.GetSize());
+						}
 					}
-
+					MODIO_PROFILE_POP();
 					if (ReadCount > 0)
 					{
+						MODIO_PROFILE_SCOPE(SSLReadSomeCopyData);
 						// Copy the exact number of bytes received into a new buffer and append that to the read buffer
 						ReadBuffer.AppendBuffer(ReadChunk.CopyRange(ReadChunk.begin(), ReadChunk.begin() + ReadCount));
 						Self.complete({}, ReadCount);
