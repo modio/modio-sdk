@@ -171,6 +171,11 @@ namespace Modio
 				return RootTempPath / FileName;
 			}
 
+			Modio::filesystem::path GetModRootInstallationPath() const
+			{
+				return RootLocalStoragePath / fmt::format("{} /mods/", CurrentGameID);
+			}
+
 			Modio::filesystem::path MakeModPath(Modio::ModID ModID) const
 			{
 				return RootLocalStoragePath / fmt::format("{}/mods/{}", CurrentGameID, ModID);

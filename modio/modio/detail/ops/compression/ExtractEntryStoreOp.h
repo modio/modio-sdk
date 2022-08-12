@@ -66,6 +66,15 @@ namespace Modio
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Compression,
 												"Extracting entry {}", Impl->EntryToExtract.FilePath.u8string());
+					
+					if (Impl->EntryToExtract.UncompressedSize == 0)
+					{
+						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Compression,
+													"Zero length file in archive extracted successfully");
+						Self.complete({});
+						return;
+					}
+
 					// Set the initial position for reading
 					Impl->ArchiveFile.Seek(Modio::FileOffset(Impl->EntryToExtract.FileOffset));
 

@@ -278,7 +278,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Edits the parameters of a mod, by updating any fields set in the Params object to match the passed-in
-	/// values. Fields left empty on the Params object will not be updated.
+	/// values. Fields left empty on the Params object will not be updated. If no fields are populated, will return an error.
 	/// @param Mod The mod to edit
 	/// @param Params Descriptor containing optional fields indicating what properties should be updated
 	/// @param Callback Callback invoked with the updated mod profile on success
@@ -289,6 +289,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory InvalidArgsError|Some of the information in the EditModParams did not pass validation
 	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error GenericError::BadParameter|No fields selected for modification in Params
 	MODIOSDK_API void SubmitModChangesAsync(
 		Modio::ModID Mod, Modio::EditModParams Params,
 		std::function<void(Modio::ErrorCode ec, Modio::Optional<Modio::ModInfo>)> Callback);
@@ -541,6 +542,14 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
 	MODIOSDK_API void ArchiveModAsync(Modio::ModID ModID, std::function<void(Modio::ErrorCode)> Callback);
+
+	/// @docpublic
+	/// @brief Returns a list of base mod installation directories. Under normal circumstances, this will return a single
+	/// directory, which is the base directory that all mods are installed to for the current user.
+	/// @experimental
+	/// @requires initialized-sdk
+	/// @return List of base mod installation directories
+	MODIOSDK_API std::vector<std::string> GetBaseModInstallationDirectories();
 
 } // namespace Modio
 

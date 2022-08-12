@@ -27,7 +27,7 @@ namespace Modio
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
 				reenter(CoroutineState) {
-					yield Modio::Detail::UninstallModAsync(ModToRemove, std::move(Self));
+					yield Modio::Detail::UninstallModAsync(ModToRemove, std::move(Self), true);
 					if (ec)
 					{
 						Self.complete(ec);

@@ -28,6 +28,7 @@
 // Implementation header - do not include directly
 
 #include <functional>
+#include <chrono>
 
 namespace Modio
 {
@@ -53,7 +54,14 @@ namespace Modio
 			{
 				Modio::Detail::Services::GetGlobalContext().restart();
 			}
-			Modio::Detail::Services::GetGlobalContext().poll();
+
+			// Run handlers one at a time until we reach the timeout threshold
+			std::chrono::time_point<std::chrono::steady_clock> PollStartTime = std::chrono::steady_clock::now();
+			do
+			{
+				Modio::Detail::Services::GetGlobalContext().poll_one();
+
+			} while (std::chrono::steady_clock::now() - PollStartTime < std::chrono::milliseconds(3));
 		}
 		
 		{

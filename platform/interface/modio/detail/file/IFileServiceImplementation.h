@@ -20,6 +20,7 @@ namespace Modio
 			virtual ~IFileServiceImplementation() {};
 			virtual const Modio::filesystem::path LocalMetadataFolder() const = 0;
 			virtual Modio::filesystem::path MakeTempFilePath(std::string Filename) const = 0;
+			virtual Modio::filesystem::path GetModRootInstallationPath() const = 0;
 			virtual Modio::filesystem::path MakeModPath(Modio::ModID ID) const = 0;
 			virtual Modio::filesystem::path MakeModMediaFilePath(Modio::ModID ID, Modio::LogoSize Size,
 																 const std::string& OriginalFilename) const = 0;
@@ -41,6 +42,7 @@ namespace Modio
 			virtual const Modio::filesystem::path& GetRootLocalStoragePath() const = 0;
 			virtual Modio::ErrorCode ApplyGlobalConfigOverrides(const class std::map<std::string, std::string> Overrides) = 0;
 			virtual void Shutdown() = 0;
+
 
 		};
 	}

@@ -407,14 +407,18 @@ namespace Modio
 		}
 	}
 
-	bool ModCollection::RemoveMod(Modio::ModID ModId)
+	bool ModCollection::RemoveMod(Modio::ModID ModId, bool bForce)
 	{
 		if (ModEntries.count(ModId))
 		{
-			if (ModEntries.at(ModId)->GetModState() == ModState::UninstallPending)
+			if ((ModEntries.at(ModId)->GetModState() == ModState::UninstallPending) || (bForce == true))
 			{
 				ModEntries.erase(ModId);
 				return true;
+			}
+			else
+			{
+				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::ModManagement, "Failed to remove Mod {} from Mod Collection as its state is not UninstallPending", ModId);
 			}
 		}
 		return false;

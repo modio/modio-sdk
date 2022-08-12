@@ -70,7 +70,8 @@ namespace Modio
 		template<typename... OtherArgs>
 		bool RequireUserIsNOTAuthenticated(std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
 		{
-			// Note that GetAuthenticationToken() checks token state, and only returns valid tokens. No need to re-check state here.  
+			// Note that GetAuthenticationToken() checks token state, and only returns valid tokens. No need to re-check
+			// state here.
 			if (!Modio::Detail::SDKSessionData::GetAuthenticationToken().has_value())
 			{
 				return true;
@@ -184,5 +185,38 @@ namespace Modio
 				return true;
 			}
 		}
+
+		template<typename... OtherArgs>
+		bool RequireValidEditModParams(const Modio::EditModParams& Params,
+									   std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
+		{
+			// clang-format off
+			bool bHasValidParameter = 
+				Params.bVisible.has_value() || 
+				Params.Description.has_value() || 
+				Params.HomepageURL.has_value() ||
+				Params.MaturityRating.has_value() || 
+				Params.MetadataBlob.has_value() || 
+				Params.Name.has_value() ||
+				Params.NamePath.has_value() ||
+				Params.Summary.has_value();
+			// clang-format on
+
+			if (!bHasValidParameter)
+			{
+				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+						   [CompletionHandler =
+								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
+							   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
+												 (OtherArgs {})...);
+						   });
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+
 	} // namespace Detail
 } // namespace Modio

@@ -318,7 +318,7 @@ namespace Modio
 		MODIO_IMPL bool AddOrUpdateMod(Modio::ModInfo ModToAdd, Modio::filesystem::path CalculatedModPath);
 		MODIO_IMPL const std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& Entries();
 		MODIO_IMPL Modio::Optional<Modio::ModCollectionEntry&> GetByModID(Modio::ModID ModId) const;
-		MODIO_IMPL bool RemoveMod(Modio::ModID ModId);
+		MODIO_IMPL bool RemoveMod(Modio::ModID ModId, bool bForce = false);
 		MODIO_IMPL std::vector<std::shared_ptr<Modio::ModCollectionEntry>> SortEntriesByRetryPriority() const;
 
 		friend void to_json(nlohmann::json& Json, const Modio::ModCollection& Collection)

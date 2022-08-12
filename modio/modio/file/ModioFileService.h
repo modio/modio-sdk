@@ -281,7 +281,7 @@ namespace Modio
 			}
 
 			/// @brief Attempts to delete a file from disk
-			/// @param FilePath The fully-qualifieid path of the file we wish to delete
+			/// @param FilePath The fully-qualified path of the file we wish to delete
 			/// @return True if the path has a filename component and we deleted it successfully
 			bool DeleteFile(const Modio::filesystem::path& FilePath) const
 			{
@@ -292,6 +292,11 @@ namespace Modio
 			const Modio::filesystem::path& GetRootLocalStoragePath() const
 			{
 				return PlatformImplementation->GetRootLocalStoragePath();
+			}
+
+			const Modio::filesystem::path GetModRootInstallationPath() const 
+			{
+				return PlatformImplementation->GetModRootInstallationPath();
 			}
 
 			bool CheckSpaceAvailable(const Modio::filesystem::path& Destination, Modio::FileSize DesiredSize)

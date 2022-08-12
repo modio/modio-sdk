@@ -29,6 +29,7 @@
 #include "modio/detail/ops/mod/SubmitNewModFileOp.h"
 #include "modio/detail/ops/mod/SubmitNewModOp.h"
 #include "modio/detail/ops/modmanagement/ForceUninstallModOp.h"
+#include "modio/file/ModioFileService.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 #include "modio/userdata/ModioUserDataService.h"
 
@@ -132,11 +133,12 @@ namespace Modio
 			{
 				return {};
 			}
-			//Check if the ID corresponds to an upload first, then check if it is a pending download
+			// Check if the ID corresponds to an upload first, then check if it is a pending download
 			if (Modio::Detail::SDKSessionData::PrioritizeModfileUpload(IDToPrioritize) ||
 				Modio::Detail::SDKSessionData::PrioritizeModfileDownload(IDToPrioritize))
 			{
-				//If we have a valid prioritization, cancel the in-progress thing so we move onto the priority immediately
+				// If we have a valid prioritization, cancel the in-progress thing so we move onto the priority
+				// immediately
 				Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
 				return {};
 			}
@@ -162,6 +164,19 @@ namespace Modio
 			UserSubscriptions.emplace(std::make_pair(ModEntry.first, (*ModEntry.second)));
 		}
 		return UserSubscriptions;
+	}
+
+	std::vector<std::string> GetBaseModInstallationDirectories()
+	{
+		auto RootInstallationDirectory = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+											 .GetModRootInstallationPath()
+											 .string();
+
+		std::vector<std::string> Paths;
+
+		Paths.push_back(RootInstallationDirectory);
+
+		return Paths;
 	}
 
 	std::map<Modio::ModID, Modio::ModCollectionEntry> QueryUserInstallations(bool bIncludeOutdatedMods)
@@ -233,7 +248,8 @@ namespace Modio
 	void SubmitModChangesAsync(Modio::ModID Mod, Modio::EditModParams Params,
 							   std::function<void(Modio::ErrorCode ec, Modio::Optional<Modio::ModInfo>)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireUserIsAuthenticated(Callback))
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireUserIsAuthenticated(Callback) &&
+			Modio::Detail::RequireValidEditModParams(Params, Callback))
 		{
 			return Modio::Detail::SubmitModChangesAsync(Mod, Params, Callback);
 		}
