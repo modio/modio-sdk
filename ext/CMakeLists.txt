@@ -60,7 +60,6 @@ install(
 )
 
 
-
 install(
 	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/fmt/include/
 	DESTINATION ${CMAKE_INSTALL_PREFIX}/static/inc

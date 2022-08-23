@@ -13,6 +13,7 @@
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioModCollectionEntry.h"
+#include "modio/core/ModioServices.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
 #include <asio/yield.hpp>
@@ -36,6 +37,7 @@ namespace Modio
 			{
 				reenter(CoroutineState)
 				{
+					yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 					// If the directory does not exist
 					if (!Modio::filesystem::exists(Entry.GetPath(), ec))
 					{

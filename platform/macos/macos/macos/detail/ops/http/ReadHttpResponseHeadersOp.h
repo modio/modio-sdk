@@ -28,6 +28,11 @@ namespace Modio
 	namespace Detail
 	{
 #include <asio/yield.hpp>
+
+		// kCFStreamPropertyHTTPResponseHeader is deprecated and causes warnings. Suppressing those warnings here.
+		MODIO_DIAGNOSTIC_PUSH
+		MODIO_ALLOW_DEPRECATED_SYMBOLS
+
 		class ReadHttpResponseHeadersOp
 		{
 			asio::coroutine CoroutineState;
@@ -107,7 +112,7 @@ namespace Modio
 			{}
 
 			template<typename CoroType>
-			void operator()(CoroType& Self, Modio::ErrorCode ec = {}, std::size_t BytesLastRead = -1)
+			void operator()(CoroType& Self, Modio::ErrorCode ec = {}, std::size_t BytesLastRead = 0)
 			{
 				std::shared_ptr<HttpSharedState> PinnedState = SharedState.lock();
 				if (PinnedState == nullptr || PinnedState->IsClosing())
@@ -146,53 +151,41 @@ namespace Modio
 						yield PollTimer->async_wait(std::move(Self));
 					}
 
-					// Read the all the stream bytes into the ResponseDataBuffer, at this stage we know that
-					// it has bytes because last while was true
-					while (Request->ReadStreamStatus() != kCFStreamStatusAtEnd)
+					// In case of POST, response headers in the HTTP request are embeded within the ReadStream
+					if (Request->GetParameters().GetTypedVerb() == Verb::POST ||
+						Request->GetParameters().GetTypedVerb() == Verb::PUT)
 					{
-						// In some cases, it is possible that the ReadStream has not "ended" but the Stream
-						// remains open. If the CFReadStreamRead is called without bytes, it would wait for
-						// a looooong time
-						if (Request->ReadStreamHasBytes() == true)
+						// Read a portion of the streaming bytes into the ResponseDataBuffer, at this stage we know that
+						// it has bytes because previously while was true
+						while (ParseHeadersInResponseBuffer() == false &&
+							   Request->ReadStreamStatus() != kCFStreamStatusAtEnd)
 						{
-							// Read bytes into the ResponseDataBuffer
-							constexpr CFIndex MaxBuffer = 64 * 1024;
-							Modio::Detail::Buffer LinearBuffer(MaxBuffer);
-							CFIndex ReadBytes = CFReadStreamRead(Request->ReadStream, LinearBuffer.Data(), MaxBuffer);
-
-							if (ReadBytes <= 0)
+							// In some cases, it is possible that the ReadStream has not "ended" but the Stream
+							// remains open. If the CFReadStreamRead is called without bytes, it would wait for
+							// a looooong time
+							if (Request->ReadStreamHasBytes() == true)
 							{
-								// The stream could not be read or an error has ocurred.
-								break;
+								// Read bytes into the ResponseDataBuffer
+								constexpr CFIndex MaxBuffer = 64 * 1024;
+								Modio::Detail::Buffer LinearBuffer(MaxBuffer);
+								CFIndex ReadBytes =
+									CFReadStreamRead(Request->ReadStream, LinearBuffer.Data(), MaxBuffer);
+
+								if (ReadBytes <= 0)
+								{
+									// The stream could not be read or an error has ocurred.
+									break;
+								}
+
+								Request->ResponseDataBuffer.AppendBuffer(LinearBuffer.CopyRange(0, ReadBytes));
+								BytesLastRead += ReadBytes;
 							}
 
-							Request->ResponseDataBuffer.AppendBuffer(
-								LinearBuffer.CopyRange(LinearBuffer.begin(), LinearBuffer.begin() + ReadBytes));
-							BytesLastRead += ReadBytes;
+							// Yield execution to avoid taking too much processing while waiting for the ReadStream to
+							// arrive
+							PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
+							yield PollTimer->async_wait(std::move(Self));
 						}
-
-						// Yield execution to avoid taking too much processing while waiting for the ReadStream to
-						// arrive
-						PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
-						yield PollTimer->async_wait(std::move(Self));
-					}
-
-					// Check if any errors occured during read
-					if (Request->ReadStreamStatus() == kCFStreamStatusError)
-					{
-						// Reading the stream produced an error, report that to the caller.
-						CFStreamError StreamError = CFReadStreamGetError(Request->ReadStream);
-						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
-													"ReadHTTPResponseHeadersOp failure with error code {}",
-													StreamError.error);
-						Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
-						return;
-					}
-
-					// In case of POST, we have to parse those headers
-					if (Request->GetParameters().GetTypedVerb() == Verb::POST)
-					{
-						ParseHeadersInResponseBuffer();
 					}
 					// With other HTTP verbs (ex. GET, DELETE), HTTPMessage parses the headers
 					else
@@ -217,8 +210,21 @@ namespace Modio
 						Request->ParsedResponseHeaders.statusCode = StatusCode;
 					}
 
+					// Check if any errors occured during read
+					if (Request->ReadStreamStatus() == kCFStreamStatusError)
+					{
+						// Reading the stream produced an error, report that to the caller.
+						CFStreamError StreamError = CFReadStreamGetError(Request->ReadStream);
+						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+													"ReadHTTPResponseHeadersOp failure with error code {}",
+													StreamError.error);
+						Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
+						return;
+					}
+
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
-												"Response Headers received OK");
+												"Response Headers received OK with response code: {}",
+                                                Request->ResponseCode);
 					// Already processed the response code and removed header data from the response buffer so just
 					// return no error code
 					Self.complete({});
@@ -252,8 +258,8 @@ namespace Modio
 					// Consume amount of data the headers used up so ResponseDataBuffer is only the body
 					Request->ResponseDataBuffer.consume(LinearBuffer.GetSize() - Matches.suffix().length());
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
-												"expecting {0} bytes in response, total",
-												Request->GetContentLength().value_or(0));
+												"Bytes remaining after consumption: {}, while expecting {} bytes total in response",
+												Request->ResponseDataBuffer.size(), Request->GetContentLength().value_or(0));
 					return true;
 				}
 				else
@@ -262,6 +268,9 @@ namespace Modio
 				}
 			}
 		};
+		// Re-allow deprecation warnings
+		MODIO_DIAGNOSTIC_POP
+
 #include <asio/unyield.hpp>
 	} // namespace Detail
 } // namespace Modio

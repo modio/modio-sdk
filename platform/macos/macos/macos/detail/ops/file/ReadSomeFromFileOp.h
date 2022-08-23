@@ -131,8 +131,8 @@ namespace Modio
 								// This condition happens when the caller reads a section of a file and provides an
 								// offset respective to the original file. The IO operation has access to the whole
 								// file, therefore only the OffsetData is returned.
-								std::size_t OffsetVal = FileOffset.value();
-								std::size_t MaxBytes = MIN(MaxBytesToRead, ReadBuffer.value().GetSize());
+								std::uint64_t OffsetVal = FileOffset.value();
+								std::uint64_t MaxBytes = MIN(MaxBytesToRead, ReadBuffer.value().GetSize());
 								Modio::Detail::Buffer OffsetData =
 									ReadBuffer->CopyRange(OffsetVal, OffsetVal + MaxBytes);
 								Self.complete({}, std::move(OffsetData));

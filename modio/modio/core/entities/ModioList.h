@@ -36,10 +36,10 @@ namespace Modio
 				return true;
 			}
 			// loop through to ensure equality even if elements are stored in a different order
-			int MatchCount = 0;
-			for (int i = 0; i < A.InternalList.size(); i++)
+			std::size_t MatchCount = 0;
+			for (std::size_t i = 0; i < A.InternalList.size(); i++)
 			{
-				for (int j = 0; j < B.InternalList.size(); j++)
+				for (std::size_t j = 0; j < B.InternalList.size(); j++)
 				{
 					if (A.InternalList.at(i) == B.InternalList.at(j))
 					{
@@ -64,7 +64,7 @@ namespace Modio
 		/// @brief Unsafe index-based lookup, does not range-check provided index
 		/// @param Index The index of the element to retrieve
 		/// @return Const reference to the element
-		const ValueType& operator[](int Index) const
+		const ValueType& operator[](std::size_t Index) const
 		{
 			assert(Index >= 0);
 			assert(Index < InternalList.size());
@@ -75,7 +75,7 @@ namespace Modio
 		/// @brief Unsafe index-based lookup, does not range-check provided index
 		/// @param Index The index of the element to retrieve
 		/// @return Mutable reference to the element
-		ValueType& operator[](int Index)
+		ValueType& operator[](std::size_t Index)
 		{
 			assert(Index >= 0);
 			assert(Index < InternalList.size());

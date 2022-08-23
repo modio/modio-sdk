@@ -206,7 +206,7 @@ namespace Modio
 				return RootLocalStoragePath / fmt::format("{}/cache/mods/{}/logos/", CurrentGameID, ModID);
 			}
 
-			Modio::filesystem::path MakeGalleryFolderPath(Modio::ModID ModID, int ImageIndex) const
+			Modio::filesystem::path MakeGalleryFolderPath(Modio::ModID ModID, Modio::GalleryIndex ImageIndex) const
 			{
 				// @todonow: Change this to temporary storage
 				return RootLocalStoragePath /

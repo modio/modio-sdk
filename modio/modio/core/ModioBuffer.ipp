@@ -38,7 +38,7 @@ namespace Modio
 			{
 				MODIO_PROFILE_SCOPE(BufferFill);
 				std::fill_n(InternalData.get(), TotalSize, (unsigned char) 0);
-			} 
+			}
 			// Perform the alignment calculation to know where we should consider the start of the data buffer
 			void* RawBufferPtr = InternalData.get();
 			std::align(Alignment, Size, RawBufferPtr, TotalSize);
@@ -161,7 +161,7 @@ namespace Modio
 
 			Alignment = Other.Alignment;
 			// Reconfigure overlapping buffers
-			for (int Idx = 0; Idx < InternalBuffers->size() && Idx < Other.InternalBuffers->size(); ++Idx)
+			for (std::size_t Idx = 0; Idx < InternalBuffers->size() && Idx < Other.InternalBuffers->size(); ++Idx)
 			{
 				Modio::Detail::Buffer& MyBuffer = InternalBuffers->at(Idx);
 				const Modio::Detail::Buffer& OtherBuffer = Other.InternalBuffers->at(Idx);

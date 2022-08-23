@@ -34,7 +34,6 @@ namespace Modio
 		class HttpImplementation : public Modio::Detail::IHttpServiceImplementation
 		{
 			std::shared_ptr<HttpSharedState> HttpState;
-			asio::io_context::service& OwningService;
 
 		public:
 			using IOObjectImplementationType = std::shared_ptr<HttpRequestImplementation>;
@@ -50,7 +49,7 @@ namespace Modio
 				Implementation = std::move(OtherImplementation);
 			}
 
-			HttpImplementation(asio::io_context::service& OwningService) : OwningService(OwningService) {}
+			HttpImplementation(asio::io_context::service&) {}
 
 			virtual ~HttpImplementation() {}
 

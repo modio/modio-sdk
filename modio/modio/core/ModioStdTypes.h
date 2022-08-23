@@ -64,7 +64,7 @@ namespace Modio
 	}
 
 	using Timestamp = std::uint64_t;
-	using GalleryIndex = int;
+	using GalleryIndex = std::size_t;
 
 	/// @brief Type alias for User IDs, used for initialization
 	using UserHandleType = std::string;

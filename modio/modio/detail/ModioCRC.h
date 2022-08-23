@@ -53,14 +53,26 @@ namespace Modio
 		/// disabling strict aliasing
 		/// @param Data Buffer containing the data to CRC. Passed by reference because we don't actually want to consume
 		/// the data in the buffer, just read it
-		/// @param PreviousCRC32 Previous CRC value allowing the chaining of multiple calls to this function
+        /// @param PreviousCRC32 Previous CRC value allowing the chaining of multiple calls to this function
+        /// @param UntilByte If only a section of the Buffer Data is required, marks the finish line of bytes to read
 		/// @return the calculated checksum value
-		inline uint32_t CRC32(Modio::Detail::Buffer& Data, uint32_t PreviousCRC32 = 0)
+		inline uint32_t CRC32(Modio::Detail::Buffer& Data, uint32_t PreviousCRC32 = 0, Modio::Optional<std::size_t> UntilByte = Modio::Optional<size_t>{})
 		{
-			uint32_t CRC = ~PreviousCRC32;
+            // Keep track of the number of bytes already accounted for
+            std::size_t ByteCounter = 0;
+            uint32_t CRC = ~PreviousCRC32;
 			for (const unsigned char& CurrentByte : Data)
 			{
 				CRC = (CRC >> 8) ^ Crc32Lookup[(CRC ^ CurrentByte) & 0xff];
+                
+                ByteCounter += sizeof(const unsigned char);
+                
+                // If the ByteCounter reaches or exceeds the "UntilByte", then we stop
+                // performing the CRC calculation
+                if (UntilByte.has_value() && ByteCounter >= UntilByte.value())
+                {
+                    break;
+                }
 			}
 
 			return ~CRC;

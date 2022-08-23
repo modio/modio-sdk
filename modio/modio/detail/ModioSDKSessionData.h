@@ -101,11 +101,15 @@ namespace Modio
 			/// @return The pending upload information, or empty Optional if nothing pending
 			MODIO_IMPL static Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>>
 				GetNextPendingModfileUpload();
-			MODIO_IMPL static Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>> GetPriorityModfileUpload();
+			MODIO_IMPL static Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>>
+				GetPriorityModfileUpload();
 			MODIO_IMPL static bool PrioritizeModfileUpload(Modio::ModID IdToPrioritize);
 			MODIO_IMPL static bool PrioritizeModfileDownload(Modio::ModID IdToPrioritize);
 
-			MODIO_IMPL static Modio::Optional<Modio::ModID> GetPriorityModID() {return Get().ModIDToPrioritize;};
+			MODIO_IMPL static Modio::Optional<Modio::ModID> GetPriorityModID()
+			{
+				return Get().ModIDToPrioritize;
+			};
 
 			/// @brief Initializes a ModProgressInfo for the specified mod, storing it in the global state. This method
 			/// is only intended for use by InstallOrUpdateModOp
@@ -150,7 +154,6 @@ namespace Modio
 			Modio::Portal PortalInUse;
 			InitializationState CurrentInitializationState = InitializationState::NotInitialized;
 			bool bModManagementEnabled = false;
-			bool bShutdownRequested = false;
 			std::vector<struct FieldError> LastValidationError;
 			// Implemented as shared_ptr because that way operations that need to alter the state of the entry can get a
 			// cheap reference to the original without the lack of safety from a potentially dangling raw reference

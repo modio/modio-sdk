@@ -54,11 +54,10 @@ namespace Modio
 						if (Request->WriteStreamAcceptsBytes() == true)
 						{
 							// Prepare the body of the request
-							std::size_t DataSize = DataToWrite.GetSize();
+							std::uint64_t DataSize = DataToWrite.GetSize();
 							CFDataRef DataRef =
 								CFDataCreate(kCFAllocatorDefault, (const UInt8*) DataToWrite.Data(), DataSize);
-							CFStringRef Str =
-								CFStringCreateWithBytes(kCFAllocatorDefault, CFDataGetBytePtr(DataRef),
+							CFStringCreateWithBytes(kCFAllocatorDefault, CFDataGetBytePtr(DataRef),
 														CFDataGetLength(DataRef), kCFStringEncodingUTF8, false);
 							CFIndex WrittenBytes = CFWriteStreamWrite(Request->WriteStream, CFDataGetBytePtr(DataRef),
 																	  CFDataGetLength(DataRef));

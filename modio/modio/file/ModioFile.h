@@ -57,7 +57,7 @@ namespace Modio
 				  FilePath(std::move(Other.FilePath)),
 				  FileStrand(std::move(Other.FileStrand)) {};
 
-			std::size_t GetFileSize()
+			std::uint64_t GetFileSize()
 			{
 				return get_implementation()->GetSize();
 			}

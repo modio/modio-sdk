@@ -40,9 +40,6 @@ namespace Modio
 			};
 
 		private:
-			// Central directory data structure
-			// Modio::optional<ZipCentralDirectory> ArchiveEntries;
-
 			std::vector<ArchiveEntry> ArchiveEntries;
 
 		public:
@@ -54,10 +51,12 @@ namespace Modio
 			Modio::filesystem::path FilePath;
 			
 			std::uintmax_t ZipMagicOffset;
-			std::uint16_t NumberOfRecords;
-			std::uint32_t CentralDirectorySize;
-			std::uint32_t CentralDirectoryOffset;
+			std::uint64_t NumberOfRecords;
+			std::uint64_t CentralDirectorySize;
+			std::uint64_t CentralDirectoryOffset;
 			Modio::FileSize TotalExtractedSize;
+            bool bIsZip64 = false;
+            
 			MODIO_IMPL std::uintmax_t GetNumberOfEntries();
 
 			MODIO_IMPL std::vector<ArchiveEntry>::iterator begin();

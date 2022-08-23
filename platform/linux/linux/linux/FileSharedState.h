@@ -32,7 +32,7 @@ namespace Modio
 					int FileDescriptorVal = (int) (uintptr_t) (io_uring_cqe_get_data(CompletionInfo));
 					// When the value of IOResult is negative, it means uring had an error. A positive
 					// number refers to the number of bytes transacted
-					int IOResult = CompletionInfo->res;
+					std::size_t IOResult = CompletionInfo->res;
 					auto IOStatus = PendingIO.find(FileDescriptorVal);
 					// Need to bail here if IOStatus == PendingIO.end();
 

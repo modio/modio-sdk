@@ -9,7 +9,8 @@
  */
 
 #pragma once
-#ifdef MODIO_PLATFORM_UNREAL
+
+#if defined(MODIO_PLATFORM_UNREAL)
 
 	#include MODIO_UNREAL_PLATFORM_PREAMBLE
 	#include "modio/detail/ModioCompilerMacros.h"
@@ -23,6 +24,20 @@
 	DISABLE_WARNING_POP
 
 	#include MODIO_UNREAL_PLATFORM_EPILOGUE
-#else
+
+#elif defined(__GNUC__) || defined(__clang__)
+
+	#include "modio/detail/ModioCompilerMacros.h"
+
+	DISABLE_WARNING_PUSH
+	DISABLE_WARNING_SIGNED_UNSIGNED_INTEGER_COMPARISON
+
 	#include "tl/optional.hpp"
+
+	DISABLE_WARNING_POP
+
+#else
+
+	#include "tl/optional.hpp"
+
 #endif

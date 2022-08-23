@@ -138,7 +138,7 @@ namespace Modio
 								// offset respective to the original file. The IO operation has access to the whole
 								// file, therefore only the OffsetData is returned in the Destination
 								std::size_t OffsetVal = FileOffset.value();
-								std::size_t MaxBytes = MIN(MaxBytesToRead, ReadBuffer.value().GetSize());
+								std::uint64_t MaxBytes = MIN(MaxBytesToRead, ReadBuffer.value().GetSize());
 								Modio::Detail::Buffer OffsetData =
 									ReadBuffer->CopyRange(OffsetVal, OffsetVal + MaxBytes);
 								Destination.AppendBuffer(std::move(OffsetData));

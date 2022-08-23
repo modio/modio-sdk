@@ -1,16 +1,17 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
+#include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
 #include <string>
 
@@ -45,6 +46,11 @@ namespace Modio
 			}
 		};
 
+		// These functions create false "unused functions" warnings on certain platforms.
+		// Suppressing those warnings here.
+		MODIO_DIAGNOSTIC_PUSH
+		MODIO_ALLOW_UNUSED_FUNCTIONS
+
 		static void from_json(const nlohmann::json& Json, Logo& Avatar)
 		{
 			Detail::ParseSafe(Json, Avatar.Filename, "filename");
@@ -63,7 +69,8 @@ namespace Modio
 					{"thumb_1280x720", ModLogo.Thumb1024x720}};
 		}
 
-			
+		// Re-allow "unused function" warnings
+		MODIO_DIAGNOSTIC_POP
 
 		inline const std::string& GetLogoURL(const Logo& Logo, Modio::LogoSize Size)
 		{

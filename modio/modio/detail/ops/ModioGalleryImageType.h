@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -20,8 +20,8 @@ namespace Modio
 	{
 		struct GalleryImageType
 		{
-			GalleryImageType(Modio::ModID ModId, const Modio::GalleryList& GalleryList,
-							 Modio::GallerySize GallerySize, Modio::GalleryIndex ImageIndex)
+			GalleryImageType(Modio::ModID ModId, const Modio::GalleryList& GalleryList, Modio::GallerySize GallerySize,
+							 Modio::GalleryIndex ImageIndex)
 				: ModId(ModId),
 				  GallerySize(GallerySize),
 				  ImageIndex(ImageIndex),
@@ -30,7 +30,8 @@ namespace Modio
 
 			bool MakeDestinationPath(Modio::filesystem::path& OutPath) const
 			{
-				Modio::Detail::FileService& FileService = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>();
+				Modio::Detail::FileService& FileService =
+					Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>();
 				Modio::Optional<std::string> FileName = Modio::Detail::String::GetFilenameFromURL(ImageURL);
 				if (FileName)
 				{
@@ -42,7 +43,8 @@ namespace Modio
 
 			Modio::Optional<Modio::filesystem::path> GetCachePath() const
 			{
-				Modio::Detail::FileService& FileService = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>();
+				Modio::Detail::FileService& FileService =
+					Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>();
 				return FileService.GetGalleryImage(ModId, GallerySize, ImageIndex);
 			}
 

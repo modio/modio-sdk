@@ -49,11 +49,7 @@ namespace Modio
 					{
 						PWSTR path = NULL;
 
-#ifdef XDK_HAXX
-						HRESULT hr;
-#else
 						HRESULT hr = SHGetKnownFolderPath(FOLDERID_Public, 0, NULL, &path);
-#endif
 
 						if (SUCCEEDED(hr))
 						{
@@ -74,11 +70,7 @@ namespace Modio
 						Modio::filesystem::path UDF;
 						PWSTR path = NULL;
 
-#ifdef XDK_HAXX
-						HRESULT hr;
-#else
 						HRESULT hr = SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &path);
-#endif
 
 						if (SUCCEEDED(hr))
 						{

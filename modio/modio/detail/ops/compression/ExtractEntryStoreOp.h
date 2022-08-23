@@ -65,7 +65,7 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Compression,
-												"Extracting entry {}", Impl->EntryToExtract.FilePath.u8string());
+												"Extracting entry in Store {}", Impl->EntryToExtract.FilePath.u8string());
 					
 					if (Impl->EntryToExtract.UncompressedSize == 0)
 					{

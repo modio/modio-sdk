@@ -11,6 +11,7 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
+#include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
 #include <string>
 
@@ -33,6 +34,8 @@ namespace Modio
 			}
 		};
 
+		
+
 		static MODIO_IMPL void from_json(const nlohmann::json& Json, Image& Image)
 		{
 			Detail::ParseSafe(Json, Image.Filename, "filename");
@@ -46,6 +49,11 @@ namespace Modio
 								   {"original", Image.Original},
 								   {"thumb_320x180", Image.Thumb320x180}};
 		}
+
+		// GetImmageURL() creates false "unused functions" warnings on certain platforms.
+		// Suppressing those warnings here.
+		MODIO_DIAGNOSTIC_PUSH
+		MODIO_ALLOW_UNUSED_FUNCTIONS
 
 		static const std::string& GetImmageURL(const Image& Image, Modio::GallerySize Size)
 		{
@@ -62,6 +70,9 @@ namespace Modio
 			static std::string NoResult("");
 			return NoResult;
 		}
+
+		// Re-allow "unused function" warnings
+		MODIO_DIAGNOSTIC_POP
 
 		inline std::string ToString(Modio::GallerySize Size)
 		{

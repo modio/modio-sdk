@@ -72,7 +72,8 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Compression,
-												"Extracting entry {}", Impl->EntryToExtract.FilePath.u8string());
+												"Extracting entry in Deflate {}", Impl->EntryToExtract.FilePath.u8string());
+					
 					if (Impl->EntryToExtract.UncompressedSize == 0)
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Compression,
@@ -116,10 +117,6 @@ namespace Modio
 							auto FileDataBuffers = Impl->FileData.data();
 							Impl->ZState.next_in = FileDataBuffers.begin()->data();
 							Impl->ZState.avail_in = FileDataBuffers.begin()->size();
-							if (Impl->ZState.avail_in == 0)
-							{
-								auto thing = 0;
-							}
 						}
 
 						while (!Impl->DeflateStatus && Impl->ZState.avail_in > 0)
@@ -152,6 +149,13 @@ namespace Modio
 									}
 								}
 							}
+                            else
+                            {
+                                Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression,
+                                                            "Error extracting entry in Deflate: {}", Impl->DeflateStatus.message());
+                                Self.complete(Impl->DeflateStatus);
+                                return;
+                            }
 						}
 						// take the first chunk out of the dynamic buffer so that we effectively consume those bytes
 						Modio::Optional<Modio::Detail::Buffer> Unused = Impl->FileData.TakeInternalBuffer();

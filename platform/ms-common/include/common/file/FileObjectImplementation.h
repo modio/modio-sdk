@@ -129,7 +129,7 @@ namespace Modio
 				SetEndOfFile(FileHandle);
 			}
 
-			virtual std::size_t GetSize() override
+			virtual std::uint64_t GetSize() override
 			{
 				if (FileHandle != INVALID_HANDLE_VALUE)
 				{

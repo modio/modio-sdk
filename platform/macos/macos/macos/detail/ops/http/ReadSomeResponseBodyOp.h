@@ -57,7 +57,7 @@ namespace Modio
 			{}
 
 			template<typename CoroType>
-			void operator()(CoroType& Self, Modio::ErrorCode ec = {}, std::size_t BytesLastRead = -1)
+			void operator()(CoroType& Self, Modio::ErrorCode ec = {}, std::size_t BytesLastRead = 0)
 			{
 				std::shared_ptr<HttpSharedState> PinnedState = SharedState.lock();
 
@@ -74,102 +74,60 @@ namespace Modio
 												"Reading response body",
 												Request->GetParameters().GetFormattedResourcePath());*/
 
+					// Clear out the destination buffer
+					ResponseBuffer.Clear();
+
+					// In case some data remained within Request->ResponseDataBuffer, return those bytes first
 					if (Request->ResponseDataBuffer.size())
 					{
 						Request->ResponseBodyReceivedLength = Request->ResponseDataBuffer.size();
-						// Clear out the destination
-						ResponseBuffer.Clear();
 						// While we have any prebuffered response data from when we were looking for the response
 						// headers, stuff that data into the response
-                        
-                        // When the server returns a "error" in json format, the response does not have "Content-Length"
-                        // in it, so the line below tries to parse it as json, if it happens, it will make sure
-                        // to append the buffer to the ResponseBuffer.
-                        nlohmann::json json = Modio::Detail::ToJson(Request->ResponseDataBuffer);
 
-						if (Modio::Optional<std::size_t> ExpectedLength = Request->GetContentLength()
-                            || json.size() > 0)
-						{
-							while (Modio::Optional<Buffer> PrebufferedResponseData =
-									   Request->ResponseDataBuffer.TakeInternalBuffer())
-							{
-								ResponseBuffer.AppendBuffer(PrebufferedResponseData.take().value());
-							}
+						while (Modio::Optional<Buffer> PrebufferedResponseData = Request->ResponseDataBuffer.TakeInternalBuffer())
+                        {
+                            ResponseBuffer.AppendBuffer(PrebufferedResponseData.take().value());
+                        }
+					}
+					// In some cases, it is possible that the ReadStream has not "ended" but the Stream
+					// remains open. If the CFReadStreamRead is called without bytes, it would wait for
+					// a looooong time
+					else if (Request->ReadStreamHasBytes() == true)
+					{
+						// Read bytes into the ResponseDataBuffer
+						CFIndex ReadBytes = CFReadStreamRead(Request->ReadStream, ReadChunk.Data(), ReadChunkSize);
 
-							if (Request->ResponseBodyReceivedLength >= ExpectedLength.value())
-							{
-								Self.complete(Modio::make_error_code(Modio::GenericError::EndOfFile));
-								return;
-							}
-						}
-						else
+						if (ReadBytes <= 0)
 						{
-							Self.complete(HandleChunkedEncoding(Request->ResponseDataBuffer, ResponseBuffer));
-							return;
+							Modio::Detail::Logger().Log(
+								Modio::LogLevel::Error, Modio::LogCategory::Http,
+								"ReadSomeResponseBodyOp stream could not be read or an error has ocurred");
+							Modio::make_error_code(Modio::HttpError::RequestError);
+							break;
 						}
+
+						BytesLastRead = ReadBytes;
+						Request->ResponseBodyReceivedLength += ReadBytes;
+
+						ResponseBuffer.AppendBuffer(ReadChunk.CopyRange(0, BytesLastRead));
+					}
+					
+                    // We need to know signal to SDK's upper layers that there are no more bytes available
+                    // in the ResponseBody. Using this method, we avoid using the function "HandleChunkedEncoding"
+                    if (Request->ReadStreamStatus() == kCFStreamStatusAtEnd)
+					{
+						ec = Modio::make_error_code(Modio::GenericError::EndOfFile);
 					}
 
-					Self.complete(Modio::make_error_code(Modio::GenericError::EndOfFile));
+					if (ec)
+					{
+						Self.complete(ec);
+						return;
+					}
+
+					Self.complete({});
 					return;
 				}
-			}
-
-			// TODO: @modio-nx detect EOF condition in chunked encoding
-			Modio::ErrorCode HandleChunkedEncoding(Modio::Detail::DynamicBuffer InChunkedData,
-												   Modio::Detail::DynamicBuffer ParsedData)
-			{
-				// Do we have any unfiltered data left?
-				while (InChunkedData.size())
-				{
-					// If we were at a chunk boundary earlier
-					if (Request->CurrentChunkSizeRemaining == 0)
-					{
-						// Search the first 1kb approx of our response
-						Modio::Detail::Buffer SearchBuffer(std::min<std::size_t>(1000, InChunkedData.size()));
-						Modio::Detail::BufferCopy(SearchBuffer, InChunkedData);
-						// Pattern matches any hex number followed by an optional semicolon and other characters until a
-						// CRLF
-						std::regex ChunkSizePattern("^(\r\n)?([a-fA-f0-9]+)(;.*?)?\r\n");
-						std::cmatch ChunkSizeMatches;
-						// if the buffer begins with a chunk header
-						if (std::regex_search((const char*) SearchBuffer.begin(), (const char*) SearchBuffer.end(),
-											  ChunkSizeMatches, ChunkSizePattern))
-						{
-							// extract the chunk size from the header
-							std::string MatchString = ChunkSizeMatches[2].str();
-							Request->CurrentChunkSizeRemaining = strtoull(MatchString.c_str(), nullptr, 16);
-							// todo: @modio-nx handle zero length chunk, that should indicate EOF
-							if (Request->CurrentChunkSizeRemaining == 0)
-							{
-								return Modio::make_error_code(Modio::GenericError::EndOfFile);
-							}
-							// Advance/consume/skip past the chunk header so we're only copying actual response data
-							std::size_t ChunkHeaderLength = ChunkSizeMatches[0].second - ChunkSizeMatches[0].first;
-							InChunkedData.consume(ChunkHeaderLength);
-						}
-						else
-						{
-							// we didn't have enough data remaining in the buffer for a full chunk header, so don't
-							// process any more data
-							return {};
-						}
-					}
-					// Either we have just calculated CurrentChunkSizeRemaining, or we already had some data remaining
-					// in the current chunk. Copy as much as we can, either up to the chunk boundary or the maximum
-					// available data, whichever is lower
-					std::size_t NumBytesToCopy = std::min(InChunkedData.size(), Request->CurrentChunkSizeRemaining);
-					Modio::Detail::Buffer AvailableData(NumBytesToCopy);
-					Modio::Detail::BufferCopy(AvailableData, InChunkedData);
-					ParsedData.AppendBuffer(std::move(AvailableData));
-					InChunkedData.consume(NumBytesToCopy);
-					Request->CurrentChunkSizeRemaining -= NumBytesToCopy;
-
-					if (Request->CurrentChunkSizeRemaining == 0)
-					{
-						InChunkedData.consume(2);
-					}
-				}
-				return {};
 			}
 		};
 #include <asio/unyield.hpp>

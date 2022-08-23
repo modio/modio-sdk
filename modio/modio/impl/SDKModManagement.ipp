@@ -153,8 +153,6 @@ namespace Modio
 
 	std::map<Modio::ModID, Modio::ModCollectionEntry> QueryUserSubscriptions()
 	{
-		Modio::Detail::UserDataService& UserService =
-			Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>();
 		Modio::ModCollection UserModCollection =
 			Modio::Detail::SDKSessionData::FilterSystemModCollectionByUserSubscriptions();
 		std::map<Modio::ModID, ModCollectionEntry> UserSubscriptions;
@@ -181,8 +179,6 @@ namespace Modio
 
 	std::map<Modio::ModID, Modio::ModCollectionEntry> QueryUserInstallations(bool bIncludeOutdatedMods)
 	{
-		Modio::Detail::UserDataService& UserService =
-			Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>();
 		Modio::ModCollection UserModCollection =
 			Modio::Detail::SDKSessionData::FilterSystemModCollectionByUserSubscriptions();
 		std::map<Modio::ModID, ModCollectionEntry> UserInstallations;

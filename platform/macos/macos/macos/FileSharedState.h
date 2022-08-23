@@ -60,7 +60,7 @@ namespace Modio
 				// it does, it will transfer MAX_BYTES at the time.
 				bool Overflow = FileOp.Data.GetSize() > MAX_BYTES;
 				// Shortcut to the FileSize
-				size_t FileSize = FileOp.Data.GetSize();
+				uint64_t FileSize = FileOp.Data.GetSize();
 				// Number of bytes to transfer in this operation
 				size_t Bytes = Overflow ? MIN(MAX_BYTES, FileSize - FileOp.NumBytesTransferred) : FileSize;
 				// The File offset, which could change according to the Overflow
@@ -121,7 +121,7 @@ namespace Modio
 									  return;
 								  }
 
-								  size_t BytesTransfer = PendingOp.Data.GetSize() - PendingOp.NumBytesTransferred;
+								  uint64_t BytesTransfer = PendingOp.Data.GetSize() - PendingOp.NumBytesTransferred;
 
 								  // It means that the PedingOp has not transferred all bytes to the Buffer
 								  if (BytesTransfer > 0)

@@ -40,7 +40,7 @@ namespace Modio
 			/// @brief OS-specific file size calculation
 			/// @return Size of the underlying file
 			/// @todo {core} Should this return std::uintmax_t instead?
-			virtual std::size_t GetSize() = 0;
+			virtual std::uint64_t GetSize() = 0;
 			/// @brief Retrieves file path
 			/// @return Path to the underlying file
 			virtual Modio::filesystem::path GetPath() = 0;

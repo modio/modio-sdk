@@ -20,7 +20,6 @@
 #include "modio/http/ModioHttpRequest.h"
 #include <asio/yield.hpp>
 
-
 namespace Modio
 {
 	namespace Detail
@@ -36,7 +35,6 @@ namespace Modio
 			Modio::StableStorage<std::uintmax_t> CurrentFilePosition;
 			Modio::StableStorage<bool> EndOfFileReached;
 			Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo;
-			bool bDownloadingMod = false;
 
 			struct DownloadFileImpl
 			{
@@ -273,7 +271,8 @@ namespace Modio
 				Token, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 
-		// Downloads file as API request, bypassing the download queue.  For use with files such as images that shouldn't have to wait for mod downloads to complete. 
+		// Downloads file as API request, bypassing the download queue.  For use with files such as images that
+		// shouldn't have to wait for mod downloads to complete.
 		template<typename CompletionTokenType>
 		auto DownloadFileAsApiRequestAsync(Modio::Detail::HttpRequestParams DownloadParameters,
 										   Modio::filesystem::path DestinationPath, CompletionTokenType&& Token)

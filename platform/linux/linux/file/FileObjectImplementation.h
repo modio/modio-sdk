@@ -99,7 +99,7 @@ namespace Modio
 				Modio::filesystem::resize_file(FilePath, Offset, ec);
 			}
 
-			virtual std::size_t GetSize() override
+			virtual std::uint64_t GetSize() override
 			{
 				Modio::ErrorCode ec;
 				return Modio::filesystem::file_size(FilePath, ec);

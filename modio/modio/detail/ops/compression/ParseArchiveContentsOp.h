@@ -13,6 +13,7 @@
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/compression/zip/ArchiveFileImplementation.h"
+#include "modio/detail/compression/zip/ZipStructures.h"
 #include "modio/file/ModioFile.h"
 
 #include <asio/yield.hpp>
@@ -26,11 +27,11 @@ namespace Modio
 			Modio::StableStorage<ArchiveFileImplementation> ArchiveState;
 			asio::coroutine CoroutineState;
 			std::uintmax_t CurrentSearchOffset = 0;
-			bool bEndOfFileReached = false;
 			std::uintmax_t CurrentRecordOffset = 0;
 			std::vector<ArchiveFileImplementation::ArchiveEntry> PendingEntries;
 			std::uintmax_t CurrentFixupEntryIndex = 0;
-
+            std::uintmax_t BytesToRead = 20;
+            
 		public:
 			ParseArchiveContentsOp(std::shared_ptr<ArchiveFileImplementation> ArchiveState)
 				: ArchiveState(ArchiveState) {};
@@ -39,26 +40,28 @@ namespace Modio
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {},
 							Modio::Optional<Modio::Detail::Buffer> FileChunk = {})
 			{
-				constexpr std::size_t ChunkOfBytes = 64 * 1024;
-				std::size_t FileSize = 0;
-				std::size_t MaxBytesToRead = 0;
+				constexpr std::uint64_t ChunkOfBytes = 64 * 1024;
+				std::uint64_t FileSize = 0;
+				std::uint64_t MaxBytesToRead = 0;
 				MODIO_PROFILE_SCOPE(ParseArchiveContents);
 				reenter(CoroutineState)
-				{
+				{	
 					{
 						ArchiveFileOnDisk = std::make_shared<Modio::Detail::File>(ArchiveState->FilePath, false);
 						FileSize = ArchiveFileOnDisk->GetFileSize();
-						CurrentSearchOffset = FileSize - (std::min((uint64_t) FileSize, (uint64_t) (ChunkOfBytes)));
+						CurrentSearchOffset = FileSize - std::min(FileSize, ChunkOfBytes);
+
+						// If the FileSize is larger than 4,294,967,295 bytes (2^32−1 bytes, or 4 GB minus 1 byte)
+						// it is automatically a Zip64 file
+						if (FileSize >= (UINT32_MAX - 1))
+						{
+                            BytesToRead = 48;
+							ArchiveState->bIsZip64 = true;
+						}
 					}
 
 					while (ArchiveState->ZipMagicOffset == 0)
 					{
-						// In case the file to read is smaller than 65K bytes (rare but possible), the linux
-						// implementation would repeat the operation at least 5 times before realizing that the uring
-						// would not continue reading because it is the end of file. In some other times, it is possible
-						// to have two read/write operations that intersect witht the same file descriptor. To be the
-						// least disruptive with other platforms, the line below checks if the FileSize is smaller than
-						// those 65K.
 						MaxBytesToRead = (FileSize < ChunkOfBytes ? FileSize : ChunkOfBytes);
 						yield ArchiveFileOnDisk->ReadSomeAtAsync(CurrentSearchOffset, MaxBytesToRead, std::move(Self));
 						if (ec && ec != Modio::GenericError::EndOfFile)
@@ -73,17 +76,10 @@ namespace Modio
 								Modio::Detail::Buffer& Chunk = FileChunk.value();
 								if (Chunk.GetSize() >= 4)
 								{
-									std::uintmax_t LocalPosition = Chunk.GetSize() - 4;
-									for (; LocalPosition > 0; LocalPosition--)
-									{
-										uint32_t Value =
-											Modio::Detail::TypedBufferRead<std::uint32_t>(Chunk, LocalPosition);
-										if (Value == 0x06054b50)
-										{
-											ArchiveState->ZipMagicOffset = CurrentSearchOffset + LocalPosition;
-											break;
-										}
-									}
+                                    // Use a helper function to search the "Zip Magic Offset" in a buffer
+                                    std::tie(ArchiveState->ZipMagicOffset, ArchiveState->bIsZip64) = ZipStructures::FindOffsetInBuffer(Chunk, ArchiveState->bIsZip64);
+                                    // Add what has been Currently Searched
+                                    ArchiveState->ZipMagicOffset += CurrentSearchOffset;
 								}
 								else
 								{
@@ -110,6 +106,7 @@ namespace Modio
 							Self.complete(Modio::make_error_code(Modio::ArchiveError::InvalidHeader));
 							return;
 						}
+						
 						if (CurrentSearchOffset >= ChunkOfBytes)
 						{
 							CurrentSearchOffset -= ChunkOfBytes;
@@ -119,12 +116,17 @@ namespace Modio
 							CurrentSearchOffset = 0;
 						}
 					}
-					// Now we've located the central directory metadata, do a direct read on that region (in case a
-					// chunk boundary from the earlier search splits it)
-					yield ArchiveFileOnDisk->ReadSomeAtAsync(ArchiveState->ZipMagicOffset, 20, std::move(Self));
-					// If we got EOF whilst trying to read the 20 bytes containing the directory information, inform the
-					// consumer
-					if (ec == Modio::GenericError::EndOfFile)
+                    
+                    // If Zip64, the End Central Directory (ECD) contains 56 bytes. Zip is only 20
+                    BytesToRead = ArchiveState->bIsZip64 == true ? 56 : 20;
+                    
+                    // Now we've located the central directory metadata, do a direct read on that region (in case a
+                    // chunk boundary from the earlier search splits it)
+                    yield ArchiveFileOnDisk->ReadSomeAtAsync(ArchiveState->ZipMagicOffset, BytesToRead, std::move(Self));
+                    
+                    // If we got EOF whilst trying to read the 20 bytes containing the directory information, inform the
+                    // consumer
+                    if (ec == Modio::GenericError::EndOfFile)
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression,
 													"Truncated central directory metadata");
@@ -135,14 +137,14 @@ namespace Modio
 
 					if (FileChunk.has_value())
 					{
-						ArchiveState->NumberOfRecords =
-							Modio::Detail::TypedBufferRead<std::uint16_t>(FileChunk.value(), 10);
-						ArchiveState->CentralDirectorySize =
-							Modio::Detail::TypedBufferRead<std::uint32_t>(FileChunk.value(), 12);
-						ArchiveState->CentralDirectoryOffset =
-							Modio::Detail::TypedBufferRead<std::uint32_t>(FileChunk.value(), 16);
+                        std::tie(ArchiveState->NumberOfRecords,
+                                 ArchiveState->CentralDirectorySize,
+                                 ArchiveState->CentralDirectoryOffset) =
+                            ZipStructures::ReadCentralDirectory(FileChunk.value(), ArchiveState->bIsZip64);
+                        
 						yield ArchiveFileOnDisk->ReadSomeAtAsync(ArchiveState->CentralDirectoryOffset,
 																 ArchiveState->CentralDirectorySize, std::move(Self));
+                        
 						if (FileChunk.has_value() && FileChunk->GetSize() != ArchiveState->CentralDirectorySize)
 						{
 							// Could not read full central directory
@@ -155,43 +157,25 @@ namespace Modio
 
 						CurrentRecordOffset = 0;
 
-						for (std::uint16_t RecordIndex = 0; RecordIndex < ArchiveState->NumberOfRecords; RecordIndex++)
+						for (std::uint64_t RecordIndex = 0; RecordIndex < ArchiveState->NumberOfRecords; RecordIndex++)
 						{
-							std::uint16_t CompressionMethod = Modio::Detail::TypedBufferRead<std::uint16_t>(
-								FileChunk.value(), CurrentRecordOffset + 10);
-							std::uint32_t InputCRC = Modio::Detail::TypedBufferRead<std::uint32_t>(
-								FileChunk.value(), CurrentRecordOffset + 16);
-							std::uint32_t CompressedSize = Modio::Detail::TypedBufferRead<std::uint32_t>(
-								FileChunk.value(), CurrentRecordOffset + 20);
-							std::uint32_t UncompressedSize = Modio::Detail::TypedBufferRead<std::uint32_t>(
-								FileChunk.value(), CurrentRecordOffset + 24);
-							std::uint16_t FileNameLength = Modio::Detail::TypedBufferRead<std::uint16_t>(
-								FileChunk.value(), CurrentRecordOffset + 28);
-
-							std::uint16_t ExtraFieldLength = Modio::Detail::TypedBufferRead<std::uint16_t>(
-								FileChunk.value(), CurrentRecordOffset + 30);
-
-							std::uint16_t CommentLength = Modio::Detail::TypedBufferRead<std::uint16_t>(
-								FileChunk.value(), CurrentRecordOffset + 32);
-
-							std::uint32_t ExternalAttributes = Modio::Detail::TypedBufferRead<std::uint32_t>(
-								FileChunk.value(), CurrentRecordOffset + 36);
-
-							std::uint32_t LocalHeaderOffset = Modio::Detail::TypedBufferRead<std::uint32_t>(
-								FileChunk.value(), CurrentRecordOffset + 42);
-
-							ArchiveState->TotalExtractedSize += Modio::FileSize(UncompressedSize);
-
-							PendingEntries.push_back(ArchiveFileImplementation::ArchiveEntry {
-								static_cast<ArchiveFileImplementation::CompressionMethod>(CompressionMethod),
-								std::string((const char*) FileChunk->Data() + CurrentRecordOffset + 46, FileNameLength),
-								LocalHeaderOffset, CompressedSize, UncompressedSize, InputCRC,
-								((ExternalAttributes & 0x10) == 0x10)});
-
-							CurrentRecordOffset += (46 + FileNameLength + ExtraFieldLength + CommentLength);
+                            ArchiveFileImplementation::ArchiveEntry Entry;
+                            Modio::ErrorCode Err;
+                            std::tie(Entry, CurrentRecordOffset, Err) = ZipStructures::ArchiveParse(FileChunk.value(), CurrentRecordOffset);
+                            
+                            if (Err)
+                            {
+                                Self.complete(Err);
+                                return;
+                            }
+                            
+                            ArchiveState->TotalExtractedSize += Modio::FileSize(Entry.UncompressedSize);
+                            PendingEntries.push_back(Entry);
 						}
+                        
 						// Now we have the information about the local headers for all the files, we need to read those
-						// parts of the zip locate the actual file offsets
+						// parts of the zip locate the actual file offsets, specially because ExtraFieldLenght might not
+                        // be the same between the Central Directory and the Local Directory .-_-.
 						for (CurrentFixupEntryIndex = 0; CurrentFixupEntryIndex < PendingEntries.size();
 							 CurrentFixupEntryIndex++)
 						{
@@ -212,6 +196,7 @@ namespace Modio
 								30 + LocalFileLength + LocalExtraFieldLength;
 							ArchiveState->AddEntry(PendingEntries[CurrentFixupEntryIndex]);
 						}
+                        
 						ArchiveFileOnDisk.reset();
 						Self.complete(Modio::ErrorCode {});
 					}

@@ -1,18 +1,19 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
 #include "modio/core/ModioStdTypes.h"
-#include <string>
+#include "modio/detail/HedleyWrapper.h"
 #include <algorithm>
+#include <string>
 
 namespace Modio
 {
@@ -42,7 +43,7 @@ namespace Modio
 			/// @brief URL-encodes a string
 			/// @param String The input to encode
 			/// @return The URL-encoded output
-			static std::string URLEncode(const std::string& String)
+			static inline std::string URLEncode(const std::string& String)
 			{
 				std::string Result;
 				Result.reserve(String.size() * 3);
@@ -55,7 +56,7 @@ namespace Modio
 
 				static const char HexChars[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
 												  '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-				for (int Idx = 0; Idx < String.size(); ++Idx)
+				for (std::size_t Idx = 0; Idx < String.size(); ++Idx)
 				{
 					const char& Char = String[Idx];
 					if (IsValidCharacter(Char))
@@ -72,6 +73,11 @@ namespace Modio
 
 				return Result;
 			}
+
+			// These functions create false "unused functions" warnings on certain platforms.
+			// Suppressing those warnings here.
+			MODIO_DIAGNOSTIC_PUSH
+			MODIO_ALLOW_UNUSED_FUNCTIONS
 
 			/// @brief Replaces all occurrences of a string in another string (inline)
 			/// @param Str Mutable input string.
@@ -140,6 +146,10 @@ namespace Modio
 
 				return URL.substr(LastPos + 1);
 			}
+
+			// Re-allow "unused function" warnings
+			MODIO_DIAGNOSTIC_POP
+
 		} // namespace String
 	} // namespace Detail
 } // namespace Modio

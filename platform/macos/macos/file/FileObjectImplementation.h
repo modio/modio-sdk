@@ -47,7 +47,7 @@ namespace Modio
 			{
 				Destroy();
 			}
-			void Destroy()
+			void Destroy() override
 			{
 				if (FileDescriptor != InvalidFileDescriptor)
 				{
@@ -70,7 +70,7 @@ namespace Modio
 				return CancelRequested;
 			}
 
-			Modio::filesystem::path GetPath()
+			Modio::filesystem::path GetPath() override
 			{
 				return FilePath;
 			}
@@ -99,7 +99,7 @@ namespace Modio
 				Modio::filesystem::resize_file(FilePath, Offset, ec);
 			}
 
-			virtual std::size_t GetSize() override
+			virtual std::uint64_t GetSize() override
 			{
 				Modio::ErrorCode ec;
 				return Modio::filesystem::file_size(FilePath, ec);
@@ -132,22 +132,22 @@ namespace Modio
 				return CurrentSeekOffset;
 			}
 
-			void SetFileStrand(asio::strand<asio::io_context::executor_type>& FileStrand)
+			void SetFileStrand(asio::strand<asio::io_context::executor_type>& FileStrand) override
 			{
 				Strand = &FileStrand;
 			}
 
-			asio::strand<asio::io_context::executor_type>& GetFileStrand()
+			asio::strand<asio::io_context::executor_type>& GetFileStrand() override
 			{
 				return *Strand;
 			}
 
-			Modio::ErrorCode CreateFile(Modio::filesystem::path NewFilePath)
+			Modio::ErrorCode CreateFile(Modio::filesystem::path NewFilePath) override
 			{
 				return OpenFile(NewFilePath, true);
 			}
 
-			Modio::ErrorCode OpenFile(Modio::filesystem::path Path, bool bOverwrite = false)
+			Modio::ErrorCode OpenFile(Modio::filesystem::path Path, bool bOverwrite = false) override
 			{
 				Modio::ErrorCode ec;
 				filesystem::create_directories(Path.parent_path(), ec);
