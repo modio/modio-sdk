@@ -57,8 +57,6 @@ namespace Modio
 							std::uint64_t DataSize = DataToWrite.GetSize();
 							CFDataRef DataRef =
 								CFDataCreate(kCFAllocatorDefault, (const UInt8*) DataToWrite.Data(), DataSize);
-							CFStringCreateWithBytes(kCFAllocatorDefault, CFDataGetBytePtr(DataRef),
-														CFDataGetLength(DataRef), kCFStringEncodingUTF8, false);
 							CFIndex WrittenBytes = CFWriteStreamWrite(Request->WriteStream, CFDataGetBytePtr(DataRef),
 																	  CFDataGetLength(DataRef));
 							CFRelease(DataRef);

@@ -62,11 +62,13 @@ namespace Modio
 							return;
 						}
 
-						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http, "Sending request",
+						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+													"Sending request: {}",
 													Request->GetParameters().GetFormattedResourcePath());
 					}
 
-					if (Request->GetParameters().GetTypedVerb() == Verb::POST)
+					if (Request->GetParameters().GetTypedVerb() == Verb::POST ||
+						Request->GetParameters().GetTypedVerb() == Verb::PUT)
 					{
 						if (CFWriteStreamOpen(Request->WriteStream) == false ||
 							CFReadStreamOpen(Request->ReadStream) == false)
@@ -77,12 +79,13 @@ namespace Modio
 							if (StreamError.error != 0)
 							{
 								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
-															"Could not open HTTPS POST connection, error code {}",
+															"Could not open HTTPS POST/PUT connection, error code {}",
 															StreamError.error);
 								ec = Modio::make_error_code(Modio::HttpError::CannotOpenConnection);
 							}
 
 							CFWriteStreamClose(Request->WriteStream);
+							CFReadStreamClose(Request->ReadStream);
 							Self.complete(ec);
 							return;
 						}
@@ -91,9 +94,22 @@ namespace Modio
 							// Write the headers if the request
 							const UInt8* DataPtr = CFDataGetBytePtr(Request->HTTPRequestData);
 							CFIndex DataLength = CFDataGetLength(Request->HTTPRequestData);
-                            //// If debugging is necessary, this will print the headers attached to the HTTP request
-                            //CFShow(CFStringCreateWithBytes(kCFAllocatorDefault, DataPtr, DataLength, kCFStringEncodingUTF8, false));
-							CFWriteStreamWrite(Request->WriteStream, DataPtr, DataLength);
+							//// If debugging is necessary, this will print the headers attached to the HTTP request
+							// CFShow(CFStringCreateWithBytes(kCFAllocatorDefault, DataPtr, DataLength,
+							// kCFStringEncodingUTF8, false));
+							CFIndex WriteResult = CFWriteStreamWrite(Request->WriteStream, DataPtr, DataLength);
+
+							if (WriteResult < 0)
+							{
+								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+															"HTTPS POST/PUT connection error code {}", WriteResult);
+								ec = Modio::make_error_code(Modio::HttpError::RequestError);
+								CFWriteStreamClose(Request->WriteStream);
+								CFReadStreamClose(Request->ReadStream);
+								Self.complete(ec);
+
+								return;
+							}
 
 							// Some POST request might have a URL encoded Payload, which will not be called at
 							// "WriteSomeToRequestOp" Therefore, it is sent at this stage.
@@ -101,32 +117,44 @@ namespace Modio
 								Request->GetParameters().GetUrlEncodedPayload();
 							if (EncodedPayload.has_value() == true)
 							{
-								CFWriteStreamWrite(Request->WriteStream, (UInt8*) EncodedPayload.value().c_str(),
-												   EncodedPayload.value().size());
+								WriteResult =
+									CFWriteStreamWrite(Request->WriteStream, (UInt8*) EncodedPayload.value().c_str(),
+													   EncodedPayload.value().size());
+								if (WriteResult < 0)
+								{
+									Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+																"HTTPS connection of EncodedPayload error code {}",
+																WriteResult);
+									ec = Modio::make_error_code(Modio::HttpError::RequestError);
+									CFWriteStreamClose(Request->WriteStream);
+									CFReadStreamClose(Request->ReadStream);
+									Self.complete(ec);
+									return;
+								}
 							}
 						}
 					}
-                    else
-                    {
-                        // An stream open means it commands CF to start the HTTPS request
-                        if (CFReadStreamOpen(Request->ReadStream) == false)
-                        {
-                            // This means that the ReadStream did not open
-                            CFStreamError StreamError = CFReadStreamGetError(Request->ReadStream);
+					else
+					{
+						// An stream open means it commands CF to start the HTTPS request
+						if (CFReadStreamOpen(Request->ReadStream) == false)
+						{
+							// This means that the ReadStream did not open
+							CFStreamError StreamError = CFReadStreamGetError(Request->ReadStream);
 
-                            if (StreamError.error != 0)
-                            {
-                                Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
-                                                            "Could not open HTTPS connection, error code {}",
-                                                            StreamError.error);
-                                ec = Modio::make_error_code(Modio::HttpError::CannotOpenConnection);
-                            }
+							if (StreamError.error != 0)
+							{
+								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+															"Could not open HTTPS connection, error code {}",
+															StreamError.error);
+								ec = Modio::make_error_code(Modio::HttpError::CannotOpenConnection);
+							}
 
-                            CFReadStreamClose(Request->ReadStream);
-                            Self.complete(ec);
-                            return;
-                        }
-                    }
+							CFReadStreamClose(Request->ReadStream);
+							Self.complete(ec);
+							return;
+						}
+					}
 
 					Self.complete({});
 				}

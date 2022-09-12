@@ -9,15 +9,15 @@
  */
 
 #pragma once
-#include <string>
-#include <codecvt>
-#include <locale>
+
 #include "utf8.h"
-//in the unlikely event codecvt ever actually gets deprecated, you can replace this with the utfcpp library at https://github.com/nemtrif/utfcpp
+#include <string>
 
 inline const std::wstring UTF8ToWideChar(std::string UTF8String)
 {
-	return std::wstring_convert< std::codecvt_utf8<wchar_t>, wchar_t >{}.from_bytes(UTF8String);
+	std::wstring Result;
+	utf8::utf8to16(UTF8String.begin(), UTF8String.end(), back_inserter(Result));
+	return Result;
 }
 
 inline const std::string WideCharToUTF8(std::wstring WideString)

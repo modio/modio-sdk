@@ -68,10 +68,12 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
-					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
-												"Begin read for {}, File Descriptor {}, expected size: {}, Offset: {}",
-												FileImpl->GetPath().u8string(), FileImpl->GetFileHandle(),
-												MaxBytesToRead, FileOffset.has_value() ? FileOffset.value() : 0);
+
+					Modio::Detail::Logger().Log(
+						Modio::LogLevel::Trace, Modio::LogCategory::File,
+						"ReadSomeFromFileOp for {}, File Descriptor {}, expected size: {}, Offset: {}",
+						FileImpl->GetPath().u8string(), FileImpl->GetFileHandle(), MaxBytesToRead,
+						std::to_string(FileOffset.has_value() ? FileOffset.value() : Modio::FileOffset(0)));
 
 					// SubmitRead could fail with system errors.
 					CurrentErrorCode = PinnedState->SubmitRead(FileImpl->GetFileHandle(), MaxBytesToRead,

@@ -70,7 +70,8 @@ namespace Modio
 							 CFRelease(Key);
 						 });
 
-				if (Request->GetParameters().GetTypedVerb() == Verb::POST)
+				if (Request->GetParameters().GetTypedVerb() == Verb::POST ||
+					Request->GetParameters().GetTypedVerb() == Verb::PUT)
 				{
 					URLStdStr = Request->Parameters.GetServerAddress();
 					CFStringRef HostURL =

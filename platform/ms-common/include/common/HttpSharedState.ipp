@@ -58,7 +58,7 @@ void HttpSharedStateBase::InitializeRequest(std::shared_ptr<HttpRequestImplement
 						   WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, WINHTTP_FLAG_SECURE);
 	}
 
-	bool Success = WinHttpSetOption(RequestHandle, WINHTTP_OPTION_CONTEXT_VALUE, this, sizeof(uintptr_t));
+	
 	if (RequestHandle == nullptr)
 	{
 		ec = Modio::make_error_code(Modio::HttpError::CannotOpenConnection);
@@ -107,4 +107,5 @@ bool HttpSharedStateBase::IsClosing()
 void HttpSharedStateBase::Close()
 {
 	CurrentServiceState = HttpServiceState::Closing;
+	WinHttpSetOption(CurrentSession, WINHTTP_OPTION_CONTEXT_VALUE, nullptr, sizeof(uintptr_t));
 }

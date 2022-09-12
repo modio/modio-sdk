@@ -38,7 +38,7 @@ static void __stdcall ModioWinhttpStatusCallback(HINTERNET InternetHandle, DWORD
 			if (StatusCode == WinHTTPCallbackStatus::RequestError)
 			{
 				WINHTTP_ASYNC_RESULT* Result = static_cast<WINHTTP_ASYNC_RESULT*>(StatusInformation);
-				Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Http,
 											"Function {:x} returned error code {:x}\r\n",
 											(unsigned long) Result->dwResult, (unsigned long) Result->dwError);
 			}

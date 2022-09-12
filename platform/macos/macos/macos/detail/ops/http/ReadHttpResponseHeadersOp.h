@@ -224,7 +224,7 @@ namespace Modio
 
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
 												"Response Headers received OK with response code: {}",
-                                                Request->ResponseCode);
+												Request->ResponseCode);
 					// Already processed the response code and removed header data from the response buffer so just
 					// return no error code
 					Self.complete({});
@@ -257,9 +257,10 @@ namespace Modio
 
 					// Consume amount of data the headers used up so ResponseDataBuffer is only the body
 					Request->ResponseDataBuffer.consume(LinearBuffer.GetSize() - Matches.suffix().length());
-					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
-												"Bytes remaining after consumption: {}, while expecting {} bytes total in response",
-												Request->ResponseDataBuffer.size(), Request->GetContentLength().value_or(0));
+					Modio::Detail::Logger().Log(
+						Modio::LogLevel::Trace, Modio::LogCategory::Http,
+						"Bytes remaining after consumption: {}, while expecting {} bytes total in response",
+						Request->ResponseDataBuffer.size(), Request->GetContentLength().value_or(0));
 					return true;
 				}
 				else

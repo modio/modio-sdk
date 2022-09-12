@@ -53,7 +53,7 @@ namespace Modio
 						if (FileBuffer.size() > 0)
 						{
 							ConfigJson = std::make_unique<nlohmann::json>(Modio::Detail::ToJson(FileBuffer));
-							if (*ConfigJson != nlohmann::json::value_t::discarded)
+							if (!ConfigJson->is_discarded())
 							{
 								if (ConfigJson->contains(Modio::Detail::Constants::JSONKeys::RootLocalStoragePath))
 								{
@@ -80,7 +80,8 @@ namespace Modio
 						}
 						std::copy(DefaultConfigString.begin(), DefaultConfigString.end(), DefaultConfigBuffer->Data());
 					}
-
+					ConfigFile->Truncate(Modio::FileOffset(0));
+					ConfigFile->Seek(Modio::FileOffset(0));
 					yield ConfigFile->WriteAsync(std::move(*DefaultConfigBuffer), std::move(Self));
 					if (ec)
 					{

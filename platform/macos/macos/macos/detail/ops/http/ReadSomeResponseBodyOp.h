@@ -84,10 +84,11 @@ namespace Modio
 						// While we have any prebuffered response data from when we were looking for the response
 						// headers, stuff that data into the response
 
-						while (Modio::Optional<Buffer> PrebufferedResponseData = Request->ResponseDataBuffer.TakeInternalBuffer())
-                        {
-                            ResponseBuffer.AppendBuffer(PrebufferedResponseData.take().value());
-                        }
+						while (Modio::Optional<Buffer> PrebufferedResponseData =
+								   Request->ResponseDataBuffer.TakeInternalBuffer())
+						{
+							ResponseBuffer.AppendBuffer(PrebufferedResponseData.take().value());
+						}
 					}
 					// In some cases, it is possible that the ReadStream has not "ended" but the Stream
 					// remains open. If the CFReadStreamRead is called without bytes, it would wait for
@@ -97,24 +98,39 @@ namespace Modio
 						// Read bytes into the ResponseDataBuffer
 						CFIndex ReadBytes = CFReadStreamRead(Request->ReadStream, ReadChunk.Data(), ReadChunkSize);
 
-						if (ReadBytes <= 0)
+						if (ReadBytes < 0)
 						{
 							Modio::Detail::Logger().Log(
 								Modio::LogLevel::Error, Modio::LogCategory::Http,
 								"ReadSomeResponseBodyOp stream could not be read or an error has ocurred");
-							Modio::make_error_code(Modio::HttpError::RequestError);
-							break;
+							Self.complete(Modio::make_error_code(Modio::HttpError::RequestError));
+							return;
 						}
+						// It is possible to read "0" bytes from the Stream, just warn about it but do nothing
+						// as the error below should signal the end of the stream or possibly at the moment
+						// there are no more bytes to read
+						else if (ReadBytes == 0)
+						{
+							Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Http,
+														"ReadSomeResponseBodyOp stream read 0 bytes");
+						}
+						// Only append if it has read more than 1 byte
+						else
+						{
+							BytesLastRead = ReadBytes;
+							Request->ResponseBodyReceivedLength += ReadBytes;
+							ResponseBuffer.AppendBuffer(ReadChunk.CopyRange(0, BytesLastRead));
 
-						BytesLastRead = ReadBytes;
-						Request->ResponseBodyReceivedLength += ReadBytes;
-
-						ResponseBuffer.AppendBuffer(ReadChunk.CopyRange(0, BytesLastRead));
+ #ifdef MODIO_TRACE_DUMP_RESPONSE
+							Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+														"ReadSomeResponseBodyOp Response body: {}", ReadChunk.Data());
+ #endif // MODIO_TRACE_DUMP_RESPONSE
+						}
 					}
-					
-                    // We need to know signal to SDK's upper layers that there are no more bytes available
-                    // in the ResponseBody. Using this method, we avoid using the function "HandleChunkedEncoding"
-                    if (Request->ReadStreamStatus() == kCFStreamStatusAtEnd)
+
+					// We need to know signal to SDK's upper layers that there are no more bytes available
+					// in the ResponseBody. Using this method, we avoid using the function "HandleChunkedEncoding"
+					if (Request->ReadStreamStatus() == kCFStreamStatusAtEnd)
 					{
 						ec = Modio::make_error_code(Modio::GenericError::EndOfFile);
 					}
