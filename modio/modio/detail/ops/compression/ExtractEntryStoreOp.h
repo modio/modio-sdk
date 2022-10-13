@@ -1,22 +1,23 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
-#include "modio/detail/compression/zlib/inflate_stream.hpp"
-#include "modio/detail/compression/zlib/zlib.hpp"
 #include "modio/core/ModioBuffer.h"
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioObjectTrack.h"
 #include "modio/detail/compression/zip/ArchiveFileImplementation.h"
+#include "modio/detail/compression/zlib/inflate_stream.hpp"
+#include "modio/detail/compression/zlib/zlib.hpp"
 #include "modio/file/ModioFile.h"
 #include <asio/yield.hpp>
 #include <cstdint>
@@ -50,9 +51,11 @@ namespace Modio
 								Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo)
 			{
 				Impl = std::make_shared<ExtractEntryImpl>(ExtractEntryImpl {
-					Modio::Detail::File(ArchiveFileImpl->FilePath, false), ArchiveFileImpl, EntryToExtract,
-					RootDirectoryToExtractTo, Modio::Detail::DynamicBuffer {}, 0u,
-					Modio::Detail::File(RootDirectoryToExtractTo / EntryToExtract.FilePath, true), ProgressInfo});
+					Modio::Detail::File(ArchiveFileImpl->FilePath, Modio::Detail::FileMode::ReadWrite, false),
+					ArchiveFileImpl, EntryToExtract, RootDirectoryToExtractTo, Modio::Detail::DynamicBuffer {}, 0u,
+					Modio::Detail::File(RootDirectoryToExtractTo / EntryToExtract.FilePath,
+										Modio::Detail::FileMode::ReadWrite, true),
+					ProgressInfo});
 			};
 
 			ExtractEntryStoreOp(ExtractEntryStoreOp&& Other)
@@ -65,8 +68,9 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Compression,
-												"Extracting entry in Store {}", Impl->EntryToExtract.FilePath.u8string());
-					
+												"Extracting entry in Store {}",
+												Impl->EntryToExtract.FilePath.u8string());
+
 					if (Impl->EntryToExtract.UncompressedSize == 0)
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Compression,
@@ -105,7 +109,8 @@ namespace Modio
 
 						while (Impl->FileData.size())
 						{
-						//Can safely assume that we'll get a value from TakeInternalBuffer because we've checked the size
+							// Can safely assume that we'll get a value from TakeInternalBuffer because we've checked
+							// the size
 							yield Impl->DestinationFile.WriteAsync(Impl->FileData.TakeInternalBuffer().value(),
 																   std::move(Self));
 							if (ec)

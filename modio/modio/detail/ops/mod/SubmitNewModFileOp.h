@@ -132,6 +132,13 @@ namespace Modio
 						Self.complete(Modio::make_error_code(Modio::FilesystemError::DirectoryNotFound));
 						return;
 					}
+					else
+					{
+						Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(
+							Modio::ModManagementEvent {CurrentModID,
+													   Modio::ModManagementEvent::EventType::BeginUpload,
+													   {}});
+					}
 
 					yield Modio::Detail::CompressFolderAsync(ModRootDirectory, ArchivePath, ProgressInfo,
 															 std::move(Self));

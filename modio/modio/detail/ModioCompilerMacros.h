@@ -32,6 +32,9 @@
     // Compiler warning (level 4) C4583	'type': destructor is not implicitly called
     #define DISABLE_WARNING_NOT_IMPLICIT_DESCTRUCTOR            DISABLE_WARNING(4583)
 
+    // It needs definition even when not used in MSVC
+    #define DISABLE_WARNING_SIGNED_UNSIGNED_INTEGER_COMPARISON
+
 #elif defined(__GNUC__) || defined(__clang__)
     #define DO_PRAGMA(X) _Pragma(#X)
     #define DISABLE_WARNING_PUSH           DO_PRAGMA(GCC diagnostic push)

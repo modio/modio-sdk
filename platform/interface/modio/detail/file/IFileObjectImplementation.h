@@ -35,7 +35,7 @@ namespace Modio
 
 			virtual Modio::ErrorCode CreateFile(filesystem::path FilePath) = 0;
 
-			virtual Modio::ErrorCode OpenFile(filesystem::path FilePath, bool bOverwrite = false) = 0;
+			virtual Modio::ErrorCode OpenFile(filesystem::path FilePath, Modio::Detail::FileMode Mode, bool bOverwrite = false) = 0;
 
 			/// @brief OS-specific file size calculation
 			/// @return Size of the underlying file
@@ -55,6 +55,9 @@ namespace Modio
 			/// @brief Sets the offset for future streamed reads or writes to the file
 			/// @param Offset The position to read or write from
 			virtual void Seek(Modio::FileOffset Offset, Modio::Detail::SeekDirection Direction) = 0;
+			/// @brief Retrieves the mode used to open the file, specifying Read-Write or Read-Only access
+			/// @return The file mode specifying Read-Write or Read-Only access
+			virtual Modio::Detail::FileMode GetFileMode() = 0;
 
 			virtual void Destroy() = 0;
 		};

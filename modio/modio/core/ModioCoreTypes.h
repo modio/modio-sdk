@@ -11,8 +11,8 @@
 #pragma once
 
 #include "modio/core/ModioStdTypes.h"
+#include "modio/detail/JsonWrapper.h"
 #include <cstdint>
-#include <nlohmann/json.hpp>
 #include <string>
 
 namespace Modio
@@ -24,6 +24,15 @@ namespace Modio
 		Test,
 		Live
 	};
+
+	/// @docpublic
+	/// @brief Transform the EnumValue into the underlying type
+	/// @param EnumValue The enumerator value
+	/// @return A statically casted value related to the enumerator
+	inline auto format_as(Modio::Environment EnumValue)
+	{
+		return static_cast<std::underlying_type_t<Modio::Environment>>(EnumValue);
+	}
 
 	/// @docpublic
 	/// @brief Enum representing the store or service your game is being distributed through
@@ -42,6 +51,15 @@ namespace Modio
 	};
 
 	/// @docpublic
+	/// @brief Transform the EnumValue into the underlying type
+	/// @param EnumValue The enumerator value
+	/// @return A statically casted value related to the enumerator
+	inline auto format_as(Modio::Portal EnumValue)
+	{
+		return static_cast<std::underlying_type_t<Modio::Portal>>(EnumValue);
+	}
+
+	/// @docpublic
 	/// @brief Enum representing the platform(s) that a modfile is enabled for
 	enum class ModfilePlatform
 	{
@@ -52,11 +70,20 @@ namespace Modio
 		iOS,
 		XboxOne,
 		XboxSeriesX,
-		PS4, 
-		PS5, 
-		Switch, 
+		PS4,
+		PS5,
+		Switch,
 		Oculus
 	};
+
+	/// @docpublic
+	/// @brief Transform the EnumValue into the underlying type
+	/// @param EnumValue The enumerator value
+	/// @return A statically casted value related to the enumerator
+	inline auto format_as(Modio::ModfilePlatform EnumValue)
+	{
+		return static_cast<std::underlying_type_t<Modio::ModfilePlatform>>(EnumValue);
+	}
 
 	/// @docpublic
 	/// @brief Enum representing mod logo sizes
@@ -69,6 +96,15 @@ namespace Modio
 	};
 
 	/// @docpublic
+	/// @brief Transform the EnumValue into the underlying type
+	/// @param EnumValue The enumerator value
+	/// @return A statically casted value related to the enumerator
+	inline auto format_as(Modio::LogoSize EnumValue)
+	{
+		return static_cast<std::underlying_type_t<Modio::LogoSize>>(EnumValue);
+	}
+
+	/// @docpublic
 	/// @brief Enum representing avatar image sizes
 	enum class AvatarSize : std::uint8_t
 	{
@@ -77,11 +113,32 @@ namespace Modio
 		Thumb100 ///< 100x100
 	};
 
+	/// @docpublic
+	/// @brief Transform the EnumValue into the underlying type
+	/// @param EnumValue The enumerator value
+	/// @return A statically casted value related to the enumerator
+	inline auto format_as(Modio::AvatarSize EnumValue)
+	{
+		return static_cast<std::underlying_type_t<Modio::AvatarSize>>(EnumValue);
+	}
+	
+	/// @docpublic
+	/// @brief Enum representing an image gallery size
 	enum class GallerySize : std::uint8_t
 	{
 		Original,
-		Thumb320 ///< 320x180
+		Thumb320, ///< 320x180
+		Thumb1280 ///< 1280x720
 	};
+
+	/// @docpublic
+	/// @brief Transform the EnumValue into the underlying type
+	/// @param EnumValue The enumerator value
+	/// @return A statically casted value related to the enumerator
+	inline auto format_as(Modio::GallerySize EnumValue)
+	{
+		return static_cast<std::underlying_type_t<Modio::GallerySize>>(EnumValue);
+	}
 
 	/// @docpublic
 	/// @brief Strong integer type to prevent accidental function parameter reordering and prevent unwanted implicit
@@ -103,6 +160,7 @@ namespace Modio
 		/// @param Value initial value
 		constexpr explicit StrongInteger(UnderlyingIntegerType Value) : Value(Value) {};
 
+		/// @docnone
 		constexpr explicit StrongInteger() = default;
 
 		/// @brief Allow implicit conversion to the underlying integer type
@@ -111,6 +169,7 @@ namespace Modio
 			return Value;
 		}
 
+		/// @docnone
 		/// @brief Allow us to explicit convert to our underlying type
 		constexpr UnderlyingIntegerType operator*() const
 		{
@@ -120,57 +179,70 @@ namespace Modio
 		///@{
 		/** Arithmetic and logical operator overloads */
 
+		/// @docnone
 		constexpr StrongInteger& operator+=(const StrongInteger Other)
 		{
 			Value += Other.Value;
 			return *this;
 		}
 
+		/// @docnone
 		constexpr StrongInteger& operator-=(const StrongInteger Other)
 		{
 			Value -= Other.Value;
 			return *this;
 		}
 
+		/// @docnone
 		constexpr StrongInteger operator+(const StrongInteger Other) const
 		{
 			return StrongInteger(Value + Other.Value);
 		}
 
+		/// @docnone
 		constexpr StrongInteger operator-(const StrongInteger Other) const
 		{
 			return StrongInteger(Value - Other.Value);
 		}
 
+		/// @docnone
 		constexpr bool operator>(const StrongInteger Other) const
 		{
 			return Value > Other.Value;
 		}
 
+		/// @docnone
 		constexpr bool operator<(const StrongInteger Other) const
 		{
 			return Value < Other.Value;
 		}
+		
+		/// @docnone
 		constexpr bool operator>=(const StrongInteger Other) const
 		{
 			return Value >= Other.Value;
 		}
 
+		/// @docnone
 		constexpr bool operator<=(const StrongInteger Other) const
 		{
 			return Value <= Other.Value;
 		}
 
+		/// @docnone
 		constexpr bool operator==(const StrongInteger Other) const
 		{
 			return Value == Other.Value;
 		}
 
+		/// @docnone
 		constexpr bool operator!=(const StrongInteger Other) const
 		{
 			return Value != Other.Value;
 		}
 		///@}
+		
+		/// @docnone
 		friend void from_json(const nlohmann::json& Json, Modio::StrongInteger<UnderlyingIntegerType>& Integer)
 		{
 			using nlohmann::from_json;
@@ -179,6 +251,7 @@ namespace Modio
 			Integer = Modio::StrongInteger<UnderlyingIntegerType>(RawValue);
 		}
 
+		/// @docnone
 		friend void to_json(nlohmann::json& Json, const Modio::StrongInteger<UnderlyingIntegerType>& Integer)
 		{
 			using nlohmann::to_json;
@@ -193,6 +266,7 @@ namespace Modio
 	{
 		std::string InternalCode;
 
+		/// @docpublic
 		/// @brief Explicit constructor
 		/// @param Code The code sent to the user's email
 		explicit EmailAuthCode(const std::string& Code) : InternalCode(Code) {}
@@ -204,6 +278,7 @@ namespace Modio
 	{
 		std::string InternalAddress;
 
+		/// @docpublic
 		/// @brief Explicit constructor
 		/// @param Code The code sent to the user's email
 		explicit EmailAddress(const std::string& Code) : InternalAddress(Code) {}
@@ -213,17 +288,24 @@ namespace Modio
 	/// @brief Strong type representing an api key
 	struct ApiKey
 	{
+		/// @docinternal
+		/// @brief Default constructor
 		ApiKey() = default;
 
+		/// @docpublic
 		/// @brief Explicit constructor
 		/// @param Code The code sent to the user's email
 		explicit ApiKey(const std::string& InApiKey) : InternalApiKey(InApiKey) {}
 
+		/// @docinternal
+		/// @brief Compare the ApiKey to an empty string
 		bool IsValid() const
 		{
 			return InternalApiKey != *InvalidAPIKey();
 		}
 
+		/// @docinternal
+		/// @brief Static function to an invalid API key
 		static const ApiKey& InvalidAPIKey()
 		{
 			static ApiKey Invalid("");
@@ -231,6 +313,7 @@ namespace Modio
 			return Invalid;
 		}
 
+		/// @docnone
 		const std::string& operator*() const
 		{
 			return InternalApiKey;
@@ -242,10 +325,13 @@ namespace Modio
 
 	// Needs to be subclassed rather than type aliased so we don't accidentally provide the wrong type to a function
 
+	/// @docpublic
 	/// @brief Strong type for User IDs
 	struct UserID : public StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
+		/// @docinternal
+		/// @brief Default constructor
 		UserID() : StrongInteger(-1) {};
 	};
 
@@ -254,13 +340,19 @@ namespace Modio
 	struct ModID : public StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
+		/// @docinternal
+		/// @brief Default constructor
 		ModID() : StrongInteger(-1) {};
 
+		/// @docinternal
+		/// @brief Compare the ModID to an invalid instance
 		constexpr bool IsValid() const
 		{
 			return *this != InvalidModID();
 		}
 
+		/// @docinternal
+		/// @brief Static function to an invalid ModID 
 		static constexpr ModID InvalidModID()
 		{
 			constexpr ModID ID(-1);
@@ -283,18 +375,21 @@ namespace Modio
 		using StrongInteger::StrongInteger;
 	};
 
+	/// @docpublic
 	/// @brief Strong type for Media File ID
 	struct MediaFileID : public StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
 	};
 
+	/// @docpublic
 	/// @brief Strong type for file offsets
 	struct FileOffset : public StrongInteger<std::uintmax_t>
 	{
 		using StrongInteger::StrongInteger;
 	};
 
+	/// @docpublic
 	/// @brief Strong type for file sizes
 	struct FileSize : public StrongInteger<std::uintmax_t>
 	{
@@ -306,13 +401,19 @@ namespace Modio
 	struct GameID : public StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
+		/// @docinternal
+		/// @brief Default constructor
 		GameID() : StrongInteger(-1) {};
 		
+		/// @docinternal
+		/// @brief Compare the GameID to an invalid instance
 		constexpr bool IsValid() const
 		{
 			return *this != InvalidGameID();
 		}
 
+		/// @docinternal
+		/// @brief Static function to an invalid GameID
 		static constexpr GameID InvalidGameID()
 		{
 			constexpr GameID ID(-1);
@@ -371,6 +472,7 @@ namespace Modio
 		Discord
 	};
 
+	/// @docpublic
 	/// @brief Simple struct representing a validation error from the REST API
 	struct FieldError
 	{
@@ -401,7 +503,7 @@ namespace Modio
 		User,
 		ModManagement,
 		Test,
-        System
+		System
 	};
 
 	/// @docpublic
@@ -419,6 +521,16 @@ namespace Modio
 {
 	namespace Detail
 	{
+		/// @docinternal
+		/// @brief The read/write access of a file
+		enum class FileMode
+		{
+			ReadOnly,
+			ReadWrite
+		};
+
+		/// @docnone
+		/// @brief Transform a Language to its two letter string representation
 		inline std::string ToString(Modio::Language Locale)
 		{
 			switch (Locale)
@@ -458,6 +570,9 @@ namespace Modio
 			return "Unknown";
 		}
 
+		/// @docinternal
+		/// @brief Transform an Authentication Provider to its string representation which
+		/// match the backend list of supported platforms
 		inline std::string ToString(Modio::AuthenticationProvider Provider)
 		{
 			switch (Provider)

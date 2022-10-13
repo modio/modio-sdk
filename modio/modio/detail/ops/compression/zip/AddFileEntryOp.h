@@ -41,8 +41,10 @@ namespace Modio
 				  LocalFileHeaderBuffer(GetLocalFileHeaderSize()),
 				  ProgressInfo(ProgressInfo)
 			{
-				InputFile = std::make_unique<Modio::Detail::File>(SourceFilePath, false);
-				OutputFile = std::make_unique<Modio::Detail::File>(ArchiveFile->FilePath, false);
+				InputFile =
+					std::make_unique<Modio::Detail::File>(SourceFilePath, Modio::Detail::FileMode::ReadWrite, false);
+				OutputFile = std::make_unique<Modio::Detail::File>(ArchiveFile->FilePath,
+																   Modio::Detail::FileMode::ReadWrite, false);
 				CompressionStream = std::make_unique<boost::beast::zlib::deflate_stream>();
 				InputFileSize = InputFile->GetFileSize();
 				IsZip64 = InputFileSize >= (UINT32_MAX - 1);
@@ -163,8 +165,8 @@ namespace Modio
 					}
 
 					// Finish the zlib stream for the current file
-                    // Only with a File that has bytes in it
-                    if (InputFileSize > 0)
+					// Only with a File that has bytes in it
+					if (InputFileSize > 0)
 					{
 						// In case the CompressionState still has data available from the last iteration
 						// keep the last pointer alive. If not, then apply nullptr
@@ -252,7 +254,7 @@ namespace Modio
 					// Add "Extra Field" information regardless of Zip64 status
 					{
 						Modio::Detail::TypedBufferWrite(
-                            Constants::ZipTag::ExtendedInformationFieldHeaderID, LocalFileHeaderBuffer,
+							Constants::ZipTag::ExtendedInformationFieldHeaderID, LocalFileHeaderBuffer,
 							30 + PathInsideArchive.generic_u8string()
 									 .size()) // header signature
 											  // Here we only need to mention the (un)compressed and offset bytes
@@ -308,7 +310,8 @@ namespace Modio
 			std::size_t GetLocalFileHeaderSize()
 			{
 				// Always include the "extra field" length even if it is not used (28 bytes at the end)
-				return 30 + PathInsideArchive.generic_u8string().size() + Constants::ZipTag::TotalExtraFieldSizeFileEntries;
+				return 30 + PathInsideArchive.generic_u8string().size() +
+					   Constants::ZipTag::TotalExtraFieldSizeFileEntries;
 			}
 		};
 #include <asio/unyield.hpp>

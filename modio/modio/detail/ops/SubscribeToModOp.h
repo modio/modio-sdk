@@ -78,15 +78,20 @@ namespace Modio
 						Modio::Detail::SDKSessionData::GetSystemModCollection().AddOrUpdateMod(
 							ProfileData.value(),
 							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MakeModPath(
-								ProfileData->ModId));
+								ProfileData->ModId).u8string());
 						// Returns true if this is a new subscription for the user
 						if (Modio::Detail::SDKSessionData::GetUserSubscriptions().AddMod(ProfileData.value()))
 						{
 							// Increment the reference count
-							Modio::Detail::SDKSessionData::GetSystemModCollection()
-								.Entries()
-								.at(ProfileData->ModId)
-								->AddLocalUserSubscription(Modio::Detail::SDKSessionData::GetAuthenticatedUser());
+							std::uint8_t ReferenceCount =
+								Modio::Detail::SDKSessionData::GetSystemModCollection()
+									.Entries()
+									.at(ProfileData->ModId)
+									->AddLocalUserSubscription(Modio::Detail::SDKSessionData::GetAuthenticatedUser());
+
+							Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::ModManagement,
+														"Incremented reference count for mod {} to {}", ModId,
+														ReferenceCount);
 
 							// Currently not checking the return values from these calls, because if they fail we'll
 							// still be installing the mod yield

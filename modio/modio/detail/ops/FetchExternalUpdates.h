@@ -82,7 +82,7 @@ namespace Modio
 							Modio::Detail::SDKSessionData::GetSystemModCollection().AddOrUpdateMod(
 								Profile,
 								Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MakeModPath(
-									Profile.ModId));
+									Profile.ModId).u8string());
 						}
 
 						std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType> ModListDiff =

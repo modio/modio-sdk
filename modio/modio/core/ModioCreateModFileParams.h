@@ -11,9 +11,12 @@
 #pragma once
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/entities/ModioModInfo.h"
+#include <string>
 
 namespace Modio
 {
+	/// @docpublic
+	/// @brief Class specifying the parameters to submit when creating a mod file
 	class CreateModFileParams
 	{
 	public:
@@ -21,7 +24,7 @@ namespace Modio
 		/// @brief Path to a directory to treat as the root of the mod. All contents of this folder will be added to the
 		/// archive, with a relative path based on this directory. This directory will not be created itself, the
 		/// contents will exist at the top level of the archive.
-		Modio::filesystem::path RootDirectory;
+		std::string RootDirectory;
 
 		/// @docpublic
 		/// @brief Optional version string for this modfile release

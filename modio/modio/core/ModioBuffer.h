@@ -13,7 +13,6 @@
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioDefines.h"
-#include "modio/detail/ModioProfiling.h"
 #include <memory>
 #include <mutex>
 
@@ -21,7 +20,7 @@ namespace Modio
 {
 	namespace Detail
 	{
-		/// @internal
+		/// @docinternal
 		/// @brief Alignable moveable fixed-size buffer class. Aligned storage is more wasteful but will allow us to
 		/// swap to unbuffered IO on Windows/ERA platforms if we need additional performance
 		class Buffer
@@ -61,6 +60,7 @@ namespace Modio
 			MODIO_IMPL std::size_t GetSize() const;
 		};
 
+		/// @docinternal
 		/// @brief Class conforming to ASIO's DynamicBuffer_v2 concept also providing a stable address for the
 		/// underlying data, suitable for use in composed asynchronous operations. Copy constructor will only copy the
 		/// shared_ptr not the underlying data so that the address of the data itself doesn't change
@@ -166,6 +166,7 @@ namespace Modio
 		TypedWriteHelper TypedBufferWrite(const SourceType& Source, Modio::Detail::Buffer& BufferToWrite,
 										  std::uintmax_t Offset);
 
+		/// @docinternal
 		/// @brief Helper struct to make repeated calls to TypedBufferWrite less verbose if they are writing to
 		/// sequential memory
 		struct TypedWriteHelper
@@ -190,26 +191,15 @@ namespace Modio
 			return {BufferToWrite, Offset + sizeof(SourceType)};
 		}
 
+		/// @docinternal
 		/// @brief Copies a Modio::Detail::DynamicBuffer into a Modio::Detail::Buffer with no error checking
 		/// @param Destination The fixed-size buffer to store the data in. Must have size >= Source.size();
 		/// @param Source The dynamic buffer to copy the data from
 		/// @return The number of bytes copied
-		inline std::size_t BufferCopy(Modio::Detail::Buffer& Destination, const Modio::Detail::DynamicBuffer Source)
-		{
-			MODIO_PROFILE_SCOPE(DynamicBufferCopyToLinear);
-			return asio::buffer_copy(Modio::MutableBufferView(Destination.Data(), Destination.GetSize()),
-									 Source.data());
-		}
+		MODIO_IMPL std::size_t BufferCopy(Modio::Detail::Buffer& Destination, const Modio::Detail::DynamicBuffer Source);
 
-		inline std::size_t BufferCopy(Modio::Detail::DynamicBuffer& Destination,
-									  const Modio::Detail::DynamicBuffer Source)
-		{
-			MODIO_PROFILE_SCOPE(DynamicBufferCopyToDynamic);
-			Modio::Detail::DynamicBuffer::Sequence SourceBufferView = Source.data();
-			Modio::Detail::DynamicBuffer::Sequence DestinationBufferView = Destination.data();
-
-			return asio::buffer_copy(DestinationBufferView, SourceBufferView);
-		}
+		MODIO_IMPL std::size_t BufferCopy(Modio::Detail::DynamicBuffer& Destination,
+									  const Modio::Detail::DynamicBuffer Source);
 	} // namespace Detail
 } // namespace Modio
 

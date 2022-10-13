@@ -8,12 +8,13 @@
  *
  */
 
-// MIRRORED TO gdk/file/FileObjectImplementation.h, UPDATE THAT FILE IF THIS IS UPDATED
 #pragma once
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioOperationQueue.h"
 #include "modio/detail/file/IFileObjectImplementation.h"
 #include <atomic>
 #include <chrono>
@@ -27,11 +28,14 @@ namespace Modio
 			Modio::filesystem::path FilePath;
 			Modio::filesystem::path BasePath;
 			HANDLE FileHandle;
+			Modio::Detail::FileMode FileMode;
 			// Strand so that IO ops don't get performed simultaneously
 			asio::strand<asio::io_context::executor_type>* Strand;
 			std::atomic<bool> OperationInProgress {false};
 			std::atomic<std::int32_t> NumWaiters {0};
-			asio::steady_timer OperationQueue;
+			// asio::steady_timer OperationQueue;
+			std::shared_ptr<Modio::Detail::OperationQueue> OperationQueue;
+			std::unique_ptr<Modio::Detail::OperationQueue::Ticket> CurrentTicket;
 			Modio::FileOffset CurrentSeekOffset = Modio::FileOffset(0);
 			bool CancelRequested = false;
 
@@ -41,9 +45,12 @@ namespace Modio
 				  BasePath(BasePath),
 				  FileHandle(INVALID_HANDLE_VALUE),
 				  Strand(nullptr),
-				  OperationQueue(ParentContext, std::chrono::steady_clock::time_point::max()),
+				  // OperationQueue(ParentContext, std::chrono::steady_clock::time_point::max()),
+
 				  CurrentSeekOffset(0)
-			{}
+			{
+				OperationQueue = std::make_shared<Modio::Detail::OperationQueue>(ParentContext);
+			}
 
 			~FileObjectImplementation()
 			{
@@ -75,28 +82,35 @@ namespace Modio
 			template<typename OperationType>
 			void BeginExclusiveOperation(OperationType&& Operation)
 			{
-				if (OperationInProgress.exchange(true))
-				{
-					++NumWaiters;
-					OperationQueue.async_wait(
-						asio::bind_executor(Modio::Detail::Services::GetGlobalContext().get_executor(),
-											[Op = std::move(Operation)](asio::error_code ec) mutable { Op(); }));
-				}
-				else
-				{
-					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Operation));
-				}
+				CurrentTicket = std::make_unique<Modio::Detail::OperationQueue::Ticket>(OperationQueue);
+				CurrentTicket->WaitForTurnAsync(std::forward<OperationType>(Operation));
+				/*
+								if (OperationInProgress.exchange(true))
+								{
+									++NumWaiters;
+									OperationQueue.async_wait(
+										asio::bind_executor(Modio::Detail::Services::GetGlobalContext().get_executor(),
+															[Op = std::move(Operation)](asio::error_code ec) mutable {
+				   Op(); }));
+								}
+								else
+								{
+									asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				   std::move(Operation));
+								}
+				*/
 			}
 
 			void FinishExclusiveOperation()
 			{
-				OperationInProgress.exchange(false);
+				/*OperationInProgress.exchange(false);
 
 				if (NumWaiters > 0)
 				{
 					--NumWaiters;
 					OperationQueue.cancel_one();
-				}
+				}*/
+				CurrentTicket.reset();
 			}
 
 			Modio::filesystem::path GetPath()
@@ -117,7 +131,7 @@ namespace Modio
 				}
 				FilePath = NewPath;
 
-				ec = OpenFile(FilePath, false);
+				ec = OpenFile(FilePath, Modio::Detail::FileMode::ReadWrite, false);
 				return ec;
 			}
 
@@ -179,10 +193,16 @@ namespace Modio
 
 			Modio::ErrorCode CreateFile(Modio::filesystem::path NewFilePath)
 			{
-				return OpenFile(NewFilePath, true);
+				return OpenFile(NewFilePath, Modio::Detail::FileMode::ReadWrite, true);
 			}
 
-			Modio::ErrorCode OpenFile(Modio::filesystem::path NewFilePath, bool bOverwrite = false)
+			Modio::Detail::FileMode GetFileMode() override
+			{
+				return FileMode;
+			}
+
+			Modio::ErrorCode OpenFile(Modio::filesystem::path NewFilePath, Modio::Detail::FileMode NewMode,
+									  bool bOverwrite = false)
 			{
 				if (FileHandle != INVALID_HANDLE_VALUE)
 				{
@@ -199,9 +219,21 @@ namespace Modio
 				}
 
 				this->FilePath = NewFilePath;
-				FileHandle = ::CreateFileW(this->FilePath.generic_wstring().c_str(), GENERIC_READ | GENERIC_WRITE,
-										   FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-										   bOverwrite ? CREATE_ALWAYS : OPEN_ALWAYS, FILE_FLAG_OVERLAPPED, NULL);
+				this->FileMode = NewMode;
+
+				DWORD Access;
+				if (FileMode == Modio::Detail::FileMode::ReadWrite)
+				{
+					Access = GENERIC_READ | GENERIC_WRITE;
+				}
+				else
+				{
+					Access = GENERIC_READ;
+				}
+
+				FileHandle =
+					::CreateFileW(this->FilePath.generic_wstring().c_str(), Access, FILE_SHARE_READ | FILE_SHARE_WRITE,
+								  NULL, bOverwrite ? CREATE_ALWAYS : OPEN_ALWAYS, FILE_FLAG_OVERLAPPED, NULL);
 				if (FileHandle != INVALID_HANDLE_VALUE)
 				{
 					return std::error_code {};

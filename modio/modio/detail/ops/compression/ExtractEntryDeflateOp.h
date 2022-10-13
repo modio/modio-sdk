@@ -11,6 +11,7 @@
 #pragma once
 
 #include "modio/core/ModioBuffer.h"
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioObjectTrack.h"
@@ -55,9 +56,11 @@ namespace Modio
 								  Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo)
 			{
 				Impl = std::make_shared<ExtractEntryImpl>(ExtractEntryImpl {
-					Modio::Detail::File(ArchiveFileImpl->FilePath, false), ArchiveFileImpl, EntryToExtract,
-					RootDirectoryToExtractTo, Modio::Detail::DynamicBuffer {}, 0u,
-					Modio::Detail::File(RootDirectoryToExtractTo / EntryToExtract.FilePath, true), ProgressInfo});
+					Modio::Detail::File(ArchiveFileImpl->FilePath, Modio::Detail::FileMode::ReadWrite, false),
+					ArchiveFileImpl, EntryToExtract, RootDirectoryToExtractTo, Modio::Detail::DynamicBuffer {}, 0u,
+					Modio::Detail::File(RootDirectoryToExtractTo / EntryToExtract.FilePath,
+										Modio::Detail::FileMode::ReadWrite, true),
+					ProgressInfo});
 			};
 
 			ExtractEntryDeflateOp(ExtractEntryDeflateOp&& Other)
@@ -72,8 +75,9 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Compression,
-												"Extracting entry in Deflate {}", Impl->EntryToExtract.FilePath.u8string());
-					
+												"Extracting entry in Deflate {}",
+												Impl->EntryToExtract.FilePath.u8string());
+
 					if (Impl->EntryToExtract.UncompressedSize == 0)
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Compression,
@@ -149,13 +153,14 @@ namespace Modio
 									}
 								}
 							}
-                            else
-                            {
-                                Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression,
-                                                            "Error extracting entry in Deflate: {}", Impl->DeflateStatus.message());
-                                Self.complete(Impl->DeflateStatus);
-                                return;
-                            }
+							else
+							{
+								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression,
+															"Error extracting entry in Deflate: {}",
+															Impl->DeflateStatus.message());
+								Self.complete(Impl->DeflateStatus);
+								return;
+							}
 						}
 						// take the first chunk out of the dynamic buffer so that we effectively consume those bytes
 						Modio::Optional<Modio::Detail::Buffer> Unused = Impl->FileData.TakeInternalBuffer();

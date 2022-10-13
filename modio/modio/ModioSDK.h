@@ -89,11 +89,14 @@ namespace Modio
 	/// @requires authenticated-user
 	/// @requires no-rate-limiting
 	/// @requires management-enabled
+	/// @requires mod-not-pending-uninstall
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
 	/// @error UserDataError::InvalidUser|No authenticated user
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error ModManagementError::ModBeingProcessed|Specified mod is pending uninstall. Wait until the uninstall
+	/// process is complete before subscribing again.
 	MODIOSDK_API void SubscribeToModAsync(Modio::ModID ModToSubscribeTo,
 										  std::function<void(Modio::ErrorCode)> OnSubscribeComplete);
 
@@ -158,10 +161,12 @@ namespace Modio
 	MODIOSDK_API bool IsModManagementBusy();
 
 	/// @docpublic
-	/// @brief Cancels or suspends the current mod update, installation, or upload, and begins processing a pending
-	/// operation for the specified mod ID
-	/// @param IDToPrioritize The ID for the mod to begin processing
-	/// @return Error code indicating the status of the prioritization request
+	/// @brief Prioritizes the specified mod for upload, install, or update.  The priority mod will be processed
+	/// immediately after the current upload or install completes (if applicable). Only one mod ID can be prioritized at
+	/// a time.
+	/// @param IDToPrioritize The ID for the mod to prioritize. This mod must be pending upload, install, or update.
+	/// @return Error code indicating there is no pending upload, install, or update associated with the provided
+	/// priority mod ID.
 	MODIOSDK_API Modio::ErrorCode PrioritizeTransferForMod(Modio::ModID IDToPrioritize);
 
 	/// @docpublic
@@ -225,7 +230,8 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Uses platform-specific authentication to associate a Mod.io user account with the current platform user
-	/// @param User Authentication payload data to submit to the provider
+	/// @param User Authentication payload data to submit to the provider. Please note that for Steam authentication you
+	/// must base64-encode the app ticket you provide.
 	/// @param Provider The provider to use to perform the authentication
 	/// @param Callback Callback invoked once the authentication request has been made
 	/// @requires initialized-sdk
@@ -278,7 +284,8 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Edits the parameters of a mod, by updating any fields set in the Params object to match the passed-in
-	/// values. Fields left empty on the Params object will not be updated. If no fields are populated, will return an error.
+	/// values. Fields left empty on the Params object will not be updated. If no fields are populated, will return an
+	/// error.
 	/// @param Mod The mod to edit
 	/// @param Params Descriptor containing optional fields indicating what properties should be updated
 	/// @param Callback Callback invoked with the updated mod profile on success
@@ -347,9 +354,8 @@ namespace Modio
 	/// @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
 	/// @error FilesystemError::InsufficientSpace|Not enough space for the file
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
-	MODIOSDK_API void GetModMediaAsync(
-		Modio::ModID ModId, Modio::LogoSize LogoSize,
-		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)> Callback);
+	MODIOSDK_API void GetModMediaAsync(Modio::ModID ModId, Modio::LogoSize LogoSize,
+									   std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback);
 
 	/// @docpublic
 	/// @brief Get a gallery image for the specified mod ID. If it already exists on disk the file will be reused unless
@@ -365,9 +371,8 @@ namespace Modio
 	/// @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
 	/// @error FilesystemError::InsufficientSpace|Not enough space for the file
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
-	MODIOSDK_API void GetModMediaAsync(
-		Modio::ModID ModId, Modio::GallerySize GallerySize, Modio::GalleryIndex Index,
-		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)> Callback);
+	MODIOSDK_API void GetModMediaAsync(Modio::ModID ModId, Modio::GallerySize GallerySize, Modio::GalleryIndex Index,
+									   std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback);
 
 	/// @docpublic
 	/// @brief Downloads the creator avatar for a specified mod. Will use existing file if it is already present on disk
@@ -383,10 +388,10 @@ namespace Modio
 	/// @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
 	/// @error FilesystemError::InsufficientSpace|Not enough space for the file
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
-	MODIOSDK_API void GetModMediaAsync(
-		Modio::ModID ModId, Modio::AvatarSize AvatarSize,
-		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)> Callback);
+	MODIOSDK_API void GetModMediaAsync(Modio::ModID ModId, Modio::AvatarSize AvatarSize,
+									   std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback);
 
+	/// @docpublic
 	/// @brief Submits a rating for a mod on behalf of the currently authenticated user.
 	/// @param ModID The mod to submit a rating for
 	/// @param Rating The rating to submit \r\n NOTE: To clear a rating for a mod, submit a rating of Rating::Neutral.
@@ -487,9 +492,8 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserDataError::InvalidUser|No authenticated user
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
-	MODIOSDK_API void GetUserMediaAsync(
-		Modio::AvatarSize AvatarSize,
-		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)> Callback);
+	MODIOSDK_API void GetUserMediaAsync(Modio::AvatarSize AvatarSize,
+										std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback);
 
 	/// @docpublic
 	/// @brief If the last request to the mod.io servers returned a validation failure, this function returns extended
@@ -525,7 +529,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserDataError::InvalidUser|No authenticated user
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
-	MODIOSDK_API void AddOrUpdateModLogoAsync(Modio::ModID ModID, Modio::filesystem::path LogoPath,
+	MODIOSDK_API void AddOrUpdateModLogoAsync(Modio::ModID ModID, std::string LogoPath,
 											  std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
@@ -544,8 +548,8 @@ namespace Modio
 	MODIOSDK_API void ArchiveModAsync(Modio::ModID ModID, std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
-	/// @brief Returns a list of base mod installation directories. Under normal circumstances, this will return a single
-	/// directory, which is the base directory that all mods are installed to for the current user.
+	/// @brief Returns a list of base mod installation directories. Under normal circumstances, this will return a
+	/// single directory, which is the base directory that all mods are installed to for the current user.
 	/// @experimental
 	/// @requires initialized-sdk
 	/// @return List of base mod installation directories

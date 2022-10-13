@@ -17,6 +17,7 @@
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioProfiling.h"
+#include "modio/timer/ModioTimer.h"
 #include <memory>
 
 #include <asio/yield.hpp>
@@ -26,7 +27,7 @@ class ReadHttpResponseHeadersOp
 	std::weak_ptr<HttpSharedStateBase> SharedState;
 	std::shared_ptr<HttpRequestImplementation> Request;
 	asio::coroutine CoroutineState;
-	std::unique_ptr<asio::steady_timer> Timer;
+	Modio::Detail::Timer Timer;
 
 public:
 	ReadHttpResponseHeadersOp(std::shared_ptr<HttpRequestImplementation> Request,
@@ -58,15 +59,10 @@ public:
 				return;
 			}
 
-			if (Timer == nullptr)
-			{
-				Timer = std::make_unique<asio::steady_timer>(Modio::Detail::Services::GetGlobalContext());
-			}
-
 			while (PinnedState->PeekHandleStatus(Request->RequestHandle) == WinHTTPCallbackStatus::Waiting)
 			{
-				Timer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
-				yield Timer->async_wait(std::move(Self));
+				Timer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
+				yield Timer.WaitAsync(std::move(Self));
 			}
 
 			switch (PinnedState->FetchAndClearHandleStatus(Request->RequestHandle))

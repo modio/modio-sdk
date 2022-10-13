@@ -22,6 +22,7 @@ namespace Modio
 	{
 		struct UserDataContainer
 		{
+			/// @docnone
 			friend bool operator==(const Modio::Detail::UserDataContainer& A, const Modio::Detail::UserDataContainer& B)
 			{
 				return (A.UserSubscriptions == B.UserSubscriptions &&
@@ -53,6 +54,7 @@ namespace Modio
 
 			Modio::Optional<Modio::filesystem::path> UserModDirectoryOverride;
 
+			/// @docnone
 			friend void to_json(nlohmann::json& Json, const Modio::Detail::UserDataContainer& UserData)
 			{
 				Json = nlohmann::json::object(
@@ -70,6 +72,8 @@ namespace Modio
 						UserData.UserModDirectoryOverride.value().u8string();
 				}
 			}
+			
+			/// @docnone
 			friend void from_json(const nlohmann::json& Json, Modio::Detail::UserDataContainer& UserData)
 			{
 				Modio::User AuthenticatedUser;

@@ -7,9 +7,3 @@
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
  *
  */
-
- // clang-format off
-
-#pragma GCC diagnostic pop
-
-// clang-format on

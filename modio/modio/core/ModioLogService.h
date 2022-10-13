@@ -20,8 +20,13 @@ namespace Modio
 {
 	namespace Detail
 	{
+		/// @docinternal
+		/// @brief Base class Modio logger service that support log levels and platform
+		/// specific implementations
 		class LogService : public asio::detail::service_base<LogService>
 		{
+			/// @docinternal
+			/// @brief Wrapper around a Log message and the level it was logged for
 			struct LogMessage
 			{
 				Modio::LogLevel Level;
@@ -29,6 +34,8 @@ namespace Modio
 			};
 
 		public:
+			/// @docinternal
+			/// @brief Default constructor
 			MODIO_IMPL explicit LogService(asio::io_context& IOService);
 
 			using implementation_type = std::shared_ptr<Modio::Detail::LoggerImplementation>;
@@ -36,14 +43,22 @@ namespace Modio
 			MODIO_IMPL void construct(implementation_type& Implementation);
 			MODIO_IMPL void destroy(implementation_type& Implementation);
 
+			/// @brief Turn off the log service
 			MODIO_IMPL void Shutdown();
 
+			/// @brief Change the LogLevel of the log service
 			MODIO_IMPL void SetLogLevel(LogLevel Level);
 
+			/// @brief Retrieve the current LogLevel
 			MODIO_IMPL LogLevel GetLogLevel() const;
 
+			/// @brief Clear the log buffer after all stored messages are forwarded
+			/// to the stored callback
 			MODIO_IMPL void FlushLogBuffer();
-
+			
+			/// @docinternal
+			/// @brief Log operation using a template of different possible arguments and most importantly
+			///a platform specific logger object
 			template<typename... ArgTypes>
 			void Log(implementation_type& PlatformLoggerObject, LogLevel Level, LogCategory Category,
 					 std::string Format, ArgTypes... Args)
@@ -54,7 +69,9 @@ namespace Modio
 					LogBuffer.push_back({Level, LogOutput});
 				}
 			}
-
+			
+			/// @docinternal
+			/// @brief Log operation that immediately emits the formatted string
 			template<typename... ArgTypes>
 			void LogImmediate(implementation_type& PlatformLoggerObject, LogLevel Level, LogCategory Category,
 							  std::string Format, ArgTypes... Args)
@@ -65,8 +82,12 @@ namespace Modio
 					LogBuffer.push_back({Level, LogOutput});
 				}
 			}
+
+			/// @docinternal
+			/// @brief Configure the callback receiver of string elements
 			static MODIO_IMPL void SetLogCallback(std::function<void(Modio::LogLevel, const std::string&)> LogCallback);
 			
+			/// @docinternal
 			/// @brief Static function to permit easy setting of global logging level
 			/// @param Level The minimum severity level to display
 			static MODIO_IMPL void SetGlobalLogLevel(Modio::LogLevel Level);

@@ -10,7 +10,7 @@
 
 #pragma once
 #include "modio/core/ModioFlag.h"
-#include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/JsonWrapper.h"
 
 namespace Modio
 {
@@ -36,6 +36,7 @@ namespace Modio
 	/// * game allows to flag mature content.
 	struct ProfileMaturity : public Modio::FlagImpl<MaturityOption>
 	{
+		/// @docinternal
 		/// @brief The default constructor would set MaturityOption to "None"
 		ProfileMaturity()
 		{
@@ -44,25 +45,13 @@ namespace Modio
 		using Modio::FlagImpl<MaturityOption>::FlagImpl;
 	};
 
-	inline void from_json(const nlohmann::json& Json, Modio::ProfileMaturity& ProfileMaturity)
-	{
-		std::uint8_t maturity = 0;
-		if (Json.is_number_integer())
-		{
-			using nlohmann::from_json;
-			from_json(Json, maturity);
-		}
-		else
-		{
-			Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
-										"ProfileMaturity from_json requires an integer.  Using default ProfileMaturity 0");
-		}
-		ProfileMaturity.Value = maturity;
-	}
-	inline void to_json(nlohmann::json& Json, const Modio::ProfileMaturity& ProfileMaturity)
-	{
-		// In case the Value inside ProfileMaturity is Optional::None, then it matches MaturityOption::None
-		std::uint8_t DefaultMaturity = static_cast<uint8_t>(MaturityOption::None);
-		Json = ProfileMaturity.Value.value_or(DefaultMaturity);
-	}
+	/// @docnone
+	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::ProfileMaturity& ProfileMaturity);
+	
+	/// @docnone
+	MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::ProfileMaturity& ProfileMaturity);
 } // namespace Modio
+
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "modio/core/entities/ModioProfileMaturity.ipp"
+#endif

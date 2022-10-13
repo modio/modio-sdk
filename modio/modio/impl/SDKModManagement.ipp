@@ -19,6 +19,7 @@
 #include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/FilesystemWrapper.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/AddOrUpdateModLogoOp.h"
 #include "modio/detail/ops/ModManagementLoop.h"
@@ -80,7 +81,8 @@ namespace Modio
 		if (Modio::Detail::RequireSDKIsInitialized(OnSubscribeComplete) &&
 			Modio::Detail::RequireNotRateLimited(OnSubscribeComplete) &&
 			Modio::Detail::RequireUserIsAuthenticated(OnSubscribeComplete) &&
-			Modio::Detail::RequireModManagementEnabled(OnSubscribeComplete))
+			Modio::Detail::RequireModManagementEnabled(OnSubscribeComplete) &&
+			Modio::Detail::RequireModIsNotUninstallPending(ModToSubscribeTo, OnSubscribeComplete))
 
 		{
 			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
@@ -125,24 +127,46 @@ namespace Modio
 
 	Modio::ErrorCode PrioritizeTransferForMod(Modio::ModID IDToPrioritize)
 	{
-		// if ID is not present in the list of pending operations, return error
+		// Check if we have already set this ID to be prioritized
+		if (Modio::Optional<Modio::ModID> PrioritizedID = Modio::Detail::SDKSessionData::GetPriorityModID())
+		{
+			if (*PrioritizedID == IDToPrioritize)
+			{
+				Modio::Detail::Logger().Log(
+					LogLevel::Info, LogCategory::ModManagement,
+					"Called PrioritizeTransferForMod() on mod {}.  This mod is already prioritized", IDToPrioritize);
+				return {};
+			}
+		}
+
+		// Check if priority ID is currently being processed
 		if (Modio::Optional<Modio::ModProgressInfo> CurrentOperationInfo =
 				Modio::Detail::SDKSessionData::GetModProgress())
 		{
 			if (CurrentOperationInfo->ID == IDToPrioritize)
 			{
-				return {};
-			}
-			// Check if the ID corresponds to an upload first, then check if it is a pending download
-			if (Modio::Detail::SDKSessionData::PrioritizeModfileUpload(IDToPrioritize) ||
-				Modio::Detail::SDKSessionData::PrioritizeModfileDownload(IDToPrioritize))
-			{
-				// If we have a valid prioritization, cancel the in-progress thing so we move onto the priority
-				// immediately
-				Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
+				Modio::Detail::Logger().Log(
+					LogLevel::Info, LogCategory::ModManagement,
+					"Called PrioritizeTransferForMod() on mod {}.  This mod is already being processed",
+					IDToPrioritize);
 				return {};
 			}
 		}
+
+		// Check if the ID corresponds to a pending upload first, then check if it is a pending download
+		if (Modio::Detail::SDKSessionData::PrioritizeModfileUpload(IDToPrioritize) ||
+			Modio::Detail::SDKSessionData::PrioritizeModfileDownload(IDToPrioritize))
+		{
+			// Cancel the in-progress thing so we move onto the priority immediately
+
+			// FinishModDownloadOrUpdate() causes issues -- cancelled op doesn't retry. State gets confused.  Need more
+			// robust testing before we implement this feature
+
+			// Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
+			return {};
+		}
+
+		// ID is not present in the list of pending operations, return error
 		return Modio::make_error_code(Modio::GenericError::BadParameter);
 	}
 
@@ -289,14 +313,14 @@ namespace Modio
 		Modio::Detail::SDKSessionData::AddPendingModfileUpload(Mod, Params);
 	}
 
-	void AddOrUpdateModLogoAsync(Modio::ModID ModID, Modio::filesystem::path LogoPath,
+	void AddOrUpdateModLogoAsync(Modio::ModID ModID, std::string LogoPath,
 								 std::function<void(Modio::ErrorCode)> Callback)
 	{
 		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
 			Modio::Detail::RequireUserIsAuthenticated(Callback))
 		{
 			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-				Modio::Detail::AddOrUpdateModLogoOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID, LogoPath),
+				Modio::Detail::AddOrUpdateModLogoOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID, Modio::filesystem::path(LogoPath)),
 				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	}

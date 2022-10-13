@@ -1,15 +1,16 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 #include "modio/core/ModioBuffer.h"
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioConstants.h"
@@ -43,8 +44,9 @@ namespace Modio
 					// but not namespaced to game or game-specific user string
 					if (FileService.FileExists(FileService.UserDataFolder() / "../../globalsettings.json"))
 					{
-						ConfigFile = std::make_unique<Modio::Detail::File>(
-							FileService.UserDataFolder() / "../../globalsettings.json", false);
+						ConfigFile = std::make_unique<Modio::Detail::File>(FileService.UserDataFolder() /
+																			   "../../globalsettings.json",
+																		   Modio::Detail::FileMode::ReadWrite, false);
 						yield ConfigFile->ReadAsync(ConfigFile->GetFileSize(), FileBuffer, std::move(Self));
 						if (ec)
 						{
@@ -76,7 +78,8 @@ namespace Modio
 						if (!ConfigFile)
 						{
 							ConfigFile = std::make_unique<Modio::Detail::File>(
-								FileService.UserDataFolder() / "../../globalsettings.json", false);
+								FileService.UserDataFolder() / "../../globalsettings.json",
+								Modio::Detail::FileMode::ReadWrite, false);
 						}
 						std::copy(DefaultConfigString.begin(), DefaultConfigString.end(), DefaultConfigBuffer->Data());
 					}
@@ -85,7 +88,8 @@ namespace Modio
 					yield ConfigFile->WriteAsync(std::move(*DefaultConfigBuffer), std::move(Self));
 					if (ec)
 					{
-						Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File, "Error code after write async {}", ec.value());
+						Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File,
+													"Error code after write async {}", ec.value());
 					}
 					FileBuffer.Clear();
 					Self.complete(Modio::make_error_code(Modio::FilesystemError::FileNotFound));

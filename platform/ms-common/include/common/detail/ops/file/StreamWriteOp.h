@@ -43,7 +43,7 @@ class StreamWriteOp : public Modio::Detail::BaseOperation<StreamWriteOp>
 	/// <summary>
 	/// Timer to allow the polling interval to be set for the waiting state of the operation
 	/// </summary>
-	std::unique_ptr<asio::steady_timer> StatusTimer;
+	Modio::Detail::Timer StatusTimer;
 
 	bool bMovedFrom = false;
 
@@ -78,18 +78,29 @@ public:
 	}
 
 	template<typename CoroType>
-	void operator()(CoroType& self, std::error_code ec = {})
+	void operator()(CoroType& Self, std::error_code ec = {})
 	{
 		if (FileImpl->ShouldCancel())
 		{
-			self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
+			Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
+			return;
+		}
+		if (FileImpl->GetFileMode() == Modio::Detail::FileMode::ReadOnly)
+		{
+			Self.complete(Modio::make_error_code(Modio::FilesystemError::NoPermission));
 			return;
 		}
 
 		reenter(Coroutine)
 		{
+			if (Buffer.GetSize() == 0)
+			{
+				Self.complete({});
+				return;
+			}
+
 			// Wait for any existing and queued IO operations on this file
-			yield FileImpl->BeginExclusiveOperation(std::move(self));
+			yield FileImpl->BeginExclusiveOperation(std::move(Self));
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
 										"Begin write of {} bytes to {}", Buffer.GetSize(),
@@ -102,7 +113,7 @@ public:
 				// Notify the caller that we could not create an event handle
 				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
 											"Could not create event handle");
-				self.complete(Modio::make_error_code(Modio::GenericError::CouldNotCreateHandle));
+				Self.complete(Modio::make_error_code(Modio::GenericError::CouldNotCreateHandle));
 				FileImpl->FinishExclusiveOperation();
 				return;
 			}
@@ -123,7 +134,7 @@ public:
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
 												"StreamWriteOp to file {} failed, error code = {}",
 												FileImpl->GetPath().string(), Error);
-					self.complete(Modio::make_error_code(Modio::FilesystemError::WriteError));
+					Self.complete(Modio::make_error_code(Modio::FilesystemError::WriteError));
 					FileImpl->FinishExclusiveOperation();
 
 					return;
@@ -135,17 +146,15 @@ public:
 				Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Finish write to {}",
 											FileImpl->GetPath().string());
 				FileImpl->Seek(Modio::FileOffset(Buffer.GetSize()), Modio::Detail::SeekDirection::Forward);
-				self.complete({});
+				Self.complete({});
 				FileImpl->FinishExclusiveOperation();
 				return;
 			}
 
-			StatusTimer =
-				std::make_unique<asio::steady_timer>(Modio::Detail::Services::GetGlobalContext().get_executor());
 			while (!HasOverlappedIoCompleted(WriteOpParams.get()))
 			{
-				StatusTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
-				yield StatusTimer->async_wait(std::move(self));
+				StatusTimer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
+				yield StatusTimer.WaitAsync(std::move(Self));
 			}
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Finish write to {}",
@@ -153,7 +162,7 @@ public:
 
 			FileImpl->Seek(Modio::FileOffset(Buffer.GetSize()), Modio::Detail::SeekDirection::Forward);
 
-			self.complete(std::error_code {});
+			Self.complete(std::error_code {});
 			FileImpl->FinishExclusiveOperation();
 			return;
 		}

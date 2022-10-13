@@ -28,6 +28,9 @@ namespace Modio
 			{
 				return *(GetGlobalContextInternal().get());
 			}
+
+			/// @brief Restart the GlobalContext
+			/// @return A new instance of the GlobalContext
 			static std::shared_ptr<asio::io_context> ResetGlobalContext()
 			{
 				// Make a copy of the old context. Note this is not a reference, but an actual copy so lifetime is
@@ -37,6 +40,8 @@ namespace Modio
 				GetGlobalContextInternal() = std::make_shared<asio::io_context>(1);
 				return OldContext;
 			}
+
+			/// @brief Static method that references the GlobalContext
 			template<typename ServiceType>
 			static ServiceType& GetGlobalService()
 			{
@@ -44,11 +49,19 @@ namespace Modio
 			}
 
 		private:
+
+			/// @docinternal
+			/// @brief Static method that stores the GlobalContext
 			static std::shared_ptr<asio::io_context>& GetGlobalContextInternal()
 			{
+				/// @docnone
+				/// @brief Singleton struct to contain a Globalcontext
 				struct ContextHolder
 				{
 					std::shared_ptr<asio::io_context> Context;
+					
+					/// @docnone
+					/// @brief Default constructor
 					ContextHolder()
 					{
 						Context = std::make_shared<asio::io_context>(1);

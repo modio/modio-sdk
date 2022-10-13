@@ -239,13 +239,15 @@ namespace Modio
 
 		void SDKSessionData::AddPendingModfileUpload(Modio::ModID ID, Modio::CreateModFileParams Params)
 		{
-			if (Params.RootDirectory.has_filename())
+			Modio::filesystem::path ModRoot = Params.RootDirectory;
+			if (ModRoot.has_filename())
 			{
-				Params.RootDirectory /= "";
+				ModRoot /= "";
 				Modio::Detail::Logger().Log(
 					Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
 					"Modfile directory path {} does not end in a path separator. Adding manually",
-					Params.RootDirectory.u8string());
+					Params.RootDirectory);
+				Params.RootDirectory = ModRoot.u8string();
 			}
 
 			auto ExistingEntry = Get().PendingModUploads.find(ID);
@@ -292,18 +294,24 @@ namespace Modio
 				return {};
 			}
 		}
+
 		bool SDKSessionData::PrioritizeModfileUpload(Modio::ModID IdToPrioritize)
 		{
+			// Checks the mod is a pending upload.
 			if (Get().PendingModUploads.size())
 			{
+				std::map<Modio::ModID, Modio::CreateModFileParams> PendingUploads = Get().PendingModUploads;
 				if (Get().PendingModUploads.find(IdToPrioritize) != Get().PendingModUploads.end())
 				{
+					Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::ModManagement,
+												"Prioritizing mod {}, currently pending upload", IdToPrioritize);
 					Get().ModIDToPrioritize = IdToPrioritize;
 					return true;
 				}
 			}
 			return false;
 		}
+
 		bool SDKSessionData::PrioritizeModfileDownload(Modio::ModID IdToPrioritize)
 		{
 			// needs to check if the mod exists in the collection and if it requires an update or installation
@@ -314,6 +322,9 @@ namespace Modio
 				if (CurrentState == Modio::ModState::InstallationPending ||
 					CurrentState == Modio::ModState::UpdatePending)
 				{
+					Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::ModManagement,
+												"Prioritizing mod {}, currently pending install or update",
+												IdToPrioritize);
 					Get().ModIDToPrioritize = IdToPrioritize;
 					return true;
 				}

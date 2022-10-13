@@ -13,6 +13,7 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioLogger.h"
+#include "modio/detail/FilesystemWrapper.h"
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioStringHash.h"
@@ -26,6 +27,8 @@ namespace Modio
 {
 	namespace Detail
 	{
+		/// @docinternal
+		/// @brief Enum with HTTP verbs
 		enum class Verb
 		{
 			GET,
@@ -34,11 +37,16 @@ namespace Modio
 			PUT,
 			DELETE
 		};
+
+		/// @docinternal
+		/// @brief Enum with the API version in use
 		enum class APIVersion
 		{
 			V1
 		};
 
+		/// @docinternal
+		/// @brief Container for payloads retrieved/uploaded by HTTP operations
 		struct PayloadContent
 		{
 			Modio::Optional<Modio::Detail::Buffer> RawBuffer;
@@ -54,7 +62,9 @@ namespace Modio
 			MODIO_IMPL PayloadContent(PayloadContent&& Other) = default;
 			MODIO_IMPL PayloadContent& operator=(PayloadContent&& Other);
 		};
-
+		
+		/// @docinternal
+		/// @brief Set of operations to construct HTTP requests
 		class HttpRequestParams
 		{
 		public:
@@ -108,6 +118,7 @@ namespace Modio
 			MODIO_IMPL HttpRequestParams AppendPayloadFile(std::string Key,
 														   Modio::filesystem::path PathToFileToUpload) const;
 
+			// @brief Template function to append a payload to a new instance of HTTPRequestParams
 			template<typename T>
 			HttpRequestParams SetPayload(T RawPayload) const
 			{

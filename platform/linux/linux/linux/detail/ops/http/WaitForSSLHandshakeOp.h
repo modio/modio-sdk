@@ -15,6 +15,7 @@
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioConstants.h"
+#include "modio/timer/ModioTimer.h"
 #include <memory>
 
 namespace Modio
@@ -47,13 +48,8 @@ namespace Modio
 						if (HandshakeStatus == MBEDTLS_ERR_SSL_WANT_READ ||
 							HandshakeStatus == MBEDTLS_ERR_SSL_WANT_WRITE)
 						{
-							if (PollTimer == nullptr)
-							{
-								PollTimer = std::make_unique<asio::steady_timer>(
-									Modio::Detail::Services::GetGlobalContext().get_executor());
-							}
-							PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
-							yield PollTimer->async_wait(std::move(Self));
+							StatusTimer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
+							yield StatusTimer.WaitAsync(std::move(Self));
 						}
 						else
 						{
@@ -72,7 +68,7 @@ namespace Modio
 
 		private:
 			asio::coroutine CoroutineState;
-			std::unique_ptr<asio::steady_timer> PollTimer;
+			Modio::Detail::Timer StatusTimer;
 			std::shared_ptr<HttpRequestImplementation> Request;
 			std::weak_ptr<HttpSharedState> SharedState;
 		};

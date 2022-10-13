@@ -29,7 +29,7 @@ class ReadSomeResponseBodyOp
 	std::pair<std::uintptr_t, std::uintmax_t> ExtendedStatus;
 	std::weak_ptr<HttpSharedStateBase> SharedState;
 	asio::coroutine CoroutineState;
-	std::unique_ptr<asio::steady_timer> SendTimer;
+	Modio::Detail::Timer SendTimer;
 	bool bReadComplete = false;
 	WinHTTPCallbackStatus Status = WinHTTPCallbackStatus::Waiting;
 
@@ -60,16 +60,13 @@ public:
 				Self.complete(Modio::make_error_code(Modio::HttpError::RequestError));
 				return;
 			}
-			if (SendTimer == nullptr)
-			{
-				SendTimer = std::make_unique<asio::steady_timer>(Modio::Detail::Services::GetGlobalContext());
-			}
+			
 
 			MODIO_PROFILE_PUSH("WaitForDataAvailable");
 			while (PinnedState->PeekHandleStatus(Request->RequestHandle) == WinHTTPCallbackStatus::Waiting)
 			{
-				SendTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
-				yield SendTimer->async_wait(std::move(Self));
+				SendTimer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
+				yield SendTimer.WaitAsync(std::move(Self));
 			}
 			MODIO_PROFILE_POP();
 
@@ -91,8 +88,8 @@ public:
 						MODIO_PROFILE_PUSH("WaitForDataRead");
 						while (PinnedState->PeekHandleStatus(Request->RequestHandle) == WinHTTPCallbackStatus::Waiting)
 						{
-							SendTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
-							yield SendTimer->async_wait(std::move(Self));
+							SendTimer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
+							yield SendTimer.WaitAsync(std::move(Self));
 						}
 						MODIO_PROFILE_POP();
 						if (PinnedState->PeekHandleStatus(Request->RequestHandle) ==

@@ -1,19 +1,19 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *  
+ *
  */
 
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "modio/core/entities/ModioPagedResult.h"
 #endif
 
+#include "modio/detail/JsonWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
-#include <nlohmann/json.hpp>
 
 namespace Modio
 {
@@ -25,8 +25,9 @@ namespace Modio
 
 		// Convert offset to pages
 		int ResultOffset = 0;
+		ResultOffset = std::move(0);
 		Detail::ParseSafe(Json, ResultOffset, "result_offset");
 		PagedResult.PageIndex = (std::int32_t) std::floor(ResultOffset / (float) PagedResult.PageSize);
 		PagedResult.PageCount = (std::int32_t) std::ceil(PagedResult.TotalResultCount / (float) PagedResult.PageSize);
 	};
-}
+} // namespace Modio

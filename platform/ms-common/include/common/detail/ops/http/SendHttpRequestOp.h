@@ -16,6 +16,7 @@
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioProfiling.h"
+#include "modio/timer/ModioTimer.h"
 #include <memory>
 
 #include <asio/yield.hpp>
@@ -25,7 +26,7 @@ class SendHttpRequestOp
 	asio::coroutine CoroutineState;
 	std::shared_ptr<HttpRequestImplementation> Request;
 	std::weak_ptr<HttpSharedStateBase> SharedState;
-	std::unique_ptr<asio::steady_timer> SendTimer;
+	Modio::Detail::Timer SendTimer;
 	std::unique_ptr<std::string> Payload;
 
 public:
@@ -108,15 +109,10 @@ public:
 				}
 			}
 
-			if (SendTimer == nullptr)
-			{
-				SendTimer = std::make_unique<asio::steady_timer>(Modio::Detail::Services::GetGlobalContext());
-			}
-
 			while (PinnedState->PeekHandleStatus(Request->RequestHandle) == WinHTTPCallbackStatus::Waiting)
 			{
-				SendTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
-				yield SendTimer->async_wait(std::move(Self));
+				SendTimer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
+				yield SendTimer.WaitAsync(std::move(Self));
 			}
 
 			switch (PinnedState->FetchAndClearHandleStatus(Request->RequestHandle))

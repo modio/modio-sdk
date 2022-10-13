@@ -15,6 +15,7 @@ add_subdirectory(expected EXCLUDE_FROM_ALL)
 add_subdirectory(filesystem EXCLUDE_FROM_ALL)
 add_subdirectory(fmt EXCLUDE_FROM_ALL)
 add_subdirectory(utfcpp EXCLUDE_FROM_ALL)
+add_subdirectory(function2 EXCLUDE_FROM_ALL)
 
 include(json.cmake)
 include(asio.cmake)
@@ -49,6 +50,12 @@ install(
 )
 
 install(
+	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/function2/include
+	DESTINATION ${CMAKE_INSTALL_PREFIX}/header_only/ext
+	COMPONENT header_only
+)
+
+install(
 	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/asio/asio/include/
 	DESTINATION ${CMAKE_INSTALL_PREFIX}/header_only/ext
 	COMPONENT header_only
@@ -77,14 +84,16 @@ install(
 	PATTERN "*.h"
 	PATTERN "*.hpp"
 )
-install(
-	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/filesystem/include/
-	DESTINATION ${CMAKE_INSTALL_PREFIX}/static/inc
-	COMPONENT static_library
-	FILES_MATCHING
-	PATTERN "*.h"
-	PATTERN "*.hpp"
-)
+
+# Filesystem should no longer be a public dependency
+#install(
+#	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/filesystem/include/
+#	DESTINATION ${CMAKE_INSTALL_PREFIX}/static/inc
+#	COMPONENT static_library
+#	FILES_MATCHING
+#	PATTERN "*.h"
+#	PATTERN "*.hpp"
+#)
 
 install(
 	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/optional/include/

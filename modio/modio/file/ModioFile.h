@@ -10,6 +10,7 @@
 
 #pragma once
 #include "modio/core/ModioBuffer.h"
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/file/ModioFileService.h"
@@ -22,40 +23,66 @@ namespace Modio
 		{
 			Modio::filesystem::path FilePath;
 			asio::strand<asio::io_context::executor_type> FileStrand;
+			Modio::Detail::FileMode Mode;
 
 		public:
-			explicit File(Modio::filesystem::path FilePath, bool bOverwriteExisting = false)
+			explicit File(Modio::filesystem::path FilePath, Modio::Detail::FileMode Mode,
+						  bool bOverwriteExisting = false)
 				: asio::basic_io_object<Modio::Detail::FileService>(Modio::Detail::Services::GetGlobalContext()),
 				  FilePath(FilePath),
-				  FileStrand(asio::make_strand(Modio::Detail::Services::GetGlobalContext()))
+				  FileStrand(asio::make_strand(Modio::Detail::Services::GetGlobalContext())),
+				  Mode(Mode)
 			{
 				get_implementation()->SetFileStrand(FileStrand);
-				std::error_code ec = get_implementation()->OpenFile(FilePath, bOverwriteExisting);
+
+				if (bOverwriteExisting && Mode == Modio::Detail::FileMode::ReadOnly)
+				{
+					Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File,
+												"Cannot overwrite a file when opening in ReadOnly mode.  Setting "
+												"bOverwriteExisting to false for {}",
+												FilePath.string());
+					bOverwriteExisting = false;
+				}
+
+				std::error_code ec = get_implementation()->OpenFile(FilePath, Mode, bOverwriteExisting);
 				if (ec)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-												"Error code {} while trying to open {}", ec.value(), FilePath.string());
+												"Error code {} while trying to open {}: {}", ec.value(), FilePath.string(), ec.message());
 				}
 			}
 
-			explicit File(asio::io_context& Context, Modio::filesystem::path FilePath, bool bOverWriteExisting = false)
+			explicit File(asio::io_context& Context, Modio::filesystem::path FilePath, Modio::Detail::FileMode Mode,
+						  bool bOverwriteExisting = false)
 				: asio::basic_io_object<Modio::Detail::FileService>(Context),
 				  FilePath(FilePath),
-				  FileStrand(asio::make_strand(Context))
+				  FileStrand(asio::make_strand(Context)),
+				  Mode(Mode)
 			{
 				get_implementation()->SetFileStrand(FileStrand);
-				std::error_code ec = get_implementation()->OpenFile(FilePath, bOverWriteExisting);
+
+				if (bOverwriteExisting && Mode == Modio::Detail::FileMode::ReadOnly)
+				{
+					Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File,
+												"Cannot overwrite a file when opening in ReadOnly mode.  Setting "
+												"bOverWriteExisting to false for {}",
+												FilePath.string());
+					bOverwriteExisting = false;
+				}
+
+				std::error_code ec = get_implementation()->OpenFile(FilePath, Mode, bOverwriteExisting);
 				if (ec)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-												"Error code {} while trying to open {}", ec.value(), FilePath.string());
+												"Error code {} while trying to open {}: {}", ec.value(), FilePath.string(), ec.message());
 				}
 			};
 
 			File(Modio::Detail::File&& Other)
 				: asio::basic_io_object<Modio::Detail::FileService>(std::move(Other)),
 				  FilePath(std::move(Other.FilePath)),
-				  FileStrand(std::move(Other.FileStrand)) {};
+				  FileStrand(std::move(Other.FileStrand)),
+				  Mode(std::move(Other.Mode)) {};
 
 			std::uint64_t GetFileSize()
 			{

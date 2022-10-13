@@ -11,6 +11,7 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
+#include "modio/detail/JsonWrapper.h"
 #include <string>
 
 namespace Modio
@@ -19,6 +20,8 @@ namespace Modio
 	/// @brief Metadata for a release archive for a mod
 	struct FileMetadata
 	{
+		/// @docpublic
+		/// @brief Enum related to the Virus scan status of a file
 		enum class VirusScanStatus : std::uint8_t
 		{
 			NotScanned = 0,
@@ -29,41 +32,47 @@ namespace Modio
 			ErrorScanning = 5
 		};
 
+		/// @docpublic
+		/// @brief Enum related to the Virus status of a file
 		enum class VirusStatus : std::uint8_t
 		{
 			NoThreat = 0,
 			Malicious = 1
 		};
 
-		///@brief Unique modfile id.
+		/// @brief Unique modfile id.
 		Modio::FileMetadataID MetadataId = Modio::FileMetadataID(0); // @todo: Reiterate this name
-		///@brief Unique mod id.
+		/// @brief Unique mod id.
 		Modio::ModID ModId = Modio::ModID(-1);
-		///@brief Unix timestamp of date file was added.
+		/// @brief Unix timestamp of date file was added.
 		std::int64_t DateAdded = 0;
-		///@brief Current virus scan status of the file. For newly added files that have yet to be scanned this field
+		/// @brief Current virus scan status of the file. For newly added files that have yet to be scanned this field
 		/// will change frequently until a scan is complete
 		VirusScanStatus CurrentVirusScanStatus = Modio::FileMetadata::VirusScanStatus::NotScanned;
-		///@brief Was a virus detected?
+		/// @brief Was a virus detected?
 		VirusStatus CurrentVirusStatus = Modio::FileMetadata::VirusStatus::NoThreat;
-		///@brief Size of the file in bytes.
+		/// @brief Size of the file in bytes.
 		std::int64_t Filesize = 0;
-		///@brief Filename including extension.
+		/// @brief Filename including extension.
 		std::string Filename = "";
-		///@brief Release version this file represents.
+		/// @brief Release version this file represents.
 		std::string Version = "";
-		///@brief Changelog for the file.
+		/// @brief Changelog for the file.
 		std::string Changelog = "";
-		///@brief Metadata stored by the game developer for this file.
+		/// @brief Metadata stored by the game developer for this file.
 		std::string MetadataBlob = "";
 		/// @brief Modfile download URL
 		std::string DownloadBinaryURL = "";
 		/// @brief Modfile download expiry date
 		std::int64_t DownloadExpiryDate = 0;
 
+		/// @docnone
 		friend MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::FileMetadata& FileMetadata);
+		
+		/// @docnone
 		friend MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::FileMetadata& FileMetadata);
 
+		/// @docnone
 		friend bool operator==(const Modio::FileMetadata& A, const Modio::FileMetadata& B)
 		{
 			if ((A.MetadataId == B.MetadataId) && (A.ModId == B.ModId) && (A.DateAdded == B.DateAdded) &&

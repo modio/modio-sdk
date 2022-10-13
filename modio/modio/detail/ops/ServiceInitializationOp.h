@@ -24,6 +24,7 @@
 #include "modio/file/ModioFile.h"
 #include "modio/file/ModioFileService.h"
 #include "modio/http/ModioHttpService.h"
+#include "modio/timer/ModioTimerService.h"
 #include "modio/userdata/ModioUserDataService.h"
 #include <algorithm>
 #include <memory>
@@ -42,7 +43,7 @@ public:
 	ServiceInitializationOp(Modio::InitializeOptions InitParams) : InitParams(InitParams) {}
 
 	template<typename CoroType>
-	void operator()(CoroType& self, std::error_code ec = {})
+	void operator()(CoroType& Self, std::error_code ec = {})
 	{
 		MODIO_PROFILE_SCOPE(ServiceInitialization);
 
@@ -52,24 +53,27 @@ public:
 			{
 				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Core,
 											"mod.io SDK was already initialized!");
-				self.complete(Modio::make_error_code(Modio::GenericError::SDKAlreadyInitialized));
+				Self.complete(Modio::make_error_code(Modio::GenericError::SDKAlreadyInitialized));
 				return;
 			}
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Core,
 										"Initializing mod.io services");
+			yield Modio::Detail::Services::GetGlobalService<Modio::Detail::TimerService>().InitializeAsync(
+				std::move(Self));
+
 			yield Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().InitializeAsync(
-				InitParams, std::move(self));
+				InitParams, std::move(Self));
 			if (ec)
 			{
 				Modio::Detail::SDKSessionData::Deinitialize();
-				self.complete(ec);
+				Self.complete(ec);
 				return;
 			}
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::File, "Initialized File Service");
 
-			yield Modio::Detail::LoadGlobalConfigOverrideFileDataAsync(GlobalConfigFileReadBuffer, std::move(self));
+			yield Modio::Detail::LoadGlobalConfigOverrideFileDataAsync(GlobalConfigFileReadBuffer, std::move(Self));
 			if (ec)
 			{
 				// do a warning here about not being able to load the global config ?
@@ -84,17 +88,17 @@ public:
 				if (ec)
 				{
 					Modio::Detail::SDKSessionData::Deinitialize();
-					self.complete(ec);
+					Self.complete(ec);
 					return;
 				}
 			}
 
 			yield Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().InitializeAsync(
-				std::move(self));
+				std::move(Self));
 			if (ec)
 			{
 				Modio::Detail::SDKSessionData::Deinitialize();
-				self.complete(ec);
+				Self.complete(ec);
 				return;
 			}
 			ec = Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().ApplyGlobalConfigOverrides(
@@ -102,19 +106,19 @@ public:
 			if (ec)
 			{
 				Modio::Detail::SDKSessionData::Deinitialize();
-				self.complete(ec);
+				Self.complete(ec);
 				return;
 			}
 			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Http, "Initialized Http Service");
 
 			// Init user data service
 			yield Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>().InitializeAsync(
-				std::move(self));
+				std::move(Self));
 			if (ec && ec != Modio::UserAuthError::StatusAuthTokenMissing)
 			{
 				Modio::Detail::SDKSessionData::Deinitialize();
 
-				self.complete(ec);
+				Self.complete(ec);
 				return;
 			}
 			ec = Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>().ApplyGlobalConfigOverrides(
@@ -122,7 +126,7 @@ public:
 			if (ec)
 			{
 				Modio::Detail::SDKSessionData::Deinitialize();
-				self.complete(ec);
+				Self.complete(ec);
 				return;
 			}
 			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::User,
@@ -136,7 +140,7 @@ public:
 				if (ec)
 				{
 					Modio::Detail::SDKSessionData::Deinitialize();
-					self.complete(ec);
+					Self.complete(ec);
 					return;
 				}
 			}
@@ -146,19 +150,19 @@ public:
 			// re-hydrate/reconstitute the mods in the user's collection until after we're done with the SDK being
 			// initialized. We do have to make sure that QueryUserSubscriptions etc fail if we're still initializing,
 			// just to be on the safe side
-			yield Modio::Detail::LoadModCollectionFromStorageAsync(std::move(self));
+			yield Modio::Detail::LoadModCollectionFromStorageAsync(std::move(Self));
 
 			// Validates all user's mods marked as ModState::Installed.  Any mods that fail validation will have
 			// ModState set to InstallationPending.  Will NOT return an error code even on validation failure to prevent
 			// killing initialization.
-			yield Modio::Detail::ValidateAllInstalledModsAsync(std::move(self));
+			yield Modio::Detail::ValidateAllInstalledModsAsync(std::move(Self));
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Core,
 										"mod.io service initialization complete");
 
 			Modio::Detail::SDKSessionData::ConfirmInitialize();
 
-			self.complete({});
+			Self.complete({});
 		}
 	}
 };

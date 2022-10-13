@@ -17,16 +17,19 @@ namespace Modio
 {
 	namespace Detail
 	{
+		/// @docnone
 		inline std::string ToString(const std::string& Value)
 		{
 			return Value;
 		}
 
+		/// @docnone
 		inline std::string ToString(std::int64_t Value)
 		{
 			return std::to_string(Value);
 		}
 
+		/// @docinternal
 		/// @brief Helper class which stores key-value pairs for HTTP request bodies
 		class RequestBodyKVPContainer
 		{

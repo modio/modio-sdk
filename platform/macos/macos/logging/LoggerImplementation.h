@@ -18,13 +18,24 @@ namespace Modio
 	static auto StartTime = std::chrono::system_clock::now();
 	namespace Detail
 	{
+		/// @docinternal
+		/// @brief Helper implementation class to organize logging operations and formatting
 		class LoggerImplementation
 		{
 			asio::strand<asio::io_context::executor_type>& LogStrand;
 
 		public:
+			/// @docinternal
+			/// @brief LoggerImplementation constructor
 			LoggerImplementation(asio::strand<asio::io_context::executor_type>& Strand) : LogStrand(Strand) {}
-
+			
+			/// @docinternal
+			/// @brief Receive an formatted string and transform it to another string that fits 
+			/// the LoggerImplementation structure, given LogLevel and Logcategory
+			/// @param LogLevel the severity of the log, from a Trace to Error
+			/// @param LogCategory it relates to the subsystem emitting this log
+			/// @param Format The basic string to log
+			/// @param Args Extra arguments used in the Format string
 			template<typename... ArgTypes>
 			std::string Log(LogLevel Level, LogCategory Category, std::string Format, ArgTypes... Args)
 			{
@@ -42,9 +53,8 @@ namespace Modio
 				return FormattedOutput;
 			}
 
-			/// <summary>
-			/// Immediately uses the current context to log output. Not intended for general usage
-			/// </summary>
+			/// @docinternal
+			/// @brief Immediately uses the current context to log output. Not intended for general usage
 			template<typename... ArgTypes>
 			std::string LogImmediate(LogLevel Level, LogCategory Category, std::string Format, ArgTypes... Args)
 			{

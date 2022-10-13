@@ -18,14 +18,21 @@ namespace Modio
 {
 	namespace Detail
 	{
+		/// @docinternal
+		/// @brief Container for metadata related to avatar images
 		struct AvatarImageType
 		{
+			/// @docinternal
+			/// @brief Constructor for the AvatarImageType
 			AvatarImageType(Modio::UserID UserId, Modio::AvatarSize AvatarSize, const Modio::Detail::Avatar& Avatar)
 				: UserId(UserId),
 				  AvatarSize(AvatarSize),
 				  AvatarURL(Modio::Detail::GetAvatarURL(Avatar, AvatarSize))
 			{}
 
+			/// @docinternal
+			/// @brief Create a path to store an avatar image
+			/// @return True when the path was created, otherwise false
 			bool MakeDestinationPath(Modio::filesystem::path& OutPath) const
 			{
 				Modio::Detail::FileService& FileService = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>();
@@ -38,12 +45,18 @@ namespace Modio
 				return false;
 			}
 
+			/// @docinternal
+			/// @brief The cache path where the avatar is located if one is found
+			/// @return Cache path or empty if none
 			Modio::Optional<Modio::filesystem::path> GetCachePath() const
 			{
 				Modio::Detail::FileService& FileService = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>();
 				return FileService.GetAvatar(UserId, AvatarSize);
 			}
 
+			/// @docinternal
+			/// @brief Retrieve the avatar download URL
+			/// @return String with the avatar URL
 			const std::string& GetDownloadURL() const
 			{
 				return AvatarURL;

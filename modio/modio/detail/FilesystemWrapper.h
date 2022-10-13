@@ -24,15 +24,40 @@ extern "C" inline int lstat(const char* path, struct stat* outStat)
 	#include MODIO_UNREAL_PLATFORM_PREAMBLE
 	#include "modio/detail/ModioCompilerMacros.h"
 
-	DISABLE_WARNING_PUSH
-	DISABLE_WARNING_OPERATOR_OPERATION
+DISABLE_WARNING_PUSH
+DISABLE_WARNING_OPERATOR_OPERATION
+	#if defined(MODIO_PLATFORM_CUSTOM_FS)
+		#pragma push_macro("GHC_OS_CUSTOM")
+		#define GHC_OS_CUSTOM
 
-	#include "ghc/filesystem.hpp"
+		#include "ghc/filesystem.hpp"
 
-	DISABLE_WARNING_POP
+		#include "file/FileSystemStubs.h"
+
+		#pragma pop_macro("GHC_OS_CUSTOM")
+	#else
+		#include "ghc/filesystem.hpp"
+	#endif
+
+DISABLE_WARNING_POP
 
 	#include MODIO_UNREAL_PLATFORM_EPILOGUE
 
-#else // _WIN32
+#elif defined(MODIO_PLATFORM_CUSTOM_FS)
+	#pragma push_macro("GHC_OS_CUSTOM")
+	#define GHC_OS_CUSTOM
+
 	#include "ghc/filesystem.hpp"
-#endif //_WIN32
+
+	#include "file/FileSystemStubs.h"
+
+	#pragma pop_macro("GHC_OS_CUSTOM")
+#else
+	#include "ghc/filesystem.hpp"
+#endif
+
+namespace Modio
+{
+	// Backport of std::filesystem to support C++14/C++11
+	namespace filesystem = ghc::filesystem;
+} // namespace Modio

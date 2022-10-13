@@ -12,13 +12,15 @@
 
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/HedleyWrapper.h"
-#include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/JsonWrapper.h"
 #include <string>
 
 namespace Modio
 {
 	namespace Detail
 	{
+		/// @docinternal
+		/// @brief Structure with the file references to the logos of a mod
 		struct Logo
 		{
 			/** Logo filename including extension. */
@@ -30,12 +32,13 @@ namespace Modio
 			/** URL to the medium logo thumbnail. */
 			std::string Thumb640x360;
 			/** URL to the large logo thumbnail. */
-			std::string Thumb1024x720;
+			std::string Thumb1280x720;
 
+			/// @docnone
 			friend bool operator==(const Modio::Detail::Logo& A, const Modio::Detail::Logo& B)
 			{
 				if ((A.Filename == B.Filename) && (A.Original == B.Original) && (A.Thumb320x180 == B.Thumb320x180) &&
-					(A.Thumb640x360 == B.Thumb640x360) && (A.Thumb1024x720 == B.Thumb1024x720))
+					(A.Thumb640x360 == B.Thumb640x360) && (A.Thumb1280x720 == B.Thumb1280x720))
 				{
 					return true;
 				}
@@ -51,27 +54,17 @@ namespace Modio
 		MODIO_DIAGNOSTIC_PUSH
 		MODIO_ALLOW_UNUSED_FUNCTIONS
 
-		static void from_json(const nlohmann::json& Json, Logo& Avatar)
-		{
-			Detail::ParseSafe(Json, Avatar.Filename, "filename");
-			Detail::ParseSafe(Json, Avatar.Original, "original");
-			Detail::ParseSafe(Json, Avatar.Thumb320x180, "thumb_320x180");
-			Detail::ParseSafe(Json, Avatar.Thumb640x360, "thumb_640x360");
-			Detail::ParseSafe(Json, Avatar.Thumb1024x720, "thumb_1280x720");
-		}
+		/// @docnone
+		MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::Detail::Logo& ModLogo);
 
-		static void to_json(nlohmann::json& Json, const Modio::Detail::Logo& ModLogo)
-		{
-			Json = {{"filename", ModLogo.Filename},
-					{"original", ModLogo.Original},
-					{"thumb_320x180", ModLogo.Thumb320x180},
-					{"thumb_640x360", ModLogo.Thumb640x360},
-					{"thumb_1280x720", ModLogo.Thumb1024x720}};
-		}
+		/// @docnone
+		MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::Detail::Logo& ModLogo);
 
 		// Re-allow "unused function" warnings
 		MODIO_DIAGNOSTIC_POP
 
+		/// @docpublic
+		/// @brief Retrieve the corresponding string according to a logo size
 		inline const std::string& GetLogoURL(const Logo& Logo, Modio::LogoSize Size)
 		{
 			switch (Size)
@@ -83,7 +76,7 @@ namespace Modio
 				case Modio::LogoSize::Thumb640:
 					return Logo.Thumb640x360;
 				case Modio::LogoSize::Thumb1280:
-					return Logo.Thumb1024x720;
+					return Logo.Thumb1280x720;
 			}
 
 			// Should never reach this
@@ -92,6 +85,8 @@ namespace Modio
 			return NoResult;
 		}
 
+		/// @docpublic
+		/// @brief Transform a LogoSize to an std::string
 		inline std::string ToString(Modio::LogoSize LogoSize)
 		{
 			switch (LogoSize)
@@ -111,3 +106,7 @@ namespace Modio
 		}
 	} // namespace Detail
 } // namespace Modio
+
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "modio/detail/entities/ModioLogo.ipp"
+#endif

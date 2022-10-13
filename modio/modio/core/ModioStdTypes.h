@@ -13,7 +13,6 @@
 #include "ModioGeneratedVariables.h"
 #include "modio/detail/ModioDefines.h"
 
-#include "modio/detail/FilesystemWrapper.h"
 #include "modio/detail/OptionalWrapper.h"
 #include <chrono>
 #include <cstdint>
@@ -36,7 +35,12 @@ namespace Modio
 	class ErrorCode : public std::error_code
 	{
 	public:
+		/// @docpublic
+		/// @brief Error code constructor using std::error_code
 		ErrorCode(std::error_code ec) : error_code(ec) {};
+		
+		/// @docpublic
+		/// @brief Error code constructor using an empty value
 		ErrorCode() : error_code() {};
 		using error_code::error_code;
 	};
@@ -48,15 +52,14 @@ namespace Modio
 	template<typename T>
 	using Optional = tl::optional<T>;
 
-	// Backport of std::filesystem to support C++14/C++11
-	namespace filesystem = ghc::filesystem;
-
 	using MutableBufferView = asio::mutable_buffer;
 	using ConstBufferView = asio::const_buffer;
 
 	template<typename Object>
 	using StableStorage = std::shared_ptr<Object>;
 
+	/// @docpublic
+	/// @brief Convenience method to make a shared pointer
 	template<typename Object, class... _Types>
 	StableStorage<Object> MakeStable(_Types&&... _Args)
 	{

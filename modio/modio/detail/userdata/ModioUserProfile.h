@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "modio/core/ModioLogger.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioModInfoList.h"
 #include "modio/core/entities/ModioUser.h"
@@ -41,7 +42,8 @@ namespace Modio
 			{}
 			void SetInvalidState()
 			{
-				Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::User, "Setting current user's OAuth token state to invalid");
+				Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::User,
+											"Setting current user's OAuth token state to invalid");
 				State = OAuthTokenState::Invalid;
 			}
 			OAuthTokenState GetTokenState() const
@@ -71,6 +73,7 @@ namespace Modio
 
 			static MODIO_IMPL Modio::Optional<std::string> NoToken;
 
+			/// @docnone
 			friend void from_json(const nlohmann::json& Json, Modio::Detail::OAuthToken& InToken)
 			{
 				Detail::ParseSafe(Json, InToken.ExpireDate, "expiry");
@@ -87,6 +90,7 @@ namespace Modio
 				}
 			}
 
+			/// @docnone
 			friend void to_json(nlohmann::json& Json, const Modio::Detail::OAuthToken& InToken)
 			{
 				if (InToken.State == OAuthTokenState::Valid && InToken.Token.has_value())
@@ -109,6 +113,7 @@ namespace Modio
 		private:
 			OAuthTokenState State = OAuthTokenState::Invalid;
 
+			/// @docnone
 			friend bool operator==(const Modio::Detail::OAuthToken& A, const Modio::Detail::OAuthToken& B)
 			{
 				return (A.Token == B.Token && A.ExpireDate == B.ExpireDate && A.State == B.State &&
@@ -143,6 +148,7 @@ namespace Modio
 			Modio::User User;
 			Modio::Detail::OAuthToken Token;
 
+			/// @docnone
 			friend bool operator==(const Modio::Detail::ProfileData& A, const Modio::Detail::ProfileData& B)
 			{
 				return (A.User == B.User && A.Token == B.Token);

@@ -19,6 +19,7 @@
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioConstants.h"
+#include "modio/timer/ModioTimer.h"
 #include <memory>
 #include <regex>
 #include <vector>
@@ -38,7 +39,7 @@ namespace Modio
 			asio::coroutine CoroutineState;
 			std::shared_ptr<HttpRequestImplementation> Request;
 			std::weak_ptr<HttpSharedState> SharedState;
-			std::unique_ptr<asio::steady_timer> PollTimer;
+			Modio::Detail::Timer StatusTimer;
 
 			/**
 			 * https://stackoverflow.com/questions/28860033/convert-from-cfurlref-or-cfstringref-to-stdstring
@@ -100,15 +101,13 @@ namespace Modio
 				: Request(Request),
 				  SharedState(SharedState)
 			{
-				PollTimer =
-					std::make_unique<asio::steady_timer>(Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 
 			ReadHttpResponseHeadersOp(ReadHttpResponseHeadersOp&& Other)
 				: CoroutineState(std::move(Other.CoroutineState)),
 				  Request(std::move(Other.Request)),
 				  SharedState(std::move(Other.SharedState)),
-				  PollTimer(std::move(Other.PollTimer))
+				  StatusTimer(std::move(Other.StatusTimer))
 			{}
 
 			template<typename CoroType>
@@ -147,8 +146,8 @@ namespace Modio
 							return;
 						}
 
-						PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
-						yield PollTimer->async_wait(std::move(Self));
+						StatusTimer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
+						yield StatusTimer.WaitAsync(std::move(Self));
 					}
 
 					// In case of POST, response headers in the HTTP request are embeded within the ReadStream
@@ -183,8 +182,8 @@ namespace Modio
 
 							// Yield execution to avoid taking too much processing while waiting for the ReadStream to
 							// arrive
-							PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
-							yield PollTimer->async_wait(std::move(Self));
+							StatusTimer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
+							yield StatusTimer.WaitAsync(std::move(Self));
 						}
 					}
 					// With other HTTP verbs (ex. GET, DELETE), HTTPMessage parses the headers

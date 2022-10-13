@@ -12,8 +12,8 @@
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/FetchExternalUpdates.h"
 #include "modio/detail/ops/modmanagement/ProcessNextModInUserCollection.h"
-
 #include "modio/detail/AsioWrapper.h"
+#include "modio/timer/ModioTimer.h"
 #include <asio/yield.hpp>
 #include <memory>
 namespace Modio
@@ -24,7 +24,7 @@ namespace Modio
 		/// kind of action (update, installation, uninstallation)
 		class ModManagementLoop
 		{
-			std::unique_ptr<asio::steady_timer> IdleTimer = nullptr;
+			Modio::Detail::Timer IdleTimer;
 			asio::coroutine CoroutineState;
 			std::uint8_t ExternalUpdateCounter = 0;
 
@@ -64,16 +64,10 @@ namespace Modio
 						// here, just sleep and try to process the next mod
 						yield Modio::Detail::ProcessNextModInUserCollectionAsync(std::move(Self));
 
-						// lazy-initialize the timer
-						if (IdleTimer == nullptr)
-						{
-							IdleTimer = std::make_unique<asio::steady_timer>(
-								Modio::Detail::Services::GetGlobalContext().get_executor());
-						}
-
+						
 						// Sleep for one second
-						IdleTimer->expires_after(std::chrono::seconds(1));
-						yield IdleTimer->async_wait(std::move(Self));
+						IdleTimer.ExpiresAfter(std::chrono::seconds(1));
+						yield IdleTimer.WaitAsync(std::move(Self));
 
 						ExternalUpdateCounter++;
 						ExternalUpdateCounter = ExternalUpdateCounter % 15;

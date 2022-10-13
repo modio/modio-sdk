@@ -9,7 +9,10 @@
  */
 
 #pragma once
+
+#include "ModioGeneratedVariables.h"
 #include "ModioWeakSymbol.h"
+#include <utility>
 
 #ifndef MODIO_WEAK_STUB_IMPL
 	#define MODIO_WEAK_STUB_IMPL
@@ -29,11 +32,13 @@ extern "C"
 	/// @brief Increments an implementation-defined counter
 	/// @param Name Name of the counter to increment
 	MODIO_WEAK(modio_profile_counter) void modio_profile_counter(const char* Name) MODIO_WEAK_STUB_IMPL;
+	
 	/// @brief Begins a scoped profiling event
 	/// @param Scope Name of the scope to start
 	/// @param Data Implementation-managed context data pointer
 	MODIO_WEAK(modio_profile_scope_start)
 	void modio_profile_scope_start(const char* Scope, void** Data) MODIO_WEAK_STUB_IMPL;
+	
 	/// @brief Ends a scoped profiling event
 	/// @param Scope Name of the scope to end
 	/// @param Data Data pointer populated by <<modio_profile_scope_start>>
@@ -44,7 +49,68 @@ extern "C"
 	MODIO_WEAK(modio_profile_pop) void modio_profile_pop() MODIO_WEAK_STUB_IMPL;
 }
 
-#define MODIO_PROFILE_START() if (modio_profile_start != nullptr) modio_profile_start()
+namespace Modio
+{
+	namespace Detail
+	{
+		/// @docinternal
+		/// @brief A profile event that falls within a certain scope
+		class ScopedProfileEvent
+		{
+			const char* EventName;
+			bool bMovedFrom = false;
+			void* Data;
+
+		public:
+			/// @docinternal
+			/// @brief Retrieve the event name
+			/// @return Characters that form the event name
+			const char* GetEventName()
+			{
+				return EventName;
+			}
+
+			/// @docinternal
+			/// @brief Default destructor
+			~ScopedProfileEvent()
+			{
+				if (!bMovedFrom)
+				{
+					modio_profile_scope_end(EventName, Data);
+				}
+			}
+			
+			/// @docinternal
+			/// @brief Explicit constructor
+			explicit ScopedProfileEvent(const char* EventName) : EventName(EventName)
+			{
+				modio_profile_scope_start(EventName, &Data);
+			}
+
+			/// @docinternal
+			/// @brief ScopedProfileEvent move constructor
+			ScopedProfileEvent(ScopedProfileEvent&& Other)
+			{
+				*this = std::move(Other);
+			}
+
+			/// @docinternal
+			/// @brief ScopedProfileEvent assignment constructor
+			MODIO_IMPL ScopedProfileEvent& operator=(ScopedProfileEvent&& Other);
+
+			/// @docnone
+			ScopedProfileEvent(const ScopedProfileEvent& Other) = delete;
+			
+			/// @docnone
+			ScopedProfileEvent& operator=(const ScopedProfileEvent& Other) = delete;
+		};
+
+	} // namespace Detail
+} // namespace Modio
+
+#define MODIO_PROFILE_START()           \
+	if (modio_profile_start != nullptr) \
+	modio_profile_start()
 #define MODIO_PROFILE_END() modio_profile_stop()
 #define MODIO_PROFILE_SAVE(FileName) modio_profile_save(#FileName)
 
@@ -54,47 +120,6 @@ extern "C"
 #define MODIO_PROFILE_PUSH(Name) modio_profile_push(#Name)
 #define MODIO_PROFILE_POP() modio_profile_pop()
 
-namespace Modio
-{
-	namespace Detail
-	{
-		class ScopedProfileEvent
-		{
-			const char* EventName;
-			bool bMovedFrom = false;
-			void* Data;
-
-		public:
-			~ScopedProfileEvent()
-			{
-				if (!bMovedFrom)
-				{
-					modio_profile_scope_end(EventName, Data);
-				}
-			}
-
-			explicit ScopedProfileEvent(const char* EventName) : EventName(EventName)
-			{
-				modio_profile_scope_start(EventName, &Data);
-			}
-
-			ScopedProfileEvent(ScopedProfileEvent&& Other)
-			{
-				*this = std::move(Other);
-			}
-
-			ScopedProfileEvent& operator=(ScopedProfileEvent&& Other)
-			{
-				if (this != &Other)
-				{
-					EventName = Other.EventName;
-					Other.bMovedFrom = true;
-				}
-				return *this;
-			}
-			ScopedProfileEvent(const ScopedProfileEvent& Other) = delete;
-			ScopedProfileEvent& operator=(const ScopedProfileEvent& Other) = delete;
-		};
-
-	} // namespace Detail
-} // namespace Modio
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "modio/detail/ModioProfiling.ipp"
+#endif

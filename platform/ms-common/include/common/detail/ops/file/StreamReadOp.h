@@ -15,6 +15,7 @@
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/ModioConstants.h"
+#include "modio/timer/ModioTimer.h"
 
 #include <asio/yield.hpp>
 class StreamReadOp
@@ -24,7 +25,7 @@ class StreamReadOp
 	std::uintmax_t Length;
 	Modio::StableStorage<OVERLAPPED> ReadOpParams;
 	asio::coroutine Coroutine;
-	std::unique_ptr<asio::steady_timer> StatusTimer;
+	Modio::Detail::Timer StatusTimer;
 	Modio::StableStorage<DWORD> NumberOfBytesRead;
 	Modio::Detail::DynamicBuffer Destination;
 
@@ -62,19 +63,25 @@ public:
 	}
 
 	template<typename CoroType>
-	void operator()(CoroType& self, std::error_code ec = {})
+	void operator()(CoroType& Self, std::error_code ec = {})
 	{
 		if (FileImpl->ShouldCancel())
 		{
-			self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
+			Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
 			return;
 		}
 
 		reenter(Coroutine)
 		{
+			if (Length == 0)
+			{
+				Self.complete({});
+				return;
+			}
+
 			// Wait for any other operations on the file to complete
 			// Possibly, we can make the release process for this 'lock' automatic
-			yield FileImpl->BeginExclusiveOperation(std::move(self));
+			yield FileImpl->BeginExclusiveOperation(std::move(Self));
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
 										"Begin read of {} bytes from {}", Length, FileImpl->GetPath().string());
@@ -83,7 +90,7 @@ public:
 
 			if (!ReadOpParams->hEvent)
 			{
-				self.complete(Modio::make_error_code(Modio::GenericError::CouldNotCreateHandle));
+				Self.complete(Modio::make_error_code(Modio::GenericError::CouldNotCreateHandle));
 				FileImpl->FinishExclusiveOperation();
 
 				return;
@@ -102,7 +109,7 @@ public:
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
 												"StreamReadOp from {} failed, error code = {}",
 												FileImpl->GetPath().string(), Error);
-					self.complete(Modio::make_error_code(Modio::FilesystemError::ReadError));
+					Self.complete(Modio::make_error_code(Modio::FilesystemError::ReadError));
 					FileImpl->FinishExclusiveOperation();
 					return;
 				}
@@ -122,18 +129,16 @@ public:
 				{
 					Destination.AppendBuffer(std::move(Buffer));
 				}
-				self.complete(std::error_code {});
+				Self.complete(std::error_code {});
 				FileImpl->FinishExclusiveOperation();
 
 				return;
 			}
 
-			StatusTimer =
-				std::make_unique<asio::steady_timer>(Modio::Detail::Services::GetGlobalContext().get_executor());
 			while (!HasOverlappedIoCompleted(ReadOpParams.get()))
 			{
-				StatusTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
-				yield StatusTimer->async_wait(std::move(self));
+				StatusTimer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
+				yield StatusTimer.WaitAsync(std::move(Self));
 			}
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Finish read from {}",
@@ -150,7 +155,7 @@ public:
 			{
 				Destination.AppendBuffer(std::move(Buffer));
 			}
-			self.complete(std::error_code {});
+			Self.complete(std::error_code {});
 			FileImpl->FinishExclusiveOperation();
 
 			return;

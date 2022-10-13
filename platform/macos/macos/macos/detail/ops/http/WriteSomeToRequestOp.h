@@ -15,6 +15,7 @@
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioConstants.h"
+#include "modio/timer/ModioTimer.h"
 #include <memory>
 
 #include <asio/yield.hpp>
@@ -27,7 +28,7 @@ namespace Modio
 			std::shared_ptr<HttpRequestImplementation> Request;
 			Modio::Detail::Buffer DataToWrite;
 			asio::coroutine CoroutineState;
-			std::unique_ptr<asio::steady_timer> PollTimer;
+			Modio::Detail::Timer StatusTimer;
 			std::weak_ptr<HttpSharedState> SharedState;
 
 		public:
@@ -57,6 +58,8 @@ namespace Modio
 							std::uint64_t DataSize = DataToWrite.GetSize();
 							CFDataRef DataRef =
 								CFDataCreate(kCFAllocatorDefault, (const UInt8*) DataToWrite.Data(), DataSize);
+							CFStringCreateWithBytes(kCFAllocatorDefault, CFDataGetBytePtr(DataRef),
+													CFDataGetLength(DataRef), kCFStringEncodingUTF8, false);
 							CFIndex WrittenBytes = CFWriteStreamWrite(Request->WriteStream, CFDataGetBytePtr(DataRef),
 																	  CFDataGetLength(DataRef));
 							CFRelease(DataRef);
@@ -91,14 +94,8 @@ namespace Modio
 						}
 						else
 						{
-							if (!PollTimer)
-							{
-								PollTimer = std::make_unique<asio::steady_timer>(
-									Modio::Detail::Services::GetGlobalContext().get_executor());
-							}
-
-							PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
-							yield PollTimer->async_wait(std::move(Self));
+							StatusTimer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
+							yield StatusTimer.WaitAsync(std::move(Self));
 						}
 					}
 

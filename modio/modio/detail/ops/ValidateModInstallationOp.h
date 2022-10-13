@@ -43,7 +43,7 @@ namespace Modio
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::ModManagement,
 													"Directory {} for installed mod with ID {} does not exist",
-													Entry.GetPath().u8string(), Entry.GetID());
+													Entry.GetPath(), Entry.GetID());
 
 						Self.complete(Modio::make_error_code(Modio::ModValidationError::ModDirectoryNotFound));
 						return;
@@ -52,7 +52,7 @@ namespace Modio
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::ModManagement,
 													"Directory {} for installed mod with ID {} is empty",
-													Entry.GetPath().u8string(), Entry.GetID());
+													Entry.GetPath(), Entry.GetID());
 
 						Self.complete(Modio::make_error_code(Modio::ModValidationError::NoFilesFoundForMod));
 						return;

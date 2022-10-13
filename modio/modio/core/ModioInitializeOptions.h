@@ -19,8 +19,12 @@ namespace Modio
 	/// SDK to properly initialize
 	struct InitializeOptions
 	{
+		/// @docpublic
 		/// @brief Initializes all variables to a invalid state if possible and minimal functionality
 		MODIO_IMPL InitializeOptions();
+
+		/// @docpublic
+		/// @brief Explicit InitializeOptions constructor
 		MODIO_IMPL explicit InitializeOptions(Modio::GameID GameID, Modio::ApiKey APIKey,
 											  Modio::Environment GameEnvironment, Modio::Portal PortalInUse,
 											  Modio::UserHandleType User);

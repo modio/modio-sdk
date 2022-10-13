@@ -19,6 +19,7 @@ namespace Modio
 {
 	namespace Detail
 	{
+		/// @docinternal
 		/// @brief Generic threadsafe logging object. Can either construct and retain an instance, or log via a
 		/// temporary
 		class Logger : public asio::basic_io_object<Modio::Detail::LogService>
@@ -53,6 +54,8 @@ namespace Modio
 				get_service().LogImmediate(get_implementation(), Level, Category, Format, Args...);
 			}
 		};
+
+		/// @docinternal
 		/// @brief Simple class to log entry and exit for a particular scope
 		class ScopedLogger : Logger
 		{

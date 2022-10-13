@@ -12,13 +12,15 @@
 
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/HedleyWrapper.h"
-#include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/JsonWrapper.h"
 #include <string>
 
 namespace Modio
 {
 	namespace Detail
 	{
+		/// @docinternal
+		/// @brief Structure with the file references to the images of a mod
 		struct Image
 		{
 			/** Image filename including extension. */
@@ -27,34 +29,29 @@ namespace Modio
 			std::string Original;
 			/** URL to the image thumbnail (320x180) */
 			std::string Thumb320x180;
+			/** URL to the image thumbnail (1280x720) */
+			std::string Thumb1280x720;
 
+			/// @docnone
 			friend bool operator==(const Modio::Detail::Image& A, const Modio::Detail::Image& B)
 			{
 				return (A.Filename == B.Filename && A.Original == B.Original && A.Thumb320x180 == B.Thumb320x180);
 			}
 		};
 
+		/// @docnone
+		MODIO_IMPL void from_json(const nlohmann::json& Json, Image& Image);
 		
-
-		static MODIO_IMPL void from_json(const nlohmann::json& Json, Image& Image)
-		{
-			Detail::ParseSafe(Json, Image.Filename, "filename");
-			Detail::ParseSafe(Json, Image.Original, "original");
-			Detail::ParseSafe(Json, Image.Thumb320x180, "thumb_320x180");
-		}
-
-		static MODIO_IMPL void to_json(nlohmann::json& Json, const Image& Image)
-		{
-			Json = nlohmann::json {{"filename", Image.Filename},
-								   {"original", Image.Original},
-								   {"thumb_320x180", Image.Thumb320x180}};
-		}
+		/// @docnone
+		MODIO_IMPL void to_json(nlohmann::json& Json, const Image& Image);
 
 		// GetImmageURL() creates false "unused functions" warnings on certain platforms.
 		// Suppressing those warnings here.
 		MODIO_DIAGNOSTIC_PUSH
 		MODIO_ALLOW_UNUSED_FUNCTIONS
 
+		/// @docinternal
+		/// @brief Retrieve the corresponding string according to a GallerySize size
 		static const std::string& GetImmageURL(const Image& Image, Modio::GallerySize Size)
 		{
 			switch (Size)
@@ -63,6 +60,8 @@ namespace Modio
 					return Image.Original;
 				case Modio::GallerySize::Thumb320:
 					return Image.Thumb320x180;
+				case Modio::GallerySize::Thumb1280:
+					return Image.Thumb1280x720;
 			}
 
 			// Should never reach this
@@ -74,6 +73,8 @@ namespace Modio
 		// Re-allow "unused function" warnings
 		MODIO_DIAGNOSTIC_POP
 
+		/// @docinternal
+		/// @brief Transform an GallerySize to an std::string 
 		inline std::string ToString(Modio::GallerySize Size)
 		{
 			switch (Size)
@@ -82,11 +83,16 @@ namespace Modio
 					return "Original";
 				case Modio::GallerySize::Thumb320:
 					return "Thumb320";
+				case Modio::GallerySize::Thumb1280:
+					return "Thumb1280";
 			}
 
 			assert(false && "Invalid value to ToString(Modio::AvatarSize)");
 			return "Unknown";
 		}
-
 	} // namespace Detail
 } // namespace Modio
+
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "modio/detail/entities/ModioImage.ipp"
+#endif

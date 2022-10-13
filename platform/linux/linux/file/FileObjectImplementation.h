@@ -9,6 +9,7 @@
  */
 
 #pragma once
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
@@ -23,13 +24,14 @@ namespace Modio
 		{
 			constexpr static int InvalidFileDescriptor = -1;
 			Modio::filesystem::path FilePath;
+			Modio::Detail::FileMode FileMode;
 			Modio::filesystem::path BasePath;
 			int FileDescriptor;
 			// Strand so that IO ops don't get performed simultaneously
 			asio::strand<asio::io_context::executor_type>* Strand;
 			std::atomic<bool> OperationInProgress {false};
 			std::atomic<std::int32_t> NumWaiters {0};
-			asio::steady_timer OperationQueue;
+			// asio::steady_timer OperationQueue;
 			Modio::FileOffset CurrentSeekOffset = Modio::FileOffset(0);
 			bool CancelRequested = false;
 
@@ -39,7 +41,7 @@ namespace Modio
 				  BasePath(BasePath),
 				  FileDescriptor(InvalidFileDescriptor),
 				  Strand(nullptr),
-				  OperationQueue(ParentContext, std::chrono::steady_clock::time_point::max()),
+				  // OperationQueue(ParentContext, std::chrono::steady_clock::time_point::max()),
 				  CurrentSeekOffset(0)
 			{}
 
@@ -69,7 +71,7 @@ namespace Modio
 			{
 				return CancelRequested;
 			}
-			
+
 			Modio::filesystem::path GetPath()
 			{
 				return FilePath;
@@ -89,7 +91,7 @@ namespace Modio
 				}
 				FilePath = NewPath;
 
-				ec = OpenFile(FilePath, false);
+				ec = OpenFile(FilePath, Modio::Detail::FileMode::ReadWrite, false);
 				return ec;
 			}
 
@@ -144,10 +146,16 @@ namespace Modio
 
 			Modio::ErrorCode CreateFile(Modio::filesystem::path NewFilePath)
 			{
-				return OpenFile(NewFilePath, true);
+				return OpenFile(NewFilePath, Modio::Detail::FileMode::ReadWrite, true);
 			}
 
-			Modio::ErrorCode OpenFile(Modio::filesystem::path Path, bool bOverwrite = false)
+			Modio::Detail::FileMode GetFileMode() override
+			{
+				return FileMode;
+			}
+
+			Modio::ErrorCode OpenFile(Modio::filesystem::path Path, Modio::Detail::FileMode Mode,
+									  bool bOverwrite = false)
 			{
 				Modio::ErrorCode ec;
 				filesystem::create_directories(Path.parent_path(), ec);
@@ -159,8 +167,19 @@ namespace Modio
 				}
 
 				this->FilePath = Path;
-				FileDescriptor = open(this->FilePath.generic_u8string().c_str(),
-									  O_RDWR | O_CREAT | O_NONBLOCK | (bOverwrite ? O_TRUNC : 0), S_IRUSR | S_IWUSR);
+				this->FileMode = Mode;
+
+				if (FileMode == Modio::Detail::FileMode::ReadWrite)
+				{
+					FileDescriptor =
+						open(this->FilePath.generic_u8string().c_str(),
+							 O_RDWR | O_CREAT | O_NONBLOCK | (bOverwrite ? O_TRUNC : 0), S_IRUSR | S_IWUSR);
+				}
+				else
+				{
+					// Read Only access
+					FileDescriptor = open(this->FilePath.generic_u8string().c_str(), O_RDONLY | O_NONBLOCK, S_IRUSR);
+				}
 
 				if (FileDescriptor != InvalidFileDescriptor)
 				{
@@ -168,21 +187,9 @@ namespace Modio
 				}
 				else
 				{
-					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
-												"Re-attempting open of file {} in read-only mode", Path.u8string());
-					FileDescriptor =
-						open(this->FilePath.generic_u8string().c_str(),
-							 O_RDONLY | O_NONBLOCK, S_IRUSR);
-					if (FileDescriptor != InvalidFileDescriptor)
-					{
-						return {};
-					}
-					else
-					{
-						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-												"Error {} after Re-attempting open of file", errno);
-						return Modio::make_error_code(Modio::FilesystemError::ReadError);
-					}
+					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+												"Error opening file: {}", errno);
+					return Modio::make_error_code(Modio::FilesystemError::ReadError);
 				}
 			}
 

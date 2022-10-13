@@ -147,6 +147,8 @@ namespace Modio
 		MODIO_IMPL std::string ToString() const;
 
 	private:
+		/// @docinternal
+		/// @brief Append a tag to the filter params
 		MODIO_IMPL FilterParams& AppendValue(std::vector<std::string>& Vector, std::string Tag);
 
 		/*template<typename... Args>

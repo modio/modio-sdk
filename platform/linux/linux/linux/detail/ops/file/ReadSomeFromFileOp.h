@@ -16,6 +16,7 @@
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioConstants.h"
+#include "modio/timer/ModioTimer.h"
 #include <memory>
 
 namespace Modio
@@ -53,6 +54,13 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+
+					if (MaxBytesToRead == 0)
+					{
+						Self.complete({}, Modio::Detail::Buffer(0));
+						return;
+					}
+
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
 												"Begin read for {}, File Descriptor {}, expected size: {}, Offset: {}",
 												FileImpl->GetPath().string(), FileImpl->GetFileHandle(), MaxBytesToRead,
@@ -70,13 +78,8 @@ namespace Modio
 
 					while ((ReadResult = PinnedState->IOCompleted(FileImpl->GetFileHandle())).first == false)
 					{
-						if (PollTimer == nullptr)
-						{
-							PollTimer = std::make_unique<asio::steady_timer>(
-								Modio::Detail::Services::GetGlobalContext().get_executor());
-						}
-						PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
-						yield PollTimer->async_wait(std::move(Self));
+						StatusTimer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
+						yield StatusTimer.WaitAsync(std::move(Self));
 					}
 
 					CurrentErrorCode = ReadResult.second;
@@ -146,7 +149,7 @@ namespace Modio
 			Modio::Optional<Modio::FileOffset> FileOffset;
 			std::weak_ptr<Modio::Detail::FileSharedState> SharedState;
 			std::pair<bool, Modio::Optional<Modio::ErrorCode>> ReadResult;
-			std::unique_ptr<asio::steady_timer> PollTimer;
+			Modio::Detail::Timer StatusTimer;
 		};
 #include <asio/unyield.hpp>
 	} // namespace Detail

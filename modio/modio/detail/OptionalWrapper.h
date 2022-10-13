@@ -10,7 +10,10 @@
 
 #pragma once
 
-#if defined(MODIO_PLATFORM_UNREAL)
+
+#define TL_OPTIONAL_NO_EXCEPTIONS
+
+#ifdef MODIO_PLATFORM_UNREAL
 
 	#include MODIO_UNREAL_PLATFORM_PREAMBLE
 	#include "modio/detail/ModioCompilerMacros.h"
@@ -41,3 +44,5 @@
 	#include "tl/optional.hpp"
 
 #endif
+
+#undef TL_OPTIONAL_NO_EXCEPTIONS

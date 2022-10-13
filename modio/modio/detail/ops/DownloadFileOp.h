@@ -11,6 +11,7 @@
 #pragma once
 
 #include "modio/core/ModioBuffer.h"
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
@@ -57,7 +58,7 @@ namespace Modio
 				: ProgressInfo(ProgressInfo)
 			{
 				File = std::make_shared<Modio::Detail::File>(DestinationPath += Modio::filesystem::path(".download"),
-															 false);
+															 Modio::Detail::FileMode::ReadWrite, false);
 				CurrentFilePosition =
 					std::make_shared<std::uintmax_t>(File->GetFileSize() - (File->GetFileSize() % (1024 * 1024)));
 				File->Truncate(Modio::FileOffset(*CurrentFilePosition));

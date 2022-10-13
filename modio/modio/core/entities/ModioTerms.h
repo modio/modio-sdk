@@ -1,24 +1,29 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
-#include <nlohmann/json.hpp>
-#include "modio/detail/ModioJsonHelpers.h"
+#include "ModioGeneratedVariables.h"
+
+#include "modio/detail/JsonWrapper.h"
+#include <string>
 namespace Modio
 {
+	/// @docpublic
 	/// @brief This struct contains strings that should be displayed to a user
 	/// when displaying the terms of use and offering to create a mod.io account
 	struct Terms
 	{
 	public:
+		/// @docpublic
+		/// @brief It contains the hyperlink details in terms of text and URL
 		struct Link
 		{
 			/// @brief The user-facing text for the link
@@ -30,6 +35,7 @@ namespace Modio
 		};
 
 		/// @docpublic
+		/// @brief It contains the text details for the terms
 		struct TermsButtons
 		{
 			/// @brief Text to display on the affirmative/OK button
@@ -39,6 +45,7 @@ namespace Modio
 		} Buttons;
 
 		/// @docpublic
+		/// @brief Link structs to contain all related terms
 		struct TermsLinks
 		{
 			/// @brief Link to the mod.io website
@@ -54,6 +61,7 @@ namespace Modio
 		/// @brief The plaintext version of the mod.io terms of use
 		std::string TermsText;
 
+		/// @docnone
 		friend bool operator==(const Modio::Terms& A, const Modio::Terms& B)
 		{
 			if (A.Buttons.AgreeText == B.Buttons.AgreeText && A.Buttons.DisagreeText == B.Buttons.DisagreeText &&
@@ -74,28 +82,14 @@ namespace Modio
 		}
 	};
 
-	inline void from_json(const nlohmann::json& Json, Modio::Terms& OutTerms)
-	{
-		nlohmann::json ButtonsJson;
-		if(Detail::GetSubobjectSafe(Json, "buttons", ButtonsJson))
-		{
-			Detail::ParseSubobjectSafe(ButtonsJson, OutTerms.Buttons.AgreeText, "agree", "text");
-			Detail::ParseSubobjectSafe(ButtonsJson, OutTerms.Buttons.DisagreeText, "disagree", "text");
-		}
-		
-		Detail::ParseSubobjectSafe(Json, OutTerms.Links.Website, "links", "website");
-		Detail::ParseSubobjectSafe(Json, OutTerms.Links.Terms, "links", "terms");
-		Detail::ParseSubobjectSafe(Json, OutTerms.Links.Privacy, "links", "privacy");
-		Detail::ParseSubobjectSafe(Json, OutTerms.Links.Manage, "links", "manage");
+	/// @docnone
+	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::Terms& OutTerms);
 
-		Detail::ParseSafe(Json, OutTerms.TermsText, "plaintext");
-	}
-	
-	inline void from_json(const nlohmann::json& Json, Modio::Terms::Link& OutLink)
-	{
-		Detail::ParseSafe(Json, OutLink.Text, "text");
-		Detail::ParseSafe(Json, OutLink.URL, "url");
-		Detail::ParseSafe(Json, OutLink.bRequired, "required");
-	}
+	/// @docnone
+	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::Terms::Link& OutLink);
 
-}
+} // namespace Modio
+
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "modio/core/entities/ModioTerms.ipp"
+#endif

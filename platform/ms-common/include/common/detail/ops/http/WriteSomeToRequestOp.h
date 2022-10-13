@@ -15,6 +15,7 @@
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioConstants.h"
+#include "modio/timer/ModioTimer.h"
 #include <memory>
 
 #include <asio/yield.hpp>
@@ -56,12 +57,9 @@ namespace Modio
 					}
 					while (PinnedState->PeekHandleStatus(Request->RequestHandle) == WinHTTPCallbackStatus::Waiting)
 					{
-						if (Timer == nullptr)
-						{
-							Timer = std::make_unique<asio::steady_timer>(Modio::Detail::Services::GetGlobalContext());
-						}
-						Timer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
-						yield Timer->async_wait(std::move(Self));
+
+						Timer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
+						yield Timer.WaitAsync(std::move(Self));
 					}
 
 					switch (PinnedState->FetchAndClearHandleStatus(Request->RequestHandle))
@@ -81,7 +79,7 @@ namespace Modio
 			std::shared_ptr<HttpRequestImplementation> Request;
 			Modio::Detail::Buffer DataToWrite;
 			asio::coroutine CoroutineState;
-			std::unique_ptr<asio::steady_timer> Timer;
+			Modio::Detail::Timer Timer;
 			std::weak_ptr<HttpSharedStateBase> SharedState;
 		};
 	} // namespace Detail

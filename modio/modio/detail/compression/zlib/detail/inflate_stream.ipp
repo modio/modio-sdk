@@ -51,7 +51,9 @@
 #include "modio/detail/compression/zlib/detail/inflate_stream.hpp"
 #endif
 
+
 #include "modio/core/ModioErrorCode.h"
+#include "modio/detail/ModioThrow.h"
 #include <array>
 
 namespace boost {
@@ -70,7 +72,7 @@ inflate_stream::
 doReset(int windowBits)
 {
     if(windowBits < 8 || windowBits > 15)
-        throw(std::domain_error{
+        Modio::Detail::MaybeThrowException(std::domain_error{
             "windowBits out of range"});
     w_.reset(windowBits);
 
@@ -535,7 +537,7 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
 
         case SYNC:
         default:
-            throw(std::logic_error{
+			Modio::Detail::MaybeThrowException(std::logic_error {
                 "stream error"});
         }
     }
@@ -761,7 +763,7 @@ inflate_table(
 
     auto const not_enough = []
     {
-        throw(std::logic_error{
+		Modio::Detail::MaybeThrowException(std::logic_error {
             "insufficient output size when inflating tables"});
     };
 
@@ -902,7 +904,7 @@ get_fixed_tables() ->
                 inflate_table(build::lens,
                     lens, 288, &next, &lenbits, work, ec);
                 if(ec)
-                    throw(std::logic_error{ec.message()});
+					Modio::Detail::MaybeThrowException(std::logic_error {ec.message()});
             }
 
             // VFALCO These fixups are from ZLib
@@ -918,7 +920,7 @@ get_fixed_tables() ->
                 inflate_table(build::dists,
                     lens, 32, &next, &distbits, work, ec);
                 if(ec)
-                    throw(std::logic_error{ec.message()});
+					Modio::Detail::MaybeThrowException(std::logic_error {ec.message()});
             }
         }
     };

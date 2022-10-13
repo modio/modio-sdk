@@ -72,13 +72,13 @@ namespace Modio
 
 							// No priority upload, get priority ID if it exists
 							if (Modio::Optional<Modio::ModID> PriorityID =
-									 Modio::Detail::SDKSessionData::GetPriorityModID())
+									Modio::Detail::SDKSessionData::GetPriorityModID())
 							{
 								Modio::ModCollection UserModCollection =
 									Modio::Detail::SDKSessionData::FilterSystemModCollectionByUserSubscriptions();
 								// If it is set, is it in the user's mod collection?
 								if (Modio::Optional<Modio::ModCollectionEntry&> FoundEntry =
-										 UserModCollection.GetByModID(*PriorityID))
+										UserModCollection.GetByModID(*PriorityID))
 								{
 									// If it is, does it need an installation or update?
 									Modio::ModState CurrentState = FoundEntry->GetModState();
@@ -94,20 +94,22 @@ namespace Modio
 									}
 								}
 							}
-
-							// if we have a pending upload, process that immediately before bothering with iterating the
-							// user subscriptions
-							if ((PendingUpload = Modio::Detail::SDKSessionData::GetNextPendingModfileUpload()))
+							// If we haven't found an EntryToProcess based on PriorityID, continue to normal uploads and installations
+							if (EntryToProcess == nullptr)
 							{
-								yield SubmitNewModFileAsync(PendingUpload->first, PendingUpload->second,
-															std::move(Self));
-								Self.complete(ec);
-								return;
-							}
+								// if we have a pending upload, process that immediately before bothering with iterating
+								// the user subscriptions
+								if ((PendingUpload = Modio::Detail::SDKSessionData::GetNextPendingModfileUpload()))
+								{
+									yield SubmitNewModFileAsync(PendingUpload->first, PendingUpload->second,
+																std::move(Self));
+									Self.complete(ec);
+									return;
+								}
 
-							{
 								Modio::ModCollection UserModCollection =
 									Modio::Detail::SDKSessionData::FilterSystemModCollectionByUserSubscriptions();
+
 								// No prioritized mod, sort by normal retry priority
 								for (auto ModEntry : UserModCollection.SortEntriesByRetryPriority())
 								{
@@ -129,10 +131,18 @@ namespace Modio
 						Self.complete({});
 						return;
 					}
+
 					if (EntryToProcess->GetModState() == Modio::ModState::InstallationPending ||
 						EntryToProcess->GetModState() == Modio::ModState::UpdatePending)
 					{
 						PendingModState = EntryToProcess->GetModState();
+
+						Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(
+							Modio::ModManagementEvent {EntryToProcess->GetID(),
+													   PendingModState.value() == Modio::ModState::InstallationPending
+														   ? Modio::ModManagementEvent::EventType::BeginInstall
+														   : Modio::ModManagementEvent::EventType::BeginUpdate,
+													   {}});
 						// Does this need to be a separate operation or could we provide a parameter to specify
 						// we only want to update if it's already installed or something?
 						yield Modio::Detail::InstallOrUpdateModAsync(EntryToProcess->GetID(), std::move(Self));
@@ -158,6 +168,11 @@ namespace Modio
 					}
 					else if (EntryToProcess->GetModState() == Modio::ModState::UninstallPending)
 					{
+						Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(
+							Modio::ModManagementEvent {EntryToProcess->GetID(),
+													   Modio::ModManagementEvent::EventType::BeginUninstall,
+													   {}});
+
 						yield Modio::Detail::UninstallModAsync(EntryToProcess->GetID(), std::move(Self));
 						Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(Modio::ModManagementEvent {
 							EntryToProcess->GetID(), Modio::ModManagementEvent::EventType::Uninstalled, ec});

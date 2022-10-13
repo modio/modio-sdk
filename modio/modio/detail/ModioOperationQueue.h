@@ -1,19 +1,21 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
+#include "function2/function2.hpp"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
 #include <atomic>
+#include <deque>
 #include <memory>
 
 namespace Modio
@@ -24,13 +26,12 @@ namespace Modio
 		{
 			std::atomic<bool> OperationInProgress;
 			std::atomic<std::int32_t> NumWaiters;
-			asio::steady_timer QueueImpl;
+			// asio::steady_timer QueueImpl;
+			std::deque<fu2::unique_function<void()>> QueueImpl;
 
 		public:
-			OperationQueue(asio::io_context& OwningContext)
-				: OperationInProgress(false),
-				  NumWaiters(0) ,
-				  QueueImpl(OwningContext, std::chrono::steady_clock::time_point::max())
+			OperationQueue(asio::io_context& OwningContext) : OperationInProgress(false), NumWaiters(0)
+			// QueueImpl(OwningContext, std::chrono::steady_clock::time_point::max())
 			{}
 			OperationQueue(const OperationQueue& Other) = delete;
 
@@ -61,6 +62,7 @@ namespace Modio
 				Ticket(Ticket&& Other)
 				{
 					Impl = std::move(Other.Impl);
+					Other.Impl.reset();
 				}
 
 				~Ticket()
@@ -108,13 +110,12 @@ namespace Modio
 					++NumWaiters;
 					// Preserve the associated executor of the queued operation
 
-					QueueImpl.async_wait(
-						asio::bind_executor(Modio::Detail::Services::GetGlobalContext().get_executor(),
-											[Op = std::move(Operation)](asio::error_code ec) mutable { Op(); }));
+					QueueImpl.push_back(std::forward<OperationType>(Operation));
 				}
 				else
 				{
-					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Operation));
+					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+							   std::forward<OperationType>(Operation));
 				}
 			}
 
@@ -125,13 +126,20 @@ namespace Modio
 				if (NumWaiters > 0)
 				{
 					--NumWaiters;
-					QueueImpl.cancel_one();
+					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+							   std::move(QueueImpl.front()));
+					QueueImpl.pop_front();
 				}
 			}
 
 			void CancelAll()
 			{
-				QueueImpl.cancel();
+				// QueueImpl.cancel();
+				for (auto& QueueEntry : QueueImpl)
+				{
+					QueueEntry();
+				}
+				QueueImpl.clear();
 			}
 		};
 	} // namespace Detail

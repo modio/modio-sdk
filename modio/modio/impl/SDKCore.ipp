@@ -96,6 +96,7 @@ namespace Modio
 		Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().Shutdown();
 		Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().Shutdown();
 		Modio::Detail::Services::GetGlobalService<Modio::Detail::LogService>().Shutdown();
+		Modio::Detail::Services::GetGlobalService<Modio::Detail::TimerService>().Shutdown();
 		Modio::Detail::SDKSessionData::Deinitialize();
 		auto OldContext = Modio::Detail::Services::ResetGlobalContext();
 		auto ExhaustOldContext = [OldContext]() mutable {
@@ -123,6 +124,7 @@ namespace Modio
 			Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().Shutdown();
 			Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().Shutdown();
 			Modio::Detail::Services::GetGlobalService<Modio::Detail::LogService>().Shutdown();
+			Modio::Detail::Services::GetGlobalService<Modio::Detail::TimerService>().Shutdown();
 			Modio::Detail::SDKSessionData::Deinitialize();
 			// Steal the old io context (and associated services)
 			auto OldContext = Modio::Detail::Services::ResetGlobalContext();

@@ -11,6 +11,7 @@
 #pragma once
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/entities/ModioModInfo.h"
+#include <string>
 
 namespace Modio
 {
@@ -22,7 +23,7 @@ namespace Modio
 		/// @docpublic
 		/// @brief Path to the logo for the mod. Must point to a valid file on disk or the mod will not be created on
 		/// the server.
-		Modio::filesystem::path PathToLogoFile;
+		std::string PathToLogoFile;
 		
 		/// @docpublic
 		/// @brief The name of the mod

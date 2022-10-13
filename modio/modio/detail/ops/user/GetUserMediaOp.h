@@ -20,6 +20,8 @@ namespace Modio
 {
 	namespace Detail
 	{
+		/// @docinternal
+		/// @brief Async operation to retrieve a user media metadata
 		class GetUserMediaOp
 		{
 		public:
@@ -54,7 +56,7 @@ namespace Modio
 						return;
 					}
 
-					Self.complete({}, std::move(*OpState.DestinationPath));
+					Self.complete({}, std::move(OpState.DestinationPath->u8string()));
 				}
 			}
 

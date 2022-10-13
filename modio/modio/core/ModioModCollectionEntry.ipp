@@ -16,12 +16,11 @@
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
-#include "nlohmann/json.hpp"
 #include <algorithm>
 
 namespace Modio
 {
-	ModCollectionEntry::ModCollectionEntry(ModInfo ProfileData, Modio::filesystem::path CalculatedModPath)
+	ModCollectionEntry::ModCollectionEntry(ModInfo ProfileData, std::string CalculatedModPath)
 		: ID(ProfileData.ModId),
 		  CurrentState(Modio::ModState::InstallationPending),
 		  ModProfile(ProfileData),
@@ -61,13 +60,12 @@ namespace Modio
 	{
 		if (User.has_value())
 		{
-			if (CurrentState == Modio::ModState::UninstallPending)
-			{
-				Modio::Detail::Logger().Log(
-					Modio::LogLevel::Info, Modio::LogCategory::ModManagement,
-					"User has subscribed to mod {} with ModState UninstallPending.  Updating ModState to Installed.", ID);
-				CurrentState.store(ModState::Installed);
-			}
+			// if the mod's CurrentState is UninstallPending, it would be preferable to switch state back to Installed.
+			// However, we don't yet have a way to verify the modfiles pending uninstall to check that they are intact
+			// and up to date.
+			//
+			// For now, until we have a mod manifest available, we will allow the mod to uninstall so that we can be
+			// confident the files are valid on reinstall.
 
 			LocalUserSubscriptions.insert(User->UserId);
 		}
@@ -179,7 +177,7 @@ namespace Modio
 		return ModProfile;
 	}
 
-	Modio::filesystem::path ModCollectionEntry::GetPath() const
+	std::string ModCollectionEntry::GetPath() const
 	{
 		return PathOnDisk;
 	}
@@ -274,7 +272,7 @@ namespace Modio
 			 {Modio::Detail::Constants::JSONKeys::ModEntrySubCount, Entry.LocalUserSubscriptions},
 			 {Modio::Detail::Constants::JSONKeys::ModEntryState, EntryState},
 			 {Modio::Detail::Constants::JSONKeys::ModSizeOnDisk, Entry.SizeOnDisk},
-			 {Modio::Detail::Constants::JSONKeys::ModPathOnDisk, Entry.PathOnDisk.string()},
+			 {Modio::Detail::Constants::JSONKeys::ModPathOnDisk, Entry.PathOnDisk},
 			 {Modio::Detail::Constants::JSONKeys::ModNeverRetryCode, Entry.NeverRetryReason.value()},
 			 {Modio::Detail::Constants::JSONKeys::ModNeverRetryCategory,
 			  Modio::Detail::ModioErrorCategoryID(Entry.NeverRetryReason.category())}});
@@ -354,6 +352,19 @@ namespace Modio
 		return Diff;
 	}
 
+	void to_json(nlohmann::json& j, const UserSubscriptionList& List)
+	{
+		j = nlohmann::json {Modio::Detail::Constants::JSONKeys::UserSubscriptionList, List.InternalList};
+	}
+	void from_json(const nlohmann::json& j, UserSubscriptionList& List)
+	{
+		if (j.is_array())
+		{
+			using nlohmann::from_json;
+			from_json(j, List.InternalList);
+		}
+	}
+
 	const Modio::ModCollection ModCollection::FilterByUserSubscriptions(
 		const UserSubscriptionList& UserSubscriptions) const
 	{
@@ -376,7 +387,7 @@ namespace Modio
 		return FilteredCollection;
 	}
 
-	bool ModCollection::AddOrUpdateMod(Modio::ModInfo ModToAdd, Modio::filesystem::path CalculatedModPath)
+	bool ModCollection::AddOrUpdateMod(Modio::ModInfo ModToAdd, std::string CalculatedModPath)
 	{
 		if (ModEntries.find(ModToAdd.ModId) == ModEntries.end())
 		{
@@ -418,7 +429,9 @@ namespace Modio
 			}
 			else
 			{
-				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::ModManagement, "Failed to remove Mod {} from Mod Collection as its state is not UninstallPending", ModId);
+				Modio::Detail::Logger().Log(
+					LogLevel::Warning, LogCategory::ModManagement,
+					"Failed to remove Mod {} from Mod Collection as its state is not UninstallPending", ModId);
 			}
 		}
 		return false;
@@ -442,6 +455,34 @@ namespace Modio
 				return Elem->GetRetriesRemaining() == Modio::Detail::Constants::Configuration::DefaultNumberOfRetries;
 			});
 		return SortedEntries;
+	}
+
+	void to_json(nlohmann::json& Json, const Modio::ModCollection& Collection)
+	{
+		std::vector<Modio::ModCollectionEntry> ResolvedEntries;
+		for (auto& Mod : Collection.ModEntries)
+		{
+			ResolvedEntries.push_back(*(Mod.second));
+		}
+		Json = {Modio::Detail::Constants::JSONKeys::ModCollection, ResolvedEntries};
+	}
+
+	void from_json(const nlohmann::json& Json, Modio::ModCollection& Collection)
+	{
+		std::vector<Modio::ModCollectionEntry> LoadedEntries;
+		Modio::Detail::ParseSafe(Json, LoadedEntries, Modio::Detail::Constants::JSONKeys::ModCollection);
+		for (Modio::ModCollectionEntry& Entry : LoadedEntries)
+		{
+			Collection.ModEntries[Entry.GetID()] = std::make_shared<Modio::ModCollectionEntry>(Entry);
+		}
+	}
+
+	void ModEventLog::AddEntry(Modio::ModManagementEvent Entry)
+	{
+		Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::ModManagement,
+									"Adding ModManagementEvent {} with status {} to ModEventLog for ModID {}",
+									static_cast<std::uint8_t>(Entry.Event), Entry.Status.value(), Entry.ID);
+		InternalData.push_back(std::move(Entry));
 	}
 
 } // namespace Modio

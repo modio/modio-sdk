@@ -106,7 +106,7 @@ namespace Modio
 						return;
 					}
 
-					Self.complete({}, std::move(*OpState.DestinationPath));
+					Self.complete({}, OpState.DestinationPath->u8string());
 				}
 			}
 		};

@@ -30,7 +30,6 @@ namespace Modio
 			asio::coroutine CoroutineState;
 			std::shared_ptr<HttpRequestImplementation> Request;
 			std::weak_ptr<HttpSharedState> SharedState;
-			std::unique_ptr<asio::steady_timer> SendTimer;
 			Modio::Detail::DynamicBuffer Payload;
 
 		public:

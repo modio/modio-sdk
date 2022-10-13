@@ -1,21 +1,22 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
-#include "modio/core/ModioServices.h"
-#include "modio/userdata/ModioUserDataService.h"
-#include "modio/core/ModioLogger.h"
-#include "modio/file/ModioFileService.h"
-#include "modio/file/ModioFile.h"
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioErrorCode.h"
+#include "modio/core/ModioLogger.h"
+#include "modio/core/ModioServices.h"
+#include "modio/file/ModioFile.h"
+#include "modio/file/ModioFileService.h"
+#include "modio/userdata/ModioUserDataService.h"
 #include <asio/yield.hpp>
 #include <memory>
 namespace Modio
@@ -41,10 +42,11 @@ namespace Modio
 						if (Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().FileExists(
 								RootPath / "user.json"))
 						{
-							DestinationFile = std::make_unique<Modio::Detail::File>(RootPath / "user.json", false);
+							DestinationFile = std::make_unique<Modio::Detail::File>(
+								RootPath / "user.json", Modio::Detail::FileMode::ReadWrite, false);
 
 							yield DestinationFile->ReadAsync(DestinationFile->GetFileSize(), DataBuffer,
-															  std::move(Self));
+															 std::move(Self));
 							if (ec)
 							{
 								Self.complete(ec);

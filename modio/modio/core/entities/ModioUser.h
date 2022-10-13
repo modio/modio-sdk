@@ -11,7 +11,7 @@
 #pragma once
 #include "ModioGeneratedVariables.h"
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/JsonWrapper.h"
 #include "modio/detail/entities/ModioAvatar.h"
 #include <string>
 
@@ -33,9 +33,10 @@ namespace Modio
 		/// @brief URL of the user's mod.io profile
 		std::string ProfileUrl = "";
 
-		/// @brief Cached information about the avatar
+		/// @brief Cached information about the user's avatar
 		Modio::Detail::Avatar Avatar;
 
+		/// @docnone
 		friend bool operator==(const Modio::User& A, const Modio::User& B)
 		{
 			return (A.UserId == B.UserId && A.Username == B.Username && A.DateOnline == B.DateOnline &&
@@ -43,25 +44,14 @@ namespace Modio
 		}
 	};
 
-	inline void from_json(const nlohmann::json& Json, Modio::User& User)
-	{
-		Detail::ParseSafe(Json, User.UserId, "id");
-		Detail::ParseSafe(Json, User.Username, "username");
-		Detail::ParseSafe(Json, User.DateOnline, "date_online");
-		Detail::ParseSafe(Json, User.ProfileUrl, "profile_url");
-		nlohmann::json AvatarJson;
-		if (Detail::GetSubobjectSafe(Json, "avatar", AvatarJson))
-		{
-			Modio::Detail::from_json(AvatarJson, User.Avatar);
-		}
-	}
-	inline void to_json(nlohmann::json& Json, const Modio::User& User)
-	{
-		Json = nlohmann::json {{"id", User.UserId},
-							   {"username", User.Username},
-							   {"date_online", User.DateOnline},
-							   {"profile_url", User.ProfileUrl},
-							   {"avatar", User.Avatar}};
-	}
+	/// @docnone
+	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::User& User);
+	
+	/// @docnone
+	MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::User& User);
 
 } // namespace Modio
+
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "modio/core/entities/ModioUser.ipp"
+#endif

@@ -12,7 +12,7 @@ if (NOT TARGET platform)
 endif()
 
 target_compile_features(platform INTERFACE cxx_std_14)
-
+target_compile_definitions(platform INTERFACE -DFU2_WITH_NO_EMPTY_PROPAGATION)
 target_include_directories(platform INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 
 find_library(FOUNDATION Foundation)

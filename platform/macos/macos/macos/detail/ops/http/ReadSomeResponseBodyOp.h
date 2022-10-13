@@ -53,7 +53,7 @@ namespace Modio
 				  Request(std::move(Other.Request)),
 				  SharedState(std::move(Other.SharedState)),
 				  ResponseBuffer(std::move(Other.ResponseBuffer)),
-				  ReadChunk(ReadChunkSize)
+				  ReadChunk(std::move(Other.ReadChunk))
 			{}
 
 			template<typename CoroType>
@@ -123,7 +123,7 @@ namespace Modio
 
  #ifdef MODIO_TRACE_DUMP_RESPONSE
 							Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
-														"ReadSomeResponseBodyOp Response body: {}", ReadChunk.Data());
+														"ReadSomeResponseBodyOp Response body: {}", std::string(ReadChunk.begin(), ReadChunk.end()));
  #endif // MODIO_TRACE_DUMP_RESPONSE
 						}
 					}

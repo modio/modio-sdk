@@ -10,8 +10,8 @@
 
 #pragma once
 #include "modio/core/ModioCoreTypes.h"
+#include "modio/detail/JsonWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
-#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
 
@@ -19,6 +19,8 @@ namespace Modio
 {
 	namespace Detail
 	{
+		/// @docinternal
+		/// @brief Container for the error codes a response can store
 		struct ResponseError
 		{
 			std::int32_t Code;
@@ -27,6 +29,7 @@ namespace Modio
 			Modio::Optional<std::vector<Modio::FieldError>> ExtendedErrorInformation;
 		};
 
+		/// @docnone
 		static void from_json(const nlohmann::json& Json, Modio::Detail::ResponseError& Error)
 		{
 			if (Json.contains("error"))
@@ -50,7 +53,7 @@ namespace Modio
 							for (auto& Item : ExtendedErrors.items())
 							{
 								FieldError.Field = Item.key();
-								FieldError.Error = Item.value();
+								FieldError.Error = std::string(Item.value());
 								FieldErrors.push_back(FieldError);
 							}
 							Error.ExtendedErrorInformation = FieldErrors;

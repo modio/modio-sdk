@@ -12,31 +12,36 @@
 	#include "modio/core/entities/ModioModInfo.h"
 #endif
 
+#include "modio/detail/JsonWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
-#include <nlohmann/json.hpp>
 namespace Modio
 {
+	/// @docnone
 	void from_json(const nlohmann::json& Json, Modio::Metadata& Metadata)
 	{
 		Detail::ParseSafe(Json, Metadata.Key, "metakey");
 		Detail::ParseSafe(Json, Metadata.Value, "metavalue");
 	}
 
+	/// @docnone
 	void to_json(nlohmann::json& Json, const Modio::Metadata& Metadata)
 	{
 		Json = nlohmann::json {{"metakey", Metadata.Key}, {"metavalue", Metadata.Value}};
 	}
 
+	/// @docnone
 	void from_json(const nlohmann::json& Json, Modio::ModTag& ModTag)
 	{
 		Detail::ParseSafe(Json, ModTag.Tag, "name");
 	}
 
+	/// @docnone
 	void to_json(nlohmann::json& Json, const Modio::ModTag& Tag)
 	{
 		Json = nlohmann::json {{"name", Tag.Tag}};
 	}
 
+	/// @docnone
 	void from_json(const nlohmann::json& Json, Modio::ModInfo& ModInfo)
 	{
 		Detail::ParseSafe(Json, ModInfo.ModId, "id");
@@ -45,9 +50,9 @@ namespace Modio
 			Modio::FileMetadata FileInfo;
 			if (Detail ::ParseSafe(Json, FileInfo, "modfile"))
 			{
-				if (FileInfo.ModId == -1) 
+				if (FileInfo.ModId == -1)
 				{
-					// This means that the FileInfo was found in 
+					// This means that the FileInfo was found in
 					// the list of object but did not have a parsable
 					// data in the json.
 					ModInfo.FileInfo = {};
@@ -78,7 +83,6 @@ namespace Modio
 			uint8_t Visibility;
 			Detail::ParseSafe(Json, Visibility, "visible");
 			ModInfo.bVisible = bool(Visibility);
-			
 		}
 
 		{
@@ -95,6 +99,7 @@ namespace Modio
 		}
 	}
 
+	/// @docnone
 	void to_json(nlohmann::json& Json, const Modio::ModInfo& Info)
 	{
 		Json = nlohmann::json {{"id", Info.ModId},

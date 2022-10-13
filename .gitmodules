@@ -1,13 +1,14 @@
 [submodule "ext/asio"]
 	path = ext/asio
-	url = https://github.com/stephenwhittle/asio
-	branch = nn_support
+	url = https://github.com/modio/modio-integration-asio
+	branch = master
 [submodule "ext/optional"]
 	path = ext/optional
-	url = https://github.com/TartanLlama/optional.git
+	url = https://github.com/modio/modio-integration-optional
 [submodule "ext/filesystem"]
 	path = ext/filesystem
-	url = https://github.com/gulrak/filesystem.git
+	url = https://github.com/modio/modio-integration-filesystem
+	branch = ghc_os_custom
 [submodule "ext/fmt"]
 	path = ext/fmt
 	url = https://github.com/fmtlib/fmt
@@ -26,3 +27,6 @@
 [submodule "ext/expected"]
 	path = ext/expected
 	url = https://github.com/TartanLlama/expected.git
+[submodule "ext/function2"]
+	path = ext/function2
+	url = https://github.com/Naios/function2.git

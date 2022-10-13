@@ -9,11 +9,15 @@
  */
 
 #pragma once
-#include "modio/core/ModioLogger.h"
+
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/FilesystemWrapper.h"
+#include "modio/detail/JsonWrapper.h"
 #include "modio/detail/ModioProfiling.h"
-#include <nlohmann/json.hpp>
+
+#ifdef MODIO_TRACE_JSON_PARSER
+	#include "modio/core/ModioLogger.h"
+#endif
 
 namespace Modio
 {
@@ -22,6 +26,9 @@ namespace Modio
 		class Buffer;
 		class DynamicBuffer;
 
+		/// @docinternal
+		/// @brief Make sure JSON element parsing is executed when checking for key
+		/// location and validity
 		template<typename T>
 		inline bool ParseSafe(const nlohmann::json& Json, T& OutVar, const std::string& Key)
 		{
@@ -32,8 +39,10 @@ namespace Modio
 			}
 			else
 			{
+#ifdef MODIO_TRACE_JSON_PARSER
 				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
 											"Failed to deserialize json Key: {}", Key);
+#endif
 				return false;
 			}
 		}
@@ -50,12 +59,15 @@ namespace Modio
 			}
 			else
 			{
+#ifdef MODIO_TRACE_JSON_PARSER
 				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
 											"Failed to deserialize json Key: {}", Key);
+#endif
 				return false;
 			}
 		}
 
+		/// @docnone
 		template<typename T>
 		inline void from_json(const nlohmann::json& Json, std::shared_ptr<T>& Object)
 		{
@@ -65,6 +77,7 @@ namespace Modio
 			}
 		}
 
+		/// @docnone
 		template<typename T>
 		inline bool ParseSubobjectSafe(const nlohmann::json& Json, T& OutVar, const std::string& SubobjectKey,
 									   const std::string& Key)
@@ -78,14 +91,18 @@ namespace Modio
 				}
 				else
 				{
+#ifdef MODIO_TRACE_JSON_PARSER
 					Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
 												"Subobject is null for SubobjectKey: {}", SubobjectKey);
+#endif
 				}
 			}
 			else
 			{
+#ifdef MODIO_TRACE_JSON_PARSER
 				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
 											"Json does not contain SubobjectKey: {}", SubobjectKey);
+#endif
 			}
 			return false;
 		}
@@ -153,12 +170,14 @@ namespace ghc
 {
 	namespace filesystem
 	{
+		/// @docnone
 		inline void to_json(nlohmann::json& Json, const Modio::filesystem::path& Path)
 		{
 			using nlohmann::to_json;
 			return to_json(Json, Path.u8string());
 		}
 
+		/// @docnone
 		inline void from_json(const nlohmann::json& Json, Modio::filesystem::path& Path)
 		{
 			Path = Modio::filesystem::path(Json.get<std::string>());

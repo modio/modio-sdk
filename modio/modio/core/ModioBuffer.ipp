@@ -11,7 +11,7 @@
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "modio/core/ModioBuffer.h"
 #endif
-
+#include "modio/detail/ModioProfiling.h"
 #include <limits>
 
 namespace Modio
@@ -210,7 +210,7 @@ namespace Modio
 			{
 				if (CurrentBuffer.Data() == nullptr)
 				{
-					throw;
+					//throw;
 				}
 				CumulativeSize += CurrentBuffer.GetSize();
 			}
@@ -443,6 +443,23 @@ namespace Modio
 		const std::vector<Modio::MutableBufferView>::const_iterator DynamicBuffer::DynamicBufferSequence::end() const
 		{
 			return BufferViews.end();
+		}
+
+		std::size_t BufferCopy(Modio::Detail::Buffer& Destination, const Modio::Detail::DynamicBuffer Source)
+		{
+			MODIO_PROFILE_SCOPE(DynamicBufferCopyToLinear);
+			return asio::buffer_copy(Modio::MutableBufferView(Destination.Data(), Destination.GetSize()),
+									 Source.data());
+		}
+
+		std::size_t BufferCopy(Modio::Detail::DynamicBuffer& Destination,
+									  const Modio::Detail::DynamicBuffer Source)
+		{
+			MODIO_PROFILE_SCOPE(DynamicBufferCopyToDynamic);
+			Modio::Detail::DynamicBuffer::Sequence SourceBufferView = Source.data();
+			Modio::Detail::DynamicBuffer::Sequence DestinationBufferView = Destination.data();
+
+			return asio::buffer_copy(DestinationBufferView, SourceBufferView);
 		}
 
 	} // namespace Detail

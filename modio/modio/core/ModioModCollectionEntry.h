@@ -10,16 +10,15 @@
 
 #pragma once
 #include "ModioGeneratedVariables.h"
-#include "modio/detail/ModioDefines.h"
-
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioModInfo.h"
+#include "modio/detail/JsonWrapper.h"
 #include "modio/detail/ModioConstants.h"
+#include "modio/detail/ModioDefines.h"
 #include "modio/detail/ModioTransactional.h"
 #include <atomic>
 #include <memory>
-#include <nlohmann/json.hpp>
 #include <set>
 
 namespace Modio
@@ -33,7 +32,7 @@ namespace Modio
 		UpdatePending,
 		Downloading, // installing - don't save to disk, previous state will be saved instead
 		Extracting, // installing- don't save to disk, previous state will be saved instead
-		UninstallPending,
+		UninstallPending
 	};
 
 	/// @docpublic
@@ -51,11 +50,11 @@ namespace Modio
 		/// @brief Mod descriptor from the REST API
 		ModInfo ModProfile;
 
-		/// @brief Reference counting to allow automatic uninstalltion of unused local mods
+		/// @brief Reference counting to allow automatic uninstallation of unused local mods
 		std::atomic<uint8_t> LocalUserSubscriptionCount {};
 		std::set<Modio::UserID> LocalUserSubscriptions;
 
-		Modio::filesystem::path PathOnDisk;
+		std::string PathOnDisk;
 		Modio::FileSize SizeOnDisk;
 
 		/// @docinternal
@@ -67,6 +66,7 @@ namespace Modio
 
 		uint8_t RetriesRemainingThisSession;
 
+		/// @docnone
 		friend bool operator==(const Modio::ModCollectionEntry& A, const Modio::ModCollectionEntry& B)
 		{
 			// Note: Operator==()  ignores transient fields ShouldNotRetry and RetriesRemainingThisSession
@@ -84,16 +84,21 @@ namespace Modio
 		}
 
 	public:
+		/// @docinternal
+		/// @brief Default constructor
 		ModCollectionEntry() = default;
 
 		/// @docinternal
 		/// @brief Constructor creating a ModCollection entry for the specified mod profile. Sets the default state to
 		/// InstallationPending
 		/// @param ProfileData Mod profile to create a collection entry for
-		MODIO_IMPL ModCollectionEntry(ModInfo ProfileData, Modio::filesystem::path CalculatedModPath);
+		MODIO_IMPL ModCollectionEntry(ModInfo ProfileData, std::string CalculatedModPath);
 
+		/// @docinternal
+		/// @brief ModCollectionEntry copy constructor
 		MODIO_IMPL ModCollectionEntry(const ModCollectionEntry& Other);
 
+		/// @docnone
 		MODIO_IMPL ModCollectionEntry& operator=(const ModCollectionEntry& Other);
 
 		/// @docinternal
@@ -162,7 +167,7 @@ namespace Modio
 		/// @return Path to the mod's installation folder on disk
 		/// NOTE: If the mod is not yet installed this path may not yet exist. Check
 		/// @doc_xref{ModCollectionEntry::GetModState} before trying to load files in this location
-		MODIO_IMPL Modio::filesystem::path GetPath() const;
+		MODIO_IMPL std::string GetPath() const;
 
 		/// @docpublic
 		/// @return Size on disk if the mod has been installed, or empty optional if installation is in progress
@@ -174,12 +179,18 @@ namespace Modio
 		/// @param NewSize The total size on disk of all files in the mod
 		MODIO_IMPL void UpdateSizeOnDisk(Modio::FileSize NewSize);
 
+		/// @docnone
 		friend MODIO_IMPL void to_json(nlohmann::json& j, const ModCollectionEntry& Entry);
 
+		/// @docnone
 		friend MODIO_IMPL void from_json(const nlohmann::json& j, ModCollectionEntry& Entry);
 
+		/// @docinternal
+		/// @brief If the conditions are met, it starts a transaction over the ModCollectionEntry
 		friend MODIO_IMPL void BeginTransactionImpl(ModCollectionEntry& Entry);
 
+		/// @docinternal
+		/// @brief Set the CurrentState to the RollbackState status
 		friend MODIO_IMPL void RollbackTransactionImpl(ModCollectionEntry& Entry);
 	};
 
@@ -207,36 +218,46 @@ namespace Modio
 		/// @brief The mod ID of the mod being processed
 		Modio::ModID ID;
 
+		/// @docinternal
+		/// @brief Default constructor
 		ModProgressInfo(Modio::ModID ID) : ID(ID) {};
 	};
 
-	/// @doc_internal
+	/// @docpublic
 	/// @brief Class containing the mod IDs the current user is subscribed to
 	class UserSubscriptionList
 	{
 	public:
+		/// @docpublic
 		/// @brief Constructs an empty subscription list
 		MODIO_IMPL UserSubscriptionList();
 
+		/// @docpublic
 		/// @brief Constructs a User subscription list by copying Mod IDs from the provided vector
 		/// @param NewIDs The source Mod IDs to use
 		MODIO_IMPL UserSubscriptionList(std::vector<Modio::ModID> NewIDs);
 
+		/// @docpublic
 		/// @brief Constructs a User subscription list by consuming Mod IDs from the provided vector
 		/// @param NewIDs The source Mod IDs to use
 		MODIO_IMPL UserSubscriptionList(std::vector<Modio::ModID>&& NewIDs);
 
+		/// @docpublic
 		/// @brief Adds a new mod to the subscription list
 		/// @param Mod Mod info object to add
 		/// @return True if the mod was added, false if already in the list
 		MODIO_IMPL bool AddMod(Modio::ModInfo Mod);
 
+		/// @docpublic
 		/// @brief Removes a mod from the subscription list
 		/// @param Mod Mod ID to remove from the list
 		MODIO_IMPL void RemoveMod(Modio::ModID Mod);
 
+		/// @docpublic
+		/// @brief Retrieve a set of ModID
 		MODIO_IMPL const std::set<Modio::ModID>& Get() const;
 
+		/// @docpublic
 		/// @brief Enum indicating if a mod was added or removed when calculating the difference of two user
 		/// subscription lists
 		enum class ChangeType
@@ -245,6 +266,7 @@ namespace Modio
 			Removed
 		};
 
+		/// @docpublic
 		/// @brief Calculates removals or additions between the two user subscription lists
 		/// @param Original The original list of subscriptions
 		/// @param Updated The updated list of subscriptions
@@ -252,27 +274,17 @@ namespace Modio
 		/// removal
 		MODIO_IMPL static std::map<Modio::ModID, ChangeType> CalculateChanges(const UserSubscriptionList& Original,
 																			  const UserSubscriptionList& Updated);
-		friend void to_json(nlohmann::json& j, const UserSubscriptionList& List)
-		{
-			j = nlohmann::json {Modio::Detail::Constants::JSONKeys::UserSubscriptionList, List.InternalList};
-		}
-		friend void from_json(const nlohmann::json& j, UserSubscriptionList& List)
-		{
-			if (j.is_array())
-			{
-				using nlohmann::from_json;
-				from_json(j, List.InternalList);
-			}
-			else
-			{
-				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
-											"from_json failed for UserSubscriptionList. List must be an array.");
-			}
-		}
+
+		/// @docnone
+		MODIO_IMPL friend void to_json(nlohmann::json& j, const UserSubscriptionList& List);
+
+		/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& j, UserSubscriptionList& List);
 
 	private:
 		std::set<Modio::ModID> InternalList;
 
+		/// @docnone
 		friend bool operator==(const Modio::UserSubscriptionList& A, const Modio::UserSubscriptionList& B)
 		{
 			// Written for Test_JsonToAndFrom.cpp, re-check functionality before using in actual code. This operator
@@ -287,14 +299,24 @@ namespace Modio
 	/// @brief Simple struct representing the outcome of a mod management operation
 	struct ModManagementEvent
 	{
+		/// @docpublic
 		/// @brief What type of event occurred
-		enum class EventType
+		enum class EventType : std::uint8_t
 		{
-			Installed, /** Mod installation to local storage */
-			Uninstalled, /** Mod uninstallation from local storage*/
-			Updated, /** Mod local installation updated to latest version*/
-			Uploaded
+			BeginInstall,   /** Mod event started to install a mod **/
+			Installed,      /** Mod installation to local storage **/
+			BeginUninstall, /** Mod event started to uninstall a mod **/
+			Uninstalled,    /** Mod uninstallation from local storage **/
+			BeginUpdate,    /** Mod event started to update a mod **/
+			Updated,        /** Mod local installation updated to latest version*/
+			BeginUpload,    /** Mod event started to upload a mod **/
+			Uploaded        /** Mod event that upload completed **/
 		};
+
+		friend auto format_as(Modio::ModManagementEvent::EventType EnumValue)
+		{
+			return static_cast<std::underlying_type_t<Modio::ModManagementEvent::EventType>>(EnumValue);
+		}
 
 		/// @brief ID for the mod that the event occurred on
 		Modio::ModID ID;
@@ -306,44 +328,55 @@ namespace Modio
 		Modio::ErrorCode Status;
 	};
 
+	/// @docpublic
+	/// @brief Container of multiple mods organized by Modio::ModID
 	class ModCollection
 	{
 	public:
+		
+		/// @docpublic
+		/// @brief Retrieve a ModCollection given a UserSubscriptionList
+		/// @param UserSubscriptionList patterns that would entitle a filter
+		/// @return ModCollection filled with patterns from UserSubscriptions or empty if nothing is found
 		MODIO_IMPL const ModCollection FilterByUserSubscriptions(const UserSubscriptionList& UserSubscriptions) const;
 
+		/// @docpublic
 		/// @brief Either inserts a mod into the collection or updates its associated profile
 		/// @param ModToAdd The mod to insert or update
 		/// @param CalculatedModPath The new path to the mod on disk
 		/// @return True of mod was inserted, false if mod was updated
-		MODIO_IMPL bool AddOrUpdateMod(Modio::ModInfo ModToAdd, Modio::filesystem::path CalculatedModPath);
+		MODIO_IMPL bool AddOrUpdateMod(Modio::ModInfo ModToAdd, std::string CalculatedModPath);
+		
+		/// @docpublic
+		/// @brief Retrieve a dictionary of ModID - ModCollectionEntry stored in this ModCollection
+		/// @return Dictionary where keys are ModID and values are ModCollectionEntry
 		MODIO_IMPL const std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& Entries();
+
+		/// @docpublic
+		/// @brief Retrieve a single ModCollectionEntry if one is found using a ModID
+		/// @return A ModCollectionEntry when the ModCollection finds it using a ModID, otherwise empty
 		MODIO_IMPL Modio::Optional<Modio::ModCollectionEntry&> GetByModID(Modio::ModID ModId) const;
+
+		/// @docpublic
+		/// @brief Remove a ModCollectionEntry inside the ModCollection indexed by ModID
+		/// @return True when the mod was found and removed, otherwise false
 		MODIO_IMPL bool RemoveMod(Modio::ModID ModId, bool bForce = false);
+		
+		/// @docpublic
+		/// @brief Retrieved a sorted ModCollectionEntry vector by priority
+		/// @return Vector with ModCollectionEntry
 		MODIO_IMPL std::vector<std::shared_ptr<Modio::ModCollectionEntry>> SortEntriesByRetryPriority() const;
 
-		friend void to_json(nlohmann::json& Json, const Modio::ModCollection& Collection)
-		{
-			std::vector<Modio::ModCollectionEntry> ResolvedEntries;
-			for (auto& Mod : Collection.ModEntries)
-			{
-				ResolvedEntries.push_back(*(Mod.second));
-			}
-			Json = {Modio::Detail::Constants::JSONKeys::ModCollection, ResolvedEntries};
-		}
-
-		friend void from_json(const nlohmann::json& Json, Modio::ModCollection& Collection)
-		{
-			std::vector<Modio::ModCollectionEntry> LoadedEntries;
-			Modio::Detail::ParseSafe(Json, LoadedEntries, Modio::Detail::Constants::JSONKeys::ModCollection);
-			for (Modio::ModCollectionEntry& Entry : LoadedEntries)
-			{
-				Collection.ModEntries[Entry.GetID()] = std::make_shared<Modio::ModCollectionEntry>(Entry);
-			}
-		}
+		/// @docnone
+		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::ModCollection& Collection);
+		
+		/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModCollection& Collection);
 
 	private:
 		std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> ModEntries;
 
+		/// @docnone
 		friend bool operator==(const Modio::ModCollection& A, const Modio::ModCollection& B)
 		{
 			if (A.ModEntries.size() != B.ModEntries.size())
@@ -369,25 +402,25 @@ namespace Modio
 		}
 	};
 
+	/// @docpublic
+	/// @brief Container of events directly related to a ModID, in particular any error occurred
+	/// during execution
 	class ModEventLog
 	{
 	public:
+		/// @docpublic
 		/// @brief Adds a new entry to the event log. If a given mod ID has an existing entry, this replaces it,
 		/// effectively updating it.
 		/// @param Entry The entry to add
-		void AddEntry(Modio::ModManagementEvent Entry)
-		{
-			Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::ModManagement,
-										"Adding ModManagementEvent {} with status {} to ModEventLog for ModID {}",
-										Entry.Event, Entry.Status.value(), Entry.ID);
-			InternalData.push_back(std::move(Entry));
-		}
+		MODIO_IMPL void AddEntry(Modio::ModManagementEvent Entry);
 
+		/// @docpublic
 		/// @brief Updates the error/status code for a given Mod ID in the log
 		/// @param ID The mod to update
 		/// @param ec The new status code
 		void UpdateStatusCode(Modio::ModID ID, Modio::ErrorCode ec);
 
+		/// @docpublic
 		/// @brief Clears the log of events
 		/// @return All entries in the log at the time ClearLog was called
 		inline std::vector<Modio::ModManagementEvent> ClearLog()

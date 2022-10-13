@@ -1,20 +1,21 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 #include "ModioGeneratedVariables.h"
-#include "modio/core/ModioStdTypes.h"
 #include "modio/core/ModioBuffer.h"
+#include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioModInfo.h"
 #include "modio/core/entities/ModioModInfoList.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/timer/ModioTimer.h"
 #include <chrono>
 #include <memory>
 #include <string>
@@ -22,11 +23,13 @@
 
 namespace Modio
 {
-	
 	namespace Detail
 	{
 		class DynamicBuffer;
 
+		/// @docinternal
+		/// @brief A global service to store mod data retrieved from the server
+		///in a form of cache, which would have a limited lifespan
 		class CacheService : public asio::detail::service_base<CacheService>
 		{
 		public:
@@ -59,7 +62,8 @@ namespace Modio
 		private:
 			struct CacheEntry
 			{
-				std::unique_ptr<asio::steady_timer> Timer;
+				Modio::Detail::Timer MyTimer;
+				// std::unique_ptr<asio::steady_timer> Timer;
 				Modio::Detail::DynamicBuffer Data;
 			};
 

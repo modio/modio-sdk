@@ -29,6 +29,7 @@ namespace Modio
 	NLOHMANN_JSON_SERIALIZE_ENUM(FileMetadata::VirusStatus,
 								 {{FileMetadata::VirusStatus::NoThreat, 0}, {FileMetadata::VirusStatus::Malicious, 1}})
 
+	/// @docnone
 	void from_json(const nlohmann::json& Json, Modio::FileMetadata& FileMetadata)
 	{
 		std::string debug = Json.dump();
@@ -54,6 +55,7 @@ namespace Modio
 		Detail::ParseSubobjectSafe(Json, FileMetadata.DownloadExpiryDate, "download", "date_expires");
 	}
 
+	/// @docnone
 	void to_json(nlohmann::json& Json, const Modio::FileMetadata& FileMetadata)
 	{
 		Json = {{"id", FileMetadata.MetadataId},

@@ -10,14 +10,16 @@
 
 #pragma once
 
+#include "ModioGeneratedVariables.h"
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/ModioJsonHelpers.h"
 #include <string>
 
 namespace Modio
 {
 	namespace Detail
 	{
+		/// @docinternal
+		/// @brief Structure with the file references to the user's avatar
 		struct Avatar
 		{
 			/** Avatar filename including extension. */
@@ -29,28 +31,22 @@ namespace Modio
 			/** URL to the medium avatar thumbnail. */
 			std::string Thumb100x100;
 
+			/// @docnone
 			friend bool operator==(const Modio::Detail::Avatar& A, const Modio::Detail::Avatar& B)
 			{
-				return (A.Filename == B.Filename && A.Original == B.Original && A.Thumb50x50 == B.Thumb50x50 && A.Thumb100x100 == B.Thumb100x100);
+				return (A.Filename == B.Filename && A.Original == B.Original && A.Thumb50x50 == B.Thumb50x50 &&
+						A.Thumb100x100 == B.Thumb100x100);
 			}
 		};
 
-		static void from_json(const nlohmann::json& Json, Avatar& Avatar)
-		{
-			Detail::ParseSafe(Json, Avatar.Filename, "filename");
-			Detail::ParseSafe(Json, Avatar.Original, "original");
-			Detail::ParseSafe(Json, Avatar.Thumb50x50, "thumb_50x50");
-			Detail::ParseSafe(Json, Avatar.Thumb100x100, "thumb_100x100");
-		}
+		/// @docnone
+		MODIO_IMPL void from_json(const nlohmann::json& Json, Avatar& Avatar);
 
-		static void to_json(nlohmann::json& Json, const Avatar& Avatar)
-		{
-			Json = nlohmann::json {{"filename", Avatar.Filename},
-								   {"original", Avatar.Original},
-								   {"thumb_50x50", Avatar.Thumb50x50},
-								   {"thumb_100x100", Avatar.Thumb100x100}};
-		}
+		/// @docnone
+		MODIO_IMPL void to_json(nlohmann::json& Json, const Avatar& Avatar);
 
+		/// @docpublic
+		/// @brief Retrieve the corresponding string according to an avatar size
 		inline const std::string& GetAvatarURL(const Avatar& Avatar, Modio::AvatarSize Size)
 		{
 			switch (Size)
@@ -69,6 +65,8 @@ namespace Modio
 			return NoResult;
 		}
 
+		/// @docpublic
+		/// @brief Transform an AvatarSize to an std::string 
 		inline std::string ToString(Modio::AvatarSize AvatarSize)
 		{
 			switch (AvatarSize)
@@ -86,3 +84,7 @@ namespace Modio
 		}
 	} // namespace Detail
 } // namespace Modio
+
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "modio/detail/entities/ModioAvatar.ipp"
+#endif

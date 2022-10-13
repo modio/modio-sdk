@@ -11,6 +11,7 @@
 #pragma once
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/JsonWrapper.h"
 #include "modio/detail/ModioObjectTrack.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioSDKSessionData.h"
@@ -18,7 +19,6 @@
 #include "modio/detail/ops/compression/ExtractAllToFolderOp.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/file/ModioFileService.h"
-#include <nlohmann/json.hpp>
 
 #include <asio/yield.hpp>
 namespace Modio
@@ -68,45 +68,56 @@ namespace Modio
 					Modio::Detail::SDKSessionData::GetSystemModCollection().Entries().at(Mod)->SetModState(
 						ModState::Downloading);
 
+					// TryMarshalResponse to get ModInfo object
+					if (Modio::Optional<Modio::ModInfo> ModInfoResponse =
+							TryMarshalResponse<Modio::ModInfo>(ModInfoBuffer))
 					{
-						Modio::Detail::Buffer LinearBuffer(ModInfoBuffer.size());
-						Modio::Detail::BufferCopy(LinearBuffer, ModInfoBuffer);
-
-						ModInfoResponse =
-							nlohmann::json::parse(LinearBuffer.begin(), LinearBuffer.end(), nullptr, false);
+						ModInfoData = std::move(*ModInfoResponse);
+					}
+					else
+					{
+						Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
+						Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
+						return;
 					}
 
+					// Check if we have valid FileInfo, and create download path if valid
+					if (ModInfoData.FileInfo.has_value())
 					{
-						std::string Filename;
-						if (!Detail::ParseSubobjectSafe(ModInfoResponse, Filename, "modfile", "filename"))
+						if (Modio::Optional<Modio::filesystem::path> TempFilePath =
+								Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+									.MakeTempFilePath(ModInfoData.FileInfo->Filename))
 						{
-							Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
-							return;
+							DownloadPath = std::move(*TempFilePath);
 						}
-
-						Modio::Optional<Modio::filesystem::path> TempFilePath =
-							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MakeTempFilePath(
-								Filename);
-
-						if (!TempFilePath)
+						else
 						{
 							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-														"couldn't create temp file {}", Filename);
-
-							Self.complete(Modio::make_error_code(FilesystemError::UnableToCreateFile));
+														"Couldn't create temp file {}", ModInfoData.FileInfo->Filename);
+							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
+							Self.complete(Modio::make_error_code(Modio::FilesystemError::UnableToCreateFile));
 							return;
 						}
-
-						DownloadPath = std::move(*TempFilePath);
+					}
+					else
+					{
+						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+													"Data received for mod {} contains no modfile information",
+													ModInfoData.FileInfo->Filename);
+						Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
+						Self.complete(Modio::make_error_code(Modio::GenericError::NoDataAvailable));
+						return;
 					}
 
 					// this check may be redundant given the above check
 					if (std::shared_ptr<Modio::ModProgressInfo> MPI = ModProgress.lock())
 					{
-						Detail::ParseSubobjectSafe(ModInfoResponse, MPI->TotalDownloadSize, "modfile", "filesize");
+						MPI->TotalDownloadSize = Modio::FileSize(ModInfoData.FileInfo->Filesize);
+
 						if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
 								 .CheckSpaceAvailable(DownloadPath, MPI->TotalDownloadSize))
 						{
+							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
 							Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
 							return;
 						}
@@ -114,7 +125,7 @@ namespace Modio
 						if (Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().FileExists(
 								DownloadPath))
 						{
-							Modio::Detail::File DownloadedFile(DownloadPath);
+							Modio::Detail::File DownloadedFile(DownloadPath, Modio::Detail::FileMode::ReadWrite);
 							if (DownloadedFile.GetFileSize() == MPI->TotalDownloadSize)
 							{
 								bFileDownloadComplete = true;
@@ -128,17 +139,17 @@ namespace Modio
 						Self.complete(Modio::make_error_code(Modio::ModManagementError::InstallOrUpdateCancelled));
 						return;
 					}
+
 					if (!bFileDownloadComplete)
 					{
 						Modio::Detail::Logger().Log(
 							LogLevel::Info, LogCategory::Http, "Starting download of modfile {} for mod {} \"{}\"",
-							ModInfoResponse["modfile"]["filename"].get<std::string>(),
-							ModInfoResponse["id"].get<Modio::ModID>(), ModInfoResponse["name"].get<std::string>());
+							ModInfoData.FileInfo->Filename, ModInfoData.ModId, ModInfoData.ProfileName);
 
-						yield Modio::Detail::DownloadFileAsync(Modio::Detail::HttpRequestParams::FileDownload(
-																   ModInfoResponse["modfile"]["download"]["binary_url"])
-																   .value(),
-															   DownloadPath, ModProgress, std::move(Self));
+						yield Modio::Detail::DownloadFileAsync(
+							Modio::Detail::HttpRequestParams::FileDownload(ModInfoData.FileInfo->DownloadBinaryURL)
+								.value(),
+							DownloadPath, ModProgress, std::move(Self));
 						if (ec)
 						{
 							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
@@ -146,6 +157,7 @@ namespace Modio
 							return;
 						}
 					}
+
 					Modio::Detail::SDKSessionData::GetSystemModCollection().Entries().at(Mod)->SetModState(
 						ModState::Extracting);
 					InstallPath =
@@ -166,6 +178,7 @@ namespace Modio
 
 					if (ec)
 					{
+						Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
 						Self.complete(ec);
 						return;
 					}
@@ -178,8 +191,9 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
-					// TODO: @modio-core perhaps resolve the file path issue by storing the mod path on the entry here
-					// rather than dynamically calculating it elsewhere?
+
+					// TODO: @modio-core perhaps resolve the file path issue by storing the mod path on the entry
+					// here rather than dynamically calculating it elsewhere?
 					Modio::Detail::SDKSessionData::GetSystemModCollection().Entries().at(Mod)->UpdateSizeOnDisk(
 						ExtractedSize);
 					Modio::Detail::SDKSessionData::GetSystemModCollection().Entries().at(Mod)->SetModState(
@@ -201,7 +215,7 @@ namespace Modio
 			Modio::Detail::DynamicBuffer ModInfoBuffer;
 			Modio::filesystem::path DownloadPath;
 			Modio::filesystem::path InstallPath;
-			nlohmann::json ModInfoResponse;
+			Modio::ModInfo ModInfoData;
 			Modio::Detail::Transaction<Modio::ModCollectionEntry> Transaction;
 			std::weak_ptr<Modio::ModProgressInfo> ModProgress;
 			bool bFileDownloadComplete = false;

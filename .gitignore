@@ -9,7 +9,7 @@ installed-sdk/
 
 # Generated documentation shouldn't be submitted
 doc/**/*.pdf
-doc/scripts/vendor/
+doc/scripts/Gemfile.lock
 .ccls-cache/
 .vscode
 .DS_Store

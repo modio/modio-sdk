@@ -247,16 +247,13 @@ doReset(
         windowBits = 9;
 
     if(level < 0 || level > 9)
-        throw(std::invalid_argument{
-            "invalid level"});
+        assert(!"invalid level");
 
     if(windowBits < 8 || windowBits > 15)
-        throw(std::invalid_argument{
-            "invalid windowBits"});
+        assert(!"invalid windowBits");
 
     if(memLevel < 1 || memLevel > max_mem_level)
-        throw(std::invalid_argument{
-            "invalid memLevel"});
+        assert(!"invalid memLevel");
 
     w_bits_ = windowBits;
 

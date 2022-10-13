@@ -16,6 +16,7 @@
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioProfiling.h"
+#include "modio/timer/ModioTimer.h"
 #include <memory>
 
 namespace Modio
@@ -51,10 +52,21 @@ namespace Modio
 					Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
 					return;
 				}
+				if (FileImpl->GetFileMode() == Modio::Detail::FileMode::ReadOnly)
+				{
+					Self.complete(Modio::make_error_code(Modio::FilesystemError::NoPermission));
+					return;
+				}
 
 				reenter(CoroutineState)
 				{
 					yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+
+					if (BufferSize == 0)
+					{
+						Self.complete({});
+						return;
+					}
 
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
 												"Begin write for {}, File Descriptor {}, expected size: {}, Offset: {}",
@@ -75,13 +87,8 @@ namespace Modio
 
 					while ((WriteResult = PinnedSharedState->IOCompleted(FileImpl->GetFileHandle())).first == false)
 					{
-						if (PollTimer == nullptr)
-						{
-							PollTimer = std::make_unique<asio::steady_timer>(
-								Modio::Detail::Services::GetGlobalContext().get_executor());
-						}
-						PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
-						yield PollTimer->async_wait(std::move(Self));
+						StatusTimer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
+						yield StatusTimer.WaitAsync(std::move(Self));
 					}
 
 					MODIO_PROFILE_POP();
@@ -115,7 +122,7 @@ namespace Modio
 			std::weak_ptr<Modio::Detail::FileSharedState> SharedState;
 			Modio::FileOffset BufferSize;
 			std::pair<bool, Modio::Optional<Modio::ErrorCode>> WriteResult;
-			std::unique_ptr<asio::steady_timer> PollTimer;
+			Modio::Detail::Timer StatusTimer;
 		};
 #include <asio/unyield.hpp>
 

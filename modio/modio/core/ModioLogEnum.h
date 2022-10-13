@@ -13,6 +13,7 @@
 
 namespace Modio
 {
+	/// @docpublic
 	/// @brief Converts a Modio::LogLevel enum to string for use in log output
 	/// @param Level the enum level
 	/// @return Null-terminated string containing friendly name
@@ -33,6 +34,7 @@ namespace Modio
 		}
 	}
 
+	/// @docpublic
 	/// @brief Converts a Modio::LogCategory enum to string for use in log output
 	/// @param Category the enum category
 	/// @return Null-terminated string containing friendly name

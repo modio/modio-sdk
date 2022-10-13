@@ -14,7 +14,7 @@ template<>
 struct fmt::formatter<Modio::ModID> : fmt::formatter<std::int64_t>
 {
 	template<typename FormatCtx>
-	auto format(const Modio::ModID& Integer, FormatCtx& ctx)
+	auto format(const Modio::ModID& Integer, FormatCtx& ctx) const
 	{
 		return fmt::formatter<std::int64_t>::format(Integer, ctx);
 	}

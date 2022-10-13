@@ -72,12 +72,12 @@ namespace Modio
 	}
 #endif
 	void GetModMediaAsync(Modio::ModID ModId, Modio::LogoSize LogoSize,
-						  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)> Callback)
+						  std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
 	{
 		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
 		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)>,
-									   void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)>(
+			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)>,
+									   void(Modio::ErrorCode, Modio::Optional<std::string>)>(
 				Modio::Detail::GetModMediaLogoOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 												 Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId, LogoSize),
 				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
@@ -85,12 +85,12 @@ namespace Modio
 	}
 
 	void GetModMediaAsync(Modio::ModID ModId, Modio::AvatarSize AvatarSize,
-						  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)> Callback)
+						  std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
 	{
 		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
 		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)>,
-									   void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)>(
+			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)>,
+									   void(Modio::ErrorCode, Modio::Optional<std::string>)>(
 				Modio::Detail::GetModMediaAvatarOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 												   Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId, AvatarSize),
 				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
@@ -98,12 +98,12 @@ namespace Modio
 	}
 
 	void GetModMediaAsync(Modio::ModID ModId, Modio::GallerySize GallerySize, Modio::GalleryIndex Index,
-						  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)> Callback)
+						  std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
 	{
 		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
 		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)>,
-									   void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)>(
+			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)>,
+									   void(Modio::ErrorCode, Modio::Optional<std::string>)>(
 				Modio::Detail::GetModMediaGalleryOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 													Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId, GallerySize,
 													Index),

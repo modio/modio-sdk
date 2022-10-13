@@ -14,6 +14,7 @@
 #include "modio/detail/HedleyWrapper.h"
 #include <algorithm>
 #include <string>
+#include <vector>
 
 namespace Modio
 {

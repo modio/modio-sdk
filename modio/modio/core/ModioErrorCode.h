@@ -34,6 +34,7 @@ namespace Modio
 		ServersOverloaded = 20494
 	};
 
+	/// @docnone
 	struct HttpErrorCategoryImpl : std::error_category
 	{
 		inline const char* name() const noexcept override { return "Modio::HttpError"; }
@@ -89,27 +90,32 @@ namespace Modio
 		}
 	};
 
+	/// @docnone
 	inline const std::error_category& HttpErrorCategory()
 	{
 		static HttpErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
 
+	/// @docnone
 	inline std::error_code make_error_code(HttpError e)
 	{
 		return { static_cast<int>(e), HttpErrorCategory() };
 	}
 
+	/// @docnone
 	inline bool operator==(std::error_code A, HttpError B)
 	{
 		return A.category() == HttpErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
+	/// @docnone
 	inline bool operator!=(std::error_code A, HttpError B)
 	{
 		return ! (A == B);
 	}
 
+	/// @docnone
 	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, HttpError RawErrorValue )
 	{
 		return ec == RawErrorValue;
@@ -129,6 +135,7 @@ namespace Modio
 		WriteError = 20746
 	};
 
+	/// @docnone
 	struct FilesystemErrorCategoryImpl : std::error_category
 	{
 		inline const char* name() const noexcept override { return "Modio::FilesystemError"; }
@@ -172,27 +179,32 @@ namespace Modio
 		}
 	};
 
+	/// @docnone
 	inline const std::error_category& FilesystemErrorCategory()
 	{
 		static FilesystemErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
 
+	/// @docnone
 	inline std::error_code make_error_code(FilesystemError e)
 	{
 		return { static_cast<int>(e), FilesystemErrorCategory() };
 	}
 
+	/// @docnone
 	inline bool operator==(std::error_code A, FilesystemError B)
 	{
 		return A.category() == FilesystemErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
+	/// @docnone
 	inline bool operator!=(std::error_code A, FilesystemError B)
 	{
 		return ! (A == B);
 	}
 
+	/// @docnone
 	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, FilesystemError RawErrorValue )
 	{
 		return ec == RawErrorValue;
@@ -207,6 +219,7 @@ namespace Modio
 		UnableToInitStorage = 20997
 	};
 
+	/// @docnone
 	struct UserAuthErrorCategoryImpl : std::error_category
 	{
 		inline const char* name() const noexcept override { return "Modio::UserAuthError"; }
@@ -235,27 +248,32 @@ namespace Modio
 		}
 	};
 
+	/// @docnone
 	inline const std::error_category& UserAuthErrorCategory()
 	{
 		static UserAuthErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
 
+	/// @docnone
 	inline std::error_code make_error_code(UserAuthError e)
 	{
 		return { static_cast<int>(e), UserAuthErrorCategory() };
 	}
 
+	/// @docnone
 	inline bool operator==(std::error_code A, UserAuthError B)
 	{
 		return A.category() == UserAuthErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
+	/// @docnone
 	inline bool operator!=(std::error_code A, UserAuthError B)
 	{
 		return ! (A == B);
 	}
 
+	/// @docnone
 	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, UserAuthError RawErrorValue )
 	{
 		return ec == RawErrorValue;
@@ -267,6 +285,7 @@ namespace Modio
 		InvalidUser = 21250
 	};
 
+	/// @docnone
 	struct UserDataErrorCategoryImpl : std::error_category
 	{
 		inline const char* name() const noexcept override { return "Modio::UserDataError"; }
@@ -286,27 +305,32 @@ namespace Modio
 		}
 	};
 
+	/// @docnone
 	inline const std::error_category& UserDataErrorCategory()
 	{
 		static UserDataErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
 
+	/// @docnone
 	inline std::error_code make_error_code(UserDataError e)
 	{
 		return { static_cast<int>(e), UserDataErrorCategory() };
 	}
 
+	/// @docnone
 	inline bool operator==(std::error_code A, UserDataError B)
 	{
 		return A.category() == UserDataErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
+	/// @docnone
 	inline bool operator!=(std::error_code A, UserDataError B)
 	{
 		return ! (A == B);
 	}
 
+	/// @docnone
 	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, UserDataError RawErrorValue )
 	{
 		return ec == RawErrorValue;
@@ -318,6 +342,7 @@ namespace Modio
 		UnsupportedCompression = 21506
 	};
 
+	/// @docnone
 	struct ArchiveErrorCategoryImpl : std::error_category
 	{
 		inline const char* name() const noexcept override { return "Modio::ArchiveError"; }
@@ -337,27 +362,32 @@ namespace Modio
 		}
 	};
 
+	/// @docnone
 	inline const std::error_category& ArchiveErrorCategory()
 	{
 		static ArchiveErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
 
+	/// @docnone
 	inline std::error_code make_error_code(ArchiveError e)
 	{
 		return { static_cast<int>(e), ArchiveErrorCategory() };
 	}
 
+	/// @docnone
 	inline bool operator==(std::error_code A, ArchiveError B)
 	{
 		return A.category() == ArchiveErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
+	/// @docnone
 	inline bool operator!=(std::error_code A, ArchiveError B)
 	{
 		return ! (A == B);
 	}
 
+	/// @docnone
 	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, ArchiveError RawErrorValue )
 	{
 		return ec == RawErrorValue;
@@ -377,6 +407,7 @@ namespace Modio
 		SDKNotInitialized = 21770
 	};
 
+	/// @docnone
 	struct GenericErrorCategoryImpl : std::error_category
 	{
 		inline const char* name() const noexcept override { return "Modio::GenericError"; }
@@ -420,27 +451,32 @@ namespace Modio
 		}
 	};
 
+	/// @docnone
 	inline const std::error_category& GenericErrorCategory()
 	{
 		static GenericErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
 
+	/// @docnone
 	inline std::error_code make_error_code(GenericError e)
 	{
 		return { static_cast<int>(e), GenericErrorCategory() };
 	}
 
+	/// @docnone
 	inline bool operator==(std::error_code A, GenericError B)
 	{
 		return A.category() == GenericErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
+	/// @docnone
 	inline bool operator!=(std::error_code A, GenericError B)
 	{
 		return ! (A == B);
 	}
 
+	/// @docnone
 	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, GenericError RawErrorValue )
 	{
 		return ec == RawErrorValue;
@@ -451,6 +487,7 @@ namespace Modio
 		UnknownSystemError = 22017
 	};
 
+	/// @docnone
 	struct SystemErrorCategoryImpl : std::error_category
 	{
 		inline const char* name() const noexcept override { return "Modio::SystemError"; }
@@ -467,27 +504,32 @@ namespace Modio
 		}
 	};
 
+	/// @docnone
 	inline const std::error_category& SystemErrorCategory()
 	{
 		static SystemErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
 
+	/// @docnone
 	inline std::error_code make_error_code(SystemError e)
 	{
 		return { static_cast<int>(e), SystemErrorCategory() };
 	}
 
+	/// @docnone
 	inline bool operator==(std::error_code A, SystemError B)
 	{
 		return A.category() == SystemErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
+	/// @docnone
 	inline bool operator!=(std::error_code A, SystemError B)
 	{
 		return ! (A == B);
 	}
 
+	/// @docnone
 	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, SystemError RawErrorValue )
 	{
 		return ec == RawErrorValue;
@@ -511,6 +553,7 @@ namespace Modio
 		TooManySymbols = 22286
 	};
 
+	/// @docnone
 	struct ZlibErrorCategoryImpl : std::error_category
 	{
 		inline const char* name() const noexcept override { return "Modio::ZlibError"; }
@@ -566,27 +609,32 @@ namespace Modio
 		}
 	};
 
+	/// @docnone
 	inline const std::error_category& ZlibErrorCategory()
 	{
 		static ZlibErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
 
+	/// @docnone
 	inline std::error_code make_error_code(ZlibError e)
 	{
 		return { static_cast<int>(e), ZlibErrorCategory() };
 	}
 
+	/// @docnone
 	inline bool operator==(std::error_code A, ZlibError B)
 	{
 		return A.category() == ZlibErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
+	/// @docnone
 	inline bool operator!=(std::error_code A, ZlibError B)
 	{
 		return ! (A == B);
 	}
 
+	/// @docnone
 	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, ZlibError RawErrorValue )
 	{
 		return ec == RawErrorValue;
@@ -596,12 +644,14 @@ namespace Modio
 	{
 		AlreadySubscribed = 22529,
 		InstallOrUpdateCancelled = 22530,
-		ModManagementAlreadyEnabled = 22531,
-		ModManagementDisabled = 22532,
-		NoPendingWork = 22533,
-		UploadCancelled = 22534
+		ModBeingProcessed  = 22531,
+		ModManagementAlreadyEnabled = 22532,
+		ModManagementDisabled = 22533,
+		NoPendingWork = 22534,
+		UploadCancelled = 22535
 	};
 
+	/// @docnone
 	struct ModManagementErrorCategoryImpl : std::error_category
 	{
 		inline const char* name() const noexcept override { return "Modio::ModManagementError"; }
@@ -614,6 +664,9 @@ namespace Modio
 					break;
 				case ModManagementError::InstallOrUpdateCancelled:
 						return "The current mod installation or update was cancelled";
+					break;
+				case ModManagementError::ModBeingProcessed :
+						return "The specified mod's files are currently being updated by the SDK. Please try again later.";
 					break;
 				case ModManagementError::ModManagementAlreadyEnabled:
 						return "Mod management was already enabled and the callback remains unchanged.";
@@ -633,27 +686,32 @@ namespace Modio
 		}
 	};
 
+	/// @docnone
 	inline const std::error_category& ModManagementErrorCategory()
 	{
 		static ModManagementErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
 
+	/// @docnone
 	inline std::error_code make_error_code(ModManagementError e)
 	{
 		return { static_cast<int>(e), ModManagementErrorCategory() };
 	}
 
+	/// @docnone
 	inline bool operator==(std::error_code A, ModManagementError B)
 	{
 		return A.category() == ModManagementErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
+	/// @docnone
 	inline bool operator!=(std::error_code A, ModManagementError B)
 	{
 		return ! (A == B);
 	}
 
+	/// @docnone
 	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, ModManagementError RawErrorValue )
 	{
 		return ec == RawErrorValue;
@@ -665,6 +723,7 @@ namespace Modio
 		NoFilesFoundForMod = 22786
 	};
 
+	/// @docnone
 	struct ModValidationErrorCategoryImpl : std::error_category
 	{
 		inline const char* name() const noexcept override { return "Modio::ModValidationError"; }
@@ -684,27 +743,32 @@ namespace Modio
 		}
 	};
 
+	/// @docnone
 	inline const std::error_category& ModValidationErrorCategory()
 	{
 		static ModValidationErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
 
+	/// @docnone
 	inline std::error_code make_error_code(ModValidationError e)
 	{
 		return { static_cast<int>(e), ModValidationErrorCategory() };
 	}
 
+	/// @docnone
 	inline bool operator==(std::error_code A, ModValidationError B)
 	{
 		return A.category() == ModValidationErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
+	/// @docnone
 	inline bool operator!=(std::error_code A, ModValidationError B)
 	{
 		return ! (A == B);
 	}
 
+	/// @docnone
 	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, ModValidationError RawErrorValue )
 	{
 		return ec == RawErrorValue;
@@ -750,6 +814,7 @@ namespace Modio
 		ValidationErrors = 13009
 	};
 
+	/// @docnone
 	struct ApiErrorCategoryImpl : std::error_category
 	{
 		inline const char* name() const noexcept override { return "Modio::ApiError"; }
@@ -871,27 +936,32 @@ namespace Modio
 		}
 	};
 
+	/// @docnone
 	inline const std::error_category& ApiErrorCategory()
 	{
 		static ApiErrorCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
 
+	/// @docnone
 	inline std::error_code make_error_code(ApiError e)
 	{
 		return { static_cast<int>(e), ApiErrorCategory() };
 	}
 
+	/// @docnone
 	inline bool operator==(std::error_code A, ApiError B)
 	{
 		return A.category() == ApiErrorCategory() && A.value() == static_cast<int>(B);
 	}
 
+	/// @docnone
 	inline bool operator!=(std::error_code A, ApiError B)
 	{
 		return ! (A == B);
 	}
 
+	/// @docnone
 	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, ApiError RawErrorValue )
 	{
 		return ec == RawErrorValue;
@@ -1041,6 +1111,7 @@ namespace Modio
 		SystemError = 18
 	};
 
+	/// @docnone
 	struct ErrorConditionCategoryImpl : std::error_category
 	{
 		inline const char* name() const noexcept override { return "Modio::ErrorConditionCategory"; }
@@ -1846,17 +1917,20 @@ namespace Modio
 		}
 	};
 	
+	/// @docnone
 	inline const std::error_category& ErrorConditionCategory()
 	{
 		static ErrorConditionCategoryImpl CategoryInstance;
 		return CategoryInstance;
 	}
 
+	/// @docnone
 	inline std::error_condition make_error_condition(Modio::ErrorConditionTypes e)
 	{
 		return { static_cast<int>(e), Modio::ErrorConditionCategory()};
 	}
 
+	/// @docnone
 	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, Modio::ErrorConditionTypes Type)
 	{
 		return ec == make_error_condition(Type);

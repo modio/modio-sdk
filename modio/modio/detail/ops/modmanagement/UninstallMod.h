@@ -60,10 +60,11 @@ namespace Modio
 		};
 
 		template<typename UninstallDoneCallback>
-		auto UninstallModAsync(Modio::ModID Mod, UninstallDoneCallback&& OnUninstallComplete, bool bForce=false)
+		auto UninstallModAsync(Modio::ModID Mod, UninstallDoneCallback&& OnUninstallComplete, bool bForce = false)
 		{
 			return asio::async_compose<UninstallDoneCallback, void(Modio::ErrorCode)>(
-				UninstallModOp(Mod, bForce), OnUninstallComplete, Modio::Detail::Services::GetGlobalContext().get_executor());
+				UninstallModOp(Mod, bForce), OnUninstallComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	} // namespace Detail
 } // namespace Modio

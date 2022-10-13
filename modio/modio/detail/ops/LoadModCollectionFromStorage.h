@@ -1,22 +1,23 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
 #include "modio/core/ModioBuffer.h"
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioServices.h"
+#include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/file/ModioFile.h"
 #include "modio/file/ModioFileService.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/ModioProfiling.h"
 
 #include <asio/yield.hpp>
 namespace Modio
@@ -31,14 +32,15 @@ namespace Modio
 			{
 				reenter(CoroutineState)
 				{
-					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::ModManagement, "Loading mod collection from storage");
-			
-						DestinationFile = std::make_unique<Modio::Detail::File>(
-							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().LocalMetadataFolder() /
-								"state.json",
-							false);
+					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::ModManagement,
+												"Loading mod collection from storage");
 
-					yield DestinationFile->ReadAsync(DestinationFile->GetFileSize(), DataBuffer , std::move(Self));
+					DestinationFile = std::make_unique<Modio::Detail::File>(
+						Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().LocalMetadataFolder() /
+							"state.json",
+						Modio::Detail::FileMode::ReadWrite, false);
+
+					yield DestinationFile->ReadAsync(DestinationFile->GetFileSize(), DataBuffer, std::move(Self));
 					if (ec)
 					{
 						Self.complete(ec);
@@ -53,8 +55,8 @@ namespace Modio
 							from_json(StateJson, Modio::Detail::SDKSessionData::GetSystemModCollection());
 						}
 						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::ModManagement,
-											"Mod collection loaded");
-			
+													"Mod collection loaded");
+
 						Self.complete({});
 					}
 				}

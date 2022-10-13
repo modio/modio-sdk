@@ -15,9 +15,11 @@ namespace Modio
 {
 	namespace Detail
 	{
+		/// @docinternal
 		class HttpRequestParams;
 	} // namespace Detail
 
+	/// @docpublic
 	class ReportParams;
 
 	/// @docpublic
@@ -39,6 +41,7 @@ namespace Modio
 	class ReportParams
 	{
 	public:
+		/// @docpublic
 		/// @brief Creates a content report for a game.
 		/// @param Game The ID of the game being reported
 		/// @param Type The nature of the content report
@@ -99,8 +102,7 @@ namespace Modio
 		/// @param Params the report to submit
 		/// @return the request parameters for use with PerformRequestAndGetResponseAsync
 		MODIO_IMPL friend Modio::Detail::HttpRequestParams ToRequest(const Modio::ReportParams& Params);
-	};
-
+	}; //class ReportParams
 } // namespace Modio
 
 #ifndef MODIO_SEPARATE_COMPILATION

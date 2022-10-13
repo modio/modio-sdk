@@ -8,8 +8,13 @@
 # 
 
 include(split-compilation)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioProfiling.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioSDKSessionData.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioJsonHelpers.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/entities/ModioAvatar.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/entities/ModioGalleryList.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/entities/ModioImage.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/entities/ModioLogo.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/compression/zip/ArchiveFileImplementation.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/compression/zlib/detail/deflate_stream.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/compression/zlib/detail/inflate_stream.ipp)

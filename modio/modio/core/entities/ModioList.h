@@ -14,6 +14,7 @@
 
 namespace Modio
 {
+	/// @docpublic
 	/// @brief Templated helper class to wrap a dynamic collection of elements
 	/// @tparam ContainerType the internal collection type to use
 	/// @tparam ValueType the value type the collection will hold
@@ -25,6 +26,7 @@ namespace Modio
 		ListType InternalList;
 
 		// operator==() Written for Test_JsonToAndFrom.cpp and Server Side tests, re-check functionality before using in actual code.
+		/// @docnone
 		friend bool operator==(const List& A, const List& B)
 		{
 			if (A.InternalList.size() != B.InternalList.size())
@@ -61,6 +63,7 @@ namespace Modio
 		using iterator = typename ListType::iterator;
 		using const_iterator = typename ListType::const_iterator;
 
+		/// @docnone
 		/// @brief Unsafe index-based lookup, does not range-check provided index
 		/// @param Index The index of the element to retrieve
 		/// @return Const reference to the element
@@ -72,6 +75,7 @@ namespace Modio
 			return InternalList[Index];
 		}
 
+		/// @docnone
 		/// @brief Unsafe index-based lookup, does not range-check provided index
 		/// @param Index The index of the element to retrieve
 		/// @return Mutable reference to the element
@@ -83,6 +87,7 @@ namespace Modio
 			return InternalList[Index];
 		}
 
+		/// @docnone
 		/// @brief Safe index-based lookup, range-checks provided index
 		/// @param Index The index of the element to retrieve
 		/// @return Pointer to the element if index was valid, or nullptr if not
@@ -95,6 +100,7 @@ namespace Modio
 			return nullptr;
 		}
 
+		/// @docnone
 		/// @brief Safe index-based lookup, range-checks provided index
 		/// @param Index The index of the element to retrieve
 		/// @return Pointer to the element if index was valid, or nullptr if not
@@ -107,36 +113,46 @@ namespace Modio
 			return nullptr;
 		}
 
+		/// @docpublic
+		/// @brief Retrieve the raw list as a const reference
 		const ListType& GetRawList() const
 		{
 			return InternalList;
 		}
 
+		/// @docpublic
+		/// @brief Retrieve the raw list as a reference
 		ListType& GetRawList()
 		{
 			return InternalList;
 		}
 
+		/// @docpublic
+		/// @brief Retrieve the size of the internal list
 		std::size_t Size() const
 		{
 			return InternalList.size();
 		}
 
+		/// @docnone
 		iterator begin()
 		{
 			return InternalList.begin();
 		}
 
+		/// @docnone
 		const_iterator begin() const
 		{
 			return InternalList.begin();
 		}
 
+		/// @docnone
 		iterator end()
 		{
 			return InternalList.end();
 		}
 
+		/// @docnone
 		const_iterator end() const
 		{
 			return InternalList.end();

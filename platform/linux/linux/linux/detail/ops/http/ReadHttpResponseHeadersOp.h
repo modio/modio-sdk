@@ -33,7 +33,6 @@ namespace Modio
 			asio::coroutine CoroutineState;
 			std::shared_ptr<HttpRequestImplementation> Request;
 			std::weak_ptr<HttpSharedState> SharedState;
-			std::unique_ptr<asio::steady_timer> PollTimer;
 
 		public:
 			ReadHttpResponseHeadersOp(std::shared_ptr<HttpRequestImplementation> Request,
@@ -45,8 +44,7 @@ namespace Modio
 			ReadHttpResponseHeadersOp(ReadHttpResponseHeadersOp&& Other)
 				: CoroutineState(std::move(Other.CoroutineState)),
 				  Request(std::move(Other.Request)),
-				  SharedState(std::move(Other.SharedState)),
-				  PollTimer(std::move(Other.PollTimer))
+				  SharedState(std::move(Other.SharedState))
 			{}
 
 			template<typename CoroType>

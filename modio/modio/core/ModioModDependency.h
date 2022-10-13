@@ -9,11 +9,12 @@
  */
 
 #pragma once
+#include "ModioGeneratedVariables.h"
 
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/entities/ModioList.h"
 #include "modio/core/entities/ModioPagedResult.h"
-#include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/JsonWrapper.h"
 
 namespace Modio
 {
@@ -24,11 +25,9 @@ namespace Modio
 	{
 		Modio::ModID ModID;
 		std::string ModName;
-		friend void from_json(const nlohmann::json& Json, Modio::ModDependency& Dependency)
-		{
-			Modio::Detail::ParseSafe(Json, Dependency.ModID, "mod_id");
-			Modio::Detail::ParseSafe(Json, Dependency.ModName, "name");
-		}
+		
+		/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModDependency& Dependency);
 	};
 
 	/// @docpublic
@@ -36,10 +35,11 @@ namespace Modio
 	/// @experimental
 	class ModDependencyList : public PagedResult, public List<std::vector, ModDependency>
 	{
-		friend void from_json(const nlohmann::json& Json, Modio::ModDependencyList& List)
-		{
-			from_json(Json, static_cast<Modio::PagedResult&>(List));
-			Modio::Detail::ParseSafe(Json, List.InternalList, "data");
-		}
+		/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModDependencyList& List);
 	};
 } // namespace Modio
+
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "modio/core/ModioModDependency.ipp"
+#endif

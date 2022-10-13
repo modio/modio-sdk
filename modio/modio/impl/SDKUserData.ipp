@@ -120,13 +120,13 @@ namespace Modio
 	}
 
 	void GetUserMediaAsync(Modio::AvatarSize AvatarSize,
-						   std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)> Callback)
+						   std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
 	{
 		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
 			Modio::Detail::RequireUserIsAuthenticated(Callback))
 		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)>,
-									   void(Modio::ErrorCode, Modio::Optional<Modio::filesystem::path>)>(
+			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)>,
+									   void(Modio::ErrorCode, Modio::Optional<std::string>)>(
 				Modio::Detail::GetUserMediaOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 											  Modio::Detail::SDKSessionData::CurrentAPIKey(), AvatarSize),
 				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());

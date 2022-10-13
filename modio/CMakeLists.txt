@@ -38,6 +38,7 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/modio/core)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/modio/detail)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/modio/http)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/modio/impl)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/modio/timer)
 
 #Populate INTERFACE_SOURCES so CMake view in VS shows the headers in projects using the SDK
 target_sources(${MODIO_TARGET_NAME} INTERFACE 
@@ -49,7 +50,7 @@ add_public_header(${MODIO_TARGET_NAME} modio/ModioSDK.h)
 
 target_include_directories(${MODIO_TARGET_NAME} INTERFACE ${ModioGeneratedHeaderPath})
 
-target_link_libraries(${MODIO_TARGET_NAME} INTERFACE asio ghc_filesystem fmt-header-only tl::optional platform nlohmann_json)
+target_link_libraries(${MODIO_TARGET_NAME} INTERFACE asio ghc_filesystem fmt-header-only tl::optional platform nlohmann_json function2)
 
 
 
@@ -101,7 +102,7 @@ install(
 
 install(
 	FILES ${CMAKE_CURRENT_LIST_DIR}/modio/ModioSDK.h
-	DESTINATION ${CMAKE_INSTALL_PREFIX}/static/inc
+	DESTINATION ${CMAKE_INSTALL_PREFIX}/static/inc/modio
 	COMPONENT static_library
 )
 

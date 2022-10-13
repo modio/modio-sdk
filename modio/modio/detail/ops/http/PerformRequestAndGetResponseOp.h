@@ -12,6 +12,7 @@
 
 #include "modio/cache/ModioCacheService.h"
 #include "modio/core/ModioBuffer.h"
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioLogService.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
@@ -24,6 +25,7 @@
 #include "modio/file/ModioFile.h"
 #include "modio/http/ModioHttpRequest.h"
 #include "modio/http/ModioHttpService.h"
+#include <functional>
 #include <memory>
 
 #ifndef MODIO_TRACE_DUMP_RESPONSE
@@ -61,7 +63,7 @@ namespace Modio
 				Modio::FileSize CurrentPayloadFileBytesRead;
 				Modio::Optional<std::pair<std::string, Modio::Detail::PayloadContent>> PayloadElement;
 				std::unique_ptr<Modio::Detail::Buffer> HeaderBuf;
-				//MODIO_PROFILE_OPERATION(PerformRequest);
+				// MODIO_PROFILE_OPERATION(PerformRequest);
 			public:
 				PerformRequestImpl(Modio::Detail::OperationQueue::Ticket RequestTicket)
 					: RequestTicket(std::move(RequestTicket)) {};
@@ -130,7 +132,7 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
-					
+
 					yield Request->SendAsync(std::move(Self));
 
 					if (ec)
@@ -162,7 +164,7 @@ namespace Modio
 									std::copy(PayloadContentHeader.begin(), PayloadContentHeader.end(),
 											  Impl->HeaderBuf->begin());
 								}
-								
+
 								yield Request->WriteSomeAsync(std::move(*Impl->HeaderBuf), std::move(Self));
 								if (ec)
 								{
@@ -178,7 +180,8 @@ namespace Modio
 								Impl->CurrentPayloadFileBytesRead = Modio::FileSize(0);
 
 								Impl->CurrentPayloadFile = std::make_unique<Modio::Detail::File>(
-									Impl->PayloadElement->second.PathToFile.value());
+									Impl->PayloadElement->second.PathToFile.value(),
+									Modio::Detail::FileMode::ReadWrite);
 
 								while (Impl->CurrentPayloadFileBytesRead < Impl->CurrentPayloadFile->GetFileSize())
 								{
@@ -189,7 +192,7 @@ namespace Modio
 														 ? ChunkOfBytes
 														 : Impl->CurrentPayloadFile->GetFileSize() -
 															   Impl->CurrentPayloadFileBytesRead;
-									
+
 									yield Impl->CurrentPayloadFile->ReadAsync(MaxBytesToRead, Impl->PayloadFileBuffer,
 																			  std::move(Self));
 									Impl->CurrentPayloadFileBytesRead +=
@@ -201,7 +204,6 @@ namespace Modio
 									}
 									while (Impl->PayloadFileBuffer.size())
 									{
-										
 										yield Request->WriteSomeAsync(
 											std::move(Impl->PayloadFileBuffer.TakeInternalBuffer().value()),
 											std::move(Self));
@@ -217,7 +219,6 @@ namespace Modio
 									 (*(Impl->PayloadElement->second.RawBuffer)).GetSize())
 
 							{
-								
 								yield Request->WriteSomeAsync(std::move(*Impl->PayloadElement->second.RawBuffer),
 															  std::move(Self));
 								if (ec)
@@ -236,7 +237,7 @@ namespace Modio
 							std::copy(FinalPayloadBoundary.begin(), FinalPayloadBoundary.end(),
 									  Impl->HeaderBuf->begin());
 						}
-						
+
 						yield Request->WriteSomeAsync(std::move(*Impl->HeaderBuf), std::move(Self));
 						if (ec)
 						{
@@ -244,7 +245,7 @@ namespace Modio
 							return;
 						}
 					}
-					
+
 					yield Request->ReadResponseHeadersAsync(std::move(Self));
 
 					if (ec)
@@ -254,7 +255,6 @@ namespace Modio
 					}
 					while (!ec)
 					{
-						
 						// Read in a chunk from the response
 						yield Request->ReadSomeFromResponseBodyAsync(State.ResponseBodyBuffer, std::move(Self));
 						if (ec && ec != make_error_code(Modio::GenericError::EndOfFile))
@@ -292,7 +292,7 @@ namespace Modio
 						for (const auto& Buffer : ResultBuffer)
 						{
 							Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http, "{}",
-														Buffer.Data());
+														std::string(Buffer.begin(), Buffer.end()));
 						}
 					}
 #endif
@@ -332,9 +332,12 @@ namespace Modio
 									Modio::Detail::Buffer ResponseBuffer(ResultBuffer.size());
 									Modio::Detail::BufferCopy(ResponseBuffer, ResultBuffer);
 
-									Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
-																"Non 200-204 response received: {}",
-																ResponseBuffer.Data());
+									// Hate doing this copy but this really should be only happening in exceptional
+									// circumstances and we want to avoid dragging in fmt string_view
+									Modio::Detail::Logger().Log(
+										Modio::LogLevel::Error, Modio::LogCategory::Http,
+										"Non 200-204 response received: {}",
+										std::string(ResponseBuffer.begin(), ResponseBuffer.end()));
 								}
 							}
 							// Return the error-ref regardless, defer upwards to Subscribe/Unsubscribe etc to handle as

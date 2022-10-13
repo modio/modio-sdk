@@ -35,7 +35,8 @@ namespace Modio
 				  DirectoryPath(DirectoryPath),
 				  LocalFileHeaderBuffer(GetLocalFileHeaderSize())
 			{
-				OutputFile = std::make_unique<Modio::Detail::File>(ArchiveFile->FilePath, false);
+				OutputFile = std::make_unique<Modio::Detail::File>(ArchiveFile->FilePath,
+																   Modio::Detail::FileMode::ReadWrite, false);
 			};
 
 			template<typename CoroType>
@@ -44,10 +45,11 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					OutputFile->Seek(Modio::FileOffset(OutputFile->GetFileSize()));
-                    LocalHeaderOffset = OutputFile->Tell();
+					LocalHeaderOffset = OutputFile->Tell();
 
 					// Marshal fields into our local file header's data buffer
-					Modio::Detail::TypedBufferWrite(Constants::ZipTag::LocalDirectoryHeader, LocalFileHeaderBuffer, 0) // header signature
+					Modio::Detail::TypedBufferWrite(Constants::ZipTag::LocalDirectoryHeader, LocalFileHeaderBuffer,
+													0) // header signature
 						.FollowedBy<uint16_t>(Constants::ZipTag::ZipVersion) // Minimum version to extract
 						.FollowedBy<uint16_t>(0) // General Purpose bitflag
 						.FollowedBy<uint16_t>(Constants::ZipTag::Deflate) // Compression Method
@@ -56,8 +58,9 @@ namespace Modio
 						.FollowedBy<uint32_t>(0) // CRC-32 of uncompressed data
 						.FollowedBy<uint32_t>(0) // Compressed size
 						.FollowedBy<uint32_t>(0) // Uncompressed size
-						.FollowedBy<uint16_t>((std::uint16_t) DirectoryPath.generic_u8string().size()) // Size of filename
-                        .FollowedBy<uint16_t>(0);
+						.FollowedBy<uint16_t>(
+							(std::uint16_t) DirectoryPath.generic_u8string().size()) // Size of filename
+						.FollowedBy<uint16_t>(0);
 
 					// TypedBufferWrite doesn't currently handle strings so manually marshal the filename
 					{
@@ -76,8 +79,7 @@ namespace Modio
 					// Add the entry to the archive file so that it knows what to put in the central directory when it
 					// is finalized
 					// Set the file data offset to "LocalHeaderOffset" to easily allocate the LDHS in the file
-					ArchiveFile->AddEntry(DirectoryPath.generic_u8string(),
-                                          LocalHeaderOffset, 0, 0,
+					ArchiveFile->AddEntry(DirectoryPath.generic_u8string(), LocalHeaderOffset, 0, 0,
 										  ArchiveFileImplementation::CompressionMethod::Store, 0, true);
 					Self.complete({});
 					return;
@@ -85,13 +87,13 @@ namespace Modio
 			}
 
 		private:
-            std::shared_ptr<Modio::Detail::ArchiveFileImplementation> ArchiveFile;
+			std::shared_ptr<Modio::Detail::ArchiveFileImplementation> ArchiveFile;
 			std::unique_ptr<Modio::Detail::File> OutputFile;
 			Modio::filesystem::path DirectoryPath;
 			Modio::Detail::Buffer LocalFileHeaderBuffer;
-            // Use this to identify where the "Local directory header signature" in the zip file for this
-            // file is located
-            Modio::FileOffset LocalHeaderOffset;
+			// Use this to identify where the "Local directory header signature" in the zip file for this
+			// file is located
+			Modio::FileOffset LocalHeaderOffset;
 			asio::coroutine CoroutineState;
 			/// @brief Helper function so when we add zip64 support we can easily change how much space to allocate for
 			/// the local header

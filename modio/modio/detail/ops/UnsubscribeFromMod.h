@@ -39,8 +39,12 @@ namespace Modio
 							Modio::Detail::SDKSessionData::GetSystemModCollection().GetByModID(ModId);
 						if (ModEntry.has_value())
 						{
-							ModEntry->RemoveLocalUserSubscription(
+							std::uint8_t ReferenceCount = ModEntry->RemoveLocalUserSubscription(
 								Modio::Detail::SDKSessionData::GetAuthenticatedUser());
+
+							Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::ModManagement,
+														"Decremented reference count for mod {} to {}", ModId,
+														ReferenceCount);
 						}
 					}
 

@@ -18,6 +18,7 @@
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioProfiling.h"
+#include "modio/timer/ModioTimer.h"
 #include <memory>
 
 namespace Modio
@@ -30,7 +31,7 @@ namespace Modio
 			asio::coroutine CoroutineState;
 			std::shared_ptr<HttpRequestImplementation> Request;
 			std::weak_ptr<HttpSharedState> SharedState;
-			std::unique_ptr<asio::steady_timer> PollTimer;
+			Modio::Detail::Timer StatusTimer;
 			Modio::Detail::DynamicBuffer Payload;
 			int WriteCount = 0;
 
@@ -66,13 +67,8 @@ namespace Modio
 						MODIO_PROFILE_PUSH(writesome_poll);
 						while (WriteCount == MBEDTLS_ERR_SSL_WANT_READ || WriteCount == MBEDTLS_ERR_SSL_WANT_WRITE)
 						{
-							if (!PollTimer)
-							{
-								PollTimer = std::make_unique<asio::steady_timer>(
-									Modio::Detail::Services::GetGlobalContext().get_executor());
-							}
-							PollTimer->expires_after(Modio::Detail::Constants::Configuration::PollInterval);
-							yield PollTimer->async_wait(std::move(Self));
+							StatusTimer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
+							yield StatusTimer.WaitAsync(std::move(Self));
 							{
 								MODIO_PROFILE_SCOPE(mbedtls_ssl_write);
 								WriteCount = mbedtls_ssl_write(&Request->SSLContext, Payload.begin()->Data(),

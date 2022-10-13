@@ -32,7 +32,7 @@ namespace Modio
 			// Cancel all timers
 			for (auto& CacheEntry : CacheInstance->CacheEntries)
 			{
-				CacheEntry.second.Timer->cancel();
+				CacheEntry.second.MyTimer.Cancel();
 			}
 			ClearCache();
 		}
@@ -58,14 +58,13 @@ namespace Modio
 			{
 				// @todo-optimize This will fragment the heap quite much, rewrite using another container so we don't
 				// need to allocate so many objects on the heap
-				std::unique_ptr<asio::steady_timer> CacheExpiryTimer =
-					std::make_unique<asio::steady_timer>(get_io_context());
-				CacheExpiryTimer->expires_after(CacheExpiryTime);
+				Modio::Detail::Timer CacheExpiryTimer;
+				CacheExpiryTimer.ExpiresAfter(CacheExpiryTime);
 
 				Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Adding hash {} to cache", URLHash);
 
 				auto DeleteCacheEntry = [WeakCacheReference = std::weak_ptr<Cache>(CacheInstance),
-										 URLHash](std::error_code) {
+										 URLHash](std::error_code) mutable {
 					std::shared_ptr<Cache> CacheReference = WeakCacheReference.lock();
 					Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Removing hash {} from cache",
 												URLHash);
@@ -75,7 +74,7 @@ namespace Modio
 					}
 				};
 
-				CacheExpiryTimer->async_wait(DeleteCacheEntry);
+				CacheExpiryTimer.WaitAsync(std::move(DeleteCacheEntry));
 
 				CacheEntry Entry = {std::move(CacheExpiryTimer), std::move(ResponseData)};
 				CacheInstance->CacheEntries.emplace(URLHash, std::move(Entry));

@@ -468,6 +468,9 @@ Modio::AuthenticateUserExternalAsync(UserParams,Provider,[](Modio::ErrorCode ec)
 
 ----
 
+.Notes
+* You will need to base-64 encode a Steam encrypted app ticket before submitting it to us via AuthenticateUserExternalAsync.
+
 '''
 
 === SDK quick-start: Browsing available mods

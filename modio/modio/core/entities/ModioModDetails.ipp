@@ -16,6 +16,7 @@
 
 namespace Modio
 {
+	/// @docnone
 	void from_json(const nlohmann::json& Json, Modio::ModDetails& ModDetails)
 	{
 		from_json(Json, static_cast<Modio::PagedResult&>(ModDetails));

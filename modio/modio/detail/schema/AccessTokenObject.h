@@ -26,6 +26,7 @@ namespace Modio
 				Modio::Timestamp DateExpires;
 			};
 
+			/// @docnone
 			inline void from_json(const nlohmann::json& Json, AccessTokenObject& AccessToken)
 			{
 				Modio::Detail::ParseSafe(Json, AccessToken.HttpResponseCode, "code");

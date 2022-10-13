@@ -12,6 +12,7 @@
 
 #include "modio/cache/ModioCacheService.h"
 #include "modio/core/ModioBuffer.h"
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioLogService.h"
 #include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/ModioStdTypes.h"
@@ -152,7 +153,8 @@ namespace Modio
 								Impl->CurrentPayloadFileBytesRead = Modio::FileSize(0);
 
 								Impl->CurrentPayloadFile = std::make_unique<Modio::Detail::File>(
-									Impl->PayloadElement->second.PathToFile.value());
+									Impl->PayloadElement->second.PathToFile.value(),
+									Modio::Detail::FileMode::ReadWrite);
 								{
 									// Currently no API endpoints ask for more than one file, so we only need to do this
 									// the once
@@ -276,7 +278,7 @@ namespace Modio
 						for (const auto& Buffer : ResultBuffer)
 						{
 							Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http, "{}",
-														Buffer.Data());
+														std::string(Buffer.begin(), Buffer.end()));
 						}
 					}
 #endif
@@ -316,9 +318,10 @@ namespace Modio
 									Modio::Detail::Buffer ResponseBuffer(ResultBuffer.size());
 									Modio::Detail::BufferCopy(ResponseBuffer, ResultBuffer);
 
-									Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
-																"Non 200-204 response received: {}",
-																ResponseBuffer.Data());
+									Modio::Detail::Logger().Log(
+										Modio::LogLevel::Error, Modio::LogCategory::Http,
+										"Non 200-204 response received: {}",
+										std::string(ResponseBuffer.begin(), ResponseBuffer.end()));
 								}
 							}
 							// Return the error-ref regardless, defer upwards to Subscribe/Unsubscribe etc to handle as

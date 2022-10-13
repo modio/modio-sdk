@@ -11,7 +11,7 @@
 #pragma once
 
 #include "ModioGeneratedVariables.h"
-#include <nlohmann/json.hpp>
+#include "modio/detail/JsonWrapper.h"
 #include <string>
 namespace Modio
 {
@@ -46,9 +46,13 @@ namespace Modio
 		/// Negative -> Unrated
 		std::string RatingDisplayText = "";
 
+		/// @docnone
 		friend MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::ModStats& ModStats);
+		
+		/// @docnone
 		friend MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::ModStats Stats);
 
+		/// @docnone
 		friend bool operator==(const Modio::ModStats& A, const Modio::ModStats& B)
 		{
 			if ((A.PopularityRankPosition == B.PopularityRankPosition) &&

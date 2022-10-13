@@ -17,44 +17,58 @@
 #include "modio/core/entities/ModioProfileMaturity.h"
 #include "modio/core/entities/ModioURLList.h"
 #include "modio/core/entities/ModioUser.h"
+#include "modio/detail/JsonWrapper.h"
 #include "modio/detail/entities/ModioGalleryList.h"
 #include "modio/detail/entities/ModioLogo.h"
-#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
 
 namespace Modio
 {
 	// @todo: If ModTag and Metadata is used somewhere else than in ModInfo, then migrate them to their own headers
+	/// @docpublic
+	/// @brief Strong type for a ModTag
 	struct ModTag
 	{
 		std::string Tag;
 
+		/// @docnone
 		friend bool operator==(const Modio::ModTag& A, const Modio::ModTag& B)
 		{
 			return (A.Tag == B.Tag);
 		}
 	};
 
+	/// @docnone
 	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::ModTag& ModTag);
+	
+	/// @docnone
 	MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::ModTag& Tag);
 
 	// Migrate: std::vector<Modio::ModTag> Tags to a custom class that encapsulates std::map helpers to fetch Values as
 	// something like this: Metadata.Get<int32>( "OptimizedFor" );
+	/// @docpublic
+	/// @brief Key-Value pair that represents a mod metadata
 	struct Metadata
 	{
 		std::string Key;
 		std::string Value;
 
+		/// @docnone
 		friend bool operator==(const Modio::Metadata& A, const Modio::Metadata& B)
 		{
 			return (A.Key == B.Key && A.Value == B.Value);
 		}
 	};
 
+	/// @docnone
 	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::Metadata& Metadata);
+	
+	/// @docnone
 	MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::Metadata& Metadata);
 
+	/// @docpublic
+	/// @brief Possible status as received from the server
 	enum class ModServerSideStatus : std::uint8_t
 	{
 		NotAccepted = 0,
@@ -118,6 +132,7 @@ namespace Modio
 		/// @brief The visibility status of the mod
 		bool bVisible = true;
 
+		/// @docnone
 		friend bool operator==(const Modio::ModInfo& A, const Modio::ModInfo& B)
 		{
 			if ((A.NumGalleryImages == B.NumGalleryImages) && (A.SketchfabURLs == B.SketchfabURLs) &&
@@ -159,7 +174,10 @@ namespace Modio
 		}
 	};
 
+	/// @docnone
 	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::ModInfo& ModInfo);
+	
+	/// @docnone
 	MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::ModInfo& Info);
 } // namespace Modio
 
