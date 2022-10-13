@@ -17,6 +17,9 @@
 
 	#include MODIO_UNREAL_PLATFORM_PREAMBLE
 
+	#pragma push_macro("check")
+	#undef check
+
 	#pragma warning(push)
 	#pragma warning(disable : 4583)
 	#pragma warning(disable : 4582)
@@ -25,6 +28,8 @@
 	#include "fmt/format.h"
 	#include "fmt/printf.h"
 	#pragma warning(pop)
+
+	#pragma pop_macro("check")
 
 	#include MODIO_UNREAL_PLATFORM_EPILOGUE
 
