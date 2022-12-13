@@ -81,6 +81,15 @@ namespace Modio
 						MODIO_PROFILE_SCOPE(SSLReadSomeCopyData);
 						// Copy the exact number of bytes received into a new buffer and append that to the read buffer
 						ReadBuffer.AppendBuffer(ReadChunk.CopyRange(ReadChunk.begin(), ReadChunk.begin() + ReadCount));
+						
+						//// The section below could help for logging purposes
+						// {
+						// 	Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+						// 								"SSL Read bytes {0}", ReadCount);
+						// 	Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+						// 								"Output: {}", ReadChunk.Data());
+						// }
+
 						Self.complete({}, ReadCount);
 						return;
 					}

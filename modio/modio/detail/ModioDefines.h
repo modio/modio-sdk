@@ -46,10 +46,10 @@
 	#define ASIO_HAS_STD_ADDRESSOF
 #endif
 
-/*#ifndef ASIO_NO_EXCEPTIONS
+#ifndef ASIO_NO_EXCEPTIONS
 	#define MODIO_DEFINED_ASIO_NO_EXCEPTIONS
 	#define ASIO_NO_EXCEPTIONS
-#endif*/
+#endif
 
 #ifndef ASIO_HAS_STD_ARRAY
 	#define MODIO_DEFINED_ASIO_HAS_STD_ARRAY
@@ -141,4 +141,3 @@
 	#define MODIO_DEFINED_UNICODE
 	#define UNICODE
 #endif
-

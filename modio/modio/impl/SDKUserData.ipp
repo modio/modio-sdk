@@ -21,6 +21,7 @@
 #include "modio/detail/ops/auth/AuthenticateUserByDiscord.h"
 #include "modio/detail/ops/auth/AuthenticateUserByGog.h"
 #include "modio/detail/ops/auth/AuthenticateUserByItch.h"
+#include "modio/detail/ops/auth/AuthenticateUserByPSN.h"
 #include "modio/detail/ops/auth/AuthenticateUserBySteam.h"
 #include "modio/detail/ops/auth/AuthenticateUserBySwitchID.h"
 #include "modio/detail/ops/auth/AuthenticateUserByXBoxLive.h"
@@ -79,6 +80,9 @@ namespace Modio
 					break;
 				case AuthenticationProvider::Discord:
 					Modio::Detail::AuthenticateUserByDiscordAsync(User, Callback);
+					break;
+				case AuthenticationProvider::PSN:
+					Modio::Detail::AuthenticateUserByPSNAsync(User, Callback);
 					break;
 			}
 		}

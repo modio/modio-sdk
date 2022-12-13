@@ -49,10 +49,14 @@ namespace Modio
 				URLStdStr += Request->Parameters.GetServerAddress();
 				URLStdStr += Request->Parameters.GetFormattedResourcePath();
 				CFStringRef URLStr =
-					CFStringCreateWithCString(kCFAllocatorDefault, URLStdStr.c_str(), kCFStringEncodingUTF8);
+				CFStringCreateWithCString(kCFAllocatorDefault, URLStdStr.c_str(), kCFStringEncodingUTF8);
+
+				// Escape the URL string appropriately	
+				CFStringRef EscapedURLRef = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, URLStr, NULL, NULL, kCFStringEncodingUTF8);
 
 				// Create a request URL string
-				CFURLRef URLRef = CFURLCreateWithString(kCFAllocatorDefault, URLStr, NULL);
+				CFURLRef URLRef = CFURLCreateWithString(kCFAllocatorDefault, EscapedURLRef, NULL);
+                
 				// Create a HTTP Message Ref
 				CFHTTPMessageRef RequestMessage =
 					CFHTTPMessageCreateRequest(kCFAllocatorDefault, Verb, URLRef, kCFHTTPVersion1_1);
@@ -98,6 +102,7 @@ namespace Modio
 					// Release locally created objects
 					CFRelease(PayloadSize);
 					CFRelease(HostURL);
+					CFRelease(EscapedURLRef);
 				}
 				else
 				{

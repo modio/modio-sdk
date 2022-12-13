@@ -9,9 +9,6 @@
  */
 
 #pragma once
-
-#include "ModioGeneratedVariables.h"
-
 #include "modio/core/entities/ModioList.h"
 #include "modio/core/entities/ModioPagedResult.h"
 #include "modio/detail/JsonWrapper.h"

@@ -19,8 +19,13 @@ if (MODIO_SERVER_SIDE_TEST)
         message(STATUS "Setting MODIO_SERVER_SIDE_TEST")
 endif()
 
+if (MODIO_TEST_REQUIRES_STATE)
+        target_compile_definitions(${MODIO_TARGET_NAME} INTERFACE MODIO_TEST_REQUIRES_STATE=1)
+        message(STATUS "Setting MODIO_TEST_REQUIRES_STATE")
+endif()
+
 if(MODIO_TRACE_DUMP_RESPONSE)
-target_compile_definitions(${MODIO_TARGET_NAME} INTERFACE MODIO_TRACE_DUMP_RESPONSE=1)
+	target_compile_definitions(${MODIO_TARGET_NAME} INTERFACE MODIO_TRACE_DUMP_RESPONSE=1)
         message(STATUS "Setting MODIO_TRACE_DUMP_RESPONSE")
 endif()
 
@@ -50,7 +55,7 @@ add_public_header(${MODIO_TARGET_NAME} modio/ModioSDK.h)
 
 target_include_directories(${MODIO_TARGET_NAME} INTERFACE ${ModioGeneratedHeaderPath})
 
-target_link_libraries(${MODIO_TARGET_NAME} INTERFACE asio ghc_filesystem fmt-header-only tl::optional platform nlohmann_json function2)
+target_link_libraries(${MODIO_TARGET_NAME} INTERFACE asio  fmt-header-only tl::optional platform nlohmann_json function2)
 
 
 

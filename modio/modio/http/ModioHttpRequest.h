@@ -9,8 +9,6 @@
  */
 
 #pragma once
-
-#include "ModioGeneratedVariables.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/http/ModioHttpParams.h"

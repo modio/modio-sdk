@@ -41,6 +41,11 @@ namespace Modio
 					// If the directory never existed, then don't call it a failure if we couldn't delete the files
 					if (ec && ec != std::errc::no_such_file_or_directory)
 					{
+						Modio::Detail::Logger().Log(
+							LogLevel::Error, LogCategory::File,
+							"DeleteFolderAsync during UninstallModUp was not successful, path: {} and error message: ",
+							InstallPath.string(), ec.message());
+
 						// Mod will still be considered as installed as something went wrong when deleting the file
 						Self.complete(ec);
 						return;

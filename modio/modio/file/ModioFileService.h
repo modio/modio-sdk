@@ -286,7 +286,15 @@ namespace Modio
 			bool DeleteFile(const Modio::filesystem::path& FilePath) const
 			{
 				MODIO_PROFILE_SCOPE(DeleteFile);
-				return PlatformImplementation->DeleteFile(FilePath);
+				bool Result = PlatformImplementation->DeleteFile(FilePath);
+
+				if (Result == false)
+				{
+					Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::File,
+												"DeleteFile operation was not successful, path: {}", FilePath.string());
+				}
+
+				return Result;
 			}
 
 			const Modio::filesystem::path& GetRootLocalStoragePath() const

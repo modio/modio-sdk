@@ -95,10 +95,11 @@ namespace Modio
 				return ec;
 			}
 
-			virtual void Truncate(Modio::FileOffset Offset) override
+			virtual Modio::ErrorCode Truncate(Modio::FileOffset Offset) override
 			{
 				Modio::ErrorCode ec;
 				Modio::filesystem::resize_file(FilePath, Offset, ec);
+				return ec;
 			}
 
 			virtual std::uint64_t GetSize() override

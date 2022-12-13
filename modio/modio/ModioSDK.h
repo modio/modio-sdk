@@ -10,8 +10,7 @@
 
 #pragma once
 
-#include "ModioGeneratedVariables.h"
-
+#include "modio/core/ModioSplitCompilation.h"
 #include "modio/detail/ModioDefines.h"
 
 #include "modio/core/ModioCoreTypes.h"
@@ -31,6 +30,7 @@
 #include "modio/core/entities/ModioTerms.h"
 #include "modio/core/entities/ModioUser.h"
 #include "modio/detail/ModioLibraryConfigurationHelpers.h"
+#include "modio/core/entities/ModioUserList.h"
 
 namespace Modio
 {
@@ -195,6 +195,13 @@ namespace Modio
 	/// a UI in order to free up space by uninstalling mods
 	/// @return std::map using Mod IDs as keys and ModCollectionEntry objects providing information about mods installed
 	/// on the system regardless of which user installed them
+	/// @remark <<QueryUserInstallations>> is more relevant for most cases to personalize the content shown to the user.
+	/// On the other hand, a call to <<QuerySystemInstallations>> returns all mods installed on the system (including
+	/// those the current user is subscribed to). This provides insight to mods installed by other users. In case local
+	/// space is a concern, here are some options to manage storage:
+	/// - Execute <<QuerySystemInstallations>>, let the user know space is limited and provide the chance to select mods
+	/// to uninstall. Then call <<ForceUninstallModAsync>> to remove mods selected by the user.
+	/// - Execute <<QueryUserInstallations>> and prompt the user to unsubscribe from large mods.
 	MODIOSDK_API std::map<Modio::ModID, Modio::ModCollectionEntry> QuerySystemInstallations();
 
 	/// @docpublic
@@ -548,12 +555,55 @@ namespace Modio
 	MODIOSDK_API void ArchiveModAsync(Modio::ModID ModID, std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
+	/// @brief Provides a list of mods that the user has submitted, or is a team member for, for the current game,
+	/// applying the parameters specified in the filter
+	/// @param Filter Modio::FilterParams object containing any filters that should be applied to the query
+	/// @param Callback Callback invoked with a status code and an optional ModInfoList providing mod profiles
+	/// @requires authenticated-user
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	MODIOSDK_API void ListUserCreatedModsAsync(
+		Modio::FilterParams Filter,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback);
+
+	/// @docpublic
 	/// @brief Returns a list of base mod installation directories. Under normal circumstances, this will return a
 	/// single directory, which is the base directory that all mods are installed to for the current user.
 	/// @experimental
 	/// @requires initialized-sdk
 	/// @return List of base mod installation directories
 	MODIOSDK_API std::vector<std::string> GetBaseModInstallationDirectories();
+
+	/// @docpublic
+	/// @brief Mute a user. This will prevent mod.io from returning mods authored by the muted user.
+	///	when performing searches.
+	/// @requires authenticated-user
+	/// @requires initialized-sdk
+	/// @param UserID ID of the User to mute
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	MODIOSDK_API void MuteUserAsync(Modio::UserID UserID, std::function<void(Modio::ErrorCode)> Callback);
+
+	/// @docpublic
+	/// @brief Unmute a user. This will allow mod.io to mods authored by the previously muted user.
+	///	when performing searches.
+	/// @requires authenticated-user
+	/// @requires initialized-sdk
+	/// @param UserID ID of the User to unmute
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	MODIOSDK_API void UnmuteUserAsync(Modio::UserID UserID, std::function<void(Modio::ErrorCode)> Callback);
+
+	/// @docpublic
+	/// @brief List all the users that have been muted by the current user.
+	/// @requires authenticated-user
+	/// @requires initialized-sdk
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	MODIOSDK_API void GetMutedUsersAsync(std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)> Callback);
 
 } // namespace Modio
 

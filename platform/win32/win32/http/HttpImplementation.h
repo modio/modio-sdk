@@ -38,6 +38,8 @@ namespace Modio
 			{
 				return InitializeHttpOp(UserString, State);
 			}
+
+			ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string>& Overrides);
 		};
 	} // namespace Detail
 } // namespace Modio

@@ -104,9 +104,6 @@ namespace Modio
 			auto BeginWriteAsync(IOObjectImplementationType PlatformIOObjectInstance, Modio::FileSize TotalLength,
 								 CompletionToken&& Token)
 			{
-				/*return asio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
-					BeginHttpRequestForWriteOp(PlatformIOObjectInstance, HttpState, TotalLength), Token,
-					Modio::Detail::Services::GetGlobalContext().get_executor());*/
 			}
 
 			template<typename CompletionToken>

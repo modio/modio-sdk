@@ -59,6 +59,8 @@ public:
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Core,
 										"Initializing mod.io services");
+			yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+
 			yield Modio::Detail::Services::GetGlobalService<Modio::Detail::TimerService>().InitializeAsync(
 				std::move(Self));
 
@@ -102,7 +104,7 @@ public:
 				return;
 			}
 			ec = Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().ApplyGlobalConfigOverrides(
-				ConfigurationValues);
+				InitParams.ExtendedParameters);
 			if (ec)
 			{
 				Modio::Detail::SDKSessionData::Deinitialize();
@@ -156,6 +158,8 @@ public:
 			// ModState set to InstallationPending.  Will NOT return an error code even on validation failure to prevent
 			// killing initialization.
 			yield Modio::Detail::ValidateAllInstalledModsAsync(std::move(Self));
+
+			yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Core,
 										"mod.io service initialization complete");

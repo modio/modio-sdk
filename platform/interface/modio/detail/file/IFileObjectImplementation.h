@@ -50,8 +50,10 @@ namespace Modio
 			virtual Modio::ErrorCode Rename(Modio::filesystem::path NewPath) = 0;
 			/// @brief Sets the file length to the desired value
 			/// @param Offset new end length for the file
+			/// @return Empty Error code when the truncate system function works,
+			/// otherwise a system error number
 			/// @todo {core} should this truncate the seek pointer?
-			virtual void Truncate(Modio::FileOffset Offset) = 0;
+			virtual Modio::ErrorCode Truncate(Modio::FileOffset Offset) = 0;
 			/// @brief Sets the offset for future streamed reads or writes to the file
 			/// @param Offset The position to read or write from
 			virtual void Seek(Modio::FileOffset Offset, Modio::Detail::SeekDirection Direction) = 0;

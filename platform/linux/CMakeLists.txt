@@ -14,6 +14,7 @@ if(MODIO_PLATFORM STREQUAL "LINUX")
     cmake_policy(SET CMP0077 NEW)
 	set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake;${CMAKE_MODULE_PATH}")
 	set (MODIO_PLATFORM_LINUX ON INTERNAL "building for linux")
+	set (MODIO_MBEDTLS_LINUX_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/mbedtls/library/")
 
 	enable_language(C)
 	enable_language(CXX)
@@ -33,5 +34,29 @@ if(MODIO_PLATFORM STREQUAL "LINUX")
 		DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/linux
 		DESTINATION ${CMAKE_INSTALL_PREFIX}/header_only
 		COMPONENT header_only
+	)
+	
+	install(
+		DIRECTORY ${MODIO_ROOT_DIR}/ext/mbedtls/include/
+		DESTINATION ${CMAKE_INSTALL_PREFIX}/header_only/ext/
+		COMPONENT header_only
+		PATTERN "psa" EXCLUDE
+		PATTERN ".gitignore" EXCLUDE
+	)
+	
+	install(
+		DIRECTORY ${MODIO_ROOT_DIR}/ext/mbedtls/include/
+		DESTINATION ${CMAKE_INSTALL_PREFIX}/static/inc/
+		COMPONENT static_library
+		PATTERN "psa" EXCLUDE
+		PATTERN ".gitignore" EXCLUDE
+	)
+
+	install(
+		DIRECTORY ${MODIO_MBEDTLS_LINUX_BINARY_DIR}
+		DESTINATION ${CMAKE_INSTALL_PREFIX}/static/lib/
+		COMPONENT static_library
+		PATTERN ".cmake" EXCLUDE
+		PATTERN "CMakeFiles" EXCLUDE
 	)
 endif()

@@ -15,7 +15,7 @@ These include the required CMake (version 3.20 or higher), Ninja, and MSVC C++ c
 
 The mod.io SDK has the following dependencies:
 
-- https://github.com/stephenwhittle/asio[asio]
+- https://github.com/modio/modio-integration-asio[asio]
 - https://github.com/gulrak/filesystem[filesystem]
 - https://github.com/fmtlib/fmt[fmt]
 - https://github.com/nekipelov/httpparser[httpparser]
@@ -58,6 +58,8 @@ wget http://mirrors.kernel.org/ubuntu/pool/main/libu/liburing/liburing-dev_0.7-3
 wget http://mirrors.kernel.org/ubuntu/pool/main/libu/liburing/liburing1_0.7-3ubuntu3_amd64.deb
 sudo apt install ./liburing*deb
 ----
+
+NOTE: If you are using the "header_only" release mode, the mod.io SDK includes MbedTLS headers, but requires the library installed in your system, which was tested with libmbedtls-dev 2.28.0 in Ubuntu. The "static" mode includes these libraries in the same folder as the libmodioStatic.a
 
 === macOS Dependencies
 
@@ -112,9 +114,9 @@ To simplify the SDK compilation, the file `CMakePresets.json` includes the most 
 
 |===
 |Platform | Preset          | Target       | Build System
-|Windows  | win64           | Release      | Visual Studio 2019
-|Windows  | win64-debug     | Debug        | Visual Studio 2019
-|Windows  | win64-dbginfo   | Pre-Release  | Visual Studio 2019
+|Windows  | win             | Release      | Visual Studio 2019
+|Windows  | win-debug       | Debug        | Visual Studio 2019
+|Windows  | win-dbginfo     | Pre-Release  | Visual Studio 2019
 |Linux    | linux64         | Release      | Ninja
 |Linux    | linux64-debug   | Debug        | Ninja
 |Linux    | linux64-dbginfo | Pre-Release  | Ninja
@@ -123,23 +125,25 @@ To simplify the SDK compilation, the file `CMakePresets.json` includes the most 
 |macOS    | macOS-dbginfo   | Pre-Release  | Ninja or XCode
 |===
 
-Debug presets have the `-debug` suffix, and Release-with-debug-info is `-dbginfo`. For example, if you want to build the SDK in debug configuration specify `win64-debug` as the preset name.
+Debug presets have the `-debug` suffix, and Release-with-debug-info is `-dbginfo`. For example, if you want to build the SDK in debug configuration specify `win-debug` as the preset name.
 
 To build the SDK using the default build and install directories:
 
-. `cmake -S <modio-sdk folder> --preset=win64`
+. `cmake -S <modio-sdk folder> --preset=win`
 +
-This will use the Ninja generator to create a Ninja build system in `<modio-sdk folder>/out/build/win64`. It installs the compiled libraries/headers to `<modio-sdk folder>/out/install/win64`.
-. `cmake --build <modio-sdk folder>/out/build/win64`
+This will use the Ninja generator to create a Ninja build system in `<modio-sdk folder>/out/build/win`. It installs the compiled libraries/headers to `<modio-sdk folder>/out/install/win`.
+. `cmake --build <modio-sdk folder>/out/build/win`
 +
 This step compiles the SDK as a static library.
-. `cmake --install <modio-sdk folder>/out/build/win64`
+. `cmake --install <modio-sdk folder>/out/build/win`
 +
-This produces a folder `<modio-sdk folder>/out/install/win64` with the following:
+This produces a folder `<modio-sdk folder>/out/install/win` with the following:
 +
 * `header_only` - directory with the header-only version of the SDK
 * `source` - directory containing the implementation files of the SDK for use in 'split compilation' mode
 * `static` - directory containing the static library binaries and necessary public include headers
+
+NOTE: If you are compiling the mod.io SDK using different architectures, you can change the preset compilation folder by modifying the "CMAKE_INSTALL_PREFIX" path.
 
 ==== Header-only mode [[header-only]]
 
@@ -159,9 +163,31 @@ Add the `inc` directory inside `static` to your `include` and link against the s
 If you use a different build system or wish to generate project files for inclusion in an existing Visual Studio solution, you can override the default CMake generator. For example, it is possible to use an MSBuild-based Visual Studio Solution:
 
 ```
-cmake -S <modio-sdk folder> --preset=win64 -G "Visual Studio 16 2019"
-cmake --build <modio-sdk folder>/out/install/win64
-cmake --install <modio-sdk folder>/out/install/win64
+cmake -S <modio-sdk folder> --preset=win -G "Visual Studio 16 2019"
+cmake --build <modio-sdk folder>/out/build/win
+cmake --install <modio-sdk folder>/out/build/win
+```
+
+=== Windows Terminal Compilation of x64 library
+
+When you compile the mod.io SDK and you require a x64 library in Windows, confirm the use the "x64 Native Tools Command Prompt for VS 2019", which by default employs the x64 compiler. To verify the Static or Shared library was compiled with x64 architecture, you can use the "dumpbin" command:
+```
+dumpbin out\build\win\modio\modioStatic.lib /headers
+```
+Then search for the confirmation as follows:
+```
+Dump of file out\build\win\modio\modioStatic.lib
+
+File Type: LIBRARY
+
+FILE HEADER VALUES
+            8664 machine (x64)
+             34A number of sections
+        63336D7D time date stamp Wed Sep 28 10:39:09 2022
+           136EC file pointer to symbol table
+             AC9 number of symbols
+               0 size of optional header
+               0 characteristics
 ```
 
 '''
@@ -321,7 +347,7 @@ while(bGameIsRunning == true)
 }
 ----
 
-When you are ready to initialize the SDK for the current user, you'll need to call <<InitializeAsync>>, passing in your product's mod.io ID, your API key, the Local Profile name, and a callback/handler so you know when the SDK is initialized correctly.  Note that <<InitializeAsync>>'s callback will be invoked after calling <<RunPendingHandlers>> from your project's main loop.
+When you are ready to initialize the SDK for the current session, you'll need to call <<InitializeAsync>>, passing in your product's mod.io ID, your API key, the Local Profile Name, and a callback/handler so you know when the SDK is initialized correctly. Note that <<InitializeAsync>>'s callback will be invoked after calling <<RunPendingHandlers>> from your project's main loop.
 
 [source,cpp]
 ----
@@ -347,13 +373,15 @@ Modio::InitializeAsync(Options, [&SDKInitialized](Modio::ErrorCode ec) {
 });
 ----
 
+It is worth considering that the "LocalProfileName" is used by the mod.io SDK to associate a local session to a user, as mentioned in <<Users and Local Profiles>>. It is possible to forward a user nickname as the LocalProfileName, then initialize the mod.io SDK. Any data related to a user session will be stored in its corresponding <<Mod Data Directory>>.
+
 .Notes
 * By convention you'll see these code examples pass in lambda functions as callback handlers, but you can use anything convertible to `std::function` with the appropriate signature.
 * The error-handling in this sample is deliberately kept brief. See <<SDK quick-start: Error Handling>> for more information on error handling.
 * You can perform calls to other functions, such as something that shows your mod browser UI implementation, directly in the callback. The primary caveat to doing much processing here is that you'll be running in the context of, and therefore blocking, the thread running the callback, which is the thread running <<RunPendingHandlers>>.
 
 
-Doing the reverse and shutting down the SDK is equally simple:
+To finalize and shut down the mod.io SDK is equally simple:
 [source, cpp]
 ----
 //State variable, stored in some valid scope
@@ -613,6 +641,14 @@ In order to see which mods the user has subscribed to, call <<QueryUserSubscript
 Each of these objects contains the mod's state, profile information, ID, and other data suitable for showing users a list of their subscriptions.
 
 NOTE: This collection includes mods that are still in the process of being installed. Make sure to check the result of <<ModCollectionEntry::GetModState>> before trying to load files from the mods in this collection. Alternatively, use <<QueryUserInstallations>> as described in <<Retrieving mod directory paths for loading>>.
+
+A distinction exists between function <<QueryUserInstallations>> and <<QuerySystemInstallations>>. The first fetches the subset of the user's subscribed mods that are installed and therefore ready for loading. <<QueryUserInstallations>> is more relevant for most cases to personalize the content shown to the user. On the other hand, a call to <<QuerySystemInstallations>> returns all mods installed on the system (including those the current user is subscribed to). This provides insight to mods installed by other users. 
+
+In case local space is a concern, here are some options to manage storage:
+- Execute <<QuerySystemInstallations>>, let the user know space is limited and provide the chance to select mods to uninstall. Then call <<ForceUninstallModAsync>> to remove mods selected by the user.
+- Execute <<QueryUserInstallations>> and prompt the user to unsubscribe from large mods.
+
+The first option would focus on the removal of mods the user has not interacted with, whereas the second option would actively uninstall from mods the user has previously considered and subscribed to. Consider other alternatives when designing your game to support mods.
 
 ===== Retrieving mod directory filepaths for loading
 

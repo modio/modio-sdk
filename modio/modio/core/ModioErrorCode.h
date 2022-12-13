@@ -12,6 +12,7 @@
 
 #include <system_error>
 
+#include "modio/core/ModioSplitCompilation.h"
 #include "modio/core/ModioStdTypes.h" //For ErrorCode type alias
 
 namespace Modio
@@ -782,6 +783,7 @@ namespace Modio
 		BannedUserAccount = 11007,
 		BinaryFileCorrupted = 13001,
 		BinaryFileUnreadable = 13002,
+		CannotMuteYourself = 17039,
 		CrossOriginForbidden = 10001,
 		ExpiredOrRevokedAccessToken = 11005,
 		FailedToCompleteTheRequest = 10002,
@@ -795,6 +797,7 @@ namespace Modio
 		MissingReadPermission = 11004,
 		MissingWritePermission = 11003,
 		ModioOutage = 10000,
+		MuteUserNotFound = 17000,
 		Ratelimited = 11008,
 		ReportedEntityUnavailable = 15030,
 		RequestedCommentNotFound = 15026,
@@ -840,6 +843,9 @@ namespace Modio
 				case ApiError::BinaryFileUnreadable:
 						return "The submitted binary file is unreadable.";
 					break;
+				case ApiError::CannotMuteYourself:
+						return "You cannot mute yourself.";
+					break;
 				case ApiError::CrossOriginForbidden:
 						return "Cross-origin request forbidden.";
 					break;
@@ -878,6 +884,9 @@ namespace Modio
 					break;
 				case ApiError::ModioOutage:
 						return "mod.io is currently experiencing an outage. (rare)";
+					break;
+				case ApiError::MuteUserNotFound:
+						return "The user with the supplied UserID could not be found.";
 					break;
 				case ApiError::Ratelimited:
 						return "You have been ratelimited for making too many requests. See Rate Limiting.";
@@ -1095,7 +1104,7 @@ namespace Modio
 		ModDeleteDeferredError = 10,
 		/// @brief When this condition is true, the error code represents an error during installation that indicates future installation will not be possible, such as a deleted mod, and so will not be retried at all.
 		ModInstallUnrecoverableError = 11,
-		/// @brief When this condition is true, the error code indicates that a specified game, mod, media file or mod file was not found.
+		/// @brief When this condition is true, the error code indicates that a specified game, mod, user, media file or mod file was not found.
 		EntityNotFoundError = 12,
 		/// @brief When this condition is true, the error code indicates that the user has not yet accepted the mod.io Terms of Use.
 		UserTermsOfUseError = 13,
@@ -1153,7 +1162,7 @@ namespace Modio
 					return "When this condition is true, the error code represents an error during installation that indicates future installation will not be possible, such as a deleted mod, and so will not be retried at all.";
 				break;
 				case ErrorConditionTypes::EntityNotFoundError:
-					return "When this condition is true, the error code indicates that a specified game, mod, media file or mod file was not found.";
+					return "When this condition is true, the error code indicates that a specified game, mod, user, media file or mod file was not found.";
 				break;
 				case ErrorConditionTypes::UserTermsOfUseError:
 					return "When this condition is true, the error code indicates that the user has not yet accepted the mod.io Terms of Use.";
@@ -1335,6 +1344,11 @@ namespace Modio
 					}
 
 					if (ec == Modio::GenericError::BadParameter)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::CannotMuteYourself)
 					{
 						return true;
 					}
@@ -1826,6 +1840,11 @@ namespace Modio
 					}
 
 					if (ec == Modio::ApiError::RequestedResourceNotFound)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MuteUserNotFound)
 					{
 						return true;
 					}

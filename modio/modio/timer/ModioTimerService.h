@@ -9,7 +9,6 @@
  */
 
 #pragma once
-#include "ModioGeneratedVariables.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
 #include "timer/TimerServiceImplementation.h"

@@ -81,7 +81,13 @@ namespace Modio
 					// next download (can't delete it here as it's locked)
 					if (File)
 					{
-						File->Truncate(Modio::FileOffset(0));
+						ec = File->Truncate(Modio::FileOffset(0));
+
+						if (ec)
+						{
+							Self.complete(ec);
+							return;
+						}
 						// Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(File->GetPath());
 					}
 					Self.complete(Modio::make_error_code(Modio::ModManagementError::InstallOrUpdateCancelled));

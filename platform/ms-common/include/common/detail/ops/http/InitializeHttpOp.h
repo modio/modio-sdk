@@ -33,8 +33,7 @@ public:
 			HINTERNET CurrentSession = NULL;
 
 			CurrentSession = WinHttpOpen(UserAgentString.c_str(), WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY,
-										 WINHTTP_NO_PROXY_NAME,
-										 WINHTTP_NO_PROXY_BYPASS, WINHTTP_FLAG_ASYNC);
+										 WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, WINHTTP_FLAG_ASYNC);
 
 			if (CurrentSession == NULL)
 			{
@@ -59,6 +58,16 @@ public:
 				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
 											"initialize http set option received system error code {}", GetLastError());
 			};
+			// Set Timeout to 120 seconds
+			unsigned long Timeout = 120000;
+			bool SetTimeoutStatus =
+				WinHttpSetOption(CurrentSession, WINHTTP_OPTION_CONNECT_TIMEOUT, &Timeout, sizeof(unsigned long));
+			if (!SetTimeoutStatus)
+			{
+				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+											"ms-common initialize http set timeout received system error code {}",
+											GetLastError());
+			}
 			if (WinHttpSetStatusCallback(CurrentSession, &ModioWinhttpStatusCallback,
 										 WINHTTP_CALLBACK_FLAG_ALL_COMPLETIONS | WINHTTP_CALLBACK_STATUS_HANDLE_CLOSING,
 										 0) == WINHTTP_INVALID_STATUS_CALLBACK)

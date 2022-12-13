@@ -469,7 +469,8 @@ namespace Modio
 		GoG,
 		Itch,
 		Switch,
-		Discord
+		Discord,
+		PSN
 	};
 
 	/// @docpublic
@@ -589,6 +590,8 @@ namespace Modio
 					return "switch";
 				case AuthenticationProvider::Discord:
 					return "discord";
+				case AuthenticationProvider::PSN:
+					return "psn";
 			}
 
 			assert(false && "Invalid value to ToString(Modio::Provider)");

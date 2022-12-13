@@ -9,7 +9,6 @@
  */
 
 #pragma once
-#include "ModioGeneratedVariables.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/JsonWrapper.h"
 #include "modio/detail/entities/ModioAvatar.h"

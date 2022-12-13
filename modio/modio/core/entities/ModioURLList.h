@@ -9,7 +9,7 @@
  */
 
 #pragma once
-#include "ModioGeneratedVariables.h"
+#include "modio/core/ModioSplitCompilation.h"
 #include "modio/core/entities/ModioList.h"
 #include "modio/detail/JsonWrapper.h"
 #include <string>

@@ -9,8 +9,7 @@
  */
 
 #pragma once
-
-#include "ModioGeneratedVariables.h"
+#include "modio/core/ModioSplitCompilation.h"
 #include "ModioWeakSymbol.h"
 #include <utility>
 

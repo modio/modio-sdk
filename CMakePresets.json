@@ -7,11 +7,11 @@
   },
   "configurePresets": [
     {
-      "name": "win64",
-      "displayName": "win64",
-      "description": "Windows native x64",
+      "name": "win",
+      "displayName": "win",
+      "description": "Windows native compilation",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/out/build/win64",
+      "binaryDir": "${sourceDir}/out/build/win",
       "cacheVariables": {
         "MODIO_PLATFORM": {
           "type": "STRING",
@@ -19,24 +19,25 @@
         },
         "CMAKE_INSTALL_PREFIX": {
           "type": "STRING",
-          "value": "${sourceDir}/out/install/win64"
-        }
+          "value": "${sourceDir}/out/install/win"
+        },
+        "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
-      "name": "win64-debug",
-      "inherits": "win64",
+      "name": "win-debug",
+      "inherits": "win",
       "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
     },
     {
-      "name": "win64-dbginfo",
-      "inherits": "win64",
+      "name": "win-dbginfo",
+      "inherits": "win",
       "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
     },
     {
       "name": "linux64",
       "displayName": "linux64",
-      "description": "Linux native x64",
+      "description": "Linux native compilation",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/out/build/linux64",
       "cacheVariables": {
@@ -63,7 +64,7 @@
     {
     "name": "macOS",
     "displayName": "macOS",
-    "description": "macOS native x64",
+    "description": "macOS native compilation",
     "generator": "Ninja",
     "binaryDir": "${sourceDir}/out/build/macOS",
     "cacheVariables": {

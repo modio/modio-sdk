@@ -21,6 +21,7 @@
 #include "modio/detail/ModioObjectTrack.h"
 #include "modio/detail/ModioOperationQueue.h"
 #include "modio/detail/ModioSDKSessionData.h"
+#include "modio/detail/http/PerformRequestImpl.h"
 #include "modio/detail/http/ResponseError.h"
 #include "modio/file/ModioFile.h"
 #include "modio/http/ModioHttpRequest.h"
@@ -46,22 +47,6 @@ namespace Modio
 			{
 				Modio::Detail::DynamicBuffer ResponseBodyBuffer;
 			} State;
-
-			struct PerformRequestImpl
-			{
-				Modio::Detail::OperationQueue::Ticket RequestTicket;
-				std::unique_ptr<Modio::Detail::File> CurrentPayloadFile;
-				Modio::Detail::DynamicBuffer PayloadFileBuffer;
-				Modio::FileSize CurrentPayloadFileBytesRead;
-				Modio::Optional<std::pair<std::string, Modio::Detail::PayloadContent>> PayloadElement;
-				std::unique_ptr<Modio::Detail::Buffer> HeaderBuf;
-				std::weak_ptr<Modio::ModProgressInfo> ProgressInfo;
-
-			public:
-				PerformRequestImpl(Modio::Detail::OperationQueue::Ticket RequestTicket)
-					: RequestTicket(std::move(RequestTicket)) {};
-				PerformRequestImpl(const PerformRequestImpl& Other) = delete;
-			};
 
 			std::unique_ptr<PerformRequestImpl> Impl;
 
@@ -122,7 +107,7 @@ namespace Modio
 								{
 									MODIO_PROFILE_SCOPE(UploadFileFormatHeader);
 									std::string PayloadContentFilename = "";
-									if (Impl->PayloadElement->second.bIsFile)
+									if (Impl->PayloadElement->second.PType == PayloadContent::PayloadType::File)
 									{
 										PayloadContentFilename =
 											fmt::format("; filename=\"{}\"",
@@ -148,7 +133,7 @@ namespace Modio
 
 							// Write the form data itself to the connection, either looping through the file data (for a
 							// file field) or just writing the in-memory data (for string fields)
-							if (Impl->PayloadElement->second.bIsFile)
+							if (Impl->PayloadElement->second.PType == PayloadContent::PayloadType::File)
 							{
 								Impl->CurrentPayloadFileBytesRead = Modio::FileSize(0);
 

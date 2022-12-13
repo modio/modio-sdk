@@ -38,12 +38,19 @@ DISABLE_WARNING_OPERATOR_OPERATION
 	#else
 		#include "ghc/filesystem.hpp"
 	#endif
+namespace Modio
+{
+	namespace filesystem = ghc::filesystem;
+} // namespace Modio
 
 DISABLE_WARNING_POP
 
 	#include MODIO_UNREAL_PLATFORM_EPILOGUE
 
 #elif defined(MODIO_PLATFORM_CUSTOM_FS)
+
+	// Backport of std::filesystem to support C++14/C++11, with special defines for providing platform stubs in a
+	// separate file
 	#pragma push_macro("GHC_OS_CUSTOM")
 	#define GHC_OS_CUSTOM
 
@@ -52,12 +59,25 @@ DISABLE_WARNING_POP
 	#include "file/FileSystemStubs.h"
 
 	#pragma pop_macro("GHC_OS_CUSTOM")
-#else
-	#include "ghc/filesystem.hpp"
-#endif
+namespace Modio
+{
+	namespace filesystem = ghc::filesystem;
+} // namespace Modio
+
+#elif defined(MODIO_USE_STD_FILESYSTEM)
+
+	#include <filesystem>
 
 namespace Modio
 {
+	namespace filesystem = std::filesystem;
+} // namespace Modio
+#else
+
 	// Backport of std::filesystem to support C++14/C++11
+	#include "ghc/filesystem.hpp"
+namespace Modio
+{
 	namespace filesystem = ghc::filesystem;
 } // namespace Modio
+#endif

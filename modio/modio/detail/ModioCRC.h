@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include "ModioGeneratedVariables.h"
-
 namespace Modio
 {
 	namespace Detail

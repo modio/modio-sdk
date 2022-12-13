@@ -9,7 +9,6 @@
  */
 
 #pragma once
-#include "ModioGeneratedVariables.h"
 #include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioUser.h"

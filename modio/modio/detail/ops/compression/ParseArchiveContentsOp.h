@@ -49,7 +49,7 @@ namespace Modio
 				{
 					{
 						ArchiveFileOnDisk = std::make_shared<Modio::Detail::File>(
-							ArchiveState->FilePath, Modio::Detail::FileMode::ReadWrite, false);
+							ArchiveState->FilePath, Modio::Detail::FileMode::ReadOnly, false);
 						FileSize = ArchiveFileOnDisk->GetFileSize();
 						CurrentSearchOffset = FileSize - std::min(FileSize, ChunkOfBytes);
 
@@ -189,6 +189,11 @@ namespace Modio
 							if (ec && ec != Modio::GenericError::EndOfFile)
 							{
 								Self.complete(ec);
+								return;
+							}
+							if (!FileChunk.has_value())
+							{
+								Self.complete(Modio::make_error_code(Modio::FilesystemError::ReadError));
 								return;
 							}
 

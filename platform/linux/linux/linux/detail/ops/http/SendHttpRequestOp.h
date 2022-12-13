@@ -62,7 +62,8 @@ namespace Modio
 							Self.complete(InitStatus);
 							return;
 						}
-						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http, "Sending request",
+						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+													"Sending request: {}",
 													Request->GetParameters().GetFormattedResourcePath());
 					}
 
@@ -72,15 +73,29 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
+
 					// Add user-agent header
 					// generate payload/http data here, making sure the request does not perform URLEncoding
 					Payload.AppendBuffer(Request->GetParameters().GetRequestBuffer(false));
+
 					{
 						Modio::Detail::Buffer End(2);
 						End[0] = '\r';
 						End[1] = '\n';
 						Payload.AppendBuffer(std::move(End));
 					}
+
+					//// The section below could help for logging purposes
+					// {
+					// 	Modio::Detail::Logger().Log(
+					//             Modio::LogLevel::Trace, Modio::LogCategory::Http,
+					//             "About to send to the server:");
+					// 	for (const auto& Buffer : Payload)
+					// 	{
+					// 		Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http, "{}",
+					// 									Buffer.Data());
+					// 	}
+					// }
 
 					yield SSLConnectionWriteAsync(Request, Payload, SharedState, std::move(Self));
 					if (ec)

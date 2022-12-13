@@ -49,11 +49,23 @@ namespace asio
 #elif defined(_WIN32)
 	// Set the proper SDK version before including asio
 	#include <SDKDDKVer.h>
-	
-	
+namespace asio
+{
+	namespace detail
+	{
+		template<typename Exception>
+		void throw_exception(const Exception& e)
+		{}
+
+	} // namespace detail
+} // namespace asio
+
+	#pragma push_macro("ASIO_NO_TYPEID")
+	#define ASIO_NO_TYPEID 1
+
 	// Note asio includes Windows.h.
 	#include <asio.hpp>
-	
+	#pragma pop_macro("ASIO_NO_TYPEID")
 
 	// Ensure that we are linking against Winhttp that we require on Windows
 	#pragma comment(lib, "Winhttp.lib")
@@ -73,11 +85,11 @@ namespace asio
 	#endif
 	#pragma push_macro("ASIO_DONT_USE_PAUSE")
 	#define ASIO_DONT_USE_PAUSE
-	//#pragma push_macro("ASIO_DISABLE_SOCKETS")
-	//#define ASIO_DISABLE_SOCKETS 1
-	//#pragma push_macro("ASIO_DISABLE_FD_SET")
+  //#pragma push_macro("ASIO_DISABLE_SOCKETS")
+  //#define ASIO_DISABLE_SOCKETS 1
+  //#pragma push_macro("ASIO_DISABLE_FD_SET")
 
-	//#define ASIO_DISABLE_FD_SET 1
+//#define ASIO_DISABLE_FD_SET 1
 MODIO_DIAGNOSTIC_PUSH
 
 // Disable spurious warning about deprecated allocator<void> specialisation

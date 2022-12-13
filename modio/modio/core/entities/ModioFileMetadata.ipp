@@ -14,8 +14,8 @@
 	#pragma once
 #endif
 
+#include "modio/detail/JsonWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
-#include "nlohmann/json.hpp"
 
 namespace Modio
 {

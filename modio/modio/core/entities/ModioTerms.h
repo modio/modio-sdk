@@ -9,11 +9,10 @@
  */
 
 #pragma once
-
-#include "ModioGeneratedVariables.h"
-
+#include "modio/core/ModioSplitCompilation.h"
 #include "modio/detail/JsonWrapper.h"
 #include <string>
+
 namespace Modio
 {
 	/// @docpublic

@@ -9,7 +9,6 @@
  */
 
 #pragma once
-#include "ModioGeneratedVariables.h"
 #include "modio/detail/ModioDefines.h"
 
 #include "modio/core/entities/ModioList.h"
@@ -26,14 +25,14 @@ namespace Modio
 	{
 	public:
 		/// @docpublic
-		/// @brief Insert MofInfoList to the end of this list
+		/// @brief Insert ModInfoList to the end of this list
 		void Append(const ModInfoList& Other)
 		{
 			InternalList.insert(InternalList.end(), std::begin(Other.InternalList), std::end(Other.InternalList));
 		}
 
 		/// @docpublic
-		/// @brief Insert a MofInfo to the end of this list
+		/// @brief Insert a ModInfo to the end of this list
 		void Append(const ModInfo& ModInfoData)
 		{
 			InternalList.push_back(ModInfoData);

@@ -20,24 +20,30 @@ namespace Modio
 	struct InitializeOptions
 	{
 		/// @docpublic
-		/// @brief Initializes all variables to a invalid state if possible and minimal functionality
+		/// @brief Default constructor that sets all variables to an invalid base value
 		MODIO_IMPL InitializeOptions();
 
 		/// @docpublic
-		/// @brief Explicit InitializeOptions constructor
+		/// @brief Explicit and preferred constructor with the necessary variables to store
+		/// @param GameID Mod.io provided to identify the game
+		/// @param APIKey Mod.io provided key associated with the game
+		/// @param GameEnvironment Mod.io environment to use, listed in the enumeration Modio::Environment
+		/// @param PortalInUse The service portal to use, listed in the enumeration Modio::Portal
+		/// @param LocalSessionIdentifier A unique identifier for the local session. This local session can have a single mod.io user account associated with it.
 		MODIO_IMPL explicit InitializeOptions(Modio::GameID GameID, Modio::ApiKey APIKey,
 											  Modio::Environment GameEnvironment, Modio::Portal PortalInUse,
-											  Modio::UserHandleType User);
+											  Modio::UserHandleType LocalSessionIdentifier);
 
-		/// @brief The Mod.io-provided ID for the game
+		/// @brief The Mod.io-provided ID for the game.
 		Modio::GameID GameID = Modio::GameID::InvalidGameID();
-		/// @brief The Mod.io-provided API key for your application or game
+		/// @brief The Mod.io-provided API key for your application or game.
 		Modio::ApiKey APIKey = Modio::ApiKey::InvalidAPIKey();
-		/// @brief The user handle for the platform you are targeting
+		/// @brief Unique identifier for the local session, which will optionally contain user data for an authenticated mod.io user (once authentication is completed).
 		Modio::UserHandleType User;
-		/// @brief Which portal is this game currently running in?
+		/// @brief The storefront or distribution method to use. The API uses this parameter to serve
+		/// platform-compliant user names. Use `Modio::Portal::None` if your title does not require this.
 		Modio::Portal PortalInUse = Modio::Portal::None;
-		/// @brief The mod.io environment you want to run the SDK on
+		/// @brief The mod.io environment you want to run the SDK on.
 		Modio::Environment GameEnvironment = Modio::Environment::Test;
 		/// @brief Platform-specific extended initialization parameters. See xref:Platform-specific Notes[] for more
 		/// information regarding any special values your platform requires or supports.

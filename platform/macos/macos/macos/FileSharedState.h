@@ -59,14 +59,16 @@ namespace Modio
 				// A flag that checks if the number of bytes exceeds MAX_BYTES, in case
 				// it does, it will transfer MAX_BYTES at the time.
 				bool Overflow = FileOp.Data.GetSize() > MAX_BYTES;
-				// Shortcut to the FileSize
-				uint64_t FileSize = FileOp.Data.GetSize();
+				// Shortcut to the buffer size
+				uint64_t BufferSize = FileOp.Data.GetSize();
 				// Number of bytes to transfer in this operation
-				size_t Bytes = Overflow ? MIN(MAX_BYTES, FileSize - FileOp.NumBytesTransferred) : FileSize;
+				size_t Bytes = Overflow ? MIN(MAX_BYTES, BufferSize - FileOp.NumBytesTransferred) : BufferSize;
 				// The File offset, which could change according to the Overflow
 				size_t AltFileOffset = FileOp.Offset;
 				unsigned char* DataPointer;
-
+                // In case we have an error, this will be retain the side where it occurred
+                Modio::ErrorCode Err;
+ 
 				// When an operation requires to move more than MAX_BYTES, the
 				// buffer is split in byte sections.
 				if (Overflow)
@@ -85,10 +87,12 @@ namespace Modio
 				if (FileOp.TransferDirection == PendingIOOperation::Direction::Write)
 				{
 					Result = pwrite(FileOp.AssocFileDesc, DataPointer, Bytes, AltFileOffset);
+                    Err = Modio::make_error_code(Modio::FilesystemError::WriteError);
 				}
 				else if (FileOp.TransferDirection == PendingIOOperation::Direction::Read)
 				{
 					Result = pread(FileOp.AssocFileDesc, DataPointer, Bytes, AltFileOffset);
+                    Err = Modio::make_error_code(Modio::FilesystemError::ReadError);
 				}
 
 				if (Result < 0)
@@ -96,15 +100,28 @@ namespace Modio
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
 												"Could not operate on file descriptor {}, response: {}",
 												FileOp.AssocFileDesc, Result);
-					FileOp.Result = Modio::make_error_code(Modio::FilesystemError::FileLocked);
+                    FileOp.Result = Err;
 					FileOp.DidFinish = true;
-				}
+                    return;
+                }
+                // This case could happen when the file operation goes outside of the file on disk
+                // bounds. Example: Read more bytes with a larger offset than the file size.
+                else if (Result > Bytes)
+                {
+                    Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+                                                "Trying to operate on file descriptor {} with out-of-bounds response: {}",
+                                                FileOp.AssocFileDesc, Result);
+                    FileOp.Result = Err;
+                    FileOp.DidFinish = true;
+                    return;
+                }
+
 
 				// It is necessary to keep track of the number of bytes transferred in the Pending Operation
 				FileOp.NumBytesTransferred += Modio::FileSize(Result);
-				// The operation is considered finished if the number of bytes transferred are more or equal
-				// to the expected Data size.
-				FileOp.DidFinish = FileOp.NumBytesTransferred >= FileSize;
+                // A "Result == 0" means that the file does not have any more bytes to read. This happens when
+                // an offset tries to read more bytes into a buffer than the actual file has on disk.
+                FileOp.DidFinish = (FileOp.NumBytesTransferred >= BufferSize) || (Result == 0);
 
 				return;
 			}

@@ -18,6 +18,9 @@
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/ReportContentOp.h"
+#include "modio/detail/ops/MuteUserOp.h"
+#include "modio/detail/ops/UnmuteUserOp.h"
+#include "modio/detail/ops/GetMutedUsersOp.h"
 #include "modio/detail/ops/ServiceInitializationOp.h"
 #include "modio/detail/ops/Shutdown.h"
 #include "modio/file/ModioFileService.h"
@@ -160,4 +163,40 @@ namespace Modio
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	}
+
+	void MuteUserAsync(Modio::UserID UserID, std::function<void(Modio::ErrorCode)> Callback)
+	{
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) &&
+			Modio::Detail::RequireNotRateLimited(Callback) && Modio::Detail::RequireUserIsAuthenticated(Callback) )
+		{
+			asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
+				Modio::Detail::MuteUserOp(UserID), Callback,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
+	}
+
+	void UnmuteUserAsync(Modio::UserID UserID, std::function<void(Modio::ErrorCode)> Callback)
+	{
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+			Modio::Detail::RequireUserIsAuthenticated(Callback))
+		{
+				asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
+					Modio::Detail::UnmuteUserOp(UserID), Callback,
+					Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
+	}
+
+	void GetMutedUsersAsync(std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)> Callback)
+	{
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+			Modio::Detail::RequireUserIsAuthenticated(Callback))
+		{
+
+			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)>,
+									   void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)>(
+				Modio::Detail::GetMutedUsersOp(),
+				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
+	}
+
 } // namespace Modio

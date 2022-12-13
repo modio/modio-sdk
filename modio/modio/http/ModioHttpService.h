@@ -9,11 +9,10 @@
  */
 
 #pragma once
-
-#include "ModioGeneratedVariables.h"
 #include "http/HttpImplementation.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioOperationQueue.h"
+#include "modio/detail/ModioSDKSessionData.h"
 #include <iostream>
 #include <memory>
 
@@ -100,6 +99,12 @@ namespace Modio
 
 			MODIO_IMPL Modio::ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string> Overrides)
 			{
+				auto EnvironmentOverrideUrl = Overrides.find("EnvironmentOverrideUrl");
+				if (EnvironmentOverrideUrl != Overrides.end())
+				{
+					Modio::Detail::SDKSessionData::SetEnvironmentOverrideUrl(EnvironmentOverrideUrl->second);
+				}
+
 				return {};
 			}
 

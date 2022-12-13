@@ -99,10 +99,11 @@ namespace Modio
 				return get_implementation()->Rename(NewPath);
 			}
 
-			void Truncate(Modio::FileOffset Offset)
+			Modio::ErrorCode Truncate(Modio::FileOffset Offset)
 			{
-				get_implementation()->Truncate(Offset);
+				return get_implementation()->Truncate(Offset);
 			}
+			
 			void Seek(Modio::FileOffset Offset,
 					  Modio::Detail::SeekDirection Direction = Modio::Detail::SeekDirection::Absolute)
 			{

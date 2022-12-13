@@ -113,6 +113,8 @@ namespace Modio
 				}
 				else
 				{
+					// Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+					// 							"Incomplete parse, data: {}", LinearBuffer.Data());
 					return false;
 				}
 			}

@@ -72,5 +72,9 @@ nlohmann::json Modio::Detail::ToJson(const Modio::filesystem::path& Path)
 nlohmann::json Modio::Detail::ToJson(const Modio::Detail::Buffer& InBuffer)
 {
 	MODIO_PROFILE_SCOPE(JsonParse);
+	if (InBuffer.GetSize() == 0)
+	{
+		return nlohmann::json {};
+	}
 	return nlohmann::json::parse(InBuffer.Data(), nullptr, false);
 }

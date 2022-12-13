@@ -27,7 +27,7 @@ namespace Modio
 		int ResultOffset = 0;
 		ResultOffset = std::move(0);
 		Detail::ParseSafe(Json, ResultOffset, "result_offset");
-		PagedResult.PageIndex = (std::int32_t) std::floor(ResultOffset / (float) PagedResult.PageSize);
-		PagedResult.PageCount = (std::int32_t) std::ceil(PagedResult.TotalResultCount / (float) PagedResult.PageSize);
+		PagedResult.PageIndex = PagedResult.PageSize ? (std::int32_t) std::floor(ResultOffset / (float) PagedResult.PageSize) : 0;
+		PagedResult.PageCount = PagedResult.PageSize ? (std::int32_t) std::ceil(PagedResult.TotalResultCount / (float) PagedResult.PageSize) : 0;
 	};
 } // namespace Modio

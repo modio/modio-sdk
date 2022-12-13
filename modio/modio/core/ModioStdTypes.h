@@ -9,8 +9,7 @@
  */
 
 #pragma once
-// These are necessary because we're pulling in windows.h via ghc fileystem
-#include "ModioGeneratedVariables.h"
+#include "modio/core/ModioSplitCompilation.h"
 #include "modio/detail/ModioDefines.h"
 
 #include "modio/detail/OptionalWrapper.h"
@@ -69,7 +68,7 @@ namespace Modio
 	using Timestamp = std::uint64_t;
 	using GalleryIndex = std::size_t;
 
-	/// @brief Type alias for User IDs, used for initialization
+	/// @brief Type alias to a local profile identifier used per user for initialization
 	using UserHandleType = std::string;
 
 } // namespace Modio

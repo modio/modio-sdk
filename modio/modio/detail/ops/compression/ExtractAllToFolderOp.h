@@ -31,7 +31,7 @@ namespace Modio
 				Modio::filesystem::path RootOutputPath;
 				Modio::Detail::ArchiveReader ArchiveView;
 				Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo;
-
+				std::vector<Modio::Detail::ArchiveFileImplementation::ArchiveEntry>::iterator CurrentEntryIterator;
 				ExtractAllImpl(asio::coroutine CoroutineState, Modio::filesystem::path ArchivePath,
 							   Modio::filesystem::path RootOutputPath, Modio::Detail::ArchiveReader ArchiveView,
 							   Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo)
@@ -42,9 +42,12 @@ namespace Modio
 					  ProgressInfo(ProgressInfo) {};
 			};
 			Modio::StableStorage<ExtractAllImpl> Impl;
-			std::vector<Modio::Detail::ArchiveFileImplementation::ArchiveEntry>::iterator CurrentEntryIterator;
 
 		public:
+			ExtractAllToFolderOp(ExtractAllToFolderOp&& Other)
+			{
+				this->Impl = Other.Impl;
+			}
 			ExtractAllToFolderOp(Modio::filesystem::path ArchivePath, Modio::filesystem::path RootOutputPath,
 								 Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo)
 			{
@@ -64,6 +67,7 @@ namespace Modio
 					Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled), Modio::FileSize(0));
 					return;
 				}
+
 				reenter(Impl->CoroutineState)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Compression,
@@ -111,21 +115,30 @@ namespace Modio
 
 					// Now we know what entries are in the zip file, we need to loop through them and extract them
 					// to disk
-					CurrentEntryIterator = Impl->ArchiveView.begin();
+					Impl->CurrentEntryIterator = Impl->ArchiveView.begin();
 
-					while (CurrentEntryIterator != Impl->ArchiveView.end())
+					while (Impl->CurrentEntryIterator != Impl->ArchiveView.end())
 					{
+						ec = CheckPathIsValid(Impl->CurrentEntryIterator->FilePath, Impl->RootOutputPath);
+
+						if (ec)
+						{
+							Self.complete(ec, Modio::FileSize(0));
+							return;
+						}
+
 						// If the current entry has no filename (ie it is just a directory), create that directory
-						if (!CurrentEntryIterator->FilePath.has_filename() || CurrentEntryIterator->bIsDirectory)
+						if (!Impl->CurrentEntryIterator->FilePath.has_filename() ||
+							Impl->CurrentEntryIterator->bIsDirectory)
 						{
 							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CreateFolder(
-								Impl->RootOutputPath / CurrentEntryIterator->FilePath);
+								Impl->RootOutputPath / Impl->CurrentEntryIterator->FilePath);
 						}
 						else
 						{
 							// Otherwise, begin an async operation to extract that entry to a file with the path
 							// based on the root path
-							yield Impl->ArchiveView.ExtractEntryAsync(*CurrentEntryIterator, Impl->RootOutputPath,
+							yield Impl->ArchiveView.ExtractEntryAsync(*Impl->CurrentEntryIterator, Impl->RootOutputPath,
 																	  Impl->ProgressInfo, std::move(Self));
 							if (ec)
 							{
@@ -133,10 +146,25 @@ namespace Modio
 								return;
 							}
 						}
-						CurrentEntryIterator++;
+						Impl->CurrentEntryIterator++;
 					}
 					// Once all files are extracted, notify the caller
 					Self.complete(Modio::ErrorCode {}, Impl->ArchiveView.GetTotalExtractedSize());
+				}
+			}
+
+			Modio::ErrorCode CheckPathIsValid(Modio::filesystem::path FilePath, Modio::filesystem::path CurrentPath)
+			{
+				Modio::ErrorCode err;
+				Modio::filesystem::path LexPath = Modio::filesystem::relative(FilePath, CurrentPath, err);
+
+				if (LexPath.string() == "")
+				{
+					return {};
+				}
+				else
+				{
+					return Modio::make_error_code(Modio::FilesystemError::NoPermission);
 				}
 			}
 		};

@@ -18,6 +18,7 @@ namespace Modio
 		{
 			namespace APIStrings
 			{
+				constexpr const char* AuthCode = "auth_code";
 				constexpr const char* SecurityCode = "security_code";
 				constexpr const char* ItchToken = "itchio_token";
 				constexpr const char* XboxToken = "xbox_token";
@@ -33,6 +34,7 @@ namespace Modio
 				constexpr const char* ReportSubmitterContact = "contact";
 				constexpr const char* ReportSummary = "summary";
 				constexpr const char* Rating = "rating";
+				constexpr const char* GameID = "game_id";
 			} // namespace APIStrings
 			namespace JSONKeys
 			{
@@ -56,7 +58,13 @@ namespace Modio
 			{
 				constexpr uint8_t DefaultNumberOfRetries = 3;
 				constexpr auto PollInterval = std::chrono::microseconds(100);
-			}
+				// The maximum size a file can be before it is uploaded using a multipart operation
+				// For reference, these are 200MiB = 209MB
+				constexpr uintmax_t MultipartMaxFileSize = 209715200;
+				// The maximum size a file section to upload using a multipart operation
+				// For reference, these are 50MiB = 52MB
+				constexpr uintmax_t MultipartMaxFilePartSize = 52428800;
+			} // namespace Configuration
 			namespace PlatformNames
 			{
 				constexpr const char* Windows = "windows";

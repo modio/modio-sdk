@@ -11,7 +11,7 @@
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "modio/http/ModioHttpParams.h"
 #endif
-
+#include "ModioGeneratedVariables.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioSDKSessionData.h"
@@ -33,13 +33,23 @@ namespace Modio
 		/// @param PathToFile The path to the file that will be submitted
 		/// @return Optional payload content. Will be empty if the file doesn't exist or we could otherwise not retrieve
 		/// the file size
-		MODIO_IMPL Modio::Optional<PayloadContent> MakePayloadContent(Modio::filesystem::path PathToFile)
+		MODIO_IMPL Modio::Optional<PayloadContent> MakePayloadContent(
+			Modio::filesystem::path PathToFile, Modio::Optional<Modio::FileOffset> FileOffset = {},
+			Modio::Optional<Modio::FileSize> ContentSize = {})
 		{
 			Modio::ErrorCode ec;
 			std::uintmax_t TmpSize = Modio::filesystem::file_size(PathToFile, ec);
 			if (!ec)
 			{
-				return PayloadContent(PathToFile, Modio::FileSize(TmpSize));
+				if (FileOffset.has_value() == true && ContentSize.has_value() == true)
+				{
+					return PayloadContent(PathToFile, Modio::FileSize(TmpSize), FileOffset.value(),
+										  ContentSize.value());
+				}
+				else
+				{
+					return PayloadContent(PathToFile, Modio::FileSize(TmpSize));
+				}
 			}
 			else
 			{
@@ -75,6 +85,20 @@ namespace Modio
 			NewParamsInstance.ModID = ID;
 			return NewParamsInstance;
 		}
+
+		Modio::Detail::HttpRequestParams HttpRequestParams::SetUserID(Modio::UserID ID) const
+		{
+			auto NewParamsInstance = HttpRequestParams(*this);
+			NewParamsInstance.UserID= ID;
+			return NewParamsInstance;
+		}
+
+		Modio::Detail::HttpRequestParams& HttpRequestParams::SetUserID(Modio::UserID ID)
+		{
+			this->UserID = ID;
+			return *this;
+		}
+
 
 		Modio::Detail::HttpRequestParams HttpRequestParams::SetLocale(Modio::Language Locale) const
 		{
@@ -137,7 +161,14 @@ namespace Modio
 		HttpRequestParams HttpRequestParams::AppendPayloadValue(std::string Key,
 																Modio::Detail::Buffer RawPayloadBuffer) const
 		{
-			HttpRequestParams NewParamsInstance = HttpRequestParams(*this);
+            HttpRequestParams NewParamsInstance = HttpRequestParams(*this);
+            
+            // No need to try to append an empty buffer
+            if (RawPayloadBuffer.GetSize() == 0)
+            {
+                return HttpRequestParams(*this);
+            }
+            
 			auto KeyIterator = NewParamsInstance.PayloadMembers.find(Key);
 			if (KeyIterator != NewParamsInstance.PayloadMembers.end())
 			{
@@ -147,11 +178,32 @@ namespace Modio
 			return NewParamsInstance;
 		}
 
+		HttpRequestParams& HttpRequestParams::AppendPayloadValue(std::string Key,
+																 Modio::Detail::Buffer RawPayloadBuffer)
+		{
+            // No need to try to append an empty buffer
+            if (RawPayloadBuffer.GetSize() == 0)
+            {
+                return *this;
+            }
+            
+			auto KeyIterator = PayloadMembers.find(Key);
+			if (KeyIterator != PayloadMembers.end())
+			{
+				PayloadMembers.erase(KeyIterator);
+			}
+			PayloadMembers.emplace(Key, MakePayloadContent(std::move(RawPayloadBuffer)));
+			return *this;
+		}
+
 		HttpRequestParams HttpRequestParams::AppendPayloadFile(std::string Key,
-															   Modio::filesystem::path PathToFileToUpload) const
+															   Modio::filesystem::path PathToFileToUpload,
+															   Modio::Optional<Modio::FileOffset> FileOffset,
+															   Modio::Optional<Modio::FileSize> ContentSize) const
 		{
 			HttpRequestParams NewParamsInstance = HttpRequestParams(*this);
-			Modio::Optional<PayloadContent> MaybePayload = MakePayloadContent(PathToFileToUpload);
+			Modio::Optional<PayloadContent> MaybePayload =
+				MakePayloadContent(PathToFileToUpload, FileOffset, ContentSize);
 			if (MaybePayload)
 			{
 				auto KeyIterator = NewParamsInstance.PayloadMembers.find(Key);
@@ -179,6 +231,20 @@ namespace Modio
 			return NewParamsInstance;
 		}
 
+		Modio::Detail::HttpRequestParams& HttpRequestParams::SuppressPlatformHeader()
+		{
+			bSuppressPlatformHeader = true;
+			return *this;
+		}
+
+		Modio::Detail::HttpRequestParams HttpRequestParams::SuppressPlatformHeader() const
+		{
+			auto NewParamsInstance = HttpRequestParams(*this);
+			NewParamsInstance.bSuppressPlatformHeader = true;
+			return NewParamsInstance;
+		}
+
+
 		Modio::Detail::HttpRequestParams& HttpRequestParams::SetRange(Modio::FileOffset Start,
 																	  Modio::Optional<Modio::FileOffset> End)
 		{
@@ -196,6 +262,14 @@ namespace Modio
 			return NewParamsInstance;
 		}
 
+		Modio::Detail::HttpRequestParams& HttpRequestParams::SetContentRange(Modio::FileOffset Start,
+																			 Modio::FileOffset End,
+																			 Modio::FileOffset Total)
+		{
+			ContentRangeOffsets = {Start, End, Total};
+			return *this;
+		}
+
 		std::string HttpRequestParams::GetServerAddress() const
 		{
 			if (bFileDownload)
@@ -207,6 +281,14 @@ namespace Modio
 #ifdef MODIO_SERVER_SIDE_TEST
 				return MODIO_SERVER_SIDE_TEST;
 #else
+
+				auto OverrideUrl = Modio::Detail::SDKSessionData::GetEnvironmentOverrideUrl();
+
+				if (OverrideUrl.has_value())
+				{
+					return OverrideUrl.value();
+				}
+
 				// @todo: Break this out so that we don't need to use this class in conjunction with the SessionData
 				switch (Modio::Detail::SDKSessionData::GetEnvironment())
 				{
@@ -287,6 +369,10 @@ namespace Modio
 			std::string PayloadString;
 			for (auto& Entry : PayloadMembers)
 			{
+				// While performing the multipart upload with a single part of the modfile,
+				// the server expects the Content-Size to be equal to the ammount of bytes
+				// to be sent to the server. An empty "key" would only append the RawBuffer
+				// without the "=" symbol
 				if (Entry.second.RawBuffer)
 				{
 					if (PayloadString.length())
@@ -325,12 +411,27 @@ namespace Modio
 				return Modio::FileSize(0);
 			}
 
-			if (ContentType.has_value() && ContentType.value() == "application/x-www-form-urlencoded" &&
-				GetUrlEncodedPayload().has_value() == true)
+			if (ContentType.has_value() && ContentType.value() == "application/x-www-form-urlencoded")
 			{
-				// In case the body of an HTTP request is URL encoded, it should
-				// only return the value of that payload.
-				return Modio::FileSize(GetUrlEncodedPayload().value().size());
+				// Try to find a PayloadContent that has ContentSize != 0
+				// this avoids the utilization of falible "uploadMultipart-binarydata"
+				// key while doing uploads
+				Modio::Optional<Modio::FileSize> ContentSize = PayloadContent::PayloadContentSize(PayloadMembers);
+
+				if (ContentSize.has_value() == true)
+				{
+					return ContentSize.value();
+				}
+				else if (GetUrlEncodedPayload().has_value() == true)
+				{
+					// In case the body of an HTTP request is URL encoded, it should
+					// only return the value of that payload.
+					return Modio::FileSize(GetUrlEncodedPayload().value().size());
+				}
+				else
+				{
+					return Modio::FileSize(0);
+				}
 			}
 			else
 			{
@@ -346,10 +447,11 @@ namespace Modio
 							   "Payload element name {} calculated length {}", ContentElement.first,
 							   ContentElement.first.size());
 					// Length of the data
-					PayloadSize += ContentElement.second.Size;
-					Logger.Log(Modio::LogLevel::Trace, Modio::LogCategory::Http, "Payload element data size for {} is {}",
-							   ContentElement.first, ContentElement.second.Size);
-					if (ContentElement.second.bIsFile)
+					PayloadSize += ContentElement.second.FileSize;
+					Logger.Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+							   "Payload element data size for {} is {}", ContentElement.first,
+							   ContentElement.second.FileSize);
+					if (ContentElement.second.PType == PayloadContent::PayloadType::File)
 					{
 						PayloadSize += Modio::FileSize(
 							fmt::format("; filename=\"{}\"", ContentElement.second.PathToFile->filename().u8string())
@@ -393,8 +495,13 @@ namespace Modio
 		Modio::Detail::HttpRequestParams::HeaderList HttpRequestParams::GetHeaders() const
 		{
 			MODIO_PROFILE_SCOPE(HttpRequestGetHeaders);
+			HeaderList Headers = {};
+
 			// Default headers
-			HeaderList Headers = {{"x-modio-platform", MODIO_TARGET_PLATFORM_HEADER}};
+			if (bSuppressPlatformHeader == false)
+			{
+				Headers.push_back({"x-modio-platform", MODIO_TARGET_PLATFORM_HEADER});	
+			}
 
 			switch (Modio::Detail::SDKSessionData::GetPortal())
 			{
@@ -463,16 +570,36 @@ namespace Modio
 			{
 				Headers.push_back({"Authorization", fmt::format("Bearer {}", *AuthToken)});
 			}
-			if (StartOffset || EndOffset)
+
+			// Header Range
+			if (StartOffset.has_value() == true)
 			{
-				Headers.push_back(
-					{"Range", fmt::format("bytes={}-{}", StartOffset ? StartOffset.value() : (std::uintmax_t) 0,
-										  EndOffset ? fmt::format("{}", EndOffset.value()) : "")});
+				std::uintmax_t StartValue = StartOffset ? StartOffset.value() : 0;
+				// In case EndOffset does not have a value, return an empty string
+				std::string EndValue = EndOffset ? std::to_string(EndOffset.value()) : "";
+
+				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
+				Headers.push_back({"Range", fmt::format("bytes={}-{}", StartValue, EndValue)});
 			}
+
+			// Header Content-Range needs all three values to
+			if (ContentRangeOffsets.has_value() == true)
+			{
+				std::uintmax_t StartValue = 0;
+				std::uintmax_t EndValue = 0;
+				std::uintmax_t TotalValue = 0;
+
+				std::tie(StartValue, EndValue, TotalValue) = ContentRangeOffsets.value();
+
+				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Range
+				Headers.push_back({"Content-Range", fmt::format("bytes {}-{}/{}", StartValue, EndValue, TotalValue)});
+			}
+
 			if (OverrideLocale)
 			{
 				Headers.push_back({"Accept-Language", Modio::Detail::ToString(*OverrideLocale)});
 			}
+
 			// @todo: Set Content-Type: multipart/form-data for binary payload
 			return Headers;
 		}
@@ -488,6 +615,7 @@ namespace Modio
 			  ResourcePath(ResourcePath),
 			  GameID(0),
 			  ModID(0),
+			  UserID(0),
 			  CurrentOperationType(Modio::Detail::Verb::GET),
 			  CurrentAPIVersion(Modio::Detail::APIVersion::V1)
 		{}
@@ -522,7 +650,7 @@ namespace Modio
 			// In linux and possibly in other platforms, it is necessary to append the content-length with the size
 			// of the request, that way the server keeps the connection alive and expects that amount of data to be
 			// transferred over the wire.
-			if (ContainsFormData() == true)
+			if (ContainsFormData() == true || PayloadContent::PayloadContentSize(PayloadMembers).has_value())
 			{
 				HeaderString += fmt::format("content-length: {0}\r\n", GetPayloadSize());
 			}
@@ -600,6 +728,7 @@ namespace Modio
 			std::string TempResourcePath = ResourcePath;
 			String::ReplaceAll(TempResourcePath, "{game-id}", std::to_string(GameID));
 			String::ReplaceAll(TempResourcePath, "{mod-id}", std::to_string(ModID));
+			String::ReplaceAll(TempResourcePath, "{user-id}", std::to_string(UserID));
 
 			return TempResourcePath;
 		}
@@ -609,41 +738,64 @@ namespace Modio
 #endif
 
 		PayloadContent::PayloadContent(const PayloadContent& Other)
-
 		{
-			if (Other.bIsFile)
+			switch (Other.PType)
 			{
-				RawBuffer = {};
-				PathToFile = Other.PathToFile;
+				case PayloadType::Buffer:
+				{
+					RawBuffer = Other.RawBuffer.value().Clone();
+					PathToFile = {};
+					break;
+				}
+				case PayloadType::File:
+				case PayloadType::FilePortion:
+				{
+					RawBuffer = {};
+					PathToFile = Other.PathToFile;
+					Offset = Other.Offset;
+					ContentSize = Other.ContentSize;
+					break;
+				}
 			}
-			else
-			{
-				RawBuffer = Other.RawBuffer.value().Clone();
-				PathToFile = {};
-			}
-			bIsFile = Other.bIsFile;
-			Size = Other.Size;
+
+			PType = Other.PType;
+			FileSize = Other.FileSize;
 		}
 
 		PayloadContent::PayloadContent(Modio::Detail::Buffer InRawBuffer)
 			: RawBuffer(std::move(InRawBuffer)),
-			  bIsFile(false)
+			  PType(PayloadType::Buffer)
 		{
-			Size = Modio::FileSize(this->RawBuffer->GetSize());
+			FileSize = Modio::FileSize(RawBuffer->GetSize());
 		}
 
-		PayloadContent::PayloadContent(Modio::filesystem::path PathToFile, Modio::FileSize Size)
-			: PathToFile(PathToFile),
-			  bIsFile(true),
-			  Size(Size)
-		{}
+		PayloadContent::PayloadContent(Modio::filesystem::path PathToFile, Modio::FileSize FSize)
+			: PathToFile(PathToFile)
+		{
+			PType = PayloadType::File;
+			FileSize = FSize;
+			Offset = Modio::FileOffset(0);
+			ContentSize = FSize;
+		}
+
+		PayloadContent::PayloadContent(Modio::filesystem::path PathToFile, Modio::FileSize FSize,
+									   Modio::FileOffset FOffset, Modio::FileSize CSize)
+			: PathToFile(PathToFile)
+		{
+			PType = PayloadType::FilePortion;
+			FileSize = FSize;
+			Offset = FOffset;
+			ContentSize = CSize;
+		}
 
 		Modio::Detail::PayloadContent& PayloadContent::operator=(PayloadContent&& Other)
 		{
-			bIsFile = std::move(Other.bIsFile);
+			PType = std::move(Other.PType);
 			RawBuffer = std::move(Other.RawBuffer);
 			PathToFile = std::move(Other.PathToFile);
-			Size = std::move(Other.Size);
+			FileSize = std::move(Other.FileSize);
+			Offset = std::move(Other.Offset);
+			ContentSize = std::move(Other.ContentSize);
 			return *this;
 		}
 
@@ -654,20 +806,50 @@ namespace Modio
 				return *this;
 			}
 
-			if (Other.bIsFile)
+			switch (Other.PType)
 			{
-				RawBuffer = {};
-				PathToFile = Other.PathToFile;
+				case PayloadType::Buffer:
+				{
+					RawBuffer = Other.RawBuffer.value().Clone();
+					PathToFile = {};
+				}
+				case PayloadType::File:
+				case PayloadType::FilePortion:
+				{
+					RawBuffer = {};
+					PathToFile = Other.PathToFile;
+					Offset = Other.Offset;
+					ContentSize = Other.ContentSize;
+				}
 			}
-			else
-			{
-				RawBuffer = Other.RawBuffer.value().Clone();
-				PathToFile = {};
-			}
-			bIsFile = Other.bIsFile;
-			Size = Other.Size;
+
+			PType = Other.PType;
+			FileSize = Other.FileSize;
 			return *this;
 		}
 
+		Modio::Optional<Modio::FileSize> PayloadContent::PayloadContentSize(
+			std::map<std::string, PayloadContent> Members)
+		{
+			Modio::FileSize Result = Modio::FileSize(0);
+			// Try to find a PayloadContent that has ContentSize != 0
+			// this happens when performing a "uploadMultipart-binarydata" operation
+			for (auto& Iterator : Members)
+			{
+				if (Iterator.second.ContentSize != 0)
+				{
+					Result += Iterator.second.ContentSize;
+				}
+			}
+
+			if (Result > 0)
+			{
+				return Result;
+			}
+			else
+			{
+				return {};
+			}
+		}
 	} // namespace Detail
 } // namespace Modio
