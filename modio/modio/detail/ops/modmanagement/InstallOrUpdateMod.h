@@ -169,6 +169,11 @@ namespace Modio
 							InstallPath, std::move(Self));
 						if (ec)
 						{
+							Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::File,
+														"DeleteFolderAsync during InstallOrUpdateModOp was not "
+														"successful, path: {} and error message: ",
+														InstallPath.string(), ec.message());
+
 							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
 							// TODO: @Modio-core handle errors when trying to delete the installed mod folder
 							Self.complete(ec);
@@ -199,6 +204,13 @@ namespace Modio
 					Modio::Detail::SDKSessionData::GetSystemModCollection().Entries().at(Mod)->SetModState(
 						ModState::Installed);
 					// ToDO: @modio-core invoke GetFolderSizeAsync here to store the value into the modstate?
+
+					if (Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(
+							DownloadPath) == false)
+					{
+						Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::File,
+													"Downloaded file {} was not removed", DownloadPath.string());
+					}
 
 					Transaction.Commit();
 

@@ -414,6 +414,16 @@ namespace Modio
 			Get().CreationHandles.insert({Handle, ID});
 		}
 
+		void SDKSessionData::SetEnvironmentOverrideUrl(std::string OverrideUrl)
+		{
+			Get().EnvironmentOverrideUrl = OverrideUrl;
+		}
+
+		Modio::Optional<std::string> SDKSessionData::GetEnvironmentOverrideUrl()
+		{
+			return Get().EnvironmentOverrideUrl;
+		}
+
 		SDKSessionData::SDKSessionData() {}
 
 		SDKSessionData::SDKSessionData(const Modio::InitializeOptions& Options)

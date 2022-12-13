@@ -9,7 +9,6 @@
  */
 
 #pragma once
-#include "ModioGeneratedVariables.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioLogger.h"
@@ -45,22 +44,51 @@ namespace Modio
 			V1
 		};
 
+		/// @brief Enumeration of the possible Cache actions, to either
+		/// keep information of a request or not
+		enum class CachedResponse : std::uint8_t
+		{
+			Allow,
+			Disallow
+		};	
+
 		/// @docinternal
 		/// @brief Container for payloads retrieved/uploaded by HTTP operations
 		struct PayloadContent
 		{
+			enum class PayloadType : std::uint8_t
+			{
+				Buffer,
+				File,
+				FilePortion
+			};
+
 			Modio::Optional<Modio::Detail::Buffer> RawBuffer;
 			Modio::Optional<Modio::filesystem::path> PathToFile;
-			bool bIsFile = false;
-			Modio::FileSize Size;
+			PayloadType PType = PayloadType::Buffer;
+			// This is the amount of bytes the file ocuppies in the system
+			Modio::FileSize FileSize;
+			// If the content should consider an offset from the file
+			Modio::FileOffset Offset = Modio::FileOffset(0);
+			// If file should have a maximum number of bytes for the content
+			// By default, it would be the same as FileSize, unless
+			Modio::FileSize ContentSize = Modio::FileSize(0);
+
 			// Prevent default construction, but allow copying to duplicate the buffer if it's present, and allow
 			// moving, too This maintains the copyability of HttpRequestParams
 			MODIO_IMPL PayloadContent(Modio::Detail::Buffer InRawBuffer);
-			MODIO_IMPL PayloadContent(Modio::filesystem::path PathToFile, Modio::FileSize Size);
+			MODIO_IMPL PayloadContent(Modio::filesystem::path PathToFile, Modio::FileSize FSize);
+			MODIO_IMPL PayloadContent(Modio::filesystem::path PathToFile, Modio::FileSize FSize,
+									  Modio::FileOffset FOffset, Modio::FileSize ContentSize);
 			MODIO_IMPL PayloadContent(const PayloadContent& Other);
 			MODIO_IMPL PayloadContent& operator=(const PayloadContent& Other);
 			MODIO_IMPL PayloadContent(PayloadContent&& Other) = default;
 			MODIO_IMPL PayloadContent& operator=(PayloadContent&& Other);
+            
+            // Search in "Members" for any attribute that has a PayloadContent with
+            // ContentSize != 0 and add that to the result "FileSize"
+			MODIO_IMPL static Modio::Optional<Modio::FileSize> PayloadContentSize(
+				std::map<std::string, PayloadContent> Members);
 		};
 		
 		/// @docinternal
@@ -77,6 +105,10 @@ namespace Modio
 			MODIO_IMPL HttpRequestParams SetModID(Modio::ModID ID) const;
 
 			MODIO_IMPL HttpRequestParams& SetModID(Modio::ModID ID);
+
+			MODIO_IMPL HttpRequestParams SetUserID(Modio::UserID ID) const;
+
+			MODIO_IMPL HttpRequestParams& SetUserID(Modio::UserID ID);
 
 			MODIO_IMPL HttpRequestParams SetFilterString(const std::string& InFilterString) const;
 
@@ -113,10 +145,13 @@ namespace Modio
 			MODIO_IMPL HttpRequestParams AppendPayloadValue(std::string Key,
 															Modio::Detail::Buffer RawPayloadBuffer) const;
 
+			MODIO_IMPL HttpRequestParams& AppendPayloadValue(std::string Key, Modio::Detail::Buffer RawPayloadBuffer);
+
 			// TODO: @modio-core consider if this should return Modio::Optional instead. Breaks method chaining but we
 			// probably want to fail early
-			MODIO_IMPL HttpRequestParams AppendPayloadFile(std::string Key,
-														   Modio::filesystem::path PathToFileToUpload) const;
+			MODIO_IMPL HttpRequestParams AppendPayloadFile(std::string Key, Modio::filesystem::path PathToFileToUpload,
+														   Modio::Optional<Modio::FileOffset> FileOffset = {},
+														   Modio::Optional<Modio::FileSize> ContentSize = {}) const;
 
 			// @brief Template function to append a payload to a new instance of HTTPRequestParams
 			template<typename T>
@@ -173,10 +208,22 @@ namespace Modio
 
 			MODIO_IMPL HttpRequestParams& SetAuthTokenOverride(const std::string& AuthToken);
 
+			// Suppress sending the X-Modio-Platform header for this request
+			MODIO_IMPL HttpRequestParams SuppressPlatformHeader() const;
+
+			// Suppress sending the X-Modio-Platform header for this request
+			MODIO_IMPL HttpRequestParams& SuppressPlatformHeader();
+
+			// It would enable the HTTP header "Range: bytes=Start-End"
 			MODIO_IMPL HttpRequestParams SetRange(Modio::FileOffset Start,
 												  Modio::Optional<Modio::FileOffset> End) const;
 
+			// It would enable the HTTP header "Range: bytes=Start-End"
 			MODIO_IMPL HttpRequestParams& SetRange(Modio::FileOffset Start, Modio::Optional<Modio::FileOffset> End);
+			
+			// It would enable the HTTP header "ContentRange: bytes Start-End/TotalBytes"
+			MODIO_IMPL HttpRequestParams& SetContentRange(Modio::FileOffset Start, Modio::FileOffset End,
+														  Modio::FileOffset TotalBytes);
 
 			MODIO_IMPL std::string GetServerAddress() const;
 
@@ -208,6 +255,7 @@ namespace Modio
 				  ContentType(ContentType),
 				  GameID(0),
 				  ModID(0),
+				  UserID(0),
 				  CurrentOperationType(CurrentOperationType),
 				  CurrentAPIVersion(Modio::Detail::APIVersion::V1) {};
 
@@ -216,6 +264,7 @@ namespace Modio
 				  ContentType(),
 				  GameID(0),
 				  ModID(0),
+				  UserID(0),
 				  CurrentOperationType(CurrentOperationType),
 				  CurrentAPIVersion(Modio::Detail::APIVersion::V1)
 			{}
@@ -225,6 +274,7 @@ namespace Modio
 				  ContentType(),
 				  GameID(0),
 				  ModID(0),
+				  UserID(0),
 				  CurrentOperationType(Modio::Detail::Verb::GET),
 				  CurrentAPIVersion(Modio::Detail::APIVersion::V1)
 			{}
@@ -254,6 +304,8 @@ namespace Modio
 
 			bool bFileDownload = false;
 
+			bool bSuppressPlatformHeader = false;
+
 			std::string FileDownloadServer;
 
 			std::string ResourcePath;
@@ -262,6 +314,7 @@ namespace Modio
 
 			std::uint64_t GameID;
 			std::uint64_t ModID;
+			std::uint64_t UserID;
 
 			// @todo: Investigate FilterString/Payload how we could refactor those
 			Modio::Optional<std::string> FilterString;
@@ -290,6 +343,10 @@ namespace Modio
 			Modio::Optional<Modio::FileOffset> StartOffset;
 			Modio::Optional<Modio::FileOffset> EndOffset;
 
+			// Three variables needed to create the header Content-Range
+			// {Start, End, Total}
+			Modio::Optional<std::tuple<Modio::FileOffset, Modio::FileOffset, Modio::FileOffset>> ContentRangeOffsets;
+			
 			Modio::Optional<std::string> UserAgentOverride;
 		};
 

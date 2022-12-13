@@ -14,7 +14,6 @@
 	#pragma once
 #endif
 
-
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioModDetails.h"
 #include "modio/core/entities/ModioModInfo.h"
@@ -28,6 +27,7 @@
 #include "modio/detail/ops/mod/GetModMediaLogoOp.h"
 #include "modio/detail/ops/mod/GetModTagsOp.h"
 #include "modio/detail/ops/mod/ListAllModsOp.h"
+#include "modio/detail/ops/mod/ListUserCreatedModsOp.h"
 #include "modio/detail/ops/mod/SubmitModRatingOp.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 
@@ -43,6 +43,19 @@ namespace Modio
 			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>(
 				Modio::Detail::ListAllModsOp(Modio::Detail::SDKSessionData::CurrentGameID(), std::move(Filter)),
+				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
+	}
+
+	void ListUserCreatedModsAsync(FilterParams Filter,
+								  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback)
+	{
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+			Modio::Detail::RequireUserIsAuthenticated(Callback))
+		{
+			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>,
+									   void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>(
+				Modio::Detail::ListUserCreatedModsOp(Modio::Detail::SDKSessionData::CurrentGameID(), std::move(Filter)),
 				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	}

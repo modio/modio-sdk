@@ -135,12 +135,24 @@ namespace Modio
 				return ec;
 			}
 
-			virtual void Truncate(Modio::FileOffset Offset) override
+			virtual Modio::ErrorCode Truncate(Modio::FileOffset Offset) override
 			{
 				LARGE_INTEGER Length;
 				Length.QuadPart = Offset;
-				SetFilePointerEx(FileHandle, Length, NULL, FILE_BEGIN);
-				SetEndOfFile(FileHandle);
+				bool Result = SetFilePointerEx(FileHandle, Length, NULL, FILE_BEGIN);
+				if (Result == true)
+				{
+					SetEndOfFile(FileHandle);
+					return {};
+				}
+				else
+				{
+					DWORD Error = GetLastError();
+					// post failure
+					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+												"Truncate file error code = {}", Error);
+					return Modio::make_error_code(Modio::FilesystemError::WriteError);
+				}
 			}
 
 			virtual std::uint64_t GetSize() override

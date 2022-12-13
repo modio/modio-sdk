@@ -21,6 +21,7 @@
 #include "modio/detail/ModioOperationQueue.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioSDKSessionData.h"
+#include "modio/detail/http/PerformRequestImpl.h"
 #include "modio/detail/http/ResponseError.h"
 #include "modio/file/ModioFile.h"
 #include "modio/http/ModioHttpRequest.h"
@@ -36,12 +37,6 @@ namespace Modio
 {
 	namespace Detail
 	{
-		enum class CachedResponse : std::uint8_t
-		{
-			Allow,
-			Disallow
-		};
-
 #include <asio/yield.hpp>
 		class PerformRequestAndGetResponseOp : public Modio::Detail::BaseOperation<PerformRequestAndGetResponseOp>
 		{
@@ -49,28 +44,12 @@ namespace Modio
 			asio::coroutine Coroutine;
 			Modio::Detail::DynamicBuffer ResultBuffer;
 			Modio::Detail::CachedResponse AllowCachedResponse;
+			std::unique_ptr<PerformRequestImpl> Impl;
 
 			struct
 			{
 				Modio::Detail::DynamicBuffer ResponseBodyBuffer;
 			} State;
-
-			struct PerformRequestImpl
-			{
-				Modio::Detail::OperationQueue::Ticket RequestTicket;
-				std::unique_ptr<Modio::Detail::File> CurrentPayloadFile;
-				Modio::Detail::DynamicBuffer PayloadFileBuffer;
-				Modio::FileSize CurrentPayloadFileBytesRead;
-				Modio::Optional<std::pair<std::string, Modio::Detail::PayloadContent>> PayloadElement;
-				std::unique_ptr<Modio::Detail::Buffer> HeaderBuf;
-				// MODIO_PROFILE_OPERATION(PerformRequest);
-			public:
-				PerformRequestImpl(Modio::Detail::OperationQueue::Ticket RequestTicket)
-					: RequestTicket(std::move(RequestTicket)) {};
-				PerformRequestImpl(const PerformRequestImpl& Other) = delete;
-			};
-
-			std::unique_ptr<PerformRequestImpl> Impl;
 
 		public:
 			PerformRequestAndGetResponseOp(Modio::Detail::DynamicBuffer Response,
@@ -149,7 +128,7 @@ namespace Modio
 							{
 								{
 									std::string PayloadContentFilename = "";
-									if (Impl->PayloadElement->second.bIsFile)
+									if (Impl->PayloadElement->second.PType == PayloadContent::PayloadType::File)
 									{
 										PayloadContentFilename =
 											fmt::format("; filename=\"{}\"",
@@ -175,7 +154,7 @@ namespace Modio
 
 							// Write the form data itself to the connection, either looping through the file data (for a
 							// file field) or just writing the in-memory data (for string fields)
-							if (Impl->PayloadElement->second.bIsFile)
+							if (Impl->PayloadElement->second.PType == PayloadContent::PayloadType::File)
 							{
 								Impl->CurrentPayloadFileBytesRead = Modio::FileSize(0);
 
@@ -192,7 +171,6 @@ namespace Modio
 														 ? ChunkOfBytes
 														 : Impl->CurrentPayloadFile->GetFileSize() -
 															   Impl->CurrentPayloadFileBytesRead;
-
 									yield Impl->CurrentPayloadFile->ReadAsync(MaxBytesToRead, Impl->PayloadFileBuffer,
 																			  std::move(Self));
 									Impl->CurrentPayloadFileBytesRead +=
@@ -217,7 +195,6 @@ namespace Modio
 							}
 							else if (Impl->PayloadElement->second.RawBuffer.has_value() &&
 									 (*(Impl->PayloadElement->second.RawBuffer)).GetSize())
-
 							{
 								yield Request->WriteSomeAsync(std::move(*Impl->PayloadElement->second.RawBuffer),
 															  std::move(Self));
@@ -237,7 +214,6 @@ namespace Modio
 							std::copy(FinalPayloadBoundary.begin(), FinalPayloadBoundary.end(),
 									  Impl->HeaderBuf->begin());
 						}
-
 						yield Request->WriteSomeAsync(std::move(*Impl->HeaderBuf), std::move(Self));
 						if (ec)
 						{

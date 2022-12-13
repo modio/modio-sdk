@@ -36,6 +36,7 @@ namespace Modio
 			{}
 
 			Timer(Timer&& Other) : asio::basic_io_object<Modio::Detail::TimerService>(std::move(Other)) {};
+			Timer& operator=(Timer&& Other) = default; 	
 
 			void ExpiresAfter(std::chrono::steady_clock::duration Duration)
 			{

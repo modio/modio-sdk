@@ -9,7 +9,8 @@
  */
 
 #pragma once
-#include "ModioGeneratedVariables.h"
+#include "modio/core/ModioSplitCompilation.h"
+
 namespace Modio
 {
 	namespace Detail

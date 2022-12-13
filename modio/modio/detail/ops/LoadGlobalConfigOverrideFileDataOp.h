@@ -83,7 +83,16 @@ namespace Modio
 						}
 						std::copy(DefaultConfigString.begin(), DefaultConfigString.end(), DefaultConfigBuffer->Data());
 					}
-					ConfigFile->Truncate(Modio::FileOffset(0));
+					
+					ec = ConfigFile->Truncate(Modio::FileOffset(0));
+					if (ec)
+					{
+						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+													"Error code after file truncation {}", ec.value());
+						Self.complete(ec);
+						return;
+					}
+
 					ConfigFile->Seek(Modio::FileOffset(0));
 					yield ConfigFile->WriteAsync(std::move(*DefaultConfigBuffer), std::move(Self));
 					if (ec)

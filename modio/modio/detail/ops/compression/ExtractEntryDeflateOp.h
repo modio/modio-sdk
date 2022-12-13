@@ -56,7 +56,7 @@ namespace Modio
 								  Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo)
 			{
 				Impl = std::make_shared<ExtractEntryImpl>(ExtractEntryImpl {
-					Modio::Detail::File(ArchiveFileImpl->FilePath, Modio::Detail::FileMode::ReadWrite, false),
+					Modio::Detail::File(ArchiveFileImpl->FilePath, Modio::Detail::FileMode::ReadOnly, false),
 					ArchiveFileImpl, EntryToExtract, RootDirectoryToExtractTo, Modio::Detail::DynamicBuffer {}, 0u,
 					Modio::Detail::File(RootDirectoryToExtractTo / EntryToExtract.FilePath,
 										Modio::Detail::FileMode::ReadWrite, true),

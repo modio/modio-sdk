@@ -60,12 +60,18 @@ public:
 				{
 					yield RecursivelyDeleteFile(DirectoryIterator->path(), std::move(Self));
 				}
-				DirectoryIterator.increment(ec);
+
+				// Give priority to an error in case "RecursivelyDeleteFile" gets one
 				if (ec)
 				{
+					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+												"Delete File {} error: {}", DirectoryIterator->path().string(),
+												ec.message());
 					Self.complete(ec);
 					return;
 				}
+
+				DirectoryIterator.increment(ec);
 			}
 			// Sort in decreasing order of depth
 			std::sort(Folders.begin(), Folders.end(),
@@ -82,7 +88,16 @@ public:
 				}
 			}
 
-			Self.complete(ec);
+			// Make sure to remove the original folder path
+			Modio::filesystem::remove(FolderPath, ec);
+			if (ec)
+			{
+				Self.complete(ec);
+			}
+			else
+			{
+				Self.complete({});
+			}
 		}
 	}
 

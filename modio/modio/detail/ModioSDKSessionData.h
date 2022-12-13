@@ -9,9 +9,6 @@
  */
 
 #pragma once
-
-#include "ModioGeneratedVariables.h"
-
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioCreateModFileParams.h"
 #include "modio/core/ModioModCollectionEntry.h"
@@ -131,6 +128,9 @@ namespace Modio
 
 			MODIO_IMPL static Modio::ModCreationHandle GetNextModCreationHandle();
 
+			MODIO_IMPL static void SetEnvironmentOverrideUrl(std::string OverrideUrl);
+			MODIO_IMPL static Modio::Optional<std::string> GetEnvironmentOverrideUrl();
+
 			MODIO_IMPL static Modio::Optional<Modio::ModID> ResolveModCreationHandle(Modio::ModCreationHandle Handle);
 			MODIO_IMPL static void LinkModCreationHandle(Modio::ModCreationHandle Handle, Modio::ModID ID);
 
@@ -151,6 +151,7 @@ namespace Modio
 			Modio::GameID GameID;
 			Modio::ApiKey APIKey;
 			Modio::Environment Environment;
+			Modio::Optional<std::string> EnvironmentOverrideUrl;
 			Modio::Portal PortalInUse;
 			InitializationState CurrentInitializationState = InitializationState::NotInitialized;
 			bool bModManagementEnabled = false;

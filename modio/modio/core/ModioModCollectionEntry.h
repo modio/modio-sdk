@@ -9,7 +9,6 @@
  */
 
 #pragma once
-#include "ModioGeneratedVariables.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioModInfo.h"
@@ -115,7 +114,7 @@ namespace Modio
 		/// @docinternal
 		/// @brief Increases the local user subscription count for the associated mod
 		/// @return the new number of local user subscriptions
-		MODIO_IMPL uint8_t AddLocalUserSubscription(Modio::Optional<User> User);
+		MODIO_IMPL uint8_t AddLocalUserSubscription(Modio::Optional<Modio::User> User);
 
 		/// @docinternal
 		/// @brief Decrements the local user subscription count for the associated mod. Use with care - this

@@ -33,6 +33,12 @@ install(
 )
 
 install(
+	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/function2/include/
+	DESTINATION ${CMAKE_INSTALL_PREFIX}/header_only/ext
+	COMPONENT header_only
+)
+
+install(
 	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/optional/include/
 	DESTINATION ${CMAKE_INSTALL_PREFIX}/header_only/ext
 	COMPONENT header_only
@@ -64,7 +70,7 @@ install(
 )
 
 install(
-	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/httpparser/src
+	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/httpparser/src/
 	DESTINATION ${CMAKE_INSTALL_PREFIX}/header_only/ext
 	COMPONENT header_only
 )
@@ -75,6 +81,11 @@ install(
 	COMPONENT header_only
 )
 
+install(
+	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/function2/include/function2
+	DESTINATION ${CMAKE_INSTALL_PREFIX}/header_only/ext
+	COMPONENT header_only
+)
 
 install(
 	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/fmt/include/

@@ -28,10 +28,12 @@ void HttpSharedStateBase::InitializeRequest(std::shared_ptr<HttpRequestImplement
 
 	{
 		MODIO_PROFILE_SCOPE(WinHttpConnect);
+
 		ConnectionHandle =
 			WinHttpConnect(CurrentSession, UTF8ToWideChar(Request->GetParameters().GetServerAddress()).c_str(),
 						   INTERNET_DEFAULT_HTTPS_PORT, 0);
 	}
+
 	if (ConnectionHandle == nullptr)
 	{
 		auto ConnectionStatus = GetLastError();

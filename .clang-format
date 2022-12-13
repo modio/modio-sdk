@@ -39,6 +39,7 @@ BraceWrapping:
 BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Custom
 BreakConstructorInitializers: BeforeColon
+ColumnLimit: 120
 CompactNamespaces: 'false'
 ConstructorInitializerAllOnOneLineOrOnePerLine: 'true'
 Cpp11BracedListStyle: 'true'
@@ -68,6 +69,6 @@ SpacesInParentheses: 'false'
 SpacesInSquareBrackets: 'false'
 Standard: Cpp11
 TabWidth: '4'
-UseTab: ForContinuationAndIndentation
+UseTab: Always
 
 ...

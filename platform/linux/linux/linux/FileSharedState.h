@@ -94,7 +94,7 @@ namespace Modio
 															"No bytes read for FileDescriptor {}",
 															IOResult, FileDescriptorVal);
 								IOStatus->second.DidFinish = true;
-								IOStatus->second.Result = Modio::make_error_code(Modio::GenericError::EndOfFile);;
+								IOStatus->second.Result = Modio::make_error_code(Modio::GenericError::EndOfFile);
 							}
 							else
 							{

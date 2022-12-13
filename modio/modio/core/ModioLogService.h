@@ -9,7 +9,6 @@
  */
 
 #pragma once
-#include "ModioGeneratedVariables.h"
 #include "modio/core/ModioServices.h"
 #include "logging/LoggerImplementation.h"
 #include "modio/core/ModioLogBuffer.h"

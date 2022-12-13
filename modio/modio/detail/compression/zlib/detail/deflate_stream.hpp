@@ -47,7 +47,6 @@
 #ifndef BOOST_BEAST_ZLIB_DETAIL_DEFLATE_STREAM_HPP
 #define BOOST_BEAST_ZLIB_DETAIL_DEFLATE_STREAM_HPP
 
-#include "ModioGeneratedVariables.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/detail/compression/zlib/detail/ranges.hpp"
 #include "modio/detail/compression/zlib/zlib.hpp"

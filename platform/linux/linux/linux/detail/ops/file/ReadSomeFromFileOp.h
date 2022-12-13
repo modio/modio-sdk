@@ -84,12 +84,14 @@ namespace Modio
 
 					CurrentErrorCode = ReadResult.second;
 
-					if (CurrentErrorCode.has_value() == true)
+					// If the error is "EndOfFile", skip this condition
+					if (CurrentErrorCode.has_value() == true &&
+						CurrentErrorCode.value() != Modio::GenericError::EndOfFile)
 					{
 						// If the caller makes a call with "out-of-bounds" parameters, like an offset larger than
 						// the file, it will return the error along a 0 buffer. This satisfies the
 						// ParseArchiveContentsOp.
-						Modio::Detail::Buffer EmptyData(MaxBytesToRead);
+						Modio::Detail::Buffer EmptyData(0);
 						Self.complete(CurrentErrorCode.value(), std::move(EmptyData));
 						return;
 					}
@@ -107,23 +109,10 @@ namespace Modio
 
 						// Partial reads might return an "EndOfFile" error. When that happens, we append the partial
 						// buffer and state that error if happens.
-						if (CurrentErrorCode.has_value() == true)
+						if (CurrentErrorCode.has_value() == true &&
+							CurrentErrorCode.value() != Modio::GenericError::EndOfFile)
 						{
-							if (FileOffset == 0)
-							{
-								Self.complete(CurrentErrorCode.value(), std::move(ReadBuffer));
-							}
-							else
-							{
-								// This condition happens when the caller reads a section of a file and provides an
-								// offset respective to the original file. The IO operation has access to the whole
-								// file, therefore only the OffsetData is returned.
-								std::size_t OffsetVal = FileOffset.value();
-								std::size_t MaxBytes = MIN(MaxBytesToRead, ReadBuffer.value().GetSize());
-								Modio::Detail::Buffer OffsetData =
-									ReadBuffer->CopyRange(OffsetVal, OffsetVal + MaxBytes);
-								Self.complete({}, std::move(OffsetData));
-							}
+							Self.complete(CurrentErrorCode.value(), std::move(ReadBuffer));
 						}
 						else
 						{

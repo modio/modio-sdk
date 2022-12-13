@@ -39,7 +39,11 @@ namespace Modio
 						Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().LocalMetadataFolder() /
 							"state.json",
 						Modio::Detail::FileMode::ReadWrite, false);
-
+					if (DestinationFile->GetFileSize() == -1)
+					{
+						Self.complete(Modio::make_error_code(Modio::FilesystemError::FileNotFound));
+						return;
+					}
 					yield DestinationFile->ReadAsync(DestinationFile->GetFileSize(), DataBuffer, std::move(Self));
 					if (ec)
 					{
