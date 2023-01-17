@@ -55,9 +55,7 @@ add_public_header(${MODIO_TARGET_NAME} modio/ModioSDK.h)
 
 target_include_directories(${MODIO_TARGET_NAME} INTERFACE ${ModioGeneratedHeaderPath})
 
-target_link_libraries(${MODIO_TARGET_NAME} INTERFACE asio  fmt-header-only tl::optional platform nlohmann_json function2)
-
-
+target_link_libraries(${MODIO_TARGET_NAME} INTERFACE asio ghc_filesystem fmt tl::optional platform nlohmann_json function2)
 
 add_library(${MODIO_TARGET_NAME}Static STATIC)
 
