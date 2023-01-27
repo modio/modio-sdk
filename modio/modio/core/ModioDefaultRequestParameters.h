@@ -38,7 +38,7 @@ namespace Modio
         static const HttpRequestParams GetModsStatsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/stats" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams DeleteModRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetModRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}" }; 
-        static const HttpRequestParams EditModRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams EditModRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}" , "multipart/form-data" }; 
         static const HttpRequestParams GetModCommentsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/comments" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AddModCommentRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/comments" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams DeleteModCommentRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}/comments/{comment-id}" , "application/x-www-form-urlencoded" }; 
