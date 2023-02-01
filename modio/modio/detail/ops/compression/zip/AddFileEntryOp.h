@@ -162,6 +162,7 @@ namespace Modio
 						BytesProcessed = Modio::FileSize(CompressionState.total_in);
 						// Update The ProgressInfo with the BytesProcessed updated
 						PinnedProgressInfo->CurrentlyExtractedBytes += BytesProcessed;
+						IncrementCurrentProgress(*PinnedProgressInfo.get(), BytesProcessed);
 					}
 
 					// Finish the zlib stream for the current file

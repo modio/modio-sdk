@@ -155,19 +155,19 @@ namespace Modio
 				return FileMode;
 			}
 
-			Modio::ErrorCode OpenFile(Modio::filesystem::path Path, Modio::Detail::FileMode Mode,
+			Modio::ErrorCode OpenFile(Modio::filesystem::path OpenFilePath, Modio::Detail::FileMode Mode,
 									  bool bOverwrite = false) override
 			{
 				Modio::ErrorCode ec;
-				filesystem::create_directories(Path.parent_path(), ec);
+				filesystem::create_directories(OpenFilePath.parent_path(), ec);
 				if (ec)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-												"Could not create parent directories for file {}", Path.u8string());
+												"Could not create parent directories for file {}", OpenFilePath.u8string());
 					return ec;
 				}
 
-				this->FilePath = Path;
+				this->FilePath = OpenFilePath;
 				this->FileMode = Mode;
 
 				// Open file with access specified by Modio::Detail::FileMode

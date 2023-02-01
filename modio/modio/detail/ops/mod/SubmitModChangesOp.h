@@ -36,12 +36,15 @@ namespace Modio
 						.AppendPayloadValue("homepage_url", Params.HomepageURL)
 						.AppendPayloadValue("metadata_blob", Params.MetadataBlob);
 
+				if (Params.LogoPath.has_value())
+				{
+					EditRequestParams = EditRequestParams.AppendPayloadFile("logo", Params.LogoPath.value());
+				}
 				if (Params.bVisible.has_value())
 				{
 					EditRequestParams =
 						EditRequestParams.AppendPayloadValue("visible", Params.bVisible.value() ? "1" : "0");
 				}
-
 				if (Params.MaturityRating.has_value())
 				{
 					EditRequestParams = EditRequestParams.AppendPayloadValue(
@@ -91,8 +94,9 @@ namespace Modio
 		};
 #include <asio/unyield.hpp>
 
-		inline auto SubmitModChangesAsync(Modio::ModID Mod, Modio::EditModParams Params,
-									   std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)> Callback)
+		inline auto SubmitModChangesAsync(
+			Modio::ModID Mod, Modio::EditModParams Params,
+			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)> Callback)
 		{
 			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>(

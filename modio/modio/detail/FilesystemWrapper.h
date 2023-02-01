@@ -35,13 +35,25 @@ DISABLE_WARNING_OPERATOR_OPERATION
 		#include "file/FileSystemStubs.h"
 
 		#pragma pop_macro("GHC_OS_CUSTOM")
+
+	#elif defined(MODIO_USE_STD_FILESYSTEM)
+
+		#include <filesystem>
+
+		namespace Modio
+		{
+			namespace filesystem = std::filesystem;
+		} // namespace Modio
 	#else
+
+		// Backport of std::filesystem to support C++14/C++11
 		#include "ghc/filesystem.hpp"
+
+		namespace Modio
+		{
+			namespace filesystem = ghc::filesystem;
+		} // namespace Modio
 	#endif
-namespace Modio
-{
-	namespace filesystem = ghc::filesystem;
-} // namespace Modio
 
 DISABLE_WARNING_POP
 
@@ -68,16 +80,17 @@ namespace Modio
 
 	#include <filesystem>
 
-namespace Modio
-{
-	namespace filesystem = std::filesystem;
-} // namespace Modio
+	namespace Modio
+	{
+		namespace filesystem = std::filesystem;
+	} // namespace Modio
 #else
 
 	// Backport of std::filesystem to support C++14/C++11
 	#include "ghc/filesystem.hpp"
-namespace Modio
-{
-	namespace filesystem = ghc::filesystem;
-} // namespace Modio
+
+	namespace Modio
+	{
+		namespace filesystem = ghc::filesystem;
+	} // namespace Modio
 #endif

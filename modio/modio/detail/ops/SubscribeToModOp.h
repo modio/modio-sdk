@@ -74,6 +74,8 @@ namespace Modio
 							return;
 						}
 
+						Modio::Detail::SDKSessionData::InvalidateSubscriptionCache();
+
 						Services::GetGlobalService<CacheService>().AddToCache(ProfileData.value());
 						Modio::Detail::SDKSessionData::GetSystemModCollection().AddOrUpdateMod(
 							ProfileData.value(),

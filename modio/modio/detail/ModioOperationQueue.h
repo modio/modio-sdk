@@ -28,6 +28,7 @@ namespace Modio
 			std::atomic<std::int32_t> NumWaiters;
 			// asio::steady_timer QueueImpl;
 			std::deque<fu2::unique_function<void()>> QueueImpl;
+			std::atomic<bool> bWasCancelled {};
 
 		public:
 			OperationQueue(asio::io_context& OwningContext) : OperationInProgress(false), NumWaiters(0)
@@ -76,6 +77,18 @@ namespace Modio
 							AssociatedQueue->Dequeue();
 						}
 					}
+				}
+				bool WasCancelled()
+				{
+					if (Impl)
+					{
+						std::shared_ptr<Modio::Detail::OperationQueue> AssociatedQueue = Impl->AssociatedQueue.lock();
+						if (AssociatedQueue != nullptr)
+						{
+							return AssociatedQueue->WasCancelled();
+						}
+					}
+					return true;
 				}
 
 				template<typename OperationType>
@@ -132,8 +145,14 @@ namespace Modio
 				}
 			}
 
+			bool WasCancelled()
+			{
+				return bWasCancelled.load();
+			}
+
 			void CancelAll()
 			{
+				bWasCancelled.store(true);
 				// QueueImpl.cancel();
 				for (auto& QueueEntry : QueueImpl)
 				{

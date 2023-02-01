@@ -70,6 +70,12 @@ namespace Modio
 				Modio::Optional<Modio::Detail::Buffer> CurrentBuffer;
 				size_t BytesToRead = 0;
 
+				if (Impl->RequestTicket.WasCancelled())
+				{
+					Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
+					return;
+				}
+
 				if (Impl->ProgressInfo.lock() == nullptr)
 				{
 					Self.complete(Modio::make_error_code(Modio::ModManagementError::UploadCancelled));
@@ -146,6 +152,10 @@ namespace Modio
 									std::shared_ptr<Modio::ModProgressInfo> Progress = Impl->ProgressInfo.lock();
 									if (Progress)
 									{
+										SetState(*Progress.get(), Modio::ModProgressInfo::EModProgressState::Uploading);
+										SetTotalProgress(*Progress.get(),
+														 Modio::ModProgressInfo::EModProgressState::Uploading,
+														 Modio::FileSize(Impl->CurrentPayloadFile->GetFileSize()));
 										Progress->TotalDownloadSize =
 											Modio::FileSize(Impl->CurrentPayloadFile->GetFileSize());
 									}
@@ -188,6 +198,7 @@ namespace Modio
 										{
 											Progress->CurrentlyDownloadedBytes =
 												Modio::FileSize(Impl->CurrentPayloadFileBytesRead);
+											SetCurrentProgress(*Progress.get(), Modio::FileSize(Impl->CurrentPayloadFileBytesRead));
 										}
 									}
 								}

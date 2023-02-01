@@ -14,6 +14,14 @@ endif()
 target_compile_features(platform INTERFACE cxx_std_14)
 
 target_include_directories(platform INTERFACE ${CMAKE_CURRENT_LIST_DIR})
-target_link_libraries(platform INTERFACE fmt-header-only utf8cpp ws2_32 winhttp ghc_filesystem)
+
+target_link_libraries(platform INTERFACE utf8cpp ws2_32 winhttp ghc_filesystem)
+
+if (MODIO_DISABLE_LINK_FMT)
+	target_link_libraries(platform INTERFACE fmt)
+else ()
+	target_link_libraries(platform INTERFACE fmt-header-only)
+endif()
+
 target_compile_definitions(platform INTERFACE WIN32_LEAN_AND_MEAN NOMINMAX D_UNICODE UNICODE)
 target_include_directories(platform INTERFACE ${ModioGeneratedHeaderPath})

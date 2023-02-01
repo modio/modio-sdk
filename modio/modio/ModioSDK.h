@@ -209,6 +209,7 @@ namespace Modio
 	/// room for a mod that the user wants to install, and as such will return an error if the current user is
 	/// subscribed to the mod. To remove a mod the current user is subscribed to, use
 	/// xref:UnsubscribeFromModAsync[Modio::UnsubscribeFromModAsync].
+	/// @param ModToRemove The ID for the mod to force remove.
 	/// @param Callback Callback invoked when the uninstallation is successful, or if it failed because the current user
 	/// remains subscribed.
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
@@ -237,8 +238,8 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Uses platform-specific authentication to associate a Mod.io user account with the current platform user
-	/// @param User Authentication payload data to submit to the provider. Please note that for Steam authentication you
-	/// must base64-encode the app ticket you provide.
+	/// @param User Authentication payload data to submit to the provider. Any AuthToken string that contains special 
+	/// characters (ex. "+, /, =") requires the boolean "bURLEncodeAuthToken" set as "True" to encode the text accordingly
 	/// @param Provider The provider to use to perform the authentication
 	/// @param Callback Callback invoked once the authentication request has been made
 	/// @requires initialized-sdk

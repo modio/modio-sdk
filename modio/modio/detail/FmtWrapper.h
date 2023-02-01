@@ -9,10 +9,15 @@
  */
 
 #pragma once
-#pragma push_macro("FMT_HEADER_ONLY")
-#ifndef FMT_HEADER_ONLY
-	#define FMT_HEADER_ONLY
+
+
+#ifndef MODIO_DISABLE_LINK_FMT
+	#pragma push_macro("FMT_HEADER_ONLY")
+	#ifndef FMT_HEADER_ONLY
+		#define FMT_HEADER_ONLY
+	#endif
 #endif
+
 #ifdef MODIO_PLATFORM_UNREAL
 
 	#include MODIO_UNREAL_PLATFORM_PREAMBLE
@@ -38,4 +43,7 @@
 	#include "fmt/format.h"
 	#include "fmt/printf.h"
 #endif
-#pragma pop_macro("FMT_HEADER_ONLY")
+
+#ifndef MODIO_DISABLE_LINK_FMT
+	#pragma pop_macro("FMT_HEADER_ONLY")
+#endif

@@ -114,7 +114,7 @@ namespace Modio
 		Modio::ModCollection UserModCollection =
 			Modio::Detail::SDKSessionData::FilterSystemModCollectionByUserSubscriptions();
 
-		for (auto ModEntry : UserModCollection.Entries())
+		for (auto& ModEntry : UserModCollection.Entries())
 		{
 			Modio::ModState CurrentState = ModEntry.second->GetModState();
 			if (CurrentState != Modio::ModState::Installed)

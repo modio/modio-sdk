@@ -177,6 +177,7 @@ namespace Modio
 						if (Progress)
 						{
 							Progress->CurrentlyDownloadedBytes = Modio::FileSize(BytesProcessed);
+							SetCurrentProgress(*Progress.get(), Modio::FileSize(BytesProcessed));
 						}
 					}
 

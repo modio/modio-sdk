@@ -183,6 +183,9 @@ namespace Modio
                         if (Progress)
                         {
                             Progress->TotalDownloadSize = Modio::FileSize(FileSize);
+							SetState(*Progress.get(), Modio::ModProgressInfo::EModProgressState::Uploading);
+							SetTotalProgress(*Progress.get(), Modio::ModProgressInfo::EModProgressState::Uploading,
+											 Modio::FileSize(FileSize));
                         }
 					}
 

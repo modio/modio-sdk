@@ -76,6 +76,12 @@ namespace Modio
 				constexpr std::size_t ChunkOfBytes = 64 * 1024;
 				std::size_t MaxBytesToRead = 0;
 
+				if (Impl->RequestTicket.WasCancelled())
+				{
+					Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
+					return;
+				}
+
 				reenter(Coroutine)
 				{
 					yield Impl->RequestTicket.WaitForTurnAsync(std::move(Self));

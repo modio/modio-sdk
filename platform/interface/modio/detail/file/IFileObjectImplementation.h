@@ -33,9 +33,9 @@ namespace Modio
 
 			virtual asio::strand<asio::io_context::executor_type>& GetFileStrand() = 0;
 
-			virtual Modio::ErrorCode CreateFile(filesystem::path FilePath) = 0;
+			virtual Modio::ErrorCode CreateFile(filesystem::path NewFilePath) = 0;
 
-			virtual Modio::ErrorCode OpenFile(filesystem::path FilePath, Modio::Detail::FileMode Mode, bool bOverwrite = false) = 0;
+			virtual Modio::ErrorCode OpenFile(filesystem::path OpenFilePath, Modio::Detail::FileMode Mode, bool bOverwrite = false) = 0;
 
 			/// @brief OS-specific file size calculation
 			/// @return Size of the underlying file

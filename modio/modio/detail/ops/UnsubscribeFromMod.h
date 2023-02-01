@@ -81,6 +81,8 @@ namespace Modio
 						return;
 					}
 
+					Modio::Detail::SDKSessionData::InvalidateSubscriptionCache();
+
 					yield Modio::Detail::SaveModCollectionToStorageAsync(std::move(Self));
 					yield Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>()
 						.SaveUserDataToStorageAsync(std::move(Self));

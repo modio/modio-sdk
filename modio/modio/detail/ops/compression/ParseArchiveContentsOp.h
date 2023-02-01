@@ -173,6 +173,19 @@ namespace Modio
 								return;
 							}
 
+							// There should not be a file with a larger offset than the Central Directory.
+							// This case ensures that a file offset fall within the extractable size,
+							// otherwise it would create an error when that is outside of an acceptable size
+							if (Entry.FileOffset > ArchiveState->CentralDirectoryOffset)
+							{
+								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression,
+															"File offset ({}) is larger than CentralDirectoryOffset",
+															Entry.FilePath.string());
+								Modio::ErrorCode Err = Modio::make_error_code(Modio::FilesystemError::ReadError);
+								Self.complete(Err);
+								return;
+							}
+
 							ArchiveState->TotalExtractedSize += Modio::FileSize(Entry.UncompressedSize);
 							PendingEntries.push_back(Entry);
 						}

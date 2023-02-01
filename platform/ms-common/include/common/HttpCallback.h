@@ -10,47 +10,44 @@
 
 #include "common/HttpSharedState.h"
 #include "modio/core/ModioLogger.h"
-#include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
-#include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioProfiling.h"
 #include <winhttp.h>
 
 static void __stdcall ModioWinhttpStatusCallback(HINTERNET InternetHandle, DWORD_PTR Context, DWORD InternetStatus,
 												 LPVOID StatusInformation, DWORD StatusInformationLength)
 {
-	DWORD_PTR AlternativeContext = 0;
-	DWORD Length = sizeof(DWORD_PTR);
-	bool Success = WinHttpQueryOption(InternetHandle, WINHTTP_OPTION_CONTEXT_VALUE, &AlternativeContext, &Length);
+	HINTERNET AlternativeContext = 0;
+	DWORD Length = sizeof(HINTERNET);
+	bool Success = WinHttpQueryOption(InternetHandle, WINHTTP_OPTION_PARENT_HANDLE, &AlternativeContext, &Length);
+	Success = WinHttpQueryOption(AlternativeContext, WINHTTP_OPTION_PARENT_HANDLE, &AlternativeContext, &Length);
 	auto err = GetLastError();
-	if (Context)
+	MODIO_PROFILE_SCOPE(WinhttpCallback);
+	// There's only ever a single SharedStateHolder for the entire life of the program
+	uint64_t SessionID = SharedStateHolder::Get().CurrentSessionId.load();
+	if (SessionID == (uint64_t) AlternativeContext)
 	{
-		MODIO_PROFILE_SCOPE(WinhttpCallback);
-		HttpSharedStateBase* SharedState = reinterpret_cast<HttpSharedStateBase*>(Context);
-		WinHTTPCallbackStatus StatusCode = static_cast<WinHTTPCallbackStatus>(InternetStatus);
-		if (StatusCode == WinHTTPCallbackStatus::DataAvailable)
+		std::shared_ptr<HttpSharedStateBase> SharedState = SharedStateHolder::Get().SharedStatePtr.lock();
+		if (SharedState)
 		{
-			std::uint64_t Value = *(DWORD*) StatusInformation;
-			SharedState->SetHandleStatus(InternetHandle, StatusCode, (void*) Value, StatusInformationLength);
-		}
-		else
-		{
-			if (StatusCode == WinHTTPCallbackStatus::RequestError)
+			WinHTTPCallbackStatus StatusCode = static_cast<WinHTTPCallbackStatus>(InternetStatus);
+			if (StatusCode == WinHTTPCallbackStatus::DataAvailable)
 			{
-				WINHTTP_ASYNC_RESULT* Result = static_cast<WINHTTP_ASYNC_RESULT*>(StatusInformation);
-				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Http,
-											"Function {:x} returned error code {:x}\r\n",
-											(unsigned long) Result->dwResult, (unsigned long) Result->dwError);
+				std::uint64_t Value = *(DWORD*) StatusInformation;
+				SharedState->SetHandleStatus(InternetHandle, StatusCode, (void*) Value, StatusInformationLength);
 			}
+			else
+			{
+				if (StatusCode == WinHTTPCallbackStatus::RequestError)
+				{
+					WINHTTP_ASYNC_RESULT* Result = static_cast<WINHTTP_ASYNC_RESULT*>(StatusInformation);
+					Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Http,
+												"Function {:x} returned error code {:x}\r\n",
+												(unsigned long) Result->dwResult, (unsigned long) Result->dwError);
+				}
 
-			// Got crash on shared state is nullptr
-			SharedState->SetHandleStatus(InternetHandle, StatusCode, StatusInformation, StatusInformationLength);
+				SharedState->SetHandleStatus(InternetHandle, StatusCode, StatusInformation, StatusInformationLength);
+			}
 		}
-		/*Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http, "Handle {:x}, status {:x}\r\n",
-							(unsigned long long) InternetHandle, (unsigned long) InternetStatus);*/
-	}
-	else
-	{
-		// throw;
 	}
 }

@@ -50,14 +50,10 @@ public:
 			}
 
 			*SharedState = HttpSharedStateBase(CurrentSession);
-			auto SharedStatePtr = SharedState.get();
-			auto SetOptionStatus =
-				WinHttpSetOption(CurrentSession, WINHTTP_OPTION_CONTEXT_VALUE, SharedStatePtr, sizeof(std::uintptr_t));
-			if (!SetOptionStatus)
-			{
-				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
-											"initialize http set option received system error code {}", GetLastError());
-			};
+
+			SharedStateHolder::Get().SharedStatePtr = SharedState;
+			SharedStateHolder::Get().CurrentSessionId.store((uint64_t) CurrentSession);
+
 			// Set Timeout to 120 seconds
 			unsigned long Timeout = 120000;
 			bool SetTimeoutStatus =

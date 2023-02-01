@@ -199,7 +199,8 @@ namespace Modio
 				Params.MetadataBlob.has_value() || 
 				Params.Name.has_value() ||
 				Params.NamePath.has_value() ||
-				Params.Summary.has_value();
+				Params.Summary.has_value() ||
+				Params.LogoPath.has_value();
 			// clang-format on
 
 			if (!bHasValidParameter)
@@ -219,19 +220,20 @@ namespace Modio
 		}
 		template<typename... OtherArgs>
 		bool RequireModIsNotUninstallPending(Modio::ModID ModToSubscribeTo,
-										 std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
+											 std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
 		{
 			ModCollection& SystemCollection = Modio::Detail::SDKSessionData::GetSystemModCollection();
 			if (Modio::Optional<Modio::ModCollectionEntry&> Entry = SystemCollection.GetByModID(ModToSubscribeTo))
 			{
 				if (Entry->GetModState() == Modio::ModState::UninstallPending)
 				{
-					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
-							   [CompletionHandler = std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(
-									Handler)]() mutable {
+					asio::post(
+						Modio::Detail::Services::GetGlobalContext().get_executor(),
+						[CompletionHandler =
+							 std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							CompletionHandler(Modio::make_error_code(Modio::ModManagementError::ModBeingProcessed),
-													 (OtherArgs {})...);
-							   });
+											  (OtherArgs {})...);
+						});
 					return false;
 				}
 				else

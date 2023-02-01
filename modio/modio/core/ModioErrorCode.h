@@ -792,6 +792,7 @@ namespace Modio
 		InvalidApiVersion = 10003,
 		InvalidJSON = 13004,
 		MalformedAPIKey = 11001,
+		MatureModsNotAllowed = 15054,
 		MissingAPIKey = 11000,
 		MissingContentTypeHeader = 13005,
 		MissingReadPermission = 11004,
@@ -869,6 +870,9 @@ namespace Modio
 					break;
 				case ApiError::MalformedAPIKey:
 						return "api_key supplied is malformed.";
+					break;
+				case ApiError::MatureModsNotAllowed:
+						return "This game does not allow mature mods.";
 					break;
 				case ApiError::MissingAPIKey:
 						return "api_key is missing from your request.";
@@ -1894,6 +1898,11 @@ namespace Modio
 					}
 
 					if (ec == Modio::UserAuthError::UnableToInitStorage)
+					{
+						return true;
+					}
+
+					if (ec == Modio::UserDataError::InvalidUser)
 					{
 						return true;
 					}

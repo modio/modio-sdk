@@ -134,6 +134,10 @@ namespace Modio
 			MODIO_IMPL static Modio::Optional<Modio::ModID> ResolveModCreationHandle(Modio::ModCreationHandle Handle);
 			MODIO_IMPL static void LinkModCreationHandle(Modio::ModCreationHandle Handle, Modio::ModID ID);
 
+			MODIO_IMPL static void InvalidateSubscriptionCache();
+			MODIO_IMPL static void ClearSubscriptionCacheInvalid();
+			MODIO_IMPL static bool IsSubscriptionCacheInvalid();
+
 		private:
 			enum class InitializationState
 			{
@@ -170,6 +174,7 @@ namespace Modio
 			std::map<Modio::ModCreationHandle, Modio::Optional<Modio::ModID>> CreationHandles;
 			Modio::Optional<Modio::ModID> ModIDToPrioritize;
 			std::map<Modio::ModID, Modio::CreateModFileParams> PendingModUploads;
+			bool bSubscriptionCacheInvalid = false;
 		};
 	} // namespace Detail
 } // namespace Modio

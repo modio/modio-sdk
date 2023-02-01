@@ -213,7 +213,7 @@ namespace Modio
 				return FileMode;
 			}
 
-			Modio::ErrorCode OpenFile(Modio::filesystem::path NewFilePath, Modio::Detail::FileMode NewMode,
+			Modio::ErrorCode OpenFile(Modio::filesystem::path OpenFilePath, Modio::Detail::FileMode NewMode,
 									  bool bOverwrite = false)
 			{
 				if (FileHandle != INVALID_HANDLE_VALUE)
@@ -224,13 +224,13 @@ namespace Modio
 				}
 
 				Modio::ErrorCode ec;
-				filesystem::create_directories(NewFilePath.parent_path(), ec);
+				filesystem::create_directories(OpenFilePath.parent_path(), ec);
 				if (ec)
 				{
 					return ec;
 				}
 
-				this->FilePath = NewFilePath;
+				this->FilePath = OpenFilePath;
 				this->FileMode = NewMode;
 
 				DWORD Access;
@@ -256,7 +256,7 @@ namespace Modio
 					// post failure
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
 												"FileObjectImplementation OpenFile {} failed, error code = {}",
-												NewFilePath.string(), Error);
+												OpenFilePath.string(), Error);
 					return Modio::make_error_code(Modio::FilesystemError::NoPermission);
 				}
 			}

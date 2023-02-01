@@ -32,6 +32,10 @@ namespace Modio
 				{
 					do
 					{
+
+						CachedResponse = Modio::Detail::SDKSessionData::IsSubscriptionCacheInvalid() ? 
+							Modio::Detail::CachedResponse::Disallow : Modio::Detail::CachedResponse::Allow;
+
 						// Because we're making a raw request here, manually add the filter to paginate 100 results at a
 						// time We're going to gather all the results together at the end of this anyways so the biggest
 						// pages give the best results because it means fewer REST calls
@@ -40,7 +44,9 @@ namespace Modio
 							Modio::Detail::GetUserSubscriptionsRequest.SetFilterString(
 								fmt::format("_limit=100&_offset={}&game_id={}", CurrentResultIndex,
 											Modio::Detail::SDKSessionData::CurrentGameID())),
-							Modio::Detail::CachedResponse::Allow, std::move(Self));
+							CachedResponse, std::move(Self));
+
+						Modio::Detail::SDKSessionData::ClearSubscriptionCacheInvalid();
 
 						if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))
 						{
@@ -96,6 +102,7 @@ namespace Modio
 			Modio::PagedResult PageInfo;
 			std::unique_ptr<Modio::ModInfoList> CollatedResults;
 			std::int32_t CurrentResultIndex = 0;
+			Modio::Detail::CachedResponse CachedResponse;
 		};
 #include <asio/unyield.hpp>
 

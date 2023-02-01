@@ -73,6 +73,13 @@ namespace Modio
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
 				MODIO_PROFILE_SCOPE(DownloadFile);
+
+				if (Impl->DownloadTicket.WasCancelled())
+				{
+					Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
+					return;
+				}
+
 				// May need to manually check bDownloadingMod and lock progressinfo if this returns true when we never
 				// had a value in the pointer
 				if (ProgressInfo.has_value() && ProgressInfo->expired())
@@ -207,8 +214,9 @@ namespace Modio
 							{
 								if (!ProgressInfo->expired())
 								{
-									ProgressInfo->lock()->CurrentlyDownloadedBytes =
-										Modio::FileSize(*CurrentFilePosition);
+									auto Progress = ProgressInfo->lock();
+									Progress->CurrentlyDownloadedBytes = Modio::FileSize(*CurrentFilePosition);
+									SetCurrentProgress(*Progress.get(), Modio::FileSize(*CurrentFilePosition));
 								}
 								else
 								{

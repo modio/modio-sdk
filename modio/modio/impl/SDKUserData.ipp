@@ -16,6 +16,7 @@
 #endif
 
 #include "modio/core/ModioCoreTypes.h"
+#include "modio/detail/ModioStringHelpers.h"
 #include "modio/detail/ops/AuthenticateUserByEmailOp.h"
 #include "modio/detail/ops/RequestEmailAuthCodeOp.h"
 #include "modio/detail/ops/auth/AuthenticateUserByDiscord.h"
@@ -55,36 +56,47 @@ namespace Modio
 	void AuthenticateUserExternalAsync(Modio::AuthenticationParams User, Modio::AuthenticationProvider Provider,
 									   std::function<void(Modio::ErrorCode)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
+		// Return immediatelly if the SDK is not initialized and
+		// The API rate limit is reached
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) == false &&
+			Modio::Detail::RequireNotRateLimited(Callback) == false)
 		{
-			switch (Provider)
-			{
-				// @todo: Add Epic when we support Epic
-				/*case AuthenticationProvider::Epic:
-					AuthenticateUserWithEpicAsync(User, Callback);
-					break;*/
-				case AuthenticationProvider::GoG:
-					Modio::Detail::AuthenticateUserByGoGAsync(User, Callback);
-					break;
-				case AuthenticationProvider::Itch:
-					Modio::Detail::AuthenticateUserByItchAsync(User, Callback);
-					break;
-				case AuthenticationProvider::Steam:
-					Modio::Detail::AuthenticateUserBySteamAsync(User, Callback);
-					break;
-				case AuthenticationProvider::XboxLive:
-					Modio::Detail::AuthenticateUserByXBoxLiveAsync(User, Callback);
-					break;
-				case AuthenticationProvider::Switch:
-					Modio::Detail::AuthenticateUserBySwitchIDAsync(User, Callback);
-					break;
-				case AuthenticationProvider::Discord:
-					Modio::Detail::AuthenticateUserByDiscordAsync(User, Callback);
-					break;
-				case AuthenticationProvider::PSN:
-					Modio::Detail::AuthenticateUserByPSNAsync(User, Callback);
-					break;
-			}
+			return;
+		}
+
+		// Check if the User's AuthToken needs URL encoding
+		if (User.bURLEncodeAuthToken == true)
+		{
+			User.AuthToken = Modio::Detail::String::URLEncode(User.AuthToken);
+		}
+
+		switch (Provider)
+		{
+			// @todo: Add Epic when we support Epic
+			/*case AuthenticationProvider::Epic:
+				AuthenticateUserWithEpicAsync(User, Callback);
+				break;*/
+			case AuthenticationProvider::GoG:
+				Modio::Detail::AuthenticateUserByGoGAsync(User, Callback);
+				break;
+			case AuthenticationProvider::Itch:
+				Modio::Detail::AuthenticateUserByItchAsync(User, Callback);
+				break;
+			case AuthenticationProvider::Steam:
+				Modio::Detail::AuthenticateUserBySteamAsync(User, Callback);
+				break;
+			case AuthenticationProvider::XboxLive:
+				Modio::Detail::AuthenticateUserByXBoxLiveAsync(User, Callback);
+				break;
+			case AuthenticationProvider::Switch:
+				Modio::Detail::AuthenticateUserBySwitchIDAsync(User, Callback);
+				break;
+			case AuthenticationProvider::Discord:
+				Modio::Detail::AuthenticateUserByDiscordAsync(User, Callback);
+				break;
+			case AuthenticationProvider::PSN:
+				Modio::Detail::AuthenticateUserByPSNAsync(User, Callback);
+				break;
 		}
 	}
 

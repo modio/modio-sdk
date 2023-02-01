@@ -374,7 +374,7 @@ namespace Modio
 				// Workaround : Don't tell consumers that a mod operation is in progress until we've resolved how much
 				// work there is to do This should eventually be replaced with a more robust check for the mod
 				// operation's state
-				if (Get().CurrentModInProgress->TotalDownloadSize == 0)
+				if (Get().CurrentModInProgress->GetTotalProgress(ModProgressInfo::EModProgressState::Downloading) == 0)
 				{
 					return {};
 				}
@@ -422,6 +422,21 @@ namespace Modio
 		Modio::Optional<std::string> SDKSessionData::GetEnvironmentOverrideUrl()
 		{
 			return Get().EnvironmentOverrideUrl;
+		}
+
+		void SDKSessionData::InvalidateSubscriptionCache()
+		{
+			Get().bSubscriptionCacheInvalid = true;
+		}
+
+		void SDKSessionData::ClearSubscriptionCacheInvalid()
+		{
+			Get().bSubscriptionCacheInvalid = false;
+		}
+
+		bool SDKSessionData::IsSubscriptionCacheInvalid()
+		{
+			return Get().bSubscriptionCacheInvalid;
 		}
 
 		SDKSessionData::SDKSessionData() {}

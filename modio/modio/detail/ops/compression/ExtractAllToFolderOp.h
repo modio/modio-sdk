@@ -102,8 +102,12 @@ namespace Modio
 					{
 						if (!Impl->ProgressInfo->expired())
 						{
-							Impl->ProgressInfo->lock()->TotalExtractedSizeOnDisk =
+							auto Info =
+								Impl->ProgressInfo->lock();
+							Info->TotalExtractedSizeOnDisk =
 								Impl->ArchiveView.GetTotalExtractedSize();
+							SetState(*Info.get(), Modio::ModProgressInfo::EModProgressState::Extracting);
+							SetTotalProgress(*Info.get(), ModProgressInfo::EModProgressState::Extracting, Impl->ArchiveView.GetTotalExtractedSize());
 						}
 						else
 						{

@@ -273,6 +273,29 @@ NOTE: If you stop calling <<RunPendingHandlers>>, any pending asynchronous API m
 ==== Users and Local Profiles
 
 The mod.io SDK uses a "Local Profile" throughout its lifetime. The Local Profile may optionally contain an authenticated user, once you have successfully authenticated using the appropriate SDK function.
+These local profiles essentially create a 'scope' for the current user to live in, so that a single system can support multiple authenticated users side-by-side without requiring deauthentication of the previous user. 
+On console platforms, we suggest that this be a string representation of the platform-provided UserID, as this gives the best experience when it comes to things like user switching. 
+
+Internally, the SessionID is used to create a folder containing the authentication information and cached profile of the authenticated user (if any). For example, a game using the GDK on Xbox, using a sanitized string representation of the Xbox live ID as the SessionID, would have a folder structure in the persistent storage like the following:
+
+[source]
+----
+<Persistent Storage>/mod.io/<Game ID>/<Xbox Live ID #1>/<Cached Auth>/<Profile data for Xbox Live User #1>
+<Persistent Storage>/mod.io/<Game ID>/<Xbox Live ID #2>/<Cached Auth>/<Profile data for Xbox Live User #2>
+----
+
+When your game starts, you can detect the user associated with the current controller and pass in the stable string representation of their Xbox Live ID as the SessionID. If the user has previously authenticated with mod.io for this game on this device, their authentication status would be maintained.
+
+In the case of a PC title with user-provided profile names, the folder structure would be more like the following:
+
+[source]
+----
+%USERDATA%/mod.io/<Game ID>/MyProfile1/<Cached Auth>/<Profile data for mod.io account #1>
+%USERDATA%/mod.io/<Game ID>/SomeOtherProfile/<Cached Auth>/<Profile data for mod.io account #2>
+%USERDATA%/mod.io/<Game ID>/ThirdUserSpecifiedProfileName/<Cached Auth>/<Profile data for mod.io account #3>
+----
+
+This allows multiple players, such as siblings, to each have their own session that lives in the same Windows account.
 
 An authenticated user is required to install mods and perform other operations. Check the `requires` section on any SDK function to see what operations need an authenticated user. However, anyone can freely browse and search your game's available mods and only prompt the user to authenticate/create an account when they wish to perform any restricted operations (such as rating or subscribing to a mod).
 

@@ -12,9 +12,11 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioModInfo.h"
+#include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/JsonWrapper.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioDefines.h"
+#include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/ModioTransactional.h"
 #include <atomic>
 #include <memory>
@@ -200,26 +202,124 @@ namespace Modio
 	class ModProgressInfo
 	{
 	public:
-		// requires enum indicating if we're downloading or installing?
+		
+		/// @brief Enum representing which state the currently processing mod is in
+		enum class EModProgressState
+		{
+			Initializing, // Download information is being retrieved from mod.io servers
+			Downloading, // Mod archive is downloading from mod.io servers
+			Extracting, // Mod archive is downloaded and now extracting
+			Compressing, // Mod archive is being compressed from files on disk
+			Uploading // Mod archive is uploading to mod.io servers
+		};
 
-		/// @brief Total size of the downloaded file
-		Modio::FileSize TotalDownloadSize;
+		/// @brief Retrieves the state of the currently processing mod
+		/// @return Enum value indicating the current state
+		EModProgressState GetCurrentState() const
+		{
+			return CurrentState;
+		}
 
-		/// @brief Current amount downloaded in bytes
-		Modio::FileSize CurrentlyDownloadedBytes;
+		/// @brief Retrieves the progress value for the specified state. CurrentProgress == TotalProgress for states
+		/// which have completed, for example if a mod is currently Extracting, then passing in Downloading would give
+		/// you a value equal to the total download size
+		/// @param State which state to query progress information for
+		/// @return Modio::FileSize for current progress in bytes
+		Modio::FileSize GetCurrentProgress(EModProgressState State) const
+		{
+			switch (State)
+			{
+				case EModProgressState::Downloading:
+					return DownloadCurrent;
+				case EModProgressState::Extracting:
+					return ExtractCurrent;
+				case EModProgressState::Uploading:
+					return UploadCurrent;
+				case EModProgressState::Compressing:
+					return CompressCurrent;
+				default:
+					return Modio::FileSize(0);
+			}
+		}
 
-		/// @brief Total size on disk when fully extracted
-		Modio::FileSize TotalExtractedSizeOnDisk;
-
-		/// @brief Amount of data currently extracted
-		Modio::FileSize CurrentlyExtractedBytes;
+		/// @brief Retrieves the total amount of progress required for the specified state.
+		/// @param State which state to query total progress for
+		/// @return Modio::FileSize for total progress in bytes
+		Modio::FileSize GetTotalProgress(EModProgressState State) const
+		{
+			switch (State)
+			{
+				case EModProgressState::Downloading:
+					return DownloadTotal;
+				case EModProgressState::Extracting:
+					return ExtractTotal;
+				case EModProgressState::Uploading:
+					return UploadTotal;
+				case EModProgressState::Compressing:
+					return CompressTotal;
+				default:
+					return Modio::FileSize(0);
+			}
+		}
 
 		/// @brief The mod ID of the mod being processed
 		Modio::ModID ID;
 
+		/// @brief Total size of the downloaded file
+		/// @deprecated 2023.1 Use GetTotalProgress(EModProgressState::Downloading)
+		MODIO_DEPRECATED("Release 2023.1", "GetTotalProgress(EModProgressState::Downloading)")
+		Modio::FileSize TotalDownloadSize;
+
+		/// @brief Current amount downloaded in bytes
+		/// @deprecated 2023.1 Use GetCurrentProgress(EModProgressState::Downloading)
+		MODIO_DEPRECATED("Release 2023.1", "GetCurrentProgress(EModProgressState::Downloading)")
+		Modio::FileSize CurrentlyDownloadedBytes;
+
+		/// @brief Total size on disk when fully extracted
+		/// @deprecated 2023.1 Use GetTotalProgress(EModProgressState::Extracting)
+		MODIO_DEPRECATED("Release 2023.1", "GetTotalProgress(EModProgressState::Extracting)")
+		Modio::FileSize TotalExtractedSizeOnDisk;
+
+		/// @brief Amount of data currently extracted
+		/// @deprecated 2023.1 Use GetCurrentProgress(EModProgressState::Extracting)
+		MODIO_DEPRECATED("Release 2023.1", "GetCurrentProgress(EModProgressState::Extracting)")
+		Modio::FileSize CurrentlyExtractedBytes;
+
 		/// @docinternal
 		/// @brief Default constructor
-		ModProgressInfo(Modio::ModID ID) : ID(ID) {};
+		ModProgressInfo(Modio::ModID ID)
+			: ID(ID),
+			  DownloadCurrent(0),
+			  DownloadTotal(0),
+			  ExtractCurrent(0),
+			  ExtractTotal(0),
+			  UploadCurrent(0),
+			  UploadTotal(0),
+			  CurrentState(EModProgressState::Initializing) {};
+
+	private:
+		Modio::FileSize DownloadCurrent;
+		Modio::FileSize DownloadTotal;
+
+		Modio::FileSize ExtractCurrent;
+		Modio::FileSize ExtractTotal;
+
+		Modio::FileSize CompressCurrent;
+		Modio::FileSize CompressTotal;
+
+		Modio::FileSize UploadCurrent;
+		Modio::FileSize UploadTotal;
+
+		EModProgressState CurrentState;
+
+		friend MODIO_IMPL void SetState(Modio::ModProgressInfo& Info, Modio::ModProgressInfo::EModProgressState State);
+		friend MODIO_IMPL void SetCurrentProgress(Modio::ModProgressInfo& Info, Modio::FileSize NewValue);
+		friend MODIO_IMPL void IncrementCurrentProgress(Modio::ModProgressInfo& Info, Modio::FileSize NewValue);
+		friend MODIO_IMPL void CompleteProgressState(Modio::ModProgressInfo& Info,
+													 Modio::ModProgressInfo::EModProgressState State);
+		friend MODIO_IMPL void SetTotalProgress(Modio::ModProgressInfo& Info,
+												Modio::ModProgressInfo::EModProgressState State,
+												Modio::FileSize NewTotal);
 	};
 
 	/// @docpublic
@@ -302,14 +402,14 @@ namespace Modio
 		/// @brief What type of event occurred
 		enum class EventType : std::uint8_t
 		{
-			BeginInstall,   /** Mod event started to install a mod **/
-			Installed,      /** Mod installation to local storage **/
+			BeginInstall, /** Mod event started to install a mod **/
+			Installed, /** Mod installation to local storage **/
 			BeginUninstall, /** Mod event started to uninstall a mod **/
-			Uninstalled,    /** Mod uninstallation from local storage **/
-			BeginUpdate,    /** Mod event started to update a mod **/
-			Updated,        /** Mod local installation updated to latest version*/
-			BeginUpload,    /** Mod event started to upload a mod **/
-			Uploaded        /** Mod event that upload completed **/
+			Uninstalled, /** Mod uninstallation from local storage **/
+			BeginUpdate, /** Mod event started to update a mod **/
+			Updated, /** Mod local installation updated to latest version*/
+			BeginUpload, /** Mod event started to upload a mod **/
+			Uploaded /** Mod event that upload completed **/
 		};
 
 		friend auto format_as(Modio::ModManagementEvent::EventType EnumValue)
@@ -332,7 +432,6 @@ namespace Modio
 	class ModCollection
 	{
 	public:
-		
 		/// @docpublic
 		/// @brief Retrieve a ModCollection given a UserSubscriptionList
 		/// @param UserSubscriptionList patterns that would entitle a filter
@@ -345,7 +444,7 @@ namespace Modio
 		/// @param CalculatedModPath The new path to the mod on disk
 		/// @return True of mod was inserted, false if mod was updated
 		MODIO_IMPL bool AddOrUpdateMod(Modio::ModInfo ModToAdd, std::string CalculatedModPath);
-		
+
 		/// @docpublic
 		/// @brief Retrieve a dictionary of ModID - ModCollectionEntry stored in this ModCollection
 		/// @return Dictionary where keys are ModID and values are ModCollectionEntry
@@ -360,7 +459,7 @@ namespace Modio
 		/// @brief Remove a ModCollectionEntry inside the ModCollection indexed by ModID
 		/// @return True when the mod was found and removed, otherwise false
 		MODIO_IMPL bool RemoveMod(Modio::ModID ModId, bool bForce = false);
-		
+
 		/// @docpublic
 		/// @brief Retrieved a sorted ModCollectionEntry vector by priority
 		/// @return Vector with ModCollectionEntry
@@ -368,7 +467,7 @@ namespace Modio
 
 		/// @docnone
 		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::ModCollection& Collection);
-		
+
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModCollection& Collection);
 

@@ -125,8 +125,11 @@ namespace Modio
 						{
 							if (!Impl->ProgressInfo->expired())
 							{
-								Impl->ProgressInfo->lock()->CurrentlyExtractedBytes +=
+								auto Info = Impl->ProgressInfo->lock();
+										
+								Info->CurrentlyExtractedBytes +=
 									Modio::FileSize(Impl->CurrentBufferSize);
+								IncrementCurrentProgress(*Info.get(), Modio::FileSize(Impl->CurrentBufferSize));
 							}
 							else
 							{

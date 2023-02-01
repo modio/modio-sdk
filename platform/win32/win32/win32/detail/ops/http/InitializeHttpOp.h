@@ -42,10 +42,11 @@ public:
 			}
 
 			*SharedState = HttpSharedState(CurrentSession);
-			auto SharedStatePtr = SharedState.get();
-			auto set =
-				WinHttpSetOption(CurrentSession, WINHTTP_OPTION_CONTEXT_VALUE, SharedStatePtr, sizeof(std::uintptr_t));
-			if (!set)
+			SharedStateHolder::Get().SharedStatePtr = SharedState;
+			uint64_t NewSessionId = ++SharedStateHolder::Get().CurrentSessionId;
+			auto SetOptionStatus =
+				WinHttpSetOption(CurrentSession, WINHTTP_OPTION_CONTEXT_VALUE, reinterpret_cast<LPVOID>(&NewSessionId), sizeof(std::uintptr_t));
+			if (!SetOptionStatus)
 			{
 				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
 											"initialize http set option received system error code {}", GetLastError());

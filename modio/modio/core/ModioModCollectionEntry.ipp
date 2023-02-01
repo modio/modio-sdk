@@ -298,6 +298,92 @@ namespace Modio
 		}
 	}
 
+	void SetState(Modio::ModProgressInfo& Info, Modio::ModProgressInfo::EModProgressState State)
+	{
+		Info.CurrentState = State;
+	}
+
+	void SetCurrentProgress(Modio::ModProgressInfo& Info, Modio::FileSize NewValue)
+	{
+		switch (Info.CurrentState)
+		{
+			case ModProgressInfo::EModProgressState::Downloading:
+				Info.DownloadCurrent = NewValue;
+				return;
+			case ModProgressInfo::EModProgressState::Extracting:
+				Info.ExtractCurrent = NewValue;
+				return;
+			case ModProgressInfo::EModProgressState::Uploading:
+				Info.UploadCurrent = NewValue;
+				return;
+			case ModProgressInfo::EModProgressState::Compressing:
+				Info.CompressCurrent = NewValue;
+			default:
+				return;
+		}
+	}
+
+	void IncrementCurrentProgress(Modio::ModProgressInfo& Info, Modio::FileSize NewValue)
+	{
+		switch (Info.CurrentState)
+		{
+			case ModProgressInfo::EModProgressState::Downloading:
+				Info.DownloadCurrent += NewValue;
+				return;
+			case ModProgressInfo::EModProgressState::Extracting:
+				Info.ExtractCurrent += NewValue;
+				return;
+			case ModProgressInfo::EModProgressState::Uploading:
+				Info.UploadCurrent += NewValue;
+				return;
+			case ModProgressInfo::EModProgressState::Compressing:
+				Info.CompressCurrent += NewValue;
+			default:
+				return;
+		}
+	}
+
+	void CompleteProgressState(Modio::ModProgressInfo& Info, Modio::ModProgressInfo::EModProgressState State)
+	{
+		switch (State)
+		{
+			case ModProgressInfo::EModProgressState::Downloading:
+				Info.DownloadCurrent = Info.DownloadTotal;
+				return;
+			case ModProgressInfo::EModProgressState::Extracting:
+				Info.ExtractCurrent = Info.ExtractTotal;
+				return;
+			case ModProgressInfo::EModProgressState::Compressing:
+				Info.CompressCurrent = Info.CompressTotal;
+			case ModProgressInfo::EModProgressState::Uploading:
+				Info.UploadCurrent = Info.UploadTotal;
+				return;
+			default:
+				return;
+		}
+	}
+
+	void SetTotalProgress(Modio::ModProgressInfo& Info, Modio::ModProgressInfo::EModProgressState State,
+						  Modio::FileSize NewTotal)
+	{
+		switch (State)
+		{
+			case ModProgressInfo::EModProgressState::Downloading:
+				Info.DownloadTotal = NewTotal;
+				return;
+			case ModProgressInfo::EModProgressState::Extracting:
+				Info.ExtractTotal = NewTotal;
+				return;
+			case ModProgressInfo::EModProgressState::Uploading:
+				Info.UploadTotal = NewTotal;
+				return;
+			case ModProgressInfo::EModProgressState::Compressing:
+				Info.CompressTotal = NewTotal;
+			default:
+				return;
+		}
+	}
+
 	UserSubscriptionList::UserSubscriptionList(std::vector<Modio::ModID>&& NewIDs)
 		: InternalList(std::make_move_iterator(NewIDs.begin()), std::make_move_iterator(NewIDs.end()))
 	{}

@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -86,6 +86,20 @@ public:
 	MODIO_IMPL std::pair<std::uintptr_t, std::uintmax_t> GetExtendedStatus(HINTERNET Handle);
 	MODIO_IMPL bool IsClosing();
 	MODIO_IMPL void Close();
+};
+
+// Indirect storage for the shared state so we're safe from null access
+// Increment, then pass the CurrentSessionID to the Winhttp callback as the context pointer
+// Only attempt to lock/dereference the shared state pointer if the session ID matches
+struct SharedStateHolder
+{
+	std::weak_ptr<HttpSharedStateBase> SharedStatePtr;
+	std::atomic<uint64_t> CurrentSessionId {0};
+	static SharedStateHolder& Get()
+	{
+		static SharedStateHolder Instance;
+		return Instance;
+	}
 };
 
 #ifndef MODIO_SEPARATE_COMPILATION

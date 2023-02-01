@@ -61,6 +61,8 @@ namespace Modio
 				}
 				reenter(CoroutineState)
 				{
+					SetState(*PinnedProgressInfo.get(), Modio::ModProgressInfo::EModProgressState::Initializing);
+
 					if (SourceDirectoryRootPath.has_filename())
 					{
 						SourceDirectoryRootPath = SourceDirectoryRootPath.parent_path();
@@ -89,7 +91,7 @@ namespace Modio
 
 						if (Modio::filesystem::is_regular_file(CurrentEntry->path(), ec))
 						{
-							PinnedProgressInfo->TotalExtractedSizeOnDisk +=
+							CurrentTotalFileSize +=
 								Modio::FileSize(Modio::filesystem::file_size(CurrentEntry->path(), ec));
 							if (ec)
 							{
@@ -100,7 +102,13 @@ namespace Modio
 						CurrentEntry.increment(ec);
 					}
 
-					//Reset the iterator
+					PinnedProgressInfo->TotalExtractedSizeOnDisk = CurrentTotalFileSize;
+
+					SetTotalProgress(
+						*PinnedProgressInfo.get(), Modio::ModProgressInfo::EModProgressState::Compressing,CurrentTotalFileSize);
+					SetState(*PinnedProgressInfo.get(), Modio::ModProgressInfo::EModProgressState::Compressing);
+
+					// Reset the iterator
 					EntriesInFolder = Modio::filesystem::recursive_directory_iterator(SourceDirectoryRootPath, ec);
 					CurrentEntry = begin(EntriesInFolder);
 					while (CurrentEntry != end(EntriesInFolder))
@@ -115,8 +123,8 @@ namespace Modio
 
 						if (Modio::filesystem::is_regular_file(CurrentEntry->path(), ec))
 						{
-							yield DestinationArchive->AddFileEntryToArchiveAsync(CurrentEntry->path(),
-																				 CurrentRelativePath, ProgressInfo,  std::move(Self));
+							yield DestinationArchive->AddFileEntryToArchiveAsync(
+								CurrentEntry->path(), CurrentRelativePath, ProgressInfo, std::move(Self));
 							if (ec)
 							{
 								Self.complete(ec);
@@ -146,6 +154,7 @@ namespace Modio
 
 					yield DestinationArchive->FinalizeArchiveAsync(std::move(Self));
 
+					CompleteProgressState(*PinnedProgressInfo.get(), Modio::ModProgressInfo::EModProgressState::Compressing);
 					Self.complete(ec);
 					return;
 				}
@@ -159,6 +168,7 @@ namespace Modio
 			Modio::filesystem::recursive_directory_iterator CurrentEntry;
 			Modio::filesystem::path CurrentRelativePath;
 			std::weak_ptr<Modio::ModProgressInfo> ProgressInfo;
+			Modio::FileSize CurrentTotalFileSize;
 		};
 #include <asio/unyield.hpp>
 
