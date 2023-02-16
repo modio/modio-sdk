@@ -32,13 +32,20 @@ namespace asio
 } // namespace asio
 
 	#pragma push_macro("ASIO_NO_TYPEID")
+#ifndef ASIO_NO_TYPEID
 	#define ASIO_NO_TYPEID 1
+#endif
 
 	#pragma push_macro("ASIO_NO_EXCEPTIONS")
+#ifndef ASIO_NO_EXCEPTIONS
 	#define ASIO_NO_EXCEPTIONS 1
+#endif
 
 	#pragma push_macro("ASIO_DONT_USE_PAUSE")
+#ifndef ASIO_DONT_USE_PAUSE
 	#define ASIO_DONT_USE_PAUSE
+#endif
+
 	#include <asio.hpp>
 	#pragma pop_macro("ASIO_DONT_USE_PAUSE")
 	#pragma pop_macro("ASIO_NO_EXCEPTIONS")
@@ -61,7 +68,9 @@ namespace asio
 } // namespace asio
 
 	#pragma push_macro("ASIO_NO_TYPEID")
+#ifndef ASIO_NO_TYPEID
 	#define ASIO_NO_TYPEID 1
+#endif
 
 	// Note asio includes Windows.h.
 	#include <asio.hpp>
@@ -84,7 +93,10 @@ namespace asio
 
 	#endif
 	#pragma push_macro("ASIO_DONT_USE_PAUSE")
+#ifndef ASIO_DONT_USE_PAUSE
 	#define ASIO_DONT_USE_PAUSE
+#endif
+
   //#pragma push_macro("ASIO_DISABLE_SOCKETS")
   //#define ASIO_DISABLE_SOCKETS 1
   //#pragma push_macro("ASIO_DISABLE_FD_SET")
