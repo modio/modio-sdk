@@ -39,31 +39,52 @@ namespace Modio
 							nlohmann::json::object({Modio::Detail::SDKSessionData::GetSystemModCollection()});
 						ModCollectionData["version"] = 1;
 						auto teststring = ModCollectionData.dump();
-						DestinationFile = std::make_unique<Modio::Detail::File>(
-							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
-									.LocalMetadataFolder() /
-								"state.json",
-							Modio::Detail::FileMode::ReadWrite, true);
+
+						DestinationFilePath = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+												  .LocalMetadataFolder() /
+											  "state.json";
+
+						// Make temporary file with new state data
+						TempFilePath = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+										   .LocalMetadataFolder() /
+									   "state.json.tmp";
+						TempFile = std::make_unique<Modio::Detail::File>(TempFilePath,
+																		 Modio::Detail::FileMode::ReadWrite, true);
 						DataBuffer = std::make_unique<Modio::Detail::Buffer>(teststring.size(), 1024 * 4);
 						std::copy(teststring.begin(), teststring.end(), DataBuffer->begin());
 					}
 
-					yield DestinationFile->WriteAsync(std::move(*DataBuffer), std::move(Self));
+					// Write new state data to state.json.tmp
+					yield TempFile->WriteAsync(std::move(*DataBuffer), std::move(Self));
 					if (ec)
 					{
 						Self.complete(ec);
 						return;
 					}
-					else
+
+					// Close file to perform MoveAndOverwriteFile()
+					TempFile.reset();
+
+					// Updates state.json with the contents of state.json.tmp, and deletes state.json.tmp
+					if (Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MoveAndOverwriteFile(
+							TempFilePath, DestinationFilePath))
 					{
 						Self.complete({});
+						return;
+					}
+					else
+					{
+						Self.complete(Modio::make_error_code(Modio::FilesystemError::WriteError));
+						return;
 					}
 				}
 			}
 
 		private:
 			asio::coroutine CoroutineState;
-			std::unique_ptr<Modio::Detail::File> DestinationFile;
+			Modio::filesystem::path DestinationFilePath;
+			Modio::filesystem::path TempFilePath;
+			std::unique_ptr<Modio::Detail::File> TempFile;
 			std::unique_ptr<Modio::Detail::Buffer> DataBuffer;
 		};
 

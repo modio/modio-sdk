@@ -29,7 +29,7 @@ namespace Modio
 		{
 		public:
 			CompressFolderOp(Modio::filesystem::path SourceDirectoryRootPath,
-							 Modio::filesystem::path DestinationArchivePath,
+							 Modio::filesystem::path DestinationArchivePath, std::shared_ptr<uint64_t> FileHash,
 							 std::weak_ptr<Modio::ModProgressInfo> ProgressInfo)
 				: SourceDirectoryRootPath(SourceDirectoryRootPath),
 				  ProgressInfo(ProgressInfo)
@@ -43,6 +43,9 @@ namespace Modio
 				}
 
 				DestinationArchive = std::make_unique<Modio::Detail::ArchiveWriter>(DestinationArchivePath);
+
+				// A variable that stores a file hash and is accesible by callers of this operation
+				RollingFileHash = FileHash;
 			};
 
 			template<typename CoroType>
@@ -99,6 +102,7 @@ namespace Modio
 								return;
 							}
 						}
+
 						CurrentEntry.increment(ec);
 					}
 
@@ -123,8 +127,10 @@ namespace Modio
 
 						if (Modio::filesystem::is_regular_file(CurrentEntry->path(), ec))
 						{
-							yield DestinationArchive->AddFileEntryToArchiveAsync(
-								CurrentEntry->path(), CurrentRelativePath, ProgressInfo, std::move(Self));
+							yield DestinationArchive->AddFileEntryToArchiveAsync(CurrentEntry->path(),
+																				 CurrentRelativePath, RollingFileHash,
+																				 ProgressInfo, std::move(Self));
+
 							if (ec)
 							{
 								Self.complete(ec);
@@ -138,6 +144,10 @@ namespace Modio
 						{
 							yield DestinationArchive->AddDirectoryEntryToArchiveAsync(CurrentRelativePath / "",
 																					  std::move(Self));
+							// Directories only consider the name in the file hash
+							*RollingFileHash = *RollingFileHash ^
+											   Modio::Detail::hash_64_fnv1a_const(CurrentRelativePath.string().c_str());
+
 							if (ec)
 							{
 								Self.complete(ec);
@@ -154,7 +164,8 @@ namespace Modio
 
 					yield DestinationArchive->FinalizeArchiveAsync(std::move(Self));
 
-					CompleteProgressState(*PinnedProgressInfo.get(), Modio::ModProgressInfo::EModProgressState::Compressing);
+					CompleteProgressState(*PinnedProgressInfo.get(),
+										  Modio::ModProgressInfo::EModProgressState::Compressing);
 					Self.complete(ec);
 					return;
 				}
@@ -169,15 +180,17 @@ namespace Modio
 			Modio::filesystem::path CurrentRelativePath;
 			std::weak_ptr<Modio::ModProgressInfo> ProgressInfo;
 			Modio::FileSize CurrentTotalFileSize;
+			std::shared_ptr<uint64_t> RollingFileHash;
 		};
 #include <asio/unyield.hpp>
 
 		template<typename CompletionHandlerType>
 		auto CompressFolderAsync(Modio::filesystem::path FolderToCompress, Modio::filesystem::path PathToOutputArchive,
-								 std::weak_ptr<Modio::ModProgressInfo> ProgressInfo, CompletionHandlerType&& Handler)
+								 std::shared_ptr<uint64_t> FileHash, std::weak_ptr<Modio::ModProgressInfo> ProgressInfo,
+								 CompletionHandlerType&& Handler)
 		{
 			return asio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
-				CompressFolderOp(FolderToCompress, PathToOutputArchive, ProgressInfo), Handler,
+				CompressFolderOp(FolderToCompress, PathToOutputArchive, FileHash, ProgressInfo), Handler,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	} // namespace Detail

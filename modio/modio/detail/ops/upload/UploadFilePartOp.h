@@ -46,10 +46,10 @@ namespace Modio
 			std::uintmax_t FileOffset = 0;
 			// How large the file is
 			std::uintmax_t FileSize = 0;
-			// The number of bytes that have already been sent over the wire
-			std::uintmax_t BytesProcessed = 0;
 			// The number of bytes that will be sent over the wire
 			std::uintmax_t BytesToSend = 0;
+			// The number of bytes that have already been sent over the wire
+			std::uintmax_t BytesProcessed = 0;
 
 		public:
 			UploadFilePartOp(Modio::Detail::DynamicBuffer Response, Modio::Detail::HttpRequestParams BasicParams,
@@ -74,11 +74,11 @@ namespace Modio
 				std::uintmax_t MaxFilePart = Modio::Detail::Constants::Configuration::MultipartMaxFilePartSize;
 				FileOffset = FilePart * MaxFilePart;
 				FileSize = ArchiveFile->GetFileSize();
-				// The number of bytes that have already been sent over the wire, start at zero always
-				BytesProcessed = 0;
 				// We need to know how many bytes this operation will process. If it exceeds the number
 				// of bytes remaining in the file, it would only send that portion, otherwise MaxFilePart
 				BytesToSend = FileOffset + MaxFilePart > FileSize ? FileSize - FileOffset : MaxFilePart;
+				// The number of bytes that have already been sent over the wire, start at zero always
+				BytesProcessed = 0;
 
 				// This needs to append the amount of bytes to send over the wire
 				Modio::Detail::HttpRequestParams RequestParams =
@@ -176,8 +176,11 @@ namespace Modio
 						std::shared_ptr<Modio::ModProgressInfo> Progress = Impl->ProgressInfo.lock();
 						if (Progress)
 						{
-							Progress->CurrentlyDownloadedBytes = Modio::FileSize(BytesProcessed);
-							SetCurrentProgress(*Progress.get(), Modio::FileSize(BytesProcessed));
+							Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+														"Multipart upload bytes uploaded {} of {} total bytes",
+														FileOffset, FileSize);
+							Progress->CurrentlyDownloadedBytes = Modio::FileSize(FileOffset);
+							SetCurrentProgress(*Progress.get(), Modio::FileSize(FileOffset));
 						}
 					}
 

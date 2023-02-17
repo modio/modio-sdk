@@ -39,6 +39,7 @@ namespace Modio
 								  .MakeTempFilePath(fmt::format("modfile_{}.zip", ModID))
 								  .value_or("");
 				ProgressInfo = Modio::Detail::SDKSessionData::StartModDownloadOrUpdate(CurrentModID);
+				FileHash = std::make_shared<uint64_t>(0);
 			}
 
 			template<typename CoroType>
@@ -74,7 +75,7 @@ namespace Modio
 
 					Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::ModManagement,
 												"Compressing directory {}", ModRootDirectory.string());
-					yield Modio::Detail::CompressFolderAsync(ModRootDirectory, ArchivePath, ProgressInfo,
+					yield Modio::Detail::CompressFolderAsync(ModRootDirectory, ArchivePath, FileHash, ProgressInfo,
 															 std::move(Self));
 
 					if (ec)
@@ -115,11 +116,16 @@ namespace Modio
 													ArchivePath.string());
 						Session = std::make_shared<Modio::Detail::UploadSession>();
 						// This operation would split request in 50MB chunks
-						yield Modio::Detail::UploadMultipartFileAsync(Session, CurrentModID, ArchivePath, ProgressInfo,
+						yield Modio::Detail::UploadMultipartFileAsync(Session, CurrentModID, ArchivePath,
+																	  std::to_string(*FileHash), ProgressInfo,
 																	  std::move(Self));
 
+						FileHash.reset();
 						if (ec)
 						{
+							Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(
+								Modio::ModManagementEvent {CurrentModID, Modio::ModManagementEvent::EventType::Uploaded,
+														   ec});
 							Self.complete(ec);
 							return;
 						}
@@ -129,7 +135,12 @@ namespace Modio
 							Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::ModManagement,
 														"ModID {} Upload Multipart did not obtain an UploadID",
 														CurrentModID, ArchivePath.string());
-							Self.complete(Modio::make_error_code(Modio::HttpError::RequestError));
+							ec = Modio::make_error_code(Modio::HttpError::RequestError);
+							Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(
+								Modio::ModManagementEvent {CurrentModID, Modio::ModManagementEvent::EventType::Uploaded,
+														   ec});
+							Self.complete(ec);
+							return;
 						}
 
 						Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::ModManagement,
@@ -264,6 +275,7 @@ namespace Modio
 			Modio::filesystem::path ArchivePath;
 			Modio::filesystem::path ModRootDirectory;
 			std::weak_ptr<Modio::ModProgressInfo> ProgressInfo;
+			std::shared_ptr<uint64_t> FileHash;
 			Modio::ModID CurrentModID;
 			Modio::CreateModFileParams CurrentModParams;
 			std::uintmax_t ZipFileSize = 0;

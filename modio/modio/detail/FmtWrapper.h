@@ -11,7 +11,7 @@
 #pragma once
 
 
-#ifndef MODIO_DISABLE_LINK_FMT
+#ifndef MODIO_USE_CUSTOM_FMT
 	#pragma push_macro("FMT_HEADER_ONLY")
 	#ifndef FMT_HEADER_ONLY
 		#define FMT_HEADER_ONLY
@@ -44,6 +44,6 @@
 	#include "fmt/printf.h"
 #endif
 
-#ifndef MODIO_DISABLE_LINK_FMT
+#ifndef MODIO_USE_CUSTOM_FMT
 	#pragma pop_macro("FMT_HEADER_ONLY")
 #endif

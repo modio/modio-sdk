@@ -300,6 +300,63 @@ namespace Modio
 				return true;
 			}
 
+			bool MoveAndOverwriteFile(const Modio::filesystem::path& SourceFilePath,
+									  const Modio::filesystem::path& DestinationFilePath)
+			{
+				if (!FileExists(SourceFilePath))
+				{
+					Modio::Detail::Logger().Log(
+						LogLevel::Error, LogCategory::File,
+						"Source file {} does not exist. Failed to perform MoveAndOverwriteFile()",
+						SourceFilePath.u8string());
+					return false;
+				}
+				if (!FileExists(DestinationFilePath))
+				{
+					// No destination file to overwrite, can rename the source file instead
+					Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::File,
+												"Destination file to overwrite does not exist: {}",
+												DestinationFilePath.u8string());
+					Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::File, "Renaming file {} to {}",
+												SourceFilePath.u8string(), DestinationFilePath.u8string());
+
+					Modio::ErrorCode ec;
+					Modio::filesystem::rename(SourceFilePath, DestinationFilePath, ec);
+					if (ec)
+					{
+						Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::File,
+													"Failed to rename file {} to {}, with code {} and message: \"{}\"",
+													SourceFilePath.u8string(), DestinationFilePath.u8string(),
+													ec.value(), ec.message());
+						return false;
+					}
+					else
+					{
+						return true;
+					}
+				}
+
+				Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::File, "Replacing file {} with {}",
+											DestinationFilePath.u8string(), SourceFilePath.u8string());
+
+				// Ignore merge and ACL errors because we're only concerned about the data itself, not security and
+				// location
+				if (ReplaceFileW(DestinationFilePath.c_str(), SourceFilePath.c_str(), nullptr,
+								 REPLACEFILE_IGNORE_MERGE_ERRORS | REPLACEFILE_IGNORE_ACL_ERRORS, nullptr, nullptr))
+				{
+					return true;
+				}
+				else
+				{
+					// Store GetLastError() so it's not lost in UE implementation
+					DWORD LastError = GetLastError();
+					Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::File,
+												"Failed to replace file {} with {}. Received error {}",
+												DestinationFilePath.u8string(), SourceFilePath.u8string(), LastError);
+					return false;
+				}
+			}
+
 			const Modio::filesystem::path& UserDataFolder() const
 			{
 				return UserDataPath;

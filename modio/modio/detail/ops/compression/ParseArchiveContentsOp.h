@@ -181,7 +181,7 @@ namespace Modio
 								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression,
 															"File offset ({}) is larger than CentralDirectoryOffset",
 															Entry.FilePath.string());
-								Modio::ErrorCode Err = Modio::make_error_code(Modio::FilesystemError::ReadError);
+								Err = Modio::make_error_code(Modio::FilesystemError::ReadError);
 								Self.complete(Err);
 								return;
 							}

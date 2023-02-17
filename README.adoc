@@ -151,7 +151,7 @@ To build the SDK using the default build and install directories:
 
 . `cmake -S <modio-sdk folder> --preset=win`
 +
-This will use the Ninja generator to create a Ninja build system in `<modio-sdk folder>/out/build/win`. It installs the compiled libraries/headers to `<modio-sdk folder>/out/install/win`.
+This will use the Ninja generator to create a Ninja build system in `<modio-sdk folder>/out/build/win`. It installs the compiled libraries/headers to `<modio-sdk folder>/out/install/win`. To build the examples, append ` -DMODIO_BUILD_EXAMPLES=true`.
 . `cmake --build <modio-sdk folder>/out/build/win`
 +
 This step compiles the SDK as a static library.
@@ -187,6 +187,13 @@ cmake -S <modio-sdk folder> --preset=win -G "Visual Studio 16 2019"
 cmake --build <modio-sdk folder>/out/build/win
 cmake --install <modio-sdk folder>/out/build/win
 ```
+
+==== Custom FMT library
+If you have a custom version of the FMT library, you can modify the linking stage defining `MODIO_USE_CUSTOM_FMT`. This define signals the CMake build system to use a custom version of the library. Also, it requires that you define `MODIO_CUSTOM_FMT_PATH` to the system path that contains the FMT library to use.
+
+The directory given to `MODIO_CUSTOM_FMT_PATH` should contain a CMakeLists.txt which exposes the `fmt` and/or `fmt-header-only` targets.
+
+By default the SDK will consume the `fmt-header-only` target. Define `MODIO_CUSTOM_FMT_STATIC` to `true` to override this and request the consumption of the `fmt` static library target instead.
 
 === Windows Terminal Compilation of x64 library
 

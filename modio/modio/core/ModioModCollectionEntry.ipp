@@ -355,6 +355,7 @@ namespace Modio
 				return;
 			case ModProgressInfo::EModProgressState::Compressing:
 				Info.CompressCurrent = Info.CompressTotal;
+				return;
 			case ModProgressInfo::EModProgressState::Uploading:
 				Info.UploadCurrent = Info.UploadTotal;
 				return;

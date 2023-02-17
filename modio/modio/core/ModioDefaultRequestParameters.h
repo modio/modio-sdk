@@ -59,7 +59,6 @@ namespace Modio
         static const HttpRequestParams AddMultipartUploadPartRequest { Modio::Detail::Verb::PUT, "/games/{game-id}/mods/{mod-id}/files/multipart" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams CompleteMultipartUploadSessionRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/files/multipart/complete" }; 
         static const HttpRequestParams GetMultipartUploadSessionsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/files/multipart/sessions" }; 
-        static const HttpRequestParams GetMultipartUploadStatusRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/files/multipart/status" }; 
         static const HttpRequestParams DeleteModfileRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}/files/{file-id}" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetModfileRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/files/{file-id}" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams EditModfileRequest { Modio::Detail::Verb::PUT, "/games/{game-id}/mods/{mod-id}/files/{file-id}" , "application/x-www-form-urlencoded" }; 
@@ -101,6 +100,6 @@ namespace Modio
         static const HttpRequestParams SubmitReportRequest { Modio::Detail::Verb::POST, "/report" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams UnmuteAUserRequest { Modio::Detail::Verb::DELETE, "/users/{user-id}/mute" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams MuteAUserRequest { Modio::Detail::Verb::POST, "/users/{user-id}/mute" , "application/x-www-form-urlencoded" }; 
-        static const HttpRequestParams EpicGamesRequest { Modio::Detail::Verb::POST, "external/epicgamesauth" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams AuthenticateViaEpicgamesRequest { Modio::Detail::Verb::POST, "external/epicgamesauth" , "application/x-www-form-urlencoded" }; 
     }
 }

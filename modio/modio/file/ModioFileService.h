@@ -280,6 +280,17 @@ namespace Modio
 				return PlatformImplementation->FileExists(FilePath);
 			}
 
+			/// @brief Replaces the file at DestinationFilePath with the file at SourceFilePath in a single blocking
+			/// call. Source file must exist, and will be deleted on success.
+			/// @param SourceFilePath Path to the file that will replace the file at DestinationFilePath.
+			/// @param DestinationFilePath Path to the file to be replaced
+			/// @return True on success
+			bool MoveAndOverwriteFile(const Modio::filesystem::path& SourceFilePath,
+									  const Modio::filesystem::path& DestinationFilePath)
+			{
+				return PlatformImplementation->MoveAndOverwriteFile(SourceFilePath, DestinationFilePath);
+			}
+
 			/// @brief Attempts to delete a file from disk
 			/// @param FilePath The fully-qualified path of the file we wish to delete
 			/// @return True if the path has a filename component and we deleted it successfully
@@ -302,7 +313,7 @@ namespace Modio
 				return PlatformImplementation->GetRootLocalStoragePath();
 			}
 
-			const Modio::filesystem::path GetModRootInstallationPath() const 
+			const Modio::filesystem::path GetModRootInstallationPath() const
 			{
 				return PlatformImplementation->GetModRootInstallationPath();
 			}

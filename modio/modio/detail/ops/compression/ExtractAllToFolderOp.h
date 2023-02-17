@@ -159,17 +159,31 @@ namespace Modio
 
 			Modio::ErrorCode CheckPathIsValid(Modio::filesystem::path FilePath, Modio::filesystem::path CurrentPath)
 			{
-				Modio::ErrorCode err;
-				Modio::filesystem::path LexPath = Modio::filesystem::relative(FilePath, CurrentPath, err);
+				Modio::ErrorCode Err;
+				Modio::filesystem::path LexPath = Modio::filesystem::relative(FilePath, CurrentPath, Err);
 
+				// In case the platform does not support symlinks, the LexPath here would not correctly identify if
+				// FilePath tries to access parent folders relative to CurrentPath. This will double check no ".."
+				// is in FilePath
 				if (LexPath.string() == "")
 				{
-					return {};
+					std::string PreFolder = "..";
+
+					// This case means that the path does not have a reference to folders above the current location.
+					if (FilePath.string().find(PreFolder) == std::string::npos)
+					{
+						return {};
+					}
 				}
-				else
+
+				if (Err)
 				{
-					return Modio::make_error_code(Modio::FilesystemError::NoPermission);
+					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression,
+												"FilePath {} returned a system error with message: {}",
+												FilePath.string(), Err.message());
 				}
+
+				return Modio::make_error_code(Modio::FilesystemError::NoPermission);
 			}
 		};
 #include <asio/unyield.hpp>

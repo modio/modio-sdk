@@ -56,7 +56,7 @@ namespace Modio
 
 		public:
 			UploadMultipartFileOp(std::shared_ptr<Modio::Detail::UploadSession> ResponseSession,
-								  Modio::ModID CurrentModID, Modio::filesystem::path ArchivePath,
+								  Modio::ModID CurrentModID, Modio::filesystem::path ArchivePath, std::string FileHash,
 								  Modio::Detail::OperationQueue::Ticket RequestTicket,
 								  std::weak_ptr<Modio::ModProgressInfo> ProgressInfo)
 				: ModID(CurrentModID),
@@ -67,14 +67,13 @@ namespace Modio
 				Session = ResponseSession;
 				this->AllowCachedResponse = Modio::Detail::CachedResponse::Disallow;
 				std::string FileName = ArchivePath.filename().string();
-				std::string FileNonce = std::to_string(Modio::Detail::hash_64_fnv1a_const(FileName.c_str()));
-
+				
 				// Request to open an Upload Session
 				OpenSessionRequest = Modio::Detail::CreateMultipartUploadSessionRequest
 										 .SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
 										 .SetModID(CurrentModID)
 										 .AppendPayloadValue("filename", FileName)
-										 .AppendPayloadValue("nonce", FileNonce);
+										 .AppendPayloadValue("nonce", FileHash);
 				;
 
 				// Request to Close an Upload Session
@@ -125,8 +124,19 @@ namespace Modio
 
 					if (ec)
 					{
-						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
-													"Error retrieving an UploadID");
+						// If the error reference value is "29002", let the user know that a file with different
+						// contents must be uploaded.
+						if (ec.value() == 29002)
+						{
+							Modio::Detail::Logger().Log(
+								Modio::LogLevel::Error, Modio::LogCategory::Http,
+								"Try to upload an updated file with different contents in the zip file");
+						}
+						else
+						{
+							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+														"Error retrieving an UploadID");
+						}
 						Self.complete(ec);
 						return;
 					}
@@ -276,12 +286,12 @@ namespace Modio
 
 		template<typename CompletionTokenType>
 		auto UploadMultipartFileAsync(std::shared_ptr<Modio::Detail::UploadSession> Response, Modio::ModID CurrentModID,
-									  Modio::filesystem::path ArchivePath,
+									  Modio::filesystem::path ArchivePath, std::string FileHash,
 									  std::weak_ptr<Modio::ModProgressInfo> ProgressInfo, CompletionTokenType&& Token)
 		{
 			return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
 				UploadMultipartFileOp(
-					std::move(Response), CurrentModID, ArchivePath,
+					std::move(Response), CurrentModID, ArchivePath, FileHash,
 					Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().GetFileDownloadTicket(),
 					ProgressInfo),
 				Token, Modio::Detail::Services::GetGlobalContext().get_executor());

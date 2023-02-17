@@ -228,8 +228,8 @@ namespace Modio
 				return RootLocalStoragePath / fmt::format("{}/cache/users/{}/avatars/", CurrentGameID, UserId);
 			}
 
-			bool DirectoryExists(const Modio::filesystem::path& DirectoryPath) const override 
-			{ 	
+			bool DirectoryExists(const Modio::filesystem::path& DirectoryPath) const override
+			{
 				Modio::ErrorCode ec;
 				if (Modio::filesystem::exists(DirectoryPath, ec) && !ec)
 				{
@@ -301,6 +301,53 @@ namespace Modio
 				}
 
 				return true;
+			}
+
+			bool MoveAndOverwriteFile(const Modio::filesystem::path& SourceFilePath,
+									  const Modio::filesystem::path& DestinationFilePath)
+			{
+				if (!FileExists(SourceFilePath))
+				{
+					Modio::Detail::Logger().Log(
+						LogLevel::Error, LogCategory::File,
+						"Source file {} does not exist. Failed to perform MoveAndOverwriteFile()",
+						SourceFilePath.u8string());
+					return false;
+				}
+				if (FileExists(DestinationFilePath))
+				{
+					Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::File,
+												"Deleting file {} to replace with {}", DestinationFilePath.u8string(),
+												SourceFilePath.u8string());
+					if (!DeleteFile(DestinationFilePath))
+					{
+						return false;
+					}
+				}
+				else
+				{
+					Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::File,
+												"Destination file to overwrite does not exist: {}",
+												DestinationFilePath.u8string());
+				}
+
+				Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::File, "Renaming file {} to {}",
+											SourceFilePath.u8string(), DestinationFilePath.u8string());
+
+				Modio::ErrorCode ec;
+				Modio::filesystem::rename(SourceFilePath, DestinationFilePath, ec);
+				if (ec)
+				{
+					Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::File,
+												"Failed to rename file {} to {}, with code {} and message: \"{}\"",
+												SourceFilePath.u8string(), DestinationFilePath.u8string(), ec.value(),
+												ec.message());
+					return false;
+				}
+				else
+				{
+					return true;
+				}
 			}
 
 			const Modio::filesystem::path& UserDataFolder() const

@@ -52,10 +52,12 @@ namespace Modio
 
 			template<typename CompletionHandlerType>
 			auto AddFileEntryAsync(implementation_type& PlatformIOObject, Modio::filesystem::path SourceFilePath,
-								   Modio::filesystem::path PathInsideArchive, std::weak_ptr<class Modio::ModProgressInfo> ProgressInfo, CompletionHandlerType&& Handler)
+								   Modio::filesystem::path PathInsideArchive, std::shared_ptr<uint64_t> FileHash,
+								   std::weak_ptr<class Modio::ModProgressInfo> ProgressInfo,
+								   CompletionHandlerType&& Handler)
 			{
-				PlatformImplementation->AddFileEntryAsync(PlatformIOObject, SourceFilePath, PathInsideArchive, ProgressInfo,
-														  std::forward<CompletionHandlerType>(Handler));
+				PlatformImplementation->AddFileEntryAsync(PlatformIOObject, SourceFilePath, PathInsideArchive, FileHash,
+														  ProgressInfo, std::forward<CompletionHandlerType>(Handler));
 			}
 
 			template<typename CompletionHandlerType>

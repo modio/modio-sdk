@@ -374,7 +374,7 @@ namespace Modio
 				// Workaround : Don't tell consumers that a mod operation is in progress until we've resolved how much
 				// work there is to do This should eventually be replaced with a more robust check for the mod
 				// operation's state
-				if (Get().CurrentModInProgress->GetTotalProgress(ModProgressInfo::EModProgressState::Downloading) == 0)
+				if (Get().CurrentModInProgress->GetCurrentState() == ModProgressInfo::EModProgressState::Initializing)
 				{
 					return {};
 				}

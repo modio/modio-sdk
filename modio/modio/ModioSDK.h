@@ -231,6 +231,20 @@ namespace Modio
 	MODIOSDK_API void VerifyUserAuthenticationAsync(std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
+	/// @brief Queries the server to update the user data.
+	/// An empty ErrorCode passed to the callback indicates successful verification, i.e. the mod.io server was contactable
+	/// and the user's data got updated.
+	/// @param Callback Callback invoked once the server-side state has been queried
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @requires authenticated-user
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	MODIOSDK_API void RefreshUserDataAsync(std::function<void(Modio::ErrorCode)> Callback);
+
+	/// @docpublic
 	/// @brief Fetches the currently authenticated Mod.io user profile if there is one associated with the current
 	/// platform user
 	/// @return Optional Modio::User object containing profile information

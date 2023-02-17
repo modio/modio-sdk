@@ -57,9 +57,22 @@ target_include_directories(${MODIO_TARGET_NAME} INTERFACE ${ModioGeneratedHeader
 
 target_link_libraries(${MODIO_TARGET_NAME} INTERFACE asio tl::optional platform nlohmann_json function2)
 
-if (MODIO_DISABLE_LINK_FMT)
-	target_link_libraries(${MODIO_TARGET_NAME} INTERFACE fmt)
-else()
+# In case you have a custom FMT library, update accordingly below
+# The default linking of the library uses the FMT Header only mode
+if (MODIO_USE_CUSTOM_FMT)
+	if (NOT DEFINED MODIO_CUSTOM_FMT_PATH)
+		message(FATAL_ERROR "The build system needs MODIO_CUSTOM_FMT_PATH defined pointing to the custom FMT library to use.")
+	else ()
+		message(STATUS "Using FMT path ${MODIO_CUSTOM_FMT_PATH}")
+		add_subdirectory(${MODIO_CUSTOM_FMT_PATH} ext/custom_fmt)
+
+		if (MODIO_CUSTOM_FMT_STATIC)
+			target_link_libraries(${MODIO_TARGET_NAME} INTERFACE fmt)
+		else()
+			target_link_libraries(${MODIO_TARGET_NAME} INTERFACE fmt-header-only)
+		endif()
+	endif()
+else ()
 	target_link_libraries(${MODIO_TARGET_NAME} INTERFACE fmt-header-only)
 endif()
 

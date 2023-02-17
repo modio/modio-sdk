@@ -34,7 +34,7 @@ namespace Modio
 		public:
 			AddFileEntryOp(std::shared_ptr<Modio::Detail::ArchiveFileImplementation> ArchiveFile,
 						   Modio::filesystem::path SourceFilePath, Modio::filesystem::path PathInsideArchive,
-						   std::weak_ptr<Modio::ModProgressInfo> ProgressInfo)
+						   std::shared_ptr<uint64_t> FileHash, std::weak_ptr<Modio::ModProgressInfo> ProgressInfo)
 				: ArchiveFile(ArchiveFile),
 				  PathInsideArchive(PathInsideArchive),
 				  CompressedOutputBuffer(1),
@@ -48,6 +48,7 @@ namespace Modio
 				CompressionStream = std::make_unique<boost::beast::zlib::deflate_stream>();
 				InputFileSize = InputFile->GetFileSize();
 				IsZip64 = InputFileSize >= (UINT32_MAX - 1);
+				RollingFileHash = FileHash;
 			};
 
 			template<typename CoroType>
@@ -161,8 +162,8 @@ namespace Modio
 						// all the bytes to the CompressionStream
 						BytesProcessed = Modio::FileSize(CompressionState.total_in);
 						// Update The ProgressInfo with the BytesProcessed updated
-						PinnedProgressInfo->CurrentlyExtractedBytes += BytesProcessed;
-						IncrementCurrentProgress(*PinnedProgressInfo.get(), BytesProcessed);
+						PinnedProgressInfo->CurrentlyExtractedBytes += Modio::FileSize(MaxBytesToRead);
+						IncrementCurrentProgress(*PinnedProgressInfo.get(), Modio::FileSize(MaxBytesToRead));
 					}
 
 					// Finish the zlib stream for the current file
@@ -279,6 +280,8 @@ namespace Modio
 					ArchiveFile->AddEntry(PathInsideArchive.generic_u8string(), LocalHeaderOffset,
 										  CompressionState.total_out, CompressionState.total_in,
 										  ArchiveFileImplementation::CompressionMethod::Deflate, InputCRC);
+
+					*RollingFileHash = *RollingFileHash ^ InputCRC;
 					Self.complete({});
 					return;
 				}
@@ -304,6 +307,7 @@ namespace Modio
 			std::uint32_t InputCRC = 0;
 			asio::coroutine CoroutineState;
 			Modio::Optional<Modio::Detail::Buffer> NextBuf;
+			std::shared_ptr<uint64_t> RollingFileHash;
 			std::weak_ptr<Modio::ModProgressInfo> ProgressInfo;
 			/// @brief Helper function so when we add zip64 support we can easily change how much space to allocate for
 			/// the local header

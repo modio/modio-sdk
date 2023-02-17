@@ -48,11 +48,12 @@ namespace Modio
 			template<typename CompletionHandlerType>
 			auto AddFileEntryToArchiveAsync(Modio::filesystem::path SourceFilePath,
 											Modio::filesystem::path PathInsideArchive,
+											std::shared_ptr<uint64_t> FileHash,
 											std::weak_ptr<class Modio::ModProgressInfo> ProgressInfo,
 											CompletionHandlerType&& Handler)
 			{
-				get_service().AddFileEntryAsync(get_implementation(), SourceFilePath, PathInsideArchive, ProgressInfo,
-												std::forward<CompletionHandlerType>(Handler));
+				get_service().AddFileEntryAsync(get_implementation(), SourceFilePath, PathInsideArchive, FileHash,
+												ProgressInfo, std::forward<CompletionHandlerType>(Handler));
 			}
 
 			/// @brief Adds an empty/virtual directory entry to the archive.

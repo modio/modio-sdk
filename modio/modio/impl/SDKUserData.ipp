@@ -29,6 +29,7 @@
 #include "modio/detail/ops/auth/ModioGetTermsOfUseOp.h"
 #include "modio/detail/ops/user/GetUserMediaOp.h"
 #include "modio/detail/ops/userdata/VerifyUserAuthenticationOp.h"
+#include "modio/detail/ops/userdata/RefreshUserDataOp.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 #include "modio/userdata/ModioUserDataService.h"
 
@@ -127,6 +128,15 @@ namespace Modio
 			Modio::Detail::RequireUserIsAuthenticated(Callback))
 		{
 			Modio::Detail::VerifyUserAuthenticationAsync(Callback);
+		}
+	}
+
+	void RefreshUserDataAsync(std::function<void(Modio::ErrorCode)> Callback)
+	{
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+			Modio::Detail::RequireUserIsAuthenticated(Callback))
+		{
+			Modio::Detail::RefreshUserDataAsync(Callback);
 		}
 	}
 
