@@ -15,6 +15,11 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioInitializeOptions.h"
 #include "modio/core/ModioLogger.h"
+#include "modio/detail/HedleyWrapper.h"
+
+MODIO_DIAGNOSTIC_PUSH
+
+MODIO_ALLOW_DEPRECATED_SYMBOLS
 
 namespace Modio
 
@@ -451,3 +456,5 @@ namespace Modio
 	} // namespace Detail
 
 } // namespace Modio
+
+MODIO_DIAGNOSTIC_POP

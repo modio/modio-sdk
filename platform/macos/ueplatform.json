@@ -3,7 +3,8 @@
     "Mac": {
       "IncludeDirectories": [],
       "PlatformSpecificDefines": [],
-      "ModuleDependencies": []
+      "ModuleDependencies": [],
+      "SystemLibraryDependencies": []
     }
   },
   "IncludeDirectories": [
@@ -17,5 +18,6 @@
     "FU2_WITH_NO_EMPTY_PROPAGATION"
   ],
   "ModuleDependencies": [
-  ]
+  ],
+  "SystemLibraryDependencies": []
 }

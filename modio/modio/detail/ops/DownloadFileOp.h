@@ -15,11 +15,17 @@
 #include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/ModioObjectTrack.h"
 #include "modio/detail/ModioOperationQueue.h"
 #include "modio/file/ModioFile.h"
 #include "modio/http/ModioHttpRequest.h"
 #include <asio/yield.hpp>
+
+MODIO_DIAGNOSTIC_PUSH
+
+MODIO_ALLOW_DEPRECATED_SYMBOLS
+
 
 namespace Modio
 {
@@ -302,3 +308,6 @@ namespace Modio
 	} // namespace Detail
 } // namespace Modio
 #include <asio/unyield.hpp>
+
+
+MODIO_DIAGNOSTIC_POP

@@ -266,7 +266,7 @@ namespace Modio
 																			 Modio::FileOffset End,
 																			 Modio::FileOffset Total)
 		{
-			ContentRangeOffsets = {Start, End, Total};
+			ContentRangeOffsets = std::make_tuple(Start, End, Total);
 			return *this;
 		}
 
@@ -574,7 +574,7 @@ namespace Modio
 			// Header Range
 			if (StartOffset.has_value() == true)
 			{
-				std::uintmax_t StartValue = StartOffset ? StartOffset.value() : 0;
+				std::uintmax_t StartValue = StartOffset ? StartOffset.value() : static_cast<uintmax_t>(0);
 				// In case EndOffset does not have a value, return an empty string
 				std::string EndValue = EndOffset ? std::to_string(EndOffset.value()) : "";
 

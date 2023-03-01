@@ -10,6 +10,7 @@
 
 #pragma once
 #include "modio/core/ModioCoreTypes.h"
+#include "modio/core/entities/ModioToken.h"
 #include "modio/detail/JsonWrapper.h"
 #include "modio/detail/entities/ModioAvatar.h"
 #include <string>
@@ -25,6 +26,9 @@ namespace Modio
 
 		/// @brief Username of the user
 		std::string Username = "";
+
+		/// @brief Authentification token of the user
+		Modio::Optional<Modio::Detail::OAuthToken> AuthToken;
 
 		/// @brief Unix timestamp the user was last online
 		std::int64_t DateOnline = 0;

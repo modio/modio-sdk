@@ -16,6 +16,7 @@
 #include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
 #include "modio/detail/ModioObjectTrack.h"
 #include "modio/detail/ModioOperationQueue.h"
@@ -27,6 +28,10 @@
 #include "modio/http/ModioHttpRequest.h"
 #include "modio/http/ModioHttpService.h"
 #include <memory>
+
+MODIO_DIAGNOSTIC_PUSH
+
+MODIO_ALLOW_DEPRECATED_SYMBOLS
 
 #include <asio/yield.hpp>
 namespace Modio
@@ -254,3 +259,5 @@ namespace Modio
 		}
 	} // namespace Detail
 } // namespace Modio
+
+MODIO_DIAGNOSTIC_POP

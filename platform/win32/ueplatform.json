@@ -3,7 +3,8 @@
     "Win64": {
       "IncludeDirectories": [],
       "PlatformSpecificDefines": [],
-      "ModuleDependencies": []
+      "ModuleDependencies": [],
+      "SystemLibraryDependencies": []
     }
   },
   "IncludeDirectories": [
@@ -18,5 +19,6 @@
   ],
   "ModuleDependencies": [
     "WinHttp"
-  ]
+  ],
+  "SystemLibraryDependencies": []
 }

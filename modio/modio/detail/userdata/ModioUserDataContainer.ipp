@@ -26,6 +26,8 @@ namespace Modio
 		void UserDataContainer::InitializeForUser(Modio::User AuthenticatedUser, Modio::Detail::OAuthToken AuthToken)
 		{
 			ResetUserData();
+			// We copy the token to the user struct for now. this will need a refactor of the authtoken
+			AuthenticatedUser.AuthToken = AuthToken;
 			AuthenticatedProfile = Modio::Detail::ProfileData {AuthenticatedUser, AuthToken};
 		}
 

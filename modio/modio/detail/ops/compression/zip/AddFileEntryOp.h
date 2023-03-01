@@ -16,6 +16,7 @@
 #include "modio/core/ModioModCollectionEntry.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/FilesystemWrapper.h"
+#include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/ModioCRC.h"
 #include "modio/detail/compression/zip/ArchiveFileImplementation.h"
 #include "modio/detail/compression/zip/ZipStructures.h"
@@ -23,6 +24,10 @@
 #include "modio/file/ModioFile.h"
 #include <algorithm>
 #include <memory>
+
+MODIO_DIAGNOSTIC_PUSH
+
+MODIO_ALLOW_DEPRECATED_SYMBOLS
 
 namespace Modio
 {
@@ -322,3 +327,6 @@ namespace Modio
 #include <asio/unyield.hpp>
 	} // namespace Detail
 } // namespace Modio
+
+
+MODIO_DIAGNOSTIC_POP

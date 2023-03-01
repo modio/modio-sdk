@@ -15,8 +15,8 @@ add_library (${MODIO_TARGET_NAME} INTERFACE)
 endif()
 
 if (MODIO_SERVER_SIDE_TEST)
-        target_compile_definitions(${MODIO_TARGET_NAME} INTERFACE MODIO_SERVER_SIDE_TEST="${MODIO_SERVER_SIDE_TEST}")
-        message(STATUS "Setting MODIO_SERVER_SIDE_TEST")
+    target_compile_definitions(${MODIO_TARGET_NAME} INTERFACE MODIO_SERVER_SIDE_TEST="${MODIO_SERVER_SIDE_TEST}")
+    message(STATUS "Setting MODIO_SERVER_SIDE_TEST")
 endif()
 
 if (MODIO_TEST_REQUIRES_STATE)
@@ -33,7 +33,6 @@ if (MODIO_CI)
 target_compile_definitions(${MODIO_TARGET_NAME} INTERFACE MODIO_CI=1)
         message(STATUS "Setting MODIO_CI")
 endif()
-
 
 target_include_directories(${MODIO_TARGET_NAME} INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 
@@ -84,6 +83,10 @@ set_target_properties(${MODIO_TARGET_NAME}Static PROPERTIES LINKER_LANGUAGE CXX)
 add_modio_implementation_to_target(${MODIO_TARGET_NAME}Static)
 target_link_libraries(${MODIO_TARGET_NAME}Static PUBLIC ${MODIO_TARGET_NAME})
 target_compile_definitions(${MODIO_TARGET_NAME}Static PUBLIC -DMODIO_SEPARATE_COMPILATION=1)
+#Suppress internal deprecations
+target_compile_definitions(${MODIO_TARGET_NAME}Static PRIVATE -DMODIO_DISABLE_ALL_DEPRECATIONS)
+
+
 #turn on more warnings for the static library target
 #disabled-modio-public-cmake target_compile_options(${MODIO_TARGET_NAME}Static PRIVATE
 #disabled-modio-public-cmake      $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:

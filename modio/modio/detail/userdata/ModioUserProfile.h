@@ -14,7 +14,7 @@
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioModInfoList.h"
 #include "modio/core/entities/ModioUser.h"
-#include "modio/detail/schema/AccessTokenObject.h"
+#include "modio/core/entities/ModioToken.h"
 
 #include <memory>
 
@@ -22,105 +22,6 @@ namespace Modio
 {
 	namespace Detail
 	{
-		enum class OAuthTokenState : std::uint8_t
-		{
-			Valid,
-			Expired,
-			Invalid
-		};
-
-		struct OAuthToken
-		{
-			OAuthToken() = default;
-			OAuthToken(const std::string& InToken, Modio::Timestamp InExpireDate)
-				: Token(InToken),
-				  ExpireDate(InExpireDate),
-				  State(OAuthTokenState::Valid)
-			{}
-			OAuthToken(Modio::Detail::Schema::AccessTokenObject AccessToken)
-				: OAuthToken(AccessToken.AccessToken, AccessToken.DateExpires)
-			{}
-			void SetInvalidState()
-			{
-				Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::User,
-											"Setting current user's OAuth token state to invalid");
-				State = OAuthTokenState::Invalid;
-			}
-			OAuthTokenState GetTokenState() const
-			{
-				if (State == OAuthTokenState::Valid)
-				{
-					auto Now = std::chrono::system_clock::now();
-					std::size_t CurrentUTCTime =
-						std::chrono::duration_cast<std::chrono::seconds>(Now.time_since_epoch()).count();
-
-					return CurrentUTCTime <= ExpireDate ? OAuthTokenState::Valid : OAuthTokenState::Invalid;
-				}
-				return OAuthTokenState::Invalid;
-			}
-			operator bool() const
-			{
-				return GetTokenState() == OAuthTokenState::Valid;
-			}
-			const Modio::Optional<std::string> GetToken() const
-			{
-				if (GetTokenState() == OAuthTokenState::Valid)
-				{
-					return Token.value();
-				}
-				return {};
-			}
-
-			static MODIO_IMPL Modio::Optional<std::string> NoToken;
-
-			/// @docnone
-			friend void from_json(const nlohmann::json& Json, Modio::Detail::OAuthToken& InToken)
-			{
-				Detail::ParseSafe(Json, InToken.ExpireDate, "expiry");
-				Detail::ParseSafe(Json, InToken.State, "status");
-				std::string TokenString = "";
-
-				if (Detail::ParseSafe(Json, TokenString, "token"))
-				{
-					InToken.Token = TokenString;
-				}
-				else
-				{
-					InToken.State = OAuthTokenState::Invalid;
-				}
-			}
-
-			/// @docnone
-			friend void to_json(nlohmann::json& Json, const Modio::Detail::OAuthToken& InToken)
-			{
-				if (InToken.State == OAuthTokenState::Valid && InToken.Token.has_value())
-				{
-					Json = nlohmann::json {{"expiry", InToken.ExpireDate},
-										   {"status", InToken.State},
-										   {"token", InToken.Token.value()}};
-				}
-				else
-				{
-					Json = nlohmann::json {{"expiry", InToken.ExpireDate}, {"status", OAuthTokenState::Invalid}};
-				}
-			}
-
-		private:
-			// Optional here so that the accessors can return references to avoid memcpy, will always be set
-			Modio::Optional<std::string> Token;
-			Modio::Timestamp ExpireDate;
-
-		private:
-			OAuthTokenState State = OAuthTokenState::Invalid;
-
-			/// @docnone
-			friend bool operator==(const Modio::Detail::OAuthToken& A, const Modio::Detail::OAuthToken& B)
-			{
-				return (A.Token == B.Token && A.ExpireDate == B.ExpireDate && A.State == B.State &&
-						A.NoToken == B.NoToken);
-			}
-		};
-
 		struct ProfileData
 		{
 			ProfileData(Modio::User InUser, Modio::Detail::OAuthToken AccessToken) : User(InUser), Token(AccessToken) {}

@@ -110,7 +110,7 @@ namespace Modio
 					CentralDirectoryOffset = Modio::Detail::TypedBufferRead<std::uint32_t>(Chunk, 16);
 				}
 
-				return {NumberOfRecords, CentralDirectorySize, CentralDirectoryOffset};
+				return std::make_tuple(NumberOfRecords, CentralDirectorySize, CentralDirectoryOffset);
 			}
 
 			static std::tuple<ArchiveFileImplementation::ArchiveEntry, std::uint64_t, Modio::ErrorCode> ArchiveParse(

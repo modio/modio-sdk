@@ -11,6 +11,7 @@
 #pragma once
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/JsonWrapper.h"
 #include "modio/detail/ModioObjectTrack.h"
 #include "modio/detail/ModioProfiling.h"
@@ -19,6 +20,12 @@
 #include "modio/detail/ops/compression/ExtractAllToFolderOp.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/file/ModioFileService.h"
+
+
+MODIO_DIAGNOSTIC_PUSH
+
+MODIO_ALLOW_DEPRECATED_SYMBOLS
+
 
 #include <asio/yield.hpp>
 namespace Modio
@@ -248,3 +255,6 @@ namespace Modio
 	} // namespace Detail
 } // namespace Modio
 #include <asio/unyield.hpp>
+
+
+MODIO_DIAGNOSTIC_POP

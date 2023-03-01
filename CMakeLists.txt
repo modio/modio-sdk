@@ -51,6 +51,7 @@ add_subdirectory(ext)
 
 add_subdirectory(modio)
 
+add_subdirectory(examples)
 
 
 #TODO : use cmake install() command to specify files to install

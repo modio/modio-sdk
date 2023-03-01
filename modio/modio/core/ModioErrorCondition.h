@@ -28,4 +28,5 @@ enum class EModioErrorCondition: uint8
 	SDKNotInitialized = 16 UMETA(ToolTip="When this condition is true, the error code indicates that the SDK has not been initialized.") ,
 	UserAlreadyAuthenticatedError = 17 UMETA(ToolTip="When this condition is true, the error code indicates that the user is already authenticated.") ,
 	SystemError = 18 UMETA(ToolTip="When this condition is true, the error code indicates that a low-level system error occurred outside of mod.io SDK control.") ,
+	OperationCanceled = 19 UMETA(ToolTip="When this condition is true, the error code indicates that the asynchronous operation was cancelled before it completed.") ,
 };

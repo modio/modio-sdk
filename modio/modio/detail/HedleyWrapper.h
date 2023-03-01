@@ -41,5 +41,9 @@
 #endif
 
 #ifndef MODIO_DEPRECATED
-	#define MODIO_DEPRECATED(Since, Replacement) HEDLEY_DEPRECATED_FOR(Since,Replacement)
+	#if MODIO_DISABLE_ALL_DEPRECATIONS
+		#define MODIO_DEPRECATED(...)
+	#else
+		#define MODIO_DEPRECATED(Since, Replacement) HEDLEY_DEPRECATED_FOR(Since,Replacement)
+	#endif
 #endif

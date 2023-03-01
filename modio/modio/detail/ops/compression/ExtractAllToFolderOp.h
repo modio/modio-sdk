@@ -14,8 +14,13 @@
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/file/ModioFileService.h"
+
+MODIO_DIAGNOSTIC_PUSH
+
+MODIO_ALLOW_DEPRECATED_SYMBOLS
 
 namespace Modio
 {
@@ -199,3 +204,5 @@ namespace Modio
 		}
 	} // namespace Detail
 } // namespace Modio
+
+MODIO_DIAGNOSTIC_POP

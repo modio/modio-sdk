@@ -16,9 +16,14 @@
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/FilesystemWrapper.h"
+#include "modio/detail/HedleyWrapper.h"
 #include "modio/file/ModioFile.h"
 #include "modio/file/ModioFileService.h"
 #include <memory>
+
+MODIO_DIAGNOSTIC_PUSH
+
+MODIO_ALLOW_DEPRECATED_SYMBOLS
 
 namespace Modio
 {
@@ -195,3 +200,5 @@ namespace Modio
 		}
 	} // namespace Detail
 } // namespace Modio
+
+MODIO_DIAGNOSTIC_POP

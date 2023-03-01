@@ -14,6 +14,7 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/ModioObjectTrack.h"
 #include "modio/detail/compression/zip/ArchiveFileImplementation.h"
 #include "modio/detail/compression/zlib/inflate_stream.hpp"
@@ -21,6 +22,10 @@
 #include "modio/file/ModioFile.h"
 #include <asio/yield.hpp>
 #include <cstdint>
+
+MODIO_DIAGNOSTIC_PUSH
+
+MODIO_ALLOW_DEPRECATED_SYMBOLS
 
 namespace Modio
 {
@@ -149,3 +154,5 @@ namespace Modio
 } // namespace Modio
 
 #include <asio/unyield.hpp>
+
+MODIO_DIAGNOSTIC_POP

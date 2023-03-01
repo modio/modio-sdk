@@ -29,12 +29,18 @@ DISABLE_WARNING_OPERATOR_OPERATION
 	#if defined(MODIO_PLATFORM_CUSTOM_FS)
 		#pragma push_macro("GHC_OS_CUSTOM")
 		#define GHC_OS_CUSTOM
+		#pragma push_macro("_LIBCPP_VERSION")
+		#undef _LIBCPP_VERSION
 
 		#include "ghc/filesystem.hpp"
 
 		#include "file/FileSystemStubs.h"
-
+		#pragma pop_macro("_LIBCPP_VERSION")
 		#pragma pop_macro("GHC_OS_CUSTOM")
+namespace Modio
+{
+	namespace filesystem = ghc::filesystem;
+} // namespace Modio
 
 	#elif defined(MODIO_USE_STD_FILESYSTEM)
 
@@ -65,11 +71,13 @@ DISABLE_WARNING_POP
 	// separate file
 	#pragma push_macro("GHC_OS_CUSTOM")
 	#define GHC_OS_CUSTOM
+	#pragma push_macro("_LIBCPP_VERSION")
+	#undef _LIBCPP_VERSION
 
 	#include "ghc/filesystem.hpp"
 
 	#include "file/FileSystemStubs.h"
-
+	#pragma pop_macro("_LIBCPP_VERSION")
 	#pragma pop_macro("GHC_OS_CUSTOM")
 namespace Modio
 {

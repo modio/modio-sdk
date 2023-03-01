@@ -42,6 +42,19 @@ namespace Modio
 					// For reference: https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
 					OutputFile->Seek(Modio::FileOffset(OutputFile->GetFileSize()));
 					StartOfCentralDirectory = OutputFile->Tell();
+                    
+                    // In case the Central Directory is outside of "4294967295" bytes, then tag it as Zip64
+                    if (StartOfCentralDirectory >= Constants::ZipTag::MAX32)
+                    {
+                        ArchiveFile->bIsZip64 = true;
+                    }
+                    
+                    // In case the number of files is larger than "65535", then tag it as Zip64
+                    if (ArchiveFile->GetNumberOfEntries() >= Constants::ZipTag::MAX16)
+                    {
+                        ArchiveFile->bIsZip64 = true;
+                    }
+                    
 					// The iterator will be safe to dereference across a `yield` because it's pointing to a vector
 					// stored in the shared_ptr, ie moving this operation won't change the location in memory of the
 					// object in ArchiveFile

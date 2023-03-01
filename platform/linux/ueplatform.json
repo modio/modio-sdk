@@ -3,7 +3,8 @@
     "Linux": {
       "IncludeDirectories": [],
       "PlatformSpecificDefines": [],
-      "ModuleDependencies": []
+      "ModuleDependencies": [],
+      "SystemLibraryDependencies": []
     }
   },
   "IncludeDirectories": [
@@ -16,6 +17,8 @@
     "MODIO_TARGET_PLATFORM_HEADER=\"Linux\""
   ],
   "ModuleDependencies": [
-    "uring", "mbedtls"
-  ]
+    "uring",
+    "mbedtls"
+  ],
+  "SystemLibraryDependencies": []
 }

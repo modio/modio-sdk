@@ -1121,7 +1121,9 @@ namespace Modio
 		/// @brief When this condition is true, the error code indicates that the user is already authenticated.
 		UserAlreadyAuthenticatedError = 17,
 		/// @brief When this condition is true, the error code indicates that a low-level system error occurred outside of mod.io SDK control.
-		SystemError = 18
+		SystemError = 18,
+		/// @brief When this condition is true, the error code indicates that the asynchronous operation was cancelled before it completed.
+		OperationCanceled = 19
 	};
 
 	/// @docnone
@@ -1185,6 +1187,9 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::SystemError:
 					return "When this condition is true, the error code indicates that a low-level system error occurred outside of mod.io SDK control.";
+				break;
+				case ErrorConditionTypes::OperationCanceled:
+					return "When this condition is true, the error code indicates that the asynchronous operation was cancelled before it completed.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -1939,6 +1944,14 @@ namespace Modio
 					}
 
 	
+				break;
+				case ErrorConditionTypes::OperationCanceled:
+					if (ec == Modio::GenericError::OperationCanceled)
+					{
+						return true;
+					}
+
+
 				break;
 			}
 			return false;
