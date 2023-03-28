@@ -173,9 +173,11 @@ namespace Modio
 				if (LexPath.string() == "")
 				{
 					std::string PreFolder = "..";
+					std::string AbsFolder = "\\";
 
 					// This case means that the path does not have a reference to folders above the current location.
-					if (FilePath.string().find(PreFolder) == std::string::npos)
+					if (FilePath.string().find(PreFolder) == std::string::npos && 
+						FilePath.string().find(AbsFolder) != 0)
 					{
 						return {};
 					}

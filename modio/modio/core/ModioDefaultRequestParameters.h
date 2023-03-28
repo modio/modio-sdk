@@ -32,6 +32,17 @@ namespace Modio
         static const HttpRequestParams AuthenticateViaXboxLiveRequest { Modio::Detail::Verb::POST, "/external/xboxauth" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetGamesRequest { Modio::Detail::Verb::GET, "/games" }; 
         static const HttpRequestParams GetGameRequest { Modio::Detail::Verb::GET, "/games/{game-id}" }; 
+        static const HttpRequestParams GetGuidesRequest { Modio::Detail::Verb::GET, "/games/{game-id}/guides" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams AddGuideRequest { Modio::Detail::Verb::POST, "/games/{game-id}/guides" , "multipart/form-data" }; 
+        static const HttpRequestParams GetGuidesTagsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/guides/tags" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams DeleteGuideRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/guides/{guide-id}" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams GetGuideRequest { Modio::Detail::Verb::GET, "/games/{game-id}/guides/{guide-id}" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams EditGuideRequest { Modio::Detail::Verb::POST, "/games/{game-id}/guides/{guide-id}" , "multipart/form-data" }; 
+        static const HttpRequestParams GetGuideCommentsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/guides/{guide-id}/comments" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams AddGuideCommentRequest { Modio::Detail::Verb::POST, "/games/{game-id}/guides/{guide-id}/comments" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams DeleteGuideCommentRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/guides/{guide-id}/comments/{comment-id}" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams GetGuideCommentRequest { Modio::Detail::Verb::GET, "/games/{game-id}/guides/{guide-id}/comments/{comment-id}" }; 
+        static const HttpRequestParams UpdateGuideCommentRequest { Modio::Detail::Verb::PUT, "/games/{game-id}/guides/{guide-id}/comments/{comment-id}" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AddGuideCommentKarmaRequest { Modio::Detail::Verb::POST, "/games/{game-id}/guides/{guide-id}/comments/{comment-id}/karma" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AddGameMediaRequest { Modio::Detail::Verb::POST, "/games/{game-id}/media" , "multipart/form-data" }; 
         static const HttpRequestParams GetModsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods" }; 

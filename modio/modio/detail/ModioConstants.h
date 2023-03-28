@@ -35,6 +35,10 @@ namespace Modio
 				constexpr const char* ReportSummary = "summary";
 				constexpr const char* Rating = "rating";
 				constexpr const char* GameID = "game_id";
+				constexpr const char* Device = "device";
+				constexpr const char* UserID = "user_id";
+				constexpr const char* Nonce = "nonce";
+				constexpr const char* AccessToken = "access_token";
 			} // namespace APIStrings
 			namespace JSONKeys
 			{

@@ -813,6 +813,7 @@ namespace Modio
 					RawBuffer = Other.RawBuffer.value().Clone();
 					PathToFile = {};
 				}
+				MODIO_FALL_THROUGH;
 				case PayloadType::File:
 				case PayloadType::FilePortion:
 				{

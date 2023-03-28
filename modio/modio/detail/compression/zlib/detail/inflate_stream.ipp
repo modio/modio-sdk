@@ -151,7 +151,7 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
         case TYPE:
             if(flush == Flush::block || flush == Flush::trees)
                 return done();
-            // fall through
+            MODIO_FALL_THROUGH;
 
         case TYPEDO:
         {
@@ -207,12 +207,11 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
             mode_ = COPY_;
             if(flush == Flush::trees)
                 return done();
-
         }
-
+        MODIO_FALL_THROUGH;
         case COPY_:
             mode_ = COPY;
-
+            MODIO_FALL_THROUGH;
         case COPY:
         {
             auto copy = length_;
@@ -245,7 +244,7 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
                 return err(Modio::make_error_code(Modio::ZlibError::TooManySymbols));
             have_ = 0;
             mode_ = LENLENS;
-
+            MODIO_FALL_THROUGH;
 
         case LENLENS:
         {
@@ -273,7 +272,7 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
             }
             have_ = 0;
             mode_ = CODELENS;
-
+            MODIO_FALL_THROUGH;
         }
 
         case CODELENS:
@@ -362,13 +361,12 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
             mode_ = LEN_;
             if(flush == Flush::trees)
                 return done();
-
+            MODIO_FALL_THROUGH;
         }
 
         case LEN_:
             mode_ = LEN;
-
-
+            MODIO_FALL_THROUGH;
         case LEN:
         {
             if(r.in.avail() >= 6 && r.out.avail() >= 258)
@@ -420,9 +418,8 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
                 return err(Modio::make_error_code(Modio::ZlibError::InvalidLiteralLength));
             extra_ = cp->op & 15;
             mode_ = LENEXT;
-
         }
-
+        MODIO_FALL_THROUGH;
         case LENEXT:
             if(extra_)
             {
@@ -435,7 +432,7 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
             }
             was_ = length_;
             mode_ = DIST;
-
+            MODIO_FALL_THROUGH;
 
         case DIST:
         {
@@ -465,6 +462,7 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
             extra_ = cp->op & 15;
             mode_ = DISTEXT;
         }
+        MODIO_FALL_THROUGH;
 
         case DISTEXT:
             if(extra_)
@@ -481,7 +479,7 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
                 return err(error::invalid_distance);
 #endif
             mode_ = MATCH;
-
+            MODIO_FALL_THROUGH;
 
         case MATCH:
         {
@@ -513,6 +511,7 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
                 mode_ = LEN;
             break;
         }
+        MODIO_FALL_THROUGH;
 
         case LIT:
         {
@@ -523,10 +522,11 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
             mode_ = LEN;
             break;
         }
+        MODIO_FALL_THROUGH;
 
         case CHECK:
             mode_ = DONE;
-
+            MODIO_FALL_THROUGH;
 
         case DONE:
             ec = Modio::make_error_code(Modio::ZlibError::EndOfStream);

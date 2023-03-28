@@ -20,16 +20,18 @@
 #include "modio/detail/ops/AuthenticateUserByEmailOp.h"
 #include "modio/detail/ops/RequestEmailAuthCodeOp.h"
 #include "modio/detail/ops/auth/AuthenticateUserByDiscord.h"
+#include "modio/detail/ops/auth/AuthenticateUserByEpic.h"
 #include "modio/detail/ops/auth/AuthenticateUserByGog.h"
 #include "modio/detail/ops/auth/AuthenticateUserByItch.h"
+#include "modio/detail/ops/auth/AuthenticateUserByOculus.h"
 #include "modio/detail/ops/auth/AuthenticateUserByPSN.h"
 #include "modio/detail/ops/auth/AuthenticateUserBySteam.h"
 #include "modio/detail/ops/auth/AuthenticateUserBySwitchID.h"
 #include "modio/detail/ops/auth/AuthenticateUserByXBoxLive.h"
 #include "modio/detail/ops/auth/ModioGetTermsOfUseOp.h"
 #include "modio/detail/ops/user/GetUserMediaOp.h"
-#include "modio/detail/ops/userdata/VerifyUserAuthenticationOp.h"
 #include "modio/detail/ops/userdata/RefreshUserDataOp.h"
+#include "modio/detail/ops/userdata/VerifyUserAuthenticationOp.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 #include "modio/userdata/ModioUserDataService.h"
 
@@ -97,6 +99,18 @@ namespace Modio
 				break;
 			case AuthenticationProvider::PSN:
 				Modio::Detail::AuthenticateUserByPSNAsync(User, Callback);
+				break;
+			case AuthenticationProvider::Epic:
+				Modio::Detail::AuthenticateUserByEpicAsync(User, Callback);
+				break;
+			case AuthenticationProvider::Oculus:
+				// Oculus requires extended parameters to be sent along, so we validate the parameters
+				// with our precondition check here.
+				if (Modio::Detail::RequireValidOculusExtendedParameters(User, Callback) == false)
+				{
+					return;
+				}
+				Modio::Detail::AuthenticateUserByOculusAsync(User, Callback);
 				break;
 		}
 	}

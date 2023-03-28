@@ -15,6 +15,7 @@
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/impl/SDKPreconditionChecks.h"
 
 namespace Modio
 {
@@ -108,10 +109,13 @@ namespace Modio
 		inline void SubmitNewModAsync(Modio::ModCreationHandle Handle, Modio::CreateModParams Params,
 									  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModID>)> Callback)
 		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModID>)>,
-									   void(Modio::ErrorCode, Modio::Optional<Modio::ModID>)>(
-				Modio::Detail::SubmitNewModOp(Handle, Params), Callback,
-				Modio::Detail::Services::GetGlobalContext().get_executor());
+			if (Modio::Detail::RequireFileExists(Params.PathToLogoFile, Callback))
+			{
+				return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModID>)>,
+										   void(Modio::ErrorCode, Modio::Optional<Modio::ModID>)>(
+					Modio::Detail::SubmitNewModOp(Handle, Params), Callback,
+					Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
 		}
 	} // namespace Detail
 } // namespace Modio

@@ -246,5 +246,51 @@ namespace Modio
 				return true;
 			}
 		}
+
+		template<typename... OtherArgs>
+		bool RequireValidOculusExtendedParameters(Modio::AuthenticationParams User,
+												  std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
+		{
+			if ((User.ExtendedParameters.count(Modio::Detail::Constants::APIStrings::Device) &&
+				 !User.ExtendedParameters[Modio::Detail::Constants::APIStrings::Device].empty()) &&
+				(User.ExtendedParameters.count(Modio::Detail::Constants::APIStrings::UserID) &&
+				 !User.ExtendedParameters[Modio::Detail::Constants::APIStrings::UserID].empty()) &&
+				(User.ExtendedParameters.count(Modio::Detail::Constants::APIStrings::Nonce) &&
+				 !User.ExtendedParameters[Modio::Detail::Constants::APIStrings::Nonce].empty()))
+			{
+				return true;
+			}
+			else
+			{
+				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+						   [CompletionHandler =
+								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
+							   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
+												 (OtherArgs {})...);
+						   });
+				return false;
+			}
+		}
+
+		template<typename... OtherArgs>
+		bool RequireFileExists(Modio::filesystem::path FileToCheck,
+							   std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
+		{
+			Modio::Detail::FileService& FileService =
+				Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>();
+
+			if (FileService.FileExists(FileToCheck) == true)
+			{
+				return true;
+			}
+
+			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					   [CompletionHandler =
+							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
+						   CompletionHandler(Modio::make_error_code(Modio::FilesystemError::FileNotFound),
+											 (OtherArgs {})...);
+					   });
+			return false;
+		}
 	} // namespace Detail
 } // namespace Modio

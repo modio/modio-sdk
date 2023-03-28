@@ -8,6 +8,8 @@
  *
  */
 
+#pragma comment(lib, "ws2_32.lib")
+
 #include "common/HttpSharedState.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/AsioWrapper.h"

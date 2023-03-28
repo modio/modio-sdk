@@ -22,7 +22,7 @@
 	#include MODIO_UNREAL_PLATFORM_PREAMBLE
 	#pragma push_macro("check") 
 	#undef check
-	#if PLATFORM_WINDOWS
+	#if PLATFORM_WINDOWS || PLATFORM_XBOXONEGDK || PLATFORM_XSX || PLATFORM_XB1
 		#pragma warning(push)
 		#pragma warning(disable : 4583)
 		#pragma warning(disable : 4582)
@@ -35,7 +35,7 @@
 	#include "fmt/chrono.h"
 	#include "fmt/format.h"
 	#include "fmt/printf.h"
-	#if PLATFORM_WINDOWS
+	#if PLATFORM_WINDOWS || PLATFORM_XBOXONEGDK || PLATFORM_XSX || PLATFORM_XB1
 		#pragma warning(pop)
 	#endif
 	#pragma pop_macro("_LIBCPP_VERSION")

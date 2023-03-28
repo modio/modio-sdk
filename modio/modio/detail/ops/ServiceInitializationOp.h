@@ -29,6 +29,12 @@
 #include <algorithm>
 #include <memory>
 
+#ifdef MODIO_PROCESS_INTERNAL_INITPARAMS
+	#include "modio/detail/ModioExtendedInitParamHandler.h"
+#else
+	#include "modio/detail/ModioExtInitParamStub.h"
+#endif
+
 #include <asio/yield.hpp>
 
 class ServiceInitializationOp
@@ -56,6 +62,8 @@ public:
 				Self.complete(Modio::make_error_code(Modio::GenericError::SDKAlreadyInitialized));
 				return;
 			}
+
+			Modio::Detail::ExtendedInitParamHandler::PostSessionDataInit(InitParams);
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Core,
 										"Initializing mod.io services");
@@ -131,6 +139,9 @@ public:
 				Self.complete(ec);
 				return;
 			}
+
+			Modio::Detail::ExtendedInitParamHandler::PostUserDataServiceInit(InitParams);
+
 			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::User,
 										"Initialized User Data service");
 			if (Modio::Detail::SDKSessionData::GetUserModDirectoryOverride().has_value())

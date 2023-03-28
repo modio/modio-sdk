@@ -11,25 +11,29 @@
 #pragma once
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ops/auth/AuthenticateUserExternal.h"
-#include "modio/http/ModioHttpParams.h"
 
 namespace Modio
 {
 	namespace Detail
 	{
-
-		inline void AuthenticateUserByEpicAsync(Modio::AuthenticationParams User,
-										 std::function<void(Modio::ErrorCode)> Callback)
+		inline void AuthenticateUserByOculusAsync(Modio::AuthenticationParams User,
+												  std::function<void(Modio::ErrorCode)> Callback)
 		{
 			Modio::Detail::HttpRequestParams Params =
-				Modio::Detail::AuthenticateViaEpicgamesRequest
+				Modio::Detail::AuthenticateViaOculusRequest
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::AccessToken, User.AuthToken)
+					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::Device,
+										User.ExtendedParameters[Modio::Detail::Constants::APIStrings::Device])
+					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::UserID,
+										User.ExtendedParameters[Modio::Detail::Constants::APIStrings::UserID])
+					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::Nonce,
+										User.ExtendedParameters[Modio::Detail::Constants::APIStrings::Nonce])
 					.EncodeAndAppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed,
 										User.bUserHasAcceptedTerms ? "true" : "false");
 			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-				AuthenticateUserExternal(Params), Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+				Modio::Detail::AuthenticateUserExternal(Params), Callback,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
-
 	} // namespace Detail
 } // namespace Modio

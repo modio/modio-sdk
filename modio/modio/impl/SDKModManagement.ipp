@@ -317,10 +317,11 @@ namespace Modio
 								 std::function<void(Modio::ErrorCode)> Callback)
 	{
 		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
-			Modio::Detail::RequireUserIsAuthenticated(Callback))
+			Modio::Detail::RequireUserIsAuthenticated(Callback) && Modio::Detail::RequireFileExists(LogoPath, Callback))
 		{
 			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-				Modio::Detail::AddOrUpdateModLogoOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID, Modio::filesystem::path(LogoPath)),
+				Modio::Detail::AddOrUpdateModLogoOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID,
+													Modio::filesystem::path(LogoPath)),
 				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	}

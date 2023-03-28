@@ -440,12 +440,14 @@ namespace Modio
 	/// @param bURLEncodeAuthToken Boolean value to let the SDK know if the AuthToken requires
 	/// URL encoding before sending the string to the mod.io API. By default, it would not
 	/// perform URL encoding.
+	/// @param ExtendedParameters A map to store extended parameters required by some providers.
 	struct AuthenticationParams
 	{
 		std::string AuthToken;
 		Modio::Optional<std::string> UserEmail;
 		bool bUserHasAcceptedTerms = false;
 		bool bURLEncodeAuthToken = false;
+		std::map<std::string, std::string> ExtendedParameters;
 	};
 
 	/// @docpublic
@@ -479,7 +481,9 @@ namespace Modio
 		Itch,
 		Switch,
 		Discord,
-		PSN
+		PSN,
+		Oculus, 
+		Epic
 	};
 
 	/// @docpublic
@@ -601,6 +605,10 @@ namespace Modio
 					return "discord";
 				case AuthenticationProvider::PSN:
 					return "psn";
+				case AuthenticationProvider::Oculus:
+					return "oculus";
+				case AuthenticationProvider::Epic:
+					return "epic";
 			}
 
 			assert(false && "Invalid value to ToString(Modio::Provider)");

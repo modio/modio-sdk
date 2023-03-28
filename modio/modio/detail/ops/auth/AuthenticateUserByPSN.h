@@ -21,11 +21,20 @@ namespace Modio
 		{
 			Modio::Detail::HttpRequestParams Params =
 				Modio::Detail::AuthenticateViaPsnRequest
-					.AppendPayloadValue("env", "256")
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::AuthCode, User.AuthToken)
 					.EncodeAndAppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed,
 										User.bUserHasAcceptedTerms ? "true" : "false");
+			//Allow the user to override the environment by specifying the numeric value for it
+			auto ParamIterator = User.ExtendedParameters.find("env");
+			if (ParamIterator != User.ExtendedParameters.end())
+			{
+				Params = Params.AppendPayloadValue("env", ParamIterator->second);
+			}
+			else
+			{
+				Params = Params.AppendPayloadValue("env", "256");
+			}
 			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
 				Modio::Detail::AuthenticateUserExternal(Params), Callback,
 				Modio::Detail::Services::GetGlobalContext().get_executor());

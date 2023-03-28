@@ -43,7 +43,7 @@ namespace Modio
 					{
 						Modio::Detail::Logger().Log(
 							LogLevel::Error, LogCategory::File,
-							"DeleteFolderAsync during UninstallModUp was not successful, path: {} and error message: ",
+							"DeleteFolderAsync during UninstallModOp was not successful, path: {} and error message: {}",
 							InstallPath.string(), ec.message());
 
 						// Mod will still be considered as installed as something went wrong when deleting the file

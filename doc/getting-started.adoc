@@ -350,7 +350,7 @@ Per-game, Local Profile-specific settings are stored in `${FolderID_LocalAppData
 *Adding* a `RootLocalDataPath` element to this file will redirect the mod installation directory for this specific game only, for the current Local Profile. Removing this value will cause the game to revert back to the global value in `globalsettings.json`.
 
 '''
-=== SDK quick-start [[quick-start]]
+== SDK quick-start [[quick-start]]
 
 The following guides are provided to help you through the basic functions of the SDK as described in <<SDK structure and concepts>>.
 

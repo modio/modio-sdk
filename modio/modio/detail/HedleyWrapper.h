@@ -47,3 +47,7 @@
 		#define MODIO_DEPRECATED(Since, Replacement) HEDLEY_DEPRECATED_FOR(Since,Replacement)
 	#endif
 #endif
+
+#ifndef MODIO_FALL_THROUGH
+	#define MODIO_FALL_THROUGH HEDLEY_FALL_THROUGH
+#endif

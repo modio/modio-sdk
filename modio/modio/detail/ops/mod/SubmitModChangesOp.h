@@ -15,6 +15,7 @@
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/impl/SDKPreconditionChecks.h"
 
 namespace Modio
 {
@@ -98,10 +99,27 @@ namespace Modio
 			Modio::ModID Mod, Modio::EditModParams Params,
 			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)> Callback)
 		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>,
-									   void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>(
-				Modio::Detail::SubmitModChangesOp(Mod, Params), Callback,
-				Modio::Detail::Services::GetGlobalContext().get_executor());
+			bool FileExists = false;
+
+			if (Params.LogoPath.has_value() == true)
+			{
+				// Because LogoPath was set, we need to check file existance
+				FileExists = Modio::Detail::RequireFileExists(Params.LogoPath.value(), Callback);
+			}
+			else
+			{
+				// Because LogoPath is empty, the precondition is not necessary and we need
+				// to continue as normal.
+				FileExists = true;
+			}
+
+			if (FileExists == true)
+			{
+				return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>,
+										   void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>(
+					Modio::Detail::SubmitModChangesOp(Mod, Params), Callback,
+					Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
 		}
 	} // namespace Detail
 } // namespace Modio

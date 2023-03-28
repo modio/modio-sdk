@@ -318,6 +318,7 @@ namespace Modio
 				return;
 			case ModProgressInfo::EModProgressState::Compressing:
 				Info.CompressCurrent = NewValue;
+				MODIO_FALL_THROUGH;
 			default:
 				return;
 		}
@@ -338,6 +339,7 @@ namespace Modio
 				return;
 			case ModProgressInfo::EModProgressState::Compressing:
 				Info.CompressCurrent += NewValue;
+				MODIO_FALL_THROUGH;
 			default:
 				return;
 		}
@@ -380,6 +382,7 @@ namespace Modio
 				return;
 			case ModProgressInfo::EModProgressState::Compressing:
 				Info.CompressTotal = NewTotal;
+				MODIO_FALL_THROUGH;
 			default:
 				return;
 		}

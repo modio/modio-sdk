@@ -66,8 +66,8 @@ namespace Modio
 			Modio::Optional<Modio::Detail::Buffer> RawBuffer;
 			Modio::Optional<Modio::filesystem::path> PathToFile;
 			PayloadType PType = PayloadType::Buffer;
-			// This is the amount of bytes the file ocuppies in the system
-			Modio::FileSize FileSize;
+			// This is the amount of bytes the file occupies in the system
+			Modio::FileSize FileSize = Modio::FileSize(0);
 			// If the content should consider an offset from the file
 			Modio::FileOffset Offset = Modio::FileOffset(0);
 			// If file should have a maximum number of bytes for the content

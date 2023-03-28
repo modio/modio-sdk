@@ -79,7 +79,6 @@ namespace Modio
 										 .SetModID(CurrentModID)
 										 .AppendPayloadValue("filename", FileName)
 										 .AppendPayloadValue("nonce", FileHash);
-				;
 
 				// Request to Close an Upload Session
 				Modio::Detail::HttpRequestParams ParamsRequest =

@@ -1123,7 +1123,9 @@ namespace Modio
 		/// @brief When this condition is true, the error code indicates that a low-level system error occurred outside of mod.io SDK control.
 		SystemError = 18,
 		/// @brief When this condition is true, the error code indicates that the asynchronous operation was cancelled before it completed.
-		OperationCanceled = 19
+		OperationCanceled = 19,
+		/// @brief When this condition is true, the error code indicates that Mod Management has not been enabled.
+		ModManagementDisabled = 20
 	};
 
 	/// @docnone
@@ -1190,6 +1192,9 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::OperationCanceled:
 					return "When this condition is true, the error code indicates that the asynchronous operation was cancelled before it completed.";
+				break;
+				case ErrorConditionTypes::ModManagementDisabled:
+					return "When this condition is true, the error code indicates that Mod Management has not been enabled.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -1947,6 +1952,14 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::OperationCanceled:
 					if (ec == Modio::GenericError::OperationCanceled)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::ModManagementDisabled:
+					if (ec == Modio::ModManagementError::ModManagementDisabled)
 					{
 						return true;
 					}

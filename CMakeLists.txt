@@ -53,7 +53,6 @@ add_subdirectory(modio)
 
 add_subdirectory(examples)
 
-
 #TODO : use cmake install() command to specify files to install
 #then we want to invoke package() somewhere, I think? set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
 

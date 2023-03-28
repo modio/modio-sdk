@@ -134,6 +134,11 @@ namespace Modio
 
 			void Dequeue()
 			{
+				if (bWasCancelled.load())
+				{
+					return;
+				}
+
 				OperationInProgress.exchange(false);
 
 				if (NumWaiters > 0)
@@ -159,6 +164,8 @@ namespace Modio
 					QueueEntry();
 				}
 				QueueImpl.clear();
+
+				OperationInProgress.exchange(false);
 			}
 		};
 	} // namespace Detail
