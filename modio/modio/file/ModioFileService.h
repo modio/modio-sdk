@@ -324,6 +324,16 @@ namespace Modio
 				return PlatformImplementation->CheckSpaceAvailable(Destination, DesiredSize);
 			}
 
+			/// @brief Checks the path of a file being extracted to ensure it extracts to the expected location on disk
+			/// @param FilePath Path of the current entry being extracted
+			/// @param RootOutputPath Location to extract to
+			/// @return Modio::FilesystemError::NoPermission on failure, or empty Modio::ErrorCode on success
+			Modio::ErrorCode CheckExtractionPath(const Modio::filesystem::path& FilePath,
+												 const Modio::filesystem::path& RootOutputPath) const
+			{
+				return PlatformImplementation->CheckExtractionPath(FilePath, RootOutputPath);
+			}
+
 		private:
 			/// @brief Internal method for getting filepath of a mod media file if it exists
 			/// @param FolderPath The path that contains the different sizes for the image

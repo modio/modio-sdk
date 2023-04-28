@@ -6,8 +6,8 @@
 
 The following packages are required to build the mod.io SDK for Windows 10:
 
-- Visual Studio 2019 (Community version works)
-- Visual Studio 2019 "Desktop Development with C++" (via Visual Studio Installer)
+- Visual Studio 2019 & 2022 (Community version works)
+- Visual Studio 2019 & 2022 "Desktop Development with C++" (via Visual Studio Installer)
 
 These include the required CMake (version 3.20 or higher), Ninja, and MSVC C++ compiler.
 
@@ -16,12 +16,13 @@ These include the required CMake (version 3.20 or higher), Ninja, and MSVC C++ c
 The mod.io SDK has the following dependencies:
 
 - https://github.com/modio/modio-integration-asio[asio]
-- https://github.com/gulrak/filesystem[filesystem]
+- https://github.com/modio/modio-integration-filesystem[filesystem]
 - https://github.com/fmtlib/fmt[fmt]
 - https://github.com/nekipelov/httpparser[httpparser]
 - https://github.com/nlohmann/json[json]
-- https://github.com/TartanLlama/optional[optional]
+- https://github.com/modio/modio-integration-optional[optional]
 - https://github.com/nemtrif/utfcpp[utfcpp]
+- https://github.com/Naios/function2[function2]
 - https://github.com/ARMmbed/mbedtls[mbedtls] (linux)
 
 While it is possible to download the SDK source code as a zip file from GitHub, a recursive clone will also download all dependencies. To ensure these dependencies are downloaded, use the following commands:
@@ -168,6 +169,45 @@ cmake --build <modio-sdk folder>/out/build/win
 cmake --install <modio-sdk folder>/out/build/win
 ```
 
+=== Deprecated code [[deprecated-code]]
+
+If you want to disable deprecated code to avoid warnings or just its usage, you can add `define MODIO_NO_DEPRECATED`, this define will avoid compilation of deprecated code.
+
+=== Clang compiler in Visual Studio [[clang-win]]
+
+It is possible to employ the Clang compiler provided by Visual Studio Installer under the name `C++ Clang Compier for Windows`. You can update the `CMakePreset.json` using the following variables:
+
+```
+"cacheVariables": 
+{
+  "CMAKE_C_COMPILER":
+  {
+    "value": "clang-cl.exe",
+    "type": "STRING"
+  },
+  "CMAKE_CXX_COMPILER":
+  {
+    "value": "clang-cpp.exe",
+    "type": "STRING"
+  }
+}
+```
+
+However, you must be aware that Visual Studio 2019 & 2022 had some issues compiling projects with CMake & Ninja, like the following error:
+
+```
+The C compiler
+  "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/Llvm/x64/bin/clang-cpp.exe"
+is not able to compile a simple test program.
+```
+
+To resolve this issue, you can add the following line to `CMakeList.txt` before the project definition
+
+```
+set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+project(${MODIO_TARGET_NAME} C CXX )
+```
+
 ==== Custom `fmt` library
 If you have a custom version of the `fmt` library, you can modify the linking stage defining `MODIO_USE_CUSTOM_FMT`. This define signals the CMake build system to use a custom version of the library. Also, it requires that you define `MODIO_CUSTOM_FMT_PATH` to the system path that contains the `fmt` library to use.
 
@@ -235,7 +275,8 @@ The mod.io SDK has a simple structure that primarily consists of a flat interfac
 * SDK management: Initialization, teardown, event loop
 * User authentication
 * Mod browsing and querying
-* Mod management: subscribe, unsubscribe.
+* Mod management: subscribe, unsubscribe
+* Two environments: Test & Live.
 
 See <<quick-start>> for basic guides for each of these categories.
 
@@ -349,6 +390,20 @@ Per-game, Local Profile-specific settings are stored in `${FolderID_LocalAppData
 +
 *Adding* a `RootLocalDataPath` element to this file will redirect the mod installation directory for this specific game only, for the current Local Profile. Removing this value will cause the game to revert back to the global value in `globalsettings.json`.
 
+==== Endpoint Environments
+
+The mod.io plugin can connect to different endpoint environments depending on the development stage your game is in. The 'test' environment is intended for use by developers while they perform initial integration of mod.io into their title.
+
+Before release, you will be able to setup a "hidden" Live environment that will allow you to perform QA against the production environment before release, without exposing your title to the public. At this stage, only selected accounts are able to see your game page, and mods that are uploaded for your title. Once you are ready, you can change the state from "hidden" to "public" to make a full release of your game's modding capabilities.
+
+In summary, here are the three steps:
+
+* Test Environment: Used for integration between your game and mod.io
+* Live Environment, Hidden: Used for quality assurance and pre-release mods
+* Live Environment, Public: It is open for everyone to see.
+
+The <<sdk-initialization, sample code>> below shows how the SDK sets the value `GameEnvironment` to denote the endpoint API to use. Also, consider that these two environments use a different API keys.If you try to connect to a Test environment with a key created from the Live environment, any endpoint API request will fail with a `401` error.
+
 '''
 == SDK quick-start [[quick-start]]
 
@@ -364,7 +419,7 @@ The following guides are provided to help you through the basic functions of the
 * <<SDK quick-start: User mute/unmute functions>>
 
 '''
-=== SDK quick-start: Initialization and Teardown
+=== SDK quick-start: Initialization and Teardown [[sdk-initialization]]
 
 As mentioned in <<Maintaining the SDK event loop>>, the SDK's internal event loop requires care and attention in the form of <<RunPendingHandlers>>.
 
@@ -382,7 +437,7 @@ while(bGameIsRunning == true)
 
 When you are ready to initialize the SDK for the current session, you'll need to call <<InitializeAsync>>, passing in your product's mod.io ID, your API key, the Local Profile Name, and a callback/handler so you know when the SDK is initialized correctly. Note that <<InitializeAsync>>'s callback will be invoked after calling <<RunPendingHandlers>> from your project's main loop.
 
-[source,cpp]
+[source,cpp] 
 ----
 //represents some external state so we know that the SDK is good to go
 Modio::Optional<bool> SDKInitialized;

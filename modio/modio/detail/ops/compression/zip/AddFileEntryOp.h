@@ -166,8 +166,7 @@ namespace Modio
 						// BytesProcessed is correctly assesed after CompressionStream has written
 						// all the bytes to the CompressionStream
 						BytesProcessed = Modio::FileSize(CompressionState.total_in);
-						// Update The ProgressInfo with the BytesProcessed updated
-						PinnedProgressInfo->CurrentlyExtractedBytes += Modio::FileSize(MaxBytesToRead);
+						// Update The ProgressInfo with MaxBytesToRead
 						IncrementCurrentProgress(*PinnedProgressInfo.get(), Modio::FileSize(MaxBytesToRead));
 					}
 

@@ -11,6 +11,7 @@
 #include "modio/ModioSDK.h"
 
 #include <iostream>
+#include <sstream>
 #include <utility>
 
 /// This example shows SDK initialization and shutdown procedures. It begins an asynchronous call that initializes the
@@ -103,10 +104,58 @@ struct ModioExample
 			NotifyApplicationSuccess();
 		}
 	}
+
+	/// @brief Helper method to retrieve input from a user with an string prompt
+	/// @param Prompt The string to show related to the expected user input
+	/// @param DefaultValue If the user wants to use a default input, this will be used
+	/// @return String with the user input or default value
+	static std::string RetrieveUserInput(std::string Prompt, std::string DefaultValue = "")
+	{
+		std::string UserInput = "";
+		std::cout << Prompt << std::endl;
+
+		if (DefaultValue.size() != 0)
+		{
+			std::cout << "(To use the default value \"" << DefaultValue << "\", just tap Enter)" << std::endl;
+		}
+		std::getline(std::cin, UserInput);
+
+		if (UserInput.size() == 0)
+		{
+			return DefaultValue;
+		}
+		else
+		{
+			return UserInput;
+		}
+	}
 };
 
 int main()
 {
+	// Ask user for their input and offer default values
+	std::stringstream IntTransformer;
+	IntTransformer << ModioExample::RetrieveUserInput("Game ID:", "3609");
+	std::string APIStr = ModioExample::RetrieveUserInput("API key:", "ca842a1f60c40bc8fb2044bc9932d763");
+	std::string ModioEnvStr = ModioExample::RetrieveUserInput("Modio Environment:", "Live");
+	std::string SessionID = ModioExample::RetrieveUserInput("SessionID:", "ExampleSession");
+
+	// Transform GameID to integer
+	int GameIDInt = 0;
+	IntTransformer >> GameIDInt;
+
+	// Determine the modio API environment to use
+	Modio::Environment ModioEnv;
+
+	if (ModioEnvStr == "Test" || ModioEnvStr == "test")
+	{
+		ModioEnv = Modio::Environment::Test;
+	}
+	else
+	{
+		ModioEnv = Modio::Environment::Live;
+	}
+
 	// Perform async initialization of the SDK
 	// Parameters:
 	// GameID Your game's ID, retrievable from the dashboard at https://mod.io
@@ -118,9 +167,8 @@ int main()
 	// Callback Function to invoke when the initialization process succeeds. This can be anything convertible to
 	// std::function with the correct signature, i.e lambda function, static member function, non-static member function
 	// (with `this` bound via std::bind or invoked via a capturing lambda), or free function
-	Modio::InitializeAsync(Modio::InitializeOptions(Modio::GameID(3609),
-													Modio::ApiKey("ca842a1f60c40bc8fb2044bc9932d763"),
-													Modio::Environment::Live, Modio::Portal::None, "ExampleSession"),
+	Modio::InitializeAsync(Modio::InitializeOptions(Modio::GameID(GameIDInt), Modio::ApiKey(APIStr), ModioEnv,
+													Modio::Portal::None, SessionID),
 						   ModioExample::OnInitializeComplete);
 
 	// The SDK operates an internal event loop that handles all of the work it performs. InitializeAsync queues the

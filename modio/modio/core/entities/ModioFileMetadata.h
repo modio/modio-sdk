@@ -37,7 +37,8 @@ namespace Modio
 		enum class VirusStatus : std::uint8_t
 		{
 			NoThreat = 0,
-			Malicious = 1
+			Malicious = 1,
+			PotentiallyHarmful = 2
 		};
 
 		/// @brief Unique modfile id.
@@ -53,6 +54,8 @@ namespace Modio
 		VirusStatus CurrentVirusStatus = Modio::FileMetadata::VirusStatus::NoThreat;
 		/// @brief Size of the file in bytes.
 		std::int64_t Filesize = 0;
+		/// @brief Size of the uncompressed file in bytes.
+		std::int64_t FilesizeUncompressed = 0;
 		/// @brief Filename including extension.
 		std::string Filename = "";
 		/// @brief Release version this file represents.
@@ -80,7 +83,7 @@ namespace Modio
 				(A.CurrentVirusStatus == B.CurrentVirusStatus) && (A.Filesize == B.Filesize) &&
 				(A.Filename == B.Filename) && (A.Version == B.Version) && (A.Changelog == B.Changelog) &&
 				(A.MetadataBlob == B.MetadataBlob) && (A.DownloadBinaryURL == B.DownloadBinaryURL) &&
-				(A.DownloadExpiryDate == B.DownloadExpiryDate))
+				(A.DownloadExpiryDate == B.DownloadExpiryDate) && (A.FilesizeUncompressed == B.FilesizeUncompressed))
 			{
 				return true;
 			}

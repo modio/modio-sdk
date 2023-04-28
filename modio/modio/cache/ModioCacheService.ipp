@@ -90,6 +90,14 @@ namespace Modio
 			CacheInstance->ModInfoCache.emplace(ModInfoDetails.ModId, ModInfoDetails);
 		}
 
+		void CacheService::AddToCache(Modio::GameInfo GameInfoDetails)
+		{
+			Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Adding GameID {} to cache",
+										GameInfoDetails.GameID);
+
+			CacheInstance->GameInfoCache.emplace(GameInfoDetails.GameID, GameInfoDetails);
+		}
+
 		void CacheService::AddToCache(Modio::GameID GameIDDetail, Modio::ModInfoList ModInfoDetails)
 		{
 			Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Adding ModIDList to cache with GameID: {}",
@@ -143,6 +151,18 @@ namespace Modio
 				return CachedModInfo->GetModProfile();
 			}
 
+			return {};
+		}
+
+		Modio::Optional<Modio::GameInfo> CacheService::FetchGameInfoFromCache(Modio::GameID GameIDDetail) const
+		{
+			auto CacheEntryIterator = CacheInstance->GameInfoCache.find(GameIDDetail);
+			if (CacheEntryIterator != CacheInstance->GameInfoCache.end())
+			{
+				Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Retrieving game {} from primary cache",
+											GameIDDetail);
+				return CacheEntryIterator->second;
+			}
 			return {};
 		}
 

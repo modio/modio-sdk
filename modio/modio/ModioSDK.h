@@ -24,13 +24,14 @@
 #include "modio/core/ModioModDependency.h"
 #include "modio/core/ModioReportParams.h"
 #include "modio/core/ModioStdTypes.h"
+#include "modio/core/entities/ModioGameInfo.h"
 #include "modio/core/entities/ModioModDetails.h"
 #include "modio/core/entities/ModioModInfoList.h"
 #include "modio/core/entities/ModioModTagOptions.h"
 #include "modio/core/entities/ModioTerms.h"
 #include "modio/core/entities/ModioUser.h"
-#include "modio/detail/ModioLibraryConfigurationHelpers.h"
 #include "modio/core/entities/ModioUserList.h"
+#include "modio/detail/ModioLibraryConfigurationHelpers.h"
 
 namespace Modio
 {
@@ -66,10 +67,15 @@ namespace Modio
 	/// functionality.
 	MODIOSDK_API void RunPendingHandlers();
 
+	#if !defined(MODIO_NO_DEPRECATED)
+	
 	/// @docpublic
 	/// @brief Cancels any running internal operations, frees SDK resources, and invokes any pending callbacks with
 	/// Modio::GenericError::OperationCanceled . This function will block while the deinitialization occurs.
+	MODIO_DEPRECATED("Release 2023.4", "ShutdownAsync")
 	MODIOSDK_API void Shutdown();
+	
+	#endif
 
 	/// @docpublic
 	/// @brief Cancels any running internal operations and invokes any pending callbacks with
@@ -232,8 +238,8 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Queries the server to update the user data.
-	/// An empty ErrorCode passed to the callback indicates successful verification, i.e. the mod.io server was contactable
-	/// and the user's data got updated.
+	/// An empty ErrorCode passed to the callback indicates successful verification, i.e. the mod.io server was
+	/// contactable and the user's data got updated.
 	/// @param Callback Callback invoked once the server-side state has been queried
 	/// @requires initialized-sdk
 	/// @requires no-rate-limiting
@@ -252,8 +258,9 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Uses platform-specific authentication to associate a Mod.io user account with the current platform user
-	/// @param User Authentication payload data to submit to the provider. Any AuthToken string that contains special 
-	/// characters (ex. "+, /, =") requires the boolean "bURLEncodeAuthToken" set as "True" to encode the text accordingly
+	/// @param User Authentication payload data to submit to the provider. Any AuthToken string that contains special
+	/// characters (ex. "+, /, =") requires the boolean "bURLEncodeAuthToken" set as "True" to encode the text
+	/// accordingly
 	/// @param Provider The provider to use to perform the authentication
 	/// @param Callback Callback invoked once the authentication request has been made
 	/// @requires initialized-sdk
@@ -618,7 +625,21 @@ namespace Modio
 	/// @requires initialized-sdk
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserDataError::InvalidUser|No authenticated user
-	MODIOSDK_API void GetMutedUsersAsync(std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)> Callback);
+	MODIOSDK_API void GetMutedUsersAsync(
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)> Callback);
+
+	/// @docpublic
+	/// @brief Fetches detailed information about the specified game
+	/// @param GameID Game ID of the game data to fetch
+	/// @param Callback Callback providing a status code and an optional Modio::GameInfo object to store the games's
+	/// extended information
+	/// @requires initialized-sdk
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @errorcategory EntityNotFoundError|Specified game does not exist
+	MODIOSDK_API void GetGameInfoAsync(
+		Modio::GameID GameID, std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfo>)> Callback);
 
 } // namespace Modio
 

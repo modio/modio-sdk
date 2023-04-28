@@ -76,6 +76,7 @@ namespace Modio
 						auto ModInfoData = TryMarshalResponse<Modio::ModInfo>(ResponseBuffer);
 						if (ModInfoData.has_value())
 						{
+							Modio::Detail::SDKSessionData::InvalidateModCache(ModInfoData.value().ModId);
 							Self.complete(ec, ModInfoData);
 							return;
 						}

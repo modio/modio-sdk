@@ -24,6 +24,8 @@
 #include "modio/detail/entities/ModioUploadSession.h"
 #include "modio/detail/http/PerformRequestImpl.h"
 #include "modio/detail/http/ResponseError.h"
+#include "modio/detail/ops/upload/Multipart/MultipartGetSessionOp.h"
+#include "modio/detail/ops/upload/Multipart/MultipartGetUploadedOp.h"
 #include "modio/detail/ops/upload/UploadFilePartOp.h"
 #include "modio/file/ModioFile.h"
 #include "modio/http/ModioHttpRequest.h"
@@ -53,6 +55,7 @@ namespace Modio
 			Modio::Detail::DynamicBuffer ResponseBuffer;
 			Modio::Detail::CachedResponse AllowCachedResponse;
 			std::shared_ptr<Modio::Detail::UploadSession> Session;
+			std::shared_ptr<Modio::Detail::UploadSessionPartList> SessionParts;
 			Modio::ModID ModID;
 			Modio::filesystem::path ArchivePath;
 			Modio::Detail::OperationQueue::Ticket RequestTicket;
@@ -72,7 +75,7 @@ namespace Modio
 				Session = ResponseSession;
 				this->AllowCachedResponse = Modio::Detail::CachedResponse::Disallow;
 				std::string FileName = ArchivePath.filename().string();
-				
+
 				// Request to open an Upload Session
 				OpenSessionRequest = Modio::Detail::CreateMultipartUploadSessionRequest
 										 .SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
@@ -86,6 +89,7 @@ namespace Modio
 						.SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
 						.SetModID(CurrentModID);
 				CloseSessionRequest = std::make_shared<Modio::Detail::HttpRequest>(ParamsRequest);
+				SessionParts = std::make_shared<Modio::Detail::UploadSessionPartList>();
 			};
 
 			template<typename CoroType>
@@ -184,10 +188,24 @@ namespace Modio
 						}
 					}
 
+					// Identify if the session has uploaded parts previously
+					{
+						yield Modio::Detail::MultipartGetUploadedAsync(SessionParts, ModID, *Session, std::move(Self));
+
+						if (ec)
+						{
+							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+														"Error executing MultipartGetUploadedAsync: {}", ec.message());
+							Self.complete(ec);
+							return;
+						}
+					}
+
 					// With a successful UploadID, then calculate the number of parts to upload based on
 					// the current file size
 					{
-						std::uint64_t FileSize = Modio::Detail::File(ArchivePath, Modio::Detail::FileMode::ReadOnly, false).GetFileSize();
+						std::uint64_t FileSize =
+							Modio::Detail::File(ArchivePath, Modio::Detail::FileMode::ReadOnly, false).GetFileSize();
 						// Make sure that NumParts nears to the next integer, for that a + 0.5 happens
 						NumParts = static_cast<int>(
 							std::ceil(FileSize / Constants::Configuration::MultipartMaxFilePartSize + 0.5f));
@@ -196,16 +214,37 @@ namespace Modio
                         std::shared_ptr<Modio::ModProgressInfo> Progress = ProgressInfo.lock();
                         if (Progress)
                         {
-                            Progress->TotalDownloadSize = Modio::FileSize(FileSize);
 							SetState(*Progress.get(), Modio::ModProgressInfo::EModProgressState::Uploading);
 							SetTotalProgress(*Progress.get(), Modio::ModProgressInfo::EModProgressState::Uploading,
 											 Modio::FileSize(FileSize));
-                        }
+						}
 					}
 
 					// #2: Upload every part of the file
 					while (FilePart < NumParts)
 					{
+						// We need to check for FilePart + 1 because the server counts from 1, whereas FilePart counts
+						// from 0
+						if (ContainsPart(*SessionParts, FilePart + 1) == true)
+						{
+							// Advance the progress by the amount of bytes the part already has in the server
+							std::shared_ptr<Modio::ModProgressInfo> Progress = ProgressInfo.lock();
+							if (Progress)
+							{
+								std::uintmax_t MaxFilePart =
+									Modio::Detail::Constants::Configuration::MultipartMaxFilePartSize;
+								Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+															"Part {} already uploaded, advancing the ModProgressInfo",
+															FilePart);
+								SetCurrentProgress(*Progress.get(), Modio::FileSize(MaxFilePart * (FilePart + 1)));
+							}
+
+							// Increase the part to process next
+							FilePart += 1;
+							continue;
+						}
+
+						// This section means that this part needs to upload
 						yield Modio::Detail::UploadFilePartAsync(
 							ResponseBuffer,
 							Modio::Detail::AddMultipartUploadPartRequest
@@ -224,7 +263,7 @@ namespace Modio
 							return;
 						}
 
-						// Per
+						// Increase the part to process next
 						FilePart += 1;
 					}
 
@@ -284,6 +323,25 @@ namespace Modio
 					// #4: Send a normal UploadFileOp with the "upload_id" obtained by this operation.
 					Self.complete({});
 				}
+			}
+
+		private:
+			// Iterate over "UploadSessionPartList" to check if any equals the "Part" variable
+			static bool ContainsPart(Modio::Detail::UploadSessionPartList Parts, std::uint32_t Part)
+			{
+				if (Parts.Size() <= 0)
+				{
+					return false;
+				}
+
+				auto PartEqual = [&Part](Modio::Detail::UploadSessionPart UpPart) {
+					return UpPart.PartNumber == Part;
+				};
+
+				auto PartFound = std::find_if(Parts.begin(), Parts.end(), PartEqual);
+
+				// If the "Part" was found, it should not be equal to the end of the list
+				return PartFound != Parts.end();
 			}
 		};
 #include <asio/unyield.hpp>

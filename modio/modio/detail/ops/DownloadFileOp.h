@@ -140,7 +140,7 @@ namespace Modio
 							return;
 						}
 
-						if (Request->GetResponseCode() == 302)
+						if (Request->GetResponseCode() >= 301 && Request->GetResponseCode() < 400)
 						{
 							Impl->bRequiresRedirect = true;
 							if (Impl->RedirectLimit)
@@ -157,14 +157,15 @@ namespace Modio
 							{
 								// Change the URL on the existing parameters provided it matches our whitelist
 								Modio::Optional<Modio::Detail::HttpRequestParams> RedirectedParams =
-									Request->Parameters().RedirectURL(RedirectedURL.value());
+									Modio::Detail::HttpRequestParams::FileDownload(RedirectedURL.value(),
+																				   Request->Parameters());
 								// URL did not match the whitelist
 								if (!RedirectedParams)
 								{
 									Modio::Detail::Logger().Log(
 										Modio::LogLevel::Trace, Modio::LogCategory::Http,
-										"download of file {} redirected to URL outside whitelist",
-										File->GetPath().u8string());
+										"download of file {} redirected to URL outside whitelist to: {}",
+										File->GetPath().u8string(), RedirectedURL.value());
 									Self.complete(Modio::make_error_code(Modio::HttpError::ResourceNotAvailable));
 									return;
 								}
@@ -221,7 +222,6 @@ namespace Modio
 								if (!ProgressInfo->expired())
 								{
 									auto Progress = ProgressInfo->lock();
-									Progress->CurrentlyDownloadedBytes = Modio::FileSize(*CurrentFilePosition);
 									SetCurrentProgress(*Progress.get(), Modio::FileSize(*CurrentFilePosition));
 								}
 								else

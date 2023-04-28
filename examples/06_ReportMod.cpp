@@ -11,6 +11,7 @@
 #include "modio/ModioSDK.h"
 
 #include <iostream>
+#include <sstream>
 #include <utility>
 
 /// This example extends 01_Initialization.cpp by demonstrating the functionality for
@@ -99,13 +100,60 @@ struct ModioExample
 			NotifyApplicationSuccess();
 		}
 	}
+
+	/// @brief Helper method to retrieve input from a user with an string prompt
+	/// @param Prompt The string to show related to the expected user input
+	/// @param DefaultValue If the user wants to use a default input, this will be used
+	/// @return String with the user input or default value
+	static std::string RetrieveUserInput(std::string Prompt, std::string DefaultValue = "")
+	{
+		std::string UserInput = "";
+		std::cout << Prompt << std::endl;
+
+		if (DefaultValue.size() != 0)
+		{
+			std::cout << "(To use the default value \"" << DefaultValue << "\", just tap Enter)" << std::endl;
+		}
+		std::getline(std::cin, UserInput);
+
+		if (UserInput.size() == 0)
+		{
+			return DefaultValue;
+		}
+		else
+		{
+			return UserInput;
+		}
+	}
 };
 
 int main()
 {
-	Modio::InitializeAsync(Modio::InitializeOptions(Modio::GameID(3609),
-													Modio::ApiKey("ca842a1f60c40bc8fb2044bc9932d763"),
-													Modio::Environment::Live, Modio::Portal::None, "ExampleSession"),
+	// Ask user for their input and offer default values
+	std::stringstream IntTransformer;
+	IntTransformer << ModioExample::RetrieveUserInput("Game ID:", "3609");
+	std::string APIStr = ModioExample::RetrieveUserInput("API key:", "ca842a1f60c40bc8fb2044bc9932d763");
+	std::string ModioEnvStr = ModioExample::RetrieveUserInput("Modio Environment:", "Live");
+	std::string SessionID = ModioExample::RetrieveUserInput("SessionID:", "ExampleSession");
+
+	// Transform GameID to integer
+	int GameIDInt = 0;
+	IntTransformer >> GameIDInt;
+
+	// Determine the modio API environment to use
+	Modio::Environment ModioEnv;
+
+	if (ModioEnvStr == "Test" || ModioEnvStr == "test")
+	{
+		ModioEnv = Modio::Environment::Test;
+	}
+	else
+	{
+		ModioEnv = Modio::Environment::Live;
+	}
+
+	Modio::InitializeAsync(Modio::InitializeOptions(Modio::GameID(GameIDInt), Modio::ApiKey(APIStr), ModioEnv,
+													Modio::Portal::None, SessionID),
 						   ModioExample::OnInitializeComplete);
 
 	while (!ModioExample::HasAsyncOperationCompleted())
@@ -118,10 +166,14 @@ int main()
 		return -1;
 	}
 
+	IntTransformer << ModioExample::RetrieveUserInput("Provide the ModID to report:");
+	int ModIDInt = 0;
+	IntTransformer >> ModIDInt;
+
 	// Populate the report with some example parameters. The first argument determines what type of report is being
 	// submitted - game, mod, or user
 	Modio::ReportParams Params =
-		Modio::ReportParams(Modio::ModID(1), Modio::ReportType::DMCA, "This mod contains copyrighted content",
+		Modio::ReportParams(Modio::ModID(ModIDInt), Modio::ReportType::DMCA, "This mod contains copyrighted content",
 							"ReporterName", "Reporter@Email.com");
 	Modio::ReportContentAsync(Params, ModioExample::OnReportSubmitted);
 

@@ -9,6 +9,8 @@
 
 include(split-compilation)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioFileMetadata.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioGameInfo.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioGameStats.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioModDetails.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioModInfo.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioModInfoList.ipp)

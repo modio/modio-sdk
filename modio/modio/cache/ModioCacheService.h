@@ -12,6 +12,7 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioModInfo.h"
+#include "modio/core/entities/ModioGameInfo.h"
 #include "modio/core/entities/ModioModInfoList.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/timer/ModioTimer.h"
@@ -28,7 +29,7 @@ namespace Modio
 
 		/// @docinternal
 		/// @brief A global service to store mod data retrieved from the server
-		///in a form of cache, which would have a limited lifespan
+		/// in a form of cache, which would have a limited lifespan
 		class CacheService : public asio::detail::service_base<CacheService>
 		{
 		public:
@@ -48,11 +49,15 @@ namespace Modio
 
 			MODIO_IMPL void AddToCache(Modio::ModInfo ModInfoDetail);
 
+			MODIO_IMPL void AddToCache(Modio::GameInfo GameInfoDetails);
+
 			MODIO_IMPL void AddToCache(Modio::GameID GameIDDetail, Modio::ModInfoList ModInfoDetails);
 
 			MODIO_IMPL Modio::Optional<Modio::Detail::DynamicBuffer> FetchFromCache(std::string ResourceURL) const;
 
 			MODIO_IMPL Modio::Optional<Modio::ModInfo> FetchFromCache(Modio::ModID ModIDDetail) const;
+
+			MODIO_IMPL Modio::Optional<Modio::GameInfo> FetchGameInfoFromCache(Modio::GameID GameIDDetail) const;
 
 			MODIO_IMPL Modio::Optional<Modio::ModInfoList> FetchFromCache(Modio::GameID GameIDDetail) const;
 
@@ -70,6 +75,7 @@ namespace Modio
 			{
 				std::unordered_map<std::uint32_t, CacheEntry> CacheEntries;
 				std::unordered_map<std::int64_t, Modio::ModInfo> ModInfoCache;
+				std::unordered_map<std::int64_t, Modio::GameInfo> GameInfoCache;
 				std::unordered_map<std::int64_t, std::vector<Modio::ModID>> ModInfoListCache;
 			};
 

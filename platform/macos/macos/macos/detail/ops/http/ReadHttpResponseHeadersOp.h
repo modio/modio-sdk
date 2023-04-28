@@ -205,8 +205,8 @@ namespace Modio
 						CFIndex StatusCode = CFHTTPMessageGetResponseStatusCode(HTTPResponse);
 						// Use an auxiliary function to parse the HTTP Headers into the Request
 						CFDictionaryApplyFunction(Headers, CopyHeaders, (void*) Request.get());
-						Request->ResponseCode = StatusCode;
-						Request->ParsedResponseHeaders.statusCode = StatusCode;
+						Request->ResponseCode = static_cast<std::uint32_t>(StatusCode);
+						Request->ParsedResponseHeaders.statusCode = static_cast<std::uint32_t>(StatusCode);
 					}
 
 					// Check if any errors occured during read

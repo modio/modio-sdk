@@ -265,26 +265,6 @@ namespace Modio
 		/// @brief The mod ID of the mod being processed
 		Modio::ModID ID;
 
-		/// @brief Total size of the downloaded file
-		/// @deprecated 2023.1 Use GetTotalProgress(EModProgressState::Downloading)
-		MODIO_DEPRECATED("Release 2023.1", "GetTotalProgress(EModProgressState::Downloading)")
-		Modio::FileSize TotalDownloadSize;
-
-		/// @brief Current amount downloaded in bytes
-		/// @deprecated 2023.1 Use GetCurrentProgress(EModProgressState::Downloading)
-		MODIO_DEPRECATED("Release 2023.1", "GetCurrentProgress(EModProgressState::Downloading)")
-		Modio::FileSize CurrentlyDownloadedBytes;
-
-		/// @brief Total size on disk when fully extracted
-		/// @deprecated 2023.1 Use GetTotalProgress(EModProgressState::Extracting)
-		MODIO_DEPRECATED("Release 2023.1", "GetTotalProgress(EModProgressState::Extracting)")
-		Modio::FileSize TotalExtractedSizeOnDisk;
-
-		/// @brief Amount of data currently extracted
-		/// @deprecated 2023.1 Use GetCurrentProgress(EModProgressState::Extracting)
-		MODIO_DEPRECATED("Release 2023.1", "GetCurrentProgress(EModProgressState::Extracting)")
-		Modio::FileSize CurrentlyExtractedBytes;
-
 		/// @docinternal
 		/// @brief Default constructor
 		ModProgressInfo(Modio::ModID ID)

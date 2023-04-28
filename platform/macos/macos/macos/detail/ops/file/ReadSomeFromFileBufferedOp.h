@@ -85,7 +85,7 @@ namespace Modio
 						Modio::LogLevel::Trace, Modio::LogCategory::File,
 						"Begin buffered read for {}, File Descriptor {}, expected size: {}, Offset: {}",
 						FileImpl->GetPath().u8string(), FileImpl->GetFileHandle(), MaxBytesToRead,
-						FileOffset.has_value() ? FileOffset.value() : 0);
+						FileOffset.has_value() ? static_cast<std::uint32_t>(FileOffset.value()) : 0);
 					CurrentErrorCode = PinnedState->SubmitRead(FileImpl->GetFileHandle(), MaxBytesToRead,
 															   FileOffset.value_or(FileImpl->Tell()));
 

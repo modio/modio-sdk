@@ -184,7 +184,6 @@ namespace Modio
 							Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
 														"Multipart upload bytes uploaded {} of {} total bytes",
 														FileOffset, FileSize);
-							Progress->CurrentlyDownloadedBytes = Modio::FileSize(FileOffset);
 							SetCurrentProgress(*Progress.get(), Modio::FileSize(FileOffset));
 						}
 					}

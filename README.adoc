@@ -188,6 +188,8 @@ cmake --build <modio-sdk folder>/out/build/win
 cmake --install <modio-sdk folder>/out/build/win
 ```
 
+If you are using the `clang` compiler with Visual studio, check section link:https://github.com/modio/modio-sdk/blob/main/doc/getting-started.adoc#clang-win[Clang compiler in Visual Studio] for further details
+
 ==== Custom FMT library
 If you have a custom version of the FMT library, you can modify the linking stage defining `MODIO_USE_CUSTOM_FMT`. This define signals the CMake build system to use a custom version of the library. Also, it requires that you define `MODIO_CUSTOM_FMT_PATH` to the system path that contains the FMT library to use.
 

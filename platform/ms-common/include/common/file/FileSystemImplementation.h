@@ -10,6 +10,7 @@
 
 // MIRRORED TO gdk/file/FileSystemImplementation.h, UPDATE THAT FILE IF THIS IS UPDATED
 #pragma once
+#include "common/FileSharedState.h"
 #include "common/detail/ops/file/DeleteFolderOp.h"
 #include "common/detail/ops/file/ReadSomeFromFileBufferedOp.h"
 #include "common/detail/ops/file/ReadSomeFromFileOp.h"
@@ -45,6 +46,8 @@ namespace Modio
 			Modio::filesystem::path RootTempPath;
 			Modio::GameID CurrentGameID;
 
+			std::shared_ptr<Modio::Detail::FileSharedState> SharedState;
+
 		public:
 			/// <summary>
 			/// Member typedef used by Modio::Detail::FileSystem
@@ -53,7 +56,10 @@ namespace Modio
 
 			std::vector<std::weak_ptr<FileObjectImplementation>> OpenFileObjects;
 
-			FileSystemImplementationBase(asio::io_context::service& OwningService) : OwningService(OwningService) {}
+			FileSystemImplementationBase(asio::io_context::service& OwningService) : OwningService(OwningService)
+			{
+				SharedState = std::make_shared<FileSharedState>();
+			}
 
 			/// <summary>
 			/// Delegated initializer for platform implementations of IO objects
@@ -87,6 +93,10 @@ namespace Modio
 
 			void Shutdown()
 			{
+				if (SharedState)
+				{
+					SharedState->bCancelRequested = true;
+				}
 				for (auto FileObject : OpenFileObjects)
 				{
 					if (auto FileImpl = FileObject.lock())
@@ -159,7 +169,8 @@ namespace Modio
 			auto DeleteFolderAsync(Modio::filesystem::path FolderPath, CompletionTokenType&& Token)
 			{
 				return asio::async_compose<CompletionTokenType, void(std::error_code)>(
-					DeleteFolderOp(FolderPath), Token, Modio::Detail::Services::GetGlobalContext().get_executor());
+					DeleteFolderOp(FolderPath, SharedState), Token,
+					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 
 			// do we need to maintain a cache of temporary files?
@@ -414,6 +425,36 @@ namespace Modio
 				{
 					return false;
 				}
+			}
+
+			Modio::ErrorCode CheckExtractionPath(const Modio::filesystem::path& FilePath,
+												 const Modio::filesystem::path& RootOutputPath) const override
+			{
+				Modio::ErrorCode ec;
+				Modio::filesystem::path LexPath = Modio::filesystem::relative(FilePath, RootOutputPath, ec);
+
+				// In case the platform does not support symlinks, the LexPath here would not correctly identify if
+				// FilePath tries to access parent folders relative to CurrentPath. This will double check no ".."
+				// is in FilePath
+				if (LexPath.string() == "")
+				{
+					std::string PreFolder = "..";
+					std::string AbsFolder = "\\";
+
+					// This case means that the path does not have a reference to folders above the current location.
+					if (FilePath.string().find(PreFolder) == std::string::npos &&
+						FilePath.string().find(AbsFolder) != 0)
+					{
+						return {};
+					}
+				}
+				if (ec)
+				{
+					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression,
+												"FilePath {} returned a system error with message: {}",
+												FilePath.string(), ec.message());
+				}
+				return Modio::make_error_code(Modio::FilesystemError::NoPermission);
 			}
 		};
 	} // namespace Detail

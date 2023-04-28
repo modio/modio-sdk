@@ -161,8 +161,6 @@ namespace Modio
 										SetTotalProgress(*Progress.get(),
 														 Modio::ModProgressInfo::EModProgressState::Uploading,
 														 Modio::FileSize(Impl->CurrentPayloadFile->GetFileSize()));
-										Progress->TotalDownloadSize =
-											Modio::FileSize(Impl->CurrentPayloadFile->GetFileSize());
 									}
 								}
 								while (Impl->CurrentPayloadFileBytesRead < Impl->CurrentPayloadFile->GetFileSize())
@@ -201,8 +199,6 @@ namespace Modio
 										std::shared_ptr<Modio::ModProgressInfo> Progress = Impl->ProgressInfo.lock();
 										if (Progress)
 										{
-											Progress->CurrentlyDownloadedBytes =
-												Modio::FileSize(Impl->CurrentPayloadFileBytesRead);
 											SetCurrentProgress(*Progress.get(), Modio::FileSize(Impl->CurrentPayloadFileBytesRead));
 										}
 									}

@@ -17,21 +17,23 @@
 #include "modio/cache/ModioCacheService.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioSDKSessionData.h"
-#include "modio/detail/ops/ReportContentOp.h"
-#include "modio/detail/ops/MuteUserOp.h"
-#include "modio/detail/ops/UnmuteUserOp.h"
+#include "modio/detail/ops/GetGameInfoOp.h"
 #include "modio/detail/ops/GetMutedUsersOp.h"
+#include "modio/detail/ops/MuteUserOp.h"
+#include "modio/detail/ops/ReportContentOp.h"
 #include "modio/detail/ops/ServiceInitializationOp.h"
 #include "modio/detail/ops/Shutdown.h"
+#include "modio/detail/ops/UnmuteUserOp.h"
 #include "modio/file/ModioFileService.h"
 #include "modio/http/ModioHttpService.h"
 #include "modio/impl/SDKPostAsync.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 #include "modio/userdata/ModioUserDataService.h"
+
 // Implementation header - do not include directly
 
-#include <functional>
 #include <chrono>
+#include <functional>
 
 namespace Modio
 {
@@ -66,7 +68,7 @@ namespace Modio
 
 			} while (std::chrono::steady_clock::now() - PollStartTime < std::chrono::milliseconds(3));
 		}
-		
+
 		{
 			MODIO_PROFILE_SCOPE(FlushManagementLog);
 			// invoke the mod management log callback if the user has set it
@@ -85,6 +87,8 @@ namespace Modio
 	void DisableModManagement();
 #endif
 
+#if !defined(MODIO_NO_DEPRECATED)
+	
 	void Shutdown()
 	{
 		// We need to be initialized to shutdown
@@ -113,6 +117,7 @@ namespace Modio
 		Modio::Detail::Services::GetGlobalContext().restart();
 		Modio::Detail::Services::GetGlobalContext().run();
 	}
+#endif
 
 	// This might need a timeout parameter
 	void ShutdownAsync(std::function<void(Modio::ErrorCode)> OnShutdownComplete)
@@ -166,8 +171,8 @@ namespace Modio
 
 	void MuteUserAsync(Modio::UserID UserID, std::function<void(Modio::ErrorCode)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) &&
-			Modio::Detail::RequireNotRateLimited(Callback) && Modio::Detail::RequireUserIsAuthenticated(Callback) )
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+			Modio::Detail::RequireUserIsAuthenticated(Callback))
 		{
 			asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
 				Modio::Detail::MuteUserOp(UserID), Callback,
@@ -180,9 +185,9 @@ namespace Modio
 		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
 			Modio::Detail::RequireUserIsAuthenticated(Callback))
 		{
-				asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-					Modio::Detail::UnmuteUserOp(UserID), Callback,
-					Modio::Detail::Services::GetGlobalContext().get_executor());
+			asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
+				Modio::Detail::UnmuteUserOp(UserID), Callback,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	}
 
@@ -191,12 +196,23 @@ namespace Modio
 		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
 			Modio::Detail::RequireUserIsAuthenticated(Callback))
 		{
-
 			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)>,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)>(
 				Modio::Detail::GetMutedUsersOp(),
+
 				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	}
 
+	void GetGameInfoAsync(Modio::GameID GameID,
+						  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfo>)> Callback)
+	{
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
+		{
+			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfo>)>,
+									   void(Modio::ErrorCode, Modio::Optional<Modio::GameInfo>)>(
+				Modio::Detail::GetGameInfoOp(GameID, Modio::Detail::SDKSessionData::CurrentAPIKey()), Callback,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
+	}
 } // namespace Modio

@@ -119,7 +119,6 @@ namespace Modio
 					// this check may be redundant given the above check
 					if (std::shared_ptr<Modio::ModProgressInfo> MPI = ModProgress.lock())
 					{
-						MPI->TotalDownloadSize = Modio::FileSize(ModInfoData.FileInfo->Filesize);
 						SetState(*MPI.get(), Modio::ModProgressInfo::EModProgressState::Downloading);
 						SetTotalProgress(*MPI.get(), Modio::ModProgressInfo::EModProgressState::Downloading, Modio::FileSize(ModInfoData.FileInfo->Filesize));
 
@@ -139,7 +138,6 @@ namespace Modio
 								MPI->GetTotalProgress(Modio::ModProgressInfo::EModProgressState::Downloading))
 							{
 								bFileDownloadComplete = true;
-								MPI->CurrentlyDownloadedBytes = MPI->GetTotalProgress(Modio::ModProgressInfo::EModProgressState::Downloading);
 								CompleteProgressState(*MPI.get(),
 													  Modio::ModProgressInfo::EModProgressState::Downloading);
 							}
@@ -199,6 +197,16 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
+
+
+					if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CheckSpaceAvailable(
+						InstallPath, Modio::FileSize(ModInfoData.FileInfo->FilesizeUncompressed)))
+					{
+						Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
+						Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
+						return;
+					}
+
 
 					yield Modio::Detail::ExtractAllFilesAsync(DownloadPath, InstallPath, ModProgress, std::move(Self));
 

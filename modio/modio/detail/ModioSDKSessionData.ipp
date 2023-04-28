@@ -444,6 +444,42 @@ namespace Modio
 			return Get().bSubscriptionCacheInvalid;
 		}
 
+		void SDKSessionData::InvalidateModCache(Modio::ModID ID)
+		{
+			auto CacheEntryIterator = Get().ModCacheInvalidMap.find(ID);
+			if (CacheEntryIterator != Get().ModCacheInvalidMap.end())
+			{
+				CacheEntryIterator->second = true;
+			}
+			else
+			{
+				Get().ModCacheInvalidMap.emplace(std::make_pair(ID, true));
+			}
+		}
+
+		void SDKSessionData::ClearModCacheInvalid(Modio::ModID ID)
+		{
+			auto CacheEntryIterator = Get().ModCacheInvalidMap.find(ID);
+			if (CacheEntryIterator != Get().ModCacheInvalidMap.end())
+			{
+				CacheEntryIterator->second = false;
+			}
+			else 
+			{
+				Get().ModCacheInvalidMap.emplace(std::make_pair(ID,false));
+			}
+		}
+
+		bool SDKSessionData::IsModCacheInvalid(Modio::ModID ID)
+		{
+			auto CacheEntryIterator = Get().ModCacheInvalidMap.find(ID);
+			if (CacheEntryIterator != Get().ModCacheInvalidMap.end())
+			{
+				return CacheEntryIterator->second;
+			}
+			return false;
+		}
+
 		SDKSessionData::SDKSessionData() {}
 
 		SDKSessionData::SDKSessionData(const Modio::InitializeOptions& Options)

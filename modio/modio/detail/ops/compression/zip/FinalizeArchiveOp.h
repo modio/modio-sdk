@@ -86,9 +86,9 @@ namespace Modio
 								.FollowedBy<std::uint16_t>(0) // Last modified date
 								.FollowedBy<std::uint32_t>(CurrentArchiveEntry->CRCValue)
 								.FollowedBy<std::uint32_t>(ExtraFieldMax ? Constants::ZipTag::MAX32
-																		 : CurrentArchiveEntry->CompressedSize)
+																		 : static_cast<std::uint32_t>(CurrentArchiveEntry->CompressedSize))
 								.FollowedBy<std::uint32_t>(ExtraFieldMax ? Constants::ZipTag::MAX32
-																		 : CurrentArchiveEntry->UncompressedSize)
+																		 : static_cast<std::uint32_t>(CurrentArchiveEntry->UncompressedSize))
 								.FollowedBy<std::uint16_t>(
 									(std::uint16_t) CurrentArchiveEntry->FilePath.generic_u8string().size())
 								.FollowedBy<std::uint16_t>(
@@ -101,7 +101,7 @@ namespace Modio
 								.FollowedBy<std::uint32_t>(
 									// Offset of local file header from start of disk (only one disk, so offset from
 									// start of file)
-									ExtraFieldMax ? Constants::ZipTag::MAX32 : LocalFileOffset);
+									ExtraFieldMax ? Constants::ZipTag::MAX32 : static_cast<std::uint32_t>(LocalFileOffset));
 						}
 
 						{
@@ -176,15 +176,15 @@ namespace Modio
 						.FollowedBy<std::uint16_t>(
 							ArchiveFile->GetNumberOfEntries()) // Number of entries in the central directory
 						.FollowedBy<std::uint32_t>(ArchiveFile->bIsZip64 == true
-													   ? SizeCentralDir
-													   : OutputFile->Tell() -
-															 StartOfCentralDirectory) // Size of central directory
+													   ? static_cast<std::uint32_t>(SizeCentralDir)
+													   : static_cast<std::uint32_t>(OutputFile->Tell() -
+															 StartOfCentralDirectory)) // Size of central directory
 						// For some reason, the macOS decompressor does not like tp have #Entries and Size of CD to
 						// "0xFF" when not necessary
 						.FollowedBy<std::uint32_t>(
 							ArchiveFile->bIsZip64 == true
 								? Constants::ZipTag::MAX32
-								: StartOfCentralDirectory) // Position of central directory in file
+								: static_cast<std::uint32_t>(StartOfCentralDirectory)) // Position of central directory in file
 						.FollowedBy<std::uint16_t>(0); // Length of comment
 
 					yield OutputFile->WriteAsync(std::move(*RecordBuffer), std::move(Self));

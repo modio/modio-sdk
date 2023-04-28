@@ -11,6 +11,7 @@
 #include "modio/ModioSDK.h"
 
 #include <iostream>
+#include <sstream>
 #include <utility>
 
 /// This example extends 01_Initialization.cpp by performing email authentication. It begins
@@ -129,13 +130,60 @@ struct ModioExample
 			NotifyApplicationSuccess();
 		}
 	}
+
+	/// @brief Helper method to retrieve input from a user with an string prompt
+	/// @param Prompt The string to show related to the expected user input
+	/// @param DefaultValue If the user wants to use a default input, this will be used
+	/// @return String with the user input or default value
+	static std::string RetrieveUserInput(std::string Prompt, std::string DefaultValue = "")
+	{
+		std::string UserInput = "";
+		std::cout << Prompt << std::endl;
+
+		if (DefaultValue.size() != 0)
+		{
+			std::cout << "(To use the default value \"" << DefaultValue << "\", just tap Enter)" << std::endl;
+		}
+		std::getline(std::cin, UserInput);
+
+		if (UserInput.size() == 0)
+		{
+			return DefaultValue;
+		}
+		else
+		{
+			return UserInput;
+		}
+	}
 };
 
 int main()
 {
-	Modio::InitializeAsync(Modio::InitializeOptions(Modio::GameID(3609),
-													Modio::ApiKey("ca842a1f60c40bc8fb2044bc9932d763"),
-													Modio::Environment::Live, Modio::Portal::None, "ExampleSession"),
+	// Ask user for their input and offer default values
+	std::stringstream IntTransformer;
+	IntTransformer << ModioExample::RetrieveUserInput("Game ID:", "3609");
+	std::string APIStr = ModioExample::RetrieveUserInput("API key:", "ca842a1f60c40bc8fb2044bc9932d763");
+	std::string ModioEnvStr = ModioExample::RetrieveUserInput("Modio Environment:", "Live");
+	std::string SessionID = ModioExample::RetrieveUserInput("SessionID:", "ExampleSession");
+
+	// Transform GameID to integer
+	int GameIDInt = 0;
+	IntTransformer >> GameIDInt;
+
+	// Determine the modio API environment to use
+	Modio::Environment ModioEnv;
+
+	if (ModioEnvStr == "Test" || ModioEnvStr == "test")
+	{
+		ModioEnv = Modio::Environment::Test;
+	}
+	else
+	{
+		ModioEnv = Modio::Environment::Live;
+	}
+
+	Modio::InitializeAsync(Modio::InitializeOptions(Modio::GameID(GameIDInt), Modio::ApiKey(APIStr), ModioEnv,
+													Modio::Portal::None, SessionID),
 						   ModioExample::OnInitializeComplete);
 
 	while (!ModioExample::HasAsyncOperationCompleted())
@@ -152,10 +200,8 @@ int main()
 
 	{
 		// Prompt user for input here
-		std::string UserEmailAddress;
-		std::cout << "Enter email address:" << std::endl;
-		std::getline(std::cin, UserEmailAddress);
-
+		std::string UserEmailAddress = ModioExample::RetrieveUserInput("Enter email address:");
+		
 		// Email authentication with mod.io is a two-step process. First, a user email address is submitted via
 		// RequestEmailAuthCodeAsync, which triggers an email containing an authentication code to that address.
 		Modio::RequestEmailAuthCodeAsync(Modio::EmailAddress(UserEmailAddress),
@@ -201,9 +247,8 @@ int main()
 
 	{
 		// Prompt user for input here
-		std::string UserEmailAuthCode;
-		std::cout << "Enter email auth code:" << std::endl;
-		std::getline(std::cin, UserEmailAuthCode);
+		std::string UserEmailAuthCode = ModioExample::RetrieveUserInput("Enter email auth code:");
+
 		// The second part of email authentication with the mod.io SDK involves submitting the user's email
 		// authentication code. To do this, you will need to prompt your user for input and then pass that input to
 		// AuthenticateUserEmailAsync. If this function returns successfully, the mod.io account will be stored in the

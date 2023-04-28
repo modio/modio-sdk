@@ -280,9 +280,8 @@ namespace Modio
 			{}
 
 			MODIO_IMPL Modio::Detail::Buffer GetRequestBuffer(bool bPerformURLEncoding = false) const;
-
-			MODIO_IMPL static Modio::Optional<HttpRequestParams> FileDownload(std::string URL);
-			MODIO_IMPL Modio::Optional<Modio::Detail::HttpRequestParams> RedirectURL(std::string URL) const;
+			MODIO_IMPL static Modio::Optional<HttpRequestParams> FileDownload(
+				std::string URL, Modio::Optional<Modio::Detail::HttpRequestParams> FromRedirect = {});
 
 			static constexpr std::uint64_t GetBoundaryHash()
 			{
@@ -306,11 +305,11 @@ namespace Modio
 
 			bool bSuppressPlatformHeader = false;
 
-			std::string FileDownloadServer;
+			std::string FileDownloadServer = "";
 
-			std::string ResourcePath;
+			std::string ResourcePath = "";
 
-			Modio::Optional<std::string> ContentType;
+			Modio::Optional<std::string> ContentType = {};
 
 			std::uint64_t GameID;
 			std::uint64_t ModID;

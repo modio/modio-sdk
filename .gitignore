@@ -14,3 +14,7 @@ doc/scripts/Gemfile.lock
 .vscode
 .DS_Store
 xcuserdata
+
+# GUITest extra files
+ext/guitest/prospero/sce/common/source/sampleutil/Prospero_Debug
+ext/guitest/prospero/sce/common/source/sampleutil/ORBIS_Debug

@@ -105,6 +105,25 @@ namespace Modio
 	}
 
 	/// @docpublic
+	/// @brief Enum representing game icon sizes
+	enum class IconSize : std::uint8_t
+	{
+		Original,
+		Thumb64, ///< 64x64
+		Thumb128, ///< 128x128
+		Thumb256 ///< 256x256
+	};
+
+	/// @docpublic
+	/// @brief Transform the EnumValue into the underlying type
+	/// @param EnumValue The enumerator value
+	/// @return A statically casted value related to the enumerator
+	inline auto format_as(Modio::IconSize EnumValue)
+	{
+		return static_cast<std::underlying_type_t<Modio::IconSize>>(EnumValue);
+	}
+
+	/// @docpublic
 	/// @brief Enum representing avatar image sizes
 	enum class AvatarSize : std::uint8_t
 	{
@@ -121,7 +140,7 @@ namespace Modio
 	{
 		return static_cast<std::underlying_type_t<Modio::AvatarSize>>(EnumValue);
 	}
-	
+
 	/// @docpublic
 	/// @brief Enum representing an image gallery size
 	enum class GallerySize : std::uint8_t
@@ -216,7 +235,7 @@ namespace Modio
 		{
 			return Value < Other.Value;
 		}
-		
+
 		/// @docnone
 		constexpr bool operator>=(const StrongInteger Other) const
 		{
@@ -241,7 +260,7 @@ namespace Modio
 			return Value != Other.Value;
 		}
 		///@}
-		
+
 		/// @docnone
 		friend void from_json(const nlohmann::json& Json, Modio::StrongInteger<UnderlyingIntegerType>& Integer)
 		{
@@ -352,7 +371,7 @@ namespace Modio
 		}
 
 		/// @docinternal
-		/// @brief Static function to an invalid ModID 
+		/// @brief Static function to an invalid ModID
 		static constexpr ModID InvalidModID()
 		{
 			constexpr ModID ID(-1);
@@ -404,7 +423,7 @@ namespace Modio
 		/// @docinternal
 		/// @brief Default constructor
 		GameID() : StrongInteger(-1) {};
-		
+
 		/// @docinternal
 		/// @brief Compare the GameID to an invalid instance
 		constexpr bool IsValid() const
@@ -482,7 +501,7 @@ namespace Modio
 		Switch,
 		Discord,
 		PSN,
-		Oculus, 
+		Oculus,
 		Epic
 	};
 

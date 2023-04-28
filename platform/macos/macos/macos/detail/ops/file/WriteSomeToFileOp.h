@@ -69,7 +69,7 @@ namespace Modio
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
 												"Begin write for {}, File Descriptor {}, expected size: {}, Offset: {}",
 												FileImpl->GetPath().u8string(), FileImpl->GetFileHandle(), BufferSize,
-												FileOffset.has_value() ? FileOffset.value() : 0);
+												FileOffset.has_value() ? static_cast<std::uint32_t>(FileOffset.value()) : 0);
 
 					// SubmitWrite could fail with system errors.
 					CreationEC = PinnedSharedState->SubmitWrite(FileImpl->GetFileHandle(), std::move(Buffer),

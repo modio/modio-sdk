@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -18,10 +18,12 @@
 namespace
 {
 	template<typename DeleteCallback>
-	auto RecursivelyDeleteFile(Modio::filesystem::path FilePath, DeleteCallback&& OnDeleteDone)
+	auto RecursivelyDeleteFile(Modio::filesystem::path FilePath,
+							   std::weak_ptr<Modio::Detail::FileSharedState> SharedState, DeleteCallback&& OnDeleteDone)
 	{
 		return asio::async_compose<DeleteCallback, void(Modio::ErrorCode)>(
-			DeleteFileOp(FilePath), OnDeleteDone, Modio::Detail::Services::GetGlobalContext().get_executor());
+			DeleteFileOp(FilePath, SharedState), OnDeleteDone,
+			Modio::Detail::Services::GetGlobalContext().get_executor());
 	}
 } // namespace
 
@@ -33,10 +35,25 @@ namespace
 class DeleteFolderOp
 {
 public:
-	DeleteFolderOp(Modio::filesystem::path FolderPath) : FolderPath(FolderPath) {};
+	DeleteFolderOp(Modio::filesystem::path FolderPath, std::weak_ptr<Modio::Detail::FileSharedState> SharedState)
+		: FolderPath(FolderPath),
+		  SharedState(SharedState) {};
 	template<typename CoroType>
 	void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 	{
+		if (std::shared_ptr<Modio::Detail::FileSharedState> PinnedState = SharedState.lock())
+		{
+			if (PinnedState->bCancelRequested)
+			{
+				Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
+				return;
+			}
+		}
+		else
+		{
+			Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
+			return;
+		}
 		reenter(CoroutineState)
 		{
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Begin delete of {}",
@@ -58,7 +75,7 @@ public:
 				}
 				else
 				{
-					yield RecursivelyDeleteFile(DirectoryIterator->path(), std::move(Self));
+					yield RecursivelyDeleteFile(DirectoryIterator->path(),SharedState, std::move(Self));
 				}
 
 				// Give priority to an error in case "RecursivelyDeleteFile" gets one
@@ -106,6 +123,7 @@ private:
 	Modio::filesystem::path FolderPath;
 	std::vector<std::pair<Modio::filesystem::path, int>> Folders;
 	Modio::filesystem::recursive_directory_iterator DirectoryIterator;
+	std::weak_ptr<Modio::Detail::FileSharedState> SharedState;
 };
 
 #include <asio/unyield.hpp>

@@ -661,35 +661,33 @@ namespace Modio
 			return HeaderBuffer;
 		}
 
-		Modio::Optional<Modio::Detail::HttpRequestParams> HttpRequestParams::FileDownload(std::string URL)
+		Modio::Optional<Modio::Detail::HttpRequestParams> HttpRequestParams::FileDownload(
+			std::string URL, Modio::Optional<Modio::Detail::HttpRequestParams> FromRedirect)
 		{
-			std::regex URLPattern("(https:\\/\\/)?(.*\\.io)(.+)$", std::regex::icase);
+			std::string Regex = "^(http[s]?:\\/\\/)?([-a-zA-Z0-9@:%._\\+~#?&\\/"
+								"=]{2,256}\\.[a-z]{2,6}\\b[-a-zA-Z0-9@:%._\\+~#?&=]*)(.+)$";
+			std::regex URLPattern(Regex, std::regex::icase);
 			std::smatch MatchInfo;
-			if (std::regex_search(URL, MatchInfo, URLPattern))
+			if (std::regex_search(URL, MatchInfo, URLPattern) == false || MatchInfo.size() != 4)
 			{
-				if (MatchInfo.size() == 4)
-				{
-					return HttpRequestParams(MatchInfo[2].str(), MatchInfo[3].str());
-				}
+				return {};
 			}
-			return {};
-		}
-		Modio::Optional<Modio::Detail::HttpRequestParams> HttpRequestParams::RedirectURL(std::string URL) const
-		{
-			std::regex URLPattern("(https:\\/\\/)?(.*\\.io)(.+)$", std::regex::icase);
-			std::smatch MatchInfo;
-			if (std::regex_search(URL, MatchInfo, URLPattern))
+
+			std::string FileDownloadServer = MatchInfo[2].str();
+			std::string ResourcePath = MatchInfo[3].str();
+
+			if (FromRedirect.has_value())
 			{
-				if (MatchInfo.size() == 4)
-				{
-					auto NewParamsInstance = HttpRequestParams(*this);
-					NewParamsInstance.bFileDownload = true;
-					NewParamsInstance.FileDownloadServer = MatchInfo[2].str();
-					NewParamsInstance.ResourcePath = MatchInfo[3].str();
-					return NewParamsInstance;
-				}
+				auto NewParamsInstance = HttpRequestParams(FromRedirect.value());
+				NewParamsInstance.bFileDownload = true;
+				NewParamsInstance.FileDownloadServer = FileDownloadServer;
+				NewParamsInstance.ResourcePath = ResourcePath;
+				return NewParamsInstance;
 			}
-			return {};
+			else
+			{
+				return HttpRequestParams(FileDownloadServer, ResourcePath);
+			}
 		}
 
 		std::string HttpRequestParams::GetAPIVersionString() const

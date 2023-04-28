@@ -27,6 +27,7 @@ namespace Modio
 			Modio::GameID GameID;
 			Modio::ApiKey ApiKey;
 			Modio::ModID ModId;
+			Modio::Detail::CachedResponse CachedResponse;
 
 			asio::coroutine CoroutineState;
 
@@ -45,19 +46,26 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					{
-						Modio::Optional<Modio::ModInfo> CachedModInfo =
-							Services::GetGlobalService<CacheService>().FetchFromCache(ModId);
-
-						if (CachedModInfo.has_value() == true)
+						if (!Modio::Detail::SDKSessionData::IsModCacheInvalid(ModId))
 						{
-							Self.complete({}, CachedModInfo);
-							return;
+							Modio::Optional<Modio::ModInfo> CachedModInfo =
+								Services::GetGlobalService<CacheService>().FetchFromCache(ModId);
+
+							if (CachedModInfo.has_value() == true)
+							{
+								Self.complete({}, CachedModInfo);
+								return;
+							}
 						}
 					}
 
+					CachedResponse = Modio::Detail::SDKSessionData::IsModCacheInvalid(ModId)
+										 ? Modio::Detail::CachedResponse::Disallow
+										 : Modio::Detail::CachedResponse::Allow;
+
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer, Modio::Detail::GetModRequest.SetGameID(GameID).SetModID(ModId),
-						Modio::Detail::CachedResponse::Allow, std::move(Self));
+						CachedResponse, std::move(Self));
 
 					if (ec)
 					{
@@ -66,6 +74,7 @@ namespace Modio
 					}
 
 					{
+						Modio::Detail::SDKSessionData::ClearModCacheInvalid(ModId);
 						auto ModInfoData = TryMarshalResponse<Modio::ModInfo>(ResponseBodyBuffer);
 						if (ModInfoData.has_value())
 						{

@@ -39,6 +39,7 @@ namespace Modio
 				constexpr const char* UserID = "user_id";
 				constexpr const char* Nonce = "nonce";
 				constexpr const char* AccessToken = "access_token";
+				constexpr const char* UploadID = "upload_id";
 			} // namespace APIStrings
 			namespace JSONKeys
 			{

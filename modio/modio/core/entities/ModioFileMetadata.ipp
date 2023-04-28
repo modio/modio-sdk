@@ -26,8 +26,9 @@ namespace Modio
 																 {FileMetadata::VirusScanStatus::FileNotFound, 4},
 																 {FileMetadata::VirusScanStatus::ErrorScanning, 5}})
 
-	NLOHMANN_JSON_SERIALIZE_ENUM(FileMetadata::VirusStatus,
-								 {{FileMetadata::VirusStatus::NoThreat, 0}, {FileMetadata::VirusStatus::Malicious, 1}})
+	NLOHMANN_JSON_SERIALIZE_ENUM(FileMetadata::VirusStatus, {{FileMetadata::VirusStatus::NoThreat, 0},
+															 {FileMetadata::VirusStatus::Malicious, 1},
+															 {FileMetadata::VirusStatus::PotentiallyHarmful, 2}})
 
 	/// @docnone
 	void from_json(const nlohmann::json& Json, Modio::FileMetadata& FileMetadata)
@@ -47,6 +48,7 @@ namespace Modio
 		Detail::ParseSafe(Json, FileMetadata.CurrentVirusScanStatus, "virus_status");
 		Detail::ParseSafe(Json, FileMetadata.CurrentVirusStatus, "virus_positive");
 		Detail::ParseSafe(Json, FileMetadata.Filesize, "filesize");
+		Detail::ParseSafe(Json, FileMetadata.FilesizeUncompressed, "filesize_uncompressed");
 		Detail::ParseSafe(Json, FileMetadata.Filename, "filename");
 		Detail::ParseSafe(Json, FileMetadata.Version, "version");
 		Detail::ParseSafe(Json, FileMetadata.Changelog, "changelog");
@@ -64,6 +66,7 @@ namespace Modio
 				{"virus_status", FileMetadata.CurrentVirusScanStatus},
 				{"virus_positive", FileMetadata.CurrentVirusStatus},
 				{"filesize", FileMetadata.Filesize},
+				{"filesize_uncompressed", FileMetadata.FilesizeUncompressed},
 				{"filename", FileMetadata.Filename},
 				{"version", FileMetadata.Version},
 				{"changelog", FileMetadata.Changelog},

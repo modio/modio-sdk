@@ -111,8 +111,6 @@ namespace Modio
 						CurrentEntry.increment(ec);
 					}
 
-					PinnedProgressInfo->TotalExtractedSizeOnDisk = CurrentTotalFileSize;
-
 					SetTotalProgress(
 						*PinnedProgressInfo.get(), Modio::ModProgressInfo::EModProgressState::Compressing,CurrentTotalFileSize);
 					SetState(*PinnedProgressInfo.get(), Modio::ModProgressInfo::EModProgressState::Compressing);

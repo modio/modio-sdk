@@ -53,5 +53,19 @@ namespace Modio
 		{
 			Json = nlohmann::json {{"upload_id", Session.UploadID.value_or("")}, {"status", Session.UploadStatus}};
 		}
+
+		/// @docpublic
+		/// @brief Container for a collection of UploadSession objects
+		class UploadSessionList : public PagedResult, public List<std::vector, UploadSession>
+		{
+			/// @docnone
+			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::UploadSessionList& List);
+		};
+
+		void from_json(const nlohmann::json& Json, Modio::Detail::UploadSessionList& List)
+		{
+			from_json(Json, static_cast<Modio::PagedResult&>(List));
+			Modio::Detail::ParseSafe(Json, List.InternalList, "data");
+		}
 	} // namespace Detail
 } // namespace Modio

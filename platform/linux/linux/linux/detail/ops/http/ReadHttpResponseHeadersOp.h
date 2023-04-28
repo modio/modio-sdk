@@ -74,7 +74,19 @@ namespace Modio
 					else
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
-													"Response Headers received OK");
+													"Response Headers received OK with response code: {}",
+													Request->ResponseCode);
+
+#ifdef MODIO_TRACE_DUMP_RESPONSE
+						// Output the headers received from the API
+						for (httpparser::Response::HeaderItem& Hdr : Request->ParsedResponseHeaders.headers)
+						{
+							Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+								"Header {} : {}",
+								Hdr.name, Hdr.value);
+						}
+#endif
+
 						// Already processed the response code and removed header data from the response buffer so just
 						// return no error code
 						Self.complete({});

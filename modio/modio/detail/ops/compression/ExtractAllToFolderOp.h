@@ -109,8 +109,6 @@ namespace Modio
 						{
 							auto Info =
 								Impl->ProgressInfo->lock();
-							Info->TotalExtractedSizeOnDisk =
-								Impl->ArchiveView.GetTotalExtractedSize();
 							SetState(*Info.get(), Modio::ModProgressInfo::EModProgressState::Extracting);
 							SetTotalProgress(*Info.get(), ModProgressInfo::EModProgressState::Extracting, Impl->ArchiveView.GetTotalExtractedSize());
 						}
@@ -128,14 +126,16 @@ namespace Modio
 
 					while (Impl->CurrentEntryIterator != Impl->ArchiveView.end())
 					{
-						ec = CheckPathIsValid(Impl->CurrentEntryIterator->FilePath, Impl->RootOutputPath);
-
+						if (Impl->CurrentEntryIterator->FilePath.has_parent_path())
+						{
+							ec = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+								.CheckExtractionPath(Impl->CurrentEntryIterator->FilePath, Impl->RootOutputPath);
+						}
 						if (ec)
 						{
 							Self.complete(ec, Modio::FileSize(0));
 							return;
 						}
-
 						// If the current entry has no filename (ie it is just a directory), create that directory
 						if (!Impl->CurrentEntryIterator->FilePath.has_filename() ||
 							Impl->CurrentEntryIterator->bIsDirectory)
@@ -160,37 +160,6 @@ namespace Modio
 					// Once all files are extracted, notify the caller
 					Self.complete(Modio::ErrorCode {}, Impl->ArchiveView.GetTotalExtractedSize());
 				}
-			}
-
-			Modio::ErrorCode CheckPathIsValid(Modio::filesystem::path FilePath, Modio::filesystem::path CurrentPath)
-			{
-				Modio::ErrorCode Err;
-				Modio::filesystem::path LexPath = Modio::filesystem::relative(FilePath, CurrentPath, Err);
-
-				// In case the platform does not support symlinks, the LexPath here would not correctly identify if
-				// FilePath tries to access parent folders relative to CurrentPath. This will double check no ".."
-				// is in FilePath
-				if (LexPath.string() == "")
-				{
-					std::string PreFolder = "..";
-					std::string AbsFolder = "\\";
-
-					// This case means that the path does not have a reference to folders above the current location.
-					if (FilePath.string().find(PreFolder) == std::string::npos && 
-						FilePath.string().find(AbsFolder) != 0)
-					{
-						return {};
-					}
-				}
-
-				if (Err)
-				{
-					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression,
-												"FilePath {} returned a system error with message: {}",
-												FilePath.string(), Err.message());
-				}
-
-				return Modio::make_error_code(Modio::FilesystemError::NoPermission);
 			}
 		};
 #include <asio/unyield.hpp>

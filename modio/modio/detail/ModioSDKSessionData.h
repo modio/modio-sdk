@@ -138,6 +138,10 @@ namespace Modio
 			MODIO_IMPL static void ClearSubscriptionCacheInvalid();
 			MODIO_IMPL static bool IsSubscriptionCacheInvalid();
 
+			MODIO_IMPL static void InvalidateModCache(Modio::ModID ID);
+			MODIO_IMPL static void ClearModCacheInvalid(Modio::ModID ID);
+			MODIO_IMPL static bool IsModCacheInvalid(Modio::ModID ID);
+
 		private:
 			enum class InitializationState
 			{
@@ -175,6 +179,7 @@ namespace Modio
 			Modio::Optional<Modio::ModID> ModIDToPrioritize;
 			std::map<Modio::ModID, Modio::CreateModFileParams> PendingModUploads;
 			bool bSubscriptionCacheInvalid = false;
+			std::unordered_map<std::int64_t, bool> ModCacheInvalidMap;
 		};
 	} // namespace Detail
 } // namespace Modio
