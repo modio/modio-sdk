@@ -18,8 +18,8 @@ namespace Modio
 	{
 		HttpService::HttpService(asio::io_context& IOService) : asio::detail::service_base<HttpService>(IOService)
 		{
-			APIQueue = std::make_shared<Modio::Detail::OperationQueue>(IOService);
-			FileDownloadQueue = std::make_shared<Modio::Detail::OperationQueue>(IOService);
+			APIQueue = std::make_shared<Modio::Detail::OperationQueue>(IOService, "API Request Queue");
+			FileDownloadQueue = std::make_shared<Modio::Detail::OperationQueue>(IOService, "File Download Queue");
 
 			auto NewImplementation = std::make_shared<HttpImplementation>(*this);
 

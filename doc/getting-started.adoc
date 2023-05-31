@@ -429,9 +429,9 @@ For optimal execution, <<RunPendingHandlers>> should be called at least once per
 ----
 while(bGameIsRunning == true)
 {
-    //other stuff
+    // other stuff
    Modio::RunPendingHandlers();
-    //other stuff
+    // other stuff
 }
 ----
 
@@ -439,7 +439,7 @@ When you are ready to initialize the SDK for the current session, you'll need to
 
 [source,cpp] 
 ----
-//represents some external state so we know that the SDK is good to go
+// represents some external state so we know that the SDK is good to go
 Modio::Optional<bool> SDKInitialized;
 
 Modio::InitializeOptions Options;
@@ -472,10 +472,10 @@ It is worth considering that the "LocalProfileName" is used by the mod.io SDK to
 To finalize and shut down the mod.io SDK is equally simple:
 [source, cpp]
 ----
-//State variable, stored in some valid scope
+// State variable, stored in some valid scope
 bool SDKShutdownComplete = false;
 
-//Capture reference to the state variable in the lambda - could use shared_ptr for more safety instead
+// Capture reference to the state variable in the lambda - could use shared_ptr for more safety instead
 Modio::ShutdownAsync([&SDKShutdownComplete](Modio::ErrorCode ec)
 {
     SDKShutdownComplete = true;
@@ -494,7 +494,102 @@ NOTE: You will need to continue to call <<RunPendingHandlers>> while the async s
 
 === SDK quick-start: User Authentication
 
-Mod.io provides two ways for users to create an account to use the service: email authentication and single sign on (SSO) through an external authentication partner. The flow for these is slightly different.
+mod.io provides two ways for users to create an account to use the service: email authentication and single sign on (SSO) through an external authentication partner. The flow for these is slightly different.
+
+==== Email authentication
+
+mod.io allows users to create an account on the mod.io website using an email address. Once the user has accepted the mod.io Terms of Use and created an account, they can use that email address to log in and access mod.io services in your game.
+
+Email authentication involves:
+
+    1. Submitting the user's email address
+    2. The user retrieving the one-time code mod.io sends to that address (externally to your application)
+    3. Submitting the code provided by the user
+
+[source, cpp]
+----
+Modio::RequestEmailAuthCodeAsync(Modio::EmailAddress(UserProvidedEmailAddress), [](Modio::ErrorCode ec)
+{
+    // Handle errors if ec is truthy
+});
+
+// some time later, after the user inputs their authentication code
+
+Modio::AuthenticateUserEmailAsync(Modio::EmailAuthCode(UserProvidedAuthCode), [](Modio::ErrorCode ec) {
+		if (ec)
+		{
+            // Authentication failure, inspect ec to determine what information to provide to the end user
+		}
+		else
+		{
+            // User is now authenticated and able to manage their subscriptions via SDK calls
+		}
+	});
+
+----
+
+==== SSO/External authentication
+
+mod.io features single sign on authentication from a number of external providers. This currently includes:
+
+    * Xbox Live
+    * Steam
+    * GoG
+    * itch.io
+    * Nintendo Switch
+    * Discord
+    * PlayStation Network (PSN)
+    * Epic Games
+    * OpenID
+
+Please note that the ability to authenticate players using OpenID is feature for advanced partners only. If you are interested in becoming an advanced partner, please contact developers@mod.io
+
+To use SSO with mod.io, a user must have accepted the mod.io Terms of Use in order to create an account.
+
+This means the external authentication flow is the following:
+
+    1. Call <<AuthenticateUserExternalAsync>> , passing in any provider-specific parameters, setting `AuthenticationParams::bUserHasAcceptedTerms` to false, and indicating which authentication provider you wish to use
+    2. Check the error code in the callback - if it indicates the user has not yet created an account or accepted the terms, call <<GetTermsOfUseAsync>> and display the provided information to your user
+    3. If the user clicks the OK/affirmative button on your screen displaying the terms of use, repeat the call in step 1 but setting `AuthenticationParams::bUserHasAcceptedTerms` to *true*
+    4. Check the error code in the callback - a false-y error code indicates that authentication was successful, and users can now install and manage mods and subscriptions.
+
+[source, cpp]
+----
+Modio::AuthenticationParams UserParams;
+UserParams.AuthToken = "AuthenticationToken";
+UserParams.UserEmail = "UserEmail";
+UserParams.bUserHasAcceptedTerms = false;
+
+Modio::AuthenticateUserExternalAsync(UserParams,Provider,[Provider, Language](Modio::ErrorCode ec)
+{
+    if (ec)
+    {
+        if (ec == Modio::ApiError::UserNoAcceptTermsOfUse)
+        {
+            // We need to display the terms of use to the user
+            Modio::GetTermsOfUseAsync(Provider, Language, [](Modio::ErrorCode ec, Modio::Optional<Modio::Terms> Terms)
+            {
+                if (ec)
+                {
+                    // something went wrong fetching the terms, inspect ec to decide what to do
+                }
+                else
+                {
+                    // Display the terms of use to the user, remember not to block in the callback here!
+                    NonBlockingFunctionThatDisplaysTheTermsOfUse(Terms);
+                }
+            });
+        }
+    }
+});
+
+// Later sometime, when your user clicks accept on the terms of use
+UserParams.bUserHasAcceptedTerms = true;
+Modio::AuthenticateUserExternalAsync(UserParams,Provider,[](Modio::ErrorCode ec){/* ... */});
+
+----
+
+NOTE: You will need to base-64 encode a Steam encrypted app ticket before submitting it to us via AuthenticateUserExternalAsync.
 
 ==== Email authentication
 
@@ -528,64 +623,6 @@ Modio::AuthenticateUserEmailAsync(Modio::EmailAuthCode(UserProvidedAuthCode), []
 
 ----
 
-==== SSO/External authentication
-
-Mod.io features single sign on authentication from a number of external providers. This currently includes:
-
-    * Xbox Live
-	* Steam
-    * GoG
-    * Itch
-    * Switch
-    * Discord
-
-In order to use SSO with mod.io, a user must have accepted the mod.io Terms of Use in order to create an account.
-
-This means the external authentication flow is the following:
-
-    1. Call <<AuthenticateUserExternalAsync>> , passing in any provider-specific parameters, setting `AuthenticationParams::bUserHasAcceptedTerms` to false, and indicating which authentication provider you wish to use
-    2. Check the error code in the callback - if it indicates the user has not yet created an account or accepted the terms, call <<GetTermsOfUseAsync>> and display the provided information to your user
-    3. If the user clicks the OK/affirmative button on your screen displaying the terms of use, repeat the call in step 1 but setting `AuthenticationParams::bUserHasAcceptedTerms` to *true*
-    4. Check the error code in the callback - a false-y error code indicates that authentication was successful, and users can now install and manage mods and subscriptions.
-
-[source, cpp]
-----
-Modio::AuthenticationParams UserParams;
-UserParams.AuthToken = "AuthenticationToken";
-UserParams.UserEmail = "UserEmail";
-UserParams.bUserHasAcceptedTerms = false;
-
-Modio::AuthenticateUserExternalAsync(UserParams,Provider,[Provider, Language](Modio::ErrorCode ec)
-{
-    if (ec)
-    {
-        if (ec == Modio::ApiError::UserNoAcceptTermsOfUse)
-        {
-            //We need to display the terms of use to the user
-            Modio::GetTermsOfUseAsync(Provider, Language, [](Modio::ErrorCode ec, Modio::Optional<Modio::Terms> Terms)
-            {
-                if (ec)
-                {
-                    //something went wrong fetching the terms, inspect ec to decide what to do
-                }
-                else
-                {
-                    //Display the terms of use to the user, remember not to block in the callback here!
-                    NonBlockingFunctionThatDisplaysTheTermsOfUse(Terms);
-                }
-            });
-        }
-    }
-});
-
-//Later sometime, when your user clicks accept on the terms of use
-UserParams.bUserHasAcceptedTerms = true;
-Modio::AuthenticateUserExternalAsync(UserParams,Provider,[](Modio::ErrorCode ec){/* ... */});
-
-----
-
-NOTE: You will need to base-64 encode a Steam encrypted app ticket before submitting it to us via AuthenticateUserExternalAsync.
-
 '''
 
 === SDK quick-start: Browsing available mods
@@ -599,7 +636,7 @@ Modio::ListAllModsAsync(Modio::FilterParams(), [](Modio::ErrorCode ec, Modio::Op
 {
     if (ec)
     {
-        //Error handling
+        // Error handling
     }
     else
     {
@@ -617,15 +654,15 @@ To search for a specific query string, sort in a different order, or combine dif
 
 [source,cpp]
 ----
-//Search queries
+// Search queries
 Modio::ListAllModsAsync(Modio::FilterParams().NameContains("SomeString"), ...)
-//Sorting
+// Sorting
 Modio::ListAllModsAsync(Modio::FilterParams().SortBy(Modio::FilterParams::SortFieldType::DownloadsToday, Modio::SortDirection::Ascending), ...)
 
-//Ranged results - starting at index 20, return 10 results
+// Ranged results - starting at index 20, return 10 results
 Modio::ListAllModsAsync(Modio::FilterParams.NameContains("Your Query").IndexedResults(20, 10), ...)
 
-//Ranged results - return the 20th page of 10 results
+// Ranged results - return the 20th page of 10 results
 Modio::ListAllModsAsync(Modio::FilterParams.NameContains("Your Query").PagedResults(20, 10), ...)
 ----
 
@@ -655,10 +692,10 @@ Modio::EnableModManagement([](Modio::ModManagementEvent ModEvent)
     }
 });
 
-//Some time later: check if there's a mod being installed, or more mods that require installation pending
+// Some time later: check if there's a mod being installed, or more mods that require installation pending
 if (!Modio::IsModManagementBusy())
 {
-    //This will reset any in-progress installations to pending, so we're only calling it if nothing's being processed
+    // This will reset any in-progress installations to pending, so we're only calling it if nothing's being processed
     Modio::DisableModManagement();
 }
 
@@ -674,29 +711,29 @@ NOTE: To subscribe to a mod, <<EnableModManagement>> must be called beforehand.
 
 [source,cpp]
 ----
-//Subscription
+// Subscription
 Modio::SubscribeToModAsync(ModID, [](Modio::ErrorCode ec)
 {
     if (ec)
     {
-        //Didn't subscribe, show a message to the user
+        // Didn't subscribe, show a message to the user
     }
     else
     {
-        //Successfully subscribed on the server
+        // Successfully subscribed on the server
     }
 });
 
-//Unsubscription
+// Unsubscription
 Modio::UnsubscribeFromModAsync(ModID, [](Modio::ErrorCode ec)
 {
     if (ec)
     {
-        //Couldn't unsubscribe, show error
+        // Couldn't unsubscribe, show error
     }
     else
     {
-        //Server records unsubscription to remove the user's association to this mod
+        // Server records unsubscription to remove the user's association to this mod
     }
 });
 
@@ -712,11 +749,11 @@ Modio::FetchExternalUpdatesAsync([](Modio::ErrorCode ec)
 {
     if (ec)
     {
-        //Couldn't fetch external subscription data, handle error
+        // Couldn't fetch external subscription data, handle error
     }
     else
     {
-        //The SDK's internal state synchronised. This is an acknowledgment of success
+        // The SDK's internal state synchronised. This is an acknowledgment of success
     }
 });
 ----
@@ -749,14 +786,14 @@ The easiest way to do this is by using <<QueryUserInstallations>>. This function
 ----
 std::vector<Modio::filesystem::path> ModPaths;
 
-//It iterates over all the installed mods that are up-to-date
+// It iterates over all the installed mods that are up-to-date
 bool bIncludeOutdatedMods = false;
 for (std::pair<Modio::ModID, Modio::ModCollectionEntry>& Entry : Modio::QueryUserInstallations(bIncludeOutdatedMods))
 {
     ModPaths.push_back(Entry.second().GetPath());
 }
 
-//You can now append whatever filenames you expect in a mod to the paths and load those in
+// You can now append whatever filenames you expect in a mod to the paths and load those in
 for (Modio::filesystem::path& Path : ModPaths)
 {
     YourGame::FileHandle ModManifest = YourGame::OpenFile(Path / "mod_manifest.txt");
@@ -931,7 +968,7 @@ Modio::GetModInfoAsync(ModID, [](Modio::ErrorCode ec, Modio::Optional<Modio::Mod
         {
             // Error code represents some network error kind. Possibly ask the user to try again later.
         }
-        else if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::EntityNotFoundError)) //Entity Not Found group
+        else if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::EntityNotFoundError)) // Entity Not Found group
         {
             // An mod entity is not located with this configuration. Therefore, the list you're fetching the ModID from is probably stale. A remedy could be to fetch an updated version of the list from the server.
         }

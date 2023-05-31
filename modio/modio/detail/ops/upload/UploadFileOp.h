@@ -150,7 +150,7 @@ namespace Modio
 
 								Impl->CurrentPayloadFile = std::make_unique<Modio::Detail::File>(
 									Impl->PayloadElement->second.PathToFile.value(),
-									Modio::Detail::FileMode::ReadWrite);
+									Modio::Detail::FileMode::ReadOnly);
 								{
 									// Currently no API endpoints ask for more than one file, so we only need to do this
 									// the once

@@ -419,6 +419,16 @@ namespace Modio
 			Get().CreationHandles.insert({Handle, ID});
 		}
 
+		void SDKSessionData::SetPlatformOverride(std::string Platform)
+		{
+			Get().PlatformOverride = Platform;
+		}
+
+		Modio::Optional<std::string> SDKSessionData::GetPlatformOverride()
+		{
+			return Get().PlatformOverride;
+		}
+
 		void SDKSessionData::SetEnvironmentOverrideUrl(std::string OverrideUrl)
 		{
 			Get().EnvironmentOverrideUrl = OverrideUrl;

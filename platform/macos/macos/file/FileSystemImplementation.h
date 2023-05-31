@@ -88,6 +88,11 @@ namespace Modio
 
 			void Shutdown() override
 			{
+				if (SharedState)
+				{
+					SharedState->bCancelRequested = true;
+				}
+
 				for (auto FileObject : OpenFileObjects)
 				{
 					if (auto FileImpl = FileObject.lock())
@@ -162,7 +167,8 @@ namespace Modio
 			auto DeleteFolderAsync(Modio::filesystem::path FolderPath, CompletionTokenType&& Token)
 			{
 				return asio::async_compose<CompletionTokenType, void(std::error_code)>(
-					DeleteFolderOp(FolderPath), Token, Modio::Detail::Services::GetGlobalContext().get_executor());
+					DeleteFolderOp(FolderPath, SharedState), Token,
+					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 
 			// do we need to maintain a cache of temporary files?

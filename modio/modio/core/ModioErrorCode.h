@@ -777,6 +777,8 @@ namespace Modio
 
 	enum class ApiError
 	{
+		APIKeyForTestOnly = 11017,
+		APIKeyHasNoGame = 11016,
 		AlreadySubscribed = 15004,
 		AlreadyUnsubscribed = 15005,
 		AuthenticatedAccountHasBeenDeleted = 11006,
@@ -784,6 +786,7 @@ namespace Modio
 		BinaryFileCorrupted = 13001,
 		BinaryFileUnreadable = 13002,
 		CannotMuteYourself = 17039,
+		CannotVerifyExternalCredentials = 11032,
 		CrossOriginForbidden = 10001,
 		ExpiredOrRevokedAccessToken = 11005,
 		FailedToCompleteTheRequest = 10002,
@@ -799,6 +802,7 @@ namespace Modio
 		MissingWritePermission = 11003,
 		ModioOutage = 10000,
 		MuteUserNotFound = 17000,
+		OpenIDNotConfigured = 11086,
 		Ratelimited = 11008,
 		ReportedEntityUnavailable = 15030,
 		RequestedCommentNotFound = 15026,
@@ -826,6 +830,12 @@ namespace Modio
 		{
 			switch (static_cast<Modio::ApiError>(ErrorValue))
 			{
+				case ApiError::APIKeyForTestOnly:
+						return "The api_key supplied in the request is for test environment purposes only and cannot be used for this functionality.";
+					break;
+				case ApiError::APIKeyHasNoGame:
+						return "The api_key supplied in the request must be associated with a game.";
+					break;
 				case ApiError::AlreadySubscribed:
 						return "The authenticated user is already subscribed to the mod.";
 					break;
@@ -846,6 +856,9 @@ namespace Modio
 					break;
 				case ApiError::CannotMuteYourself:
 						return "You cannot mute yourself.";
+					break;
+				case ApiError::CannotVerifyExternalCredentials:
+						return "mod.io was unable to verify the credentials against the external service provider.";
 					break;
 				case ApiError::CrossOriginForbidden:
 						return "Cross-origin request forbidden.";
@@ -891,6 +904,9 @@ namespace Modio
 					break;
 				case ApiError::MuteUserNotFound:
 						return "The user with the supplied UserID could not be found.";
+					break;
+				case ApiError::OpenIDNotConfigured:
+						return "You must configure your OpenID config for your game in your game authentication settings before being able to authenticate users.";
 					break;
 				case ApiError::Ratelimited:
 						return "You have been ratelimited for making too many requests. See Rate Limiting.";
@@ -1324,6 +1340,21 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::ApiError::APIKeyHasNoGame)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::APIKeyForTestOnly)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::OpenIDNotConfigured)
+					{
+						return true;
+					}
+
 					if (ec == Modio::GenericError::BadParameter)
 					{
 						return true;
@@ -1348,6 +1379,21 @@ namespace Modio
 					}
 
 					if (ec == Modio::ApiError::ValidationErrors)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::APIKeyHasNoGame)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::APIKeyForTestOnly)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::CannotVerifyExternalCredentials)
 					{
 						return true;
 					}

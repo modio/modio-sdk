@@ -23,6 +23,7 @@ namespace Modio
 				constexpr const char* ItchToken = "itchio_token";
 				constexpr const char* XboxToken = "xbox_token";
 				constexpr const char* SwitchToken = "id_token";
+				constexpr const char* OpenIDToken = "id_token";
 				constexpr const char* DiscordToken = "discord_token";
 				constexpr const char* Appdata = "appdata";
 				constexpr const char* EmailAddress = "email";
@@ -83,6 +84,7 @@ namespace Modio
 				constexpr const char* PS5 = "ps5";
 				constexpr const char* Switch = "switch";
 				constexpr const char* Oculus = "oculus";
+				constexpr const char* Source = "source";
 			}
 		}
 	}

@@ -21,7 +21,7 @@ if(MODIO_PLATFORM STREQUAL "WIN")
 	add_subdirectory(../ms-common ../ms-common)
 
 	if (MODIO_BUILD_TESTS)
-		add_subdirectory(tests EXCLUDE_FROM_ALL)
+		add_subdirectory(tests)
 	endif()
 
 	install(

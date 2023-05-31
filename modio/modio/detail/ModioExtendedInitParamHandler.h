@@ -22,6 +22,7 @@ namespace Modio
 		{
 			static constexpr const char* ServerURL = "ServerURL";
 			static constexpr const char* OAuthToken = "OAuthToken";
+			static constexpr const char* PlatformOverride = "PlatformOverride";
 		};
 
 		/// @brief Struct for handling internal-only initialization options
@@ -51,6 +52,14 @@ namespace Modio
 				if (ServerURLOverride.has_value())
 				{
 					Modio::Detail::SDKSessionData::SetEnvironmentOverrideUrl(*ServerURLOverride);
+				}
+
+				Modio::Optional<std::string> PlatformOverride =
+					GetExtendedParameterValue(InitParams, Modio::Detail::InternalConstants::PlatformOverride);
+
+				if (PlatformOverride.has_value())
+				{
+					Modio::Detail::SDKSessionData::SetPlatformOverride(*PlatformOverride);
 				}
 			};
 

@@ -157,6 +157,8 @@ namespace Modio
 			const int MAX_BYTES = 1048575; // It operates in 1 MB chunks of data.
 
 		public:
+			bool bCancelRequested = false;
+			
 			Modio::ErrorCode Initialize()
 			{
 				return {};

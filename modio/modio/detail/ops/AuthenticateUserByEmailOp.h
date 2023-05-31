@@ -13,10 +13,10 @@
 #include "modio/cache/ModioCacheService.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCoreTypes.h"
+#include "modio/core/entities/ModioToken.h"
 #include "modio/core/entities/ModioUser.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
-#include "modio/detail/schema/AccessTokenObject.h"
 #include "modio/http/ModioHttpParams.h"
 #include "modio/userdata/ModioUserDataService.h"
 
@@ -55,8 +55,8 @@ namespace Modio
 					}
 
 					{
-						Modio::Optional<Modio::Detail::Schema::AccessTokenObject> Token =
-							Detail::TryMarshalResponse<Detail::Schema::AccessTokenObject>(Local.ResponseBodyBuffer);
+						Modio::Optional<Modio::Detail::AccessTokenObject> Token =
+							Detail::TryMarshalResponse<Detail::AccessTokenObject>(Local.ResponseBodyBuffer);
 						if (Token.has_value())
 						{
 							Local.AuthResponse = Token.value();
@@ -113,7 +113,7 @@ namespace Modio
 			struct
 			{
 				Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-				Modio::Detail::Schema::AccessTokenObject AuthResponse;
+				Modio::Detail::AccessTokenObject AuthResponse;
 				Modio::User NewlyAuthenticatedUser;
 			} Local;
 		};

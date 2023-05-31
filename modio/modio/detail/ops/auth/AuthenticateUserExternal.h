@@ -53,8 +53,8 @@ namespace Modio
 						return;
 					}
 					{
-						Modio::Optional<Modio::Detail::Schema::AccessTokenObject> Token =
-							Detail::TryMarshalResponse<Detail::Schema::AccessTokenObject>(LocalState->ResponseBuffer);
+						Modio::Optional<Modio::Detail::AccessTokenObject> Token =
+							Detail::TryMarshalResponse<Detail::AccessTokenObject>(LocalState->ResponseBuffer);
 						if (Token.has_value())
 						{
 							LocalState->AuthResponse = Token.value();
@@ -112,7 +112,7 @@ namespace Modio
 				asio::coroutine CoroutineState;
 				Modio::Detail::DynamicBuffer ResponseBuffer;
 				Modio::Detail::HttpRequestParams AuthenticationParams;
-				Modio::Detail::Schema::AccessTokenObject AuthResponse;
+				Modio::Detail::AccessTokenObject AuthResponse;
 				Modio::User AuthUser;
 			};
 			Modio::StableStorage<Impl> LocalState;

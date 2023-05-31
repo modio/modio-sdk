@@ -48,10 +48,26 @@ class ServiceInitializationOp
 public:
 	ServiceInitializationOp(Modio::InitializeOptions InitParams) : InitParams(InitParams) {}
 
+	static Modio::Optional<std::string> GetExtendedParameterValue(Modio::InitializeOptions& InitParams,
+																  std::string ParamName)
+	{
+		auto ParamIterator = InitParams.ExtendedParameters.find(ParamName);
+		if (ParamIterator == InitParams.ExtendedParameters.end())
+		{
+			return {};
+		}
+		else
+		{
+			return ParamIterator->second;
+		}
+	}
+
 	template<typename CoroType>
 	void operator()(CoroType& Self, std::error_code ec = {})
 	{
 		MODIO_PROFILE_SCOPE(ServiceInitialization);
+
+		Modio::Optional<std::string> PlatformOverride = GetExtendedParameterValue(InitParams, "PlatformOverride");
 
 		reenter(CoroutineState)
 		{
@@ -61,6 +77,11 @@ public:
 											"mod.io SDK was already initialized!");
 				Self.complete(Modio::make_error_code(Modio::GenericError::SDKAlreadyInitialized));
 				return;
+			}
+			
+			if (PlatformOverride.has_value())
+			{
+				Modio::Detail::SDKSessionData::SetPlatformOverride(*PlatformOverride);
 			}
 
 			Modio::Detail::ExtendedInitParamHandler::PostSessionDataInit(InitParams);

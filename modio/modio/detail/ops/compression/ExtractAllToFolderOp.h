@@ -77,6 +77,14 @@ namespace Modio
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Compression,
 												"Extracting archive {}", Impl->ArchivePath.u8string());
+
+					if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().FileExists(
+							Impl->ArchivePath))
+					{
+						Self.complete(Modio::make_error_code(Modio::FilesystemError::FileNotFound), Modio::FileSize(0));
+						return;
+					}
+
 					// Parsing archive contents is an async operation because it requires reading/seeking around in
 					// the archive file which is async
 					yield Impl->ArchiveView.ParseArchiveContentsAsync(std::move(Self));

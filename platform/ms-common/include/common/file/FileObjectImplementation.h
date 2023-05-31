@@ -49,7 +49,7 @@ namespace Modio
 
 				  CurrentSeekOffset(0)
 			{
-				OperationQueue = std::make_shared<Modio::Detail::OperationQueue>(ParentContext);
+				OperationQueue = std::make_shared<Modio::Detail::OperationQueue>(ParentContext, BasePath.u8string().c_str());
 			}
 
 			~FileObjectImplementation()

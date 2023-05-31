@@ -26,7 +26,7 @@ namespace Modio
         static const HttpRequestParams AuthenticateViaGoogleRequest { Modio::Detail::Verb::POST, "/external/googleauth" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AuthenticateViaItchioRequest { Modio::Detail::Verb::POST, "/external/itchioauth" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AuthenticateViaOculusRequest { Modio::Detail::Verb::POST, "/external/oculusauth" , "application/x-www-form-urlencoded" }; 
-        static const HttpRequestParams AuthenticateViaOpenidRequest { Modio::Detail::Verb::POST, "/external/openid" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams AuthenticateViaOpenidRequest { Modio::Detail::Verb::POST, "/external/openidauth" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AuthenticateViaPsnRequest { Modio::Detail::Verb::POST, "/external/psnauth" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AuthenticateViaSteamRequest { Modio::Detail::Verb::POST, "/external/steamauth" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AuthenticateViaSwitchRequest { Modio::Detail::Verb::POST, "/external/switchauth" , "application/x-www-form-urlencoded" }; 
@@ -96,6 +96,7 @@ namespace Modio
         static const HttpRequestParams DeleteGameTagOptionRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/tags" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetGameTagOptionsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/tags" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AddGameTagOptionRequest { Modio::Detail::Verb::POST, "/games/{game-id}/tags" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams RenameGameTagOptionRequest { Modio::Detail::Verb::PUT, "/games/{game-id}/tags/rename" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetResourceOwnerRequest { Modio::Detail::Verb::POST, "/general/ownership" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetAuthenticatedUserRequest { Modio::Detail::Verb::GET, "/me" }; 
         static const HttpRequestParams GetUserEventsRequest { Modio::Detail::Verb::GET, "/me/events" , "application/x-www-form-urlencoded" }; 

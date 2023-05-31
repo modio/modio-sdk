@@ -73,7 +73,8 @@ namespace Modio
 		PS4,
 		PS5,
 		Switch,
-		Oculus
+		Oculus,
+		Source
 	};
 
 	/// @docpublic
@@ -502,7 +503,8 @@ namespace Modio
 		Discord,
 		PSN,
 		Oculus,
-		Epic
+		Epic,
+		OpenID
 	};
 
 	/// @docpublic
@@ -628,6 +630,8 @@ namespace Modio
 					return "oculus";
 				case AuthenticationProvider::Epic:
 					return "epic";
+				case AuthenticationProvider::OpenID:
+					return "openid";
 			}
 
 			assert(false && "Invalid value to ToString(Modio::Provider)");

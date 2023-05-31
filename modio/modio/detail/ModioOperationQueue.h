@@ -14,6 +14,7 @@
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioProfiling.h"
 #include <atomic>
 #include <deque>
 #include <memory>
@@ -29,9 +30,13 @@ namespace Modio
 			// asio::steady_timer QueueImpl;
 			std::deque<fu2::unique_function<void()>> QueueImpl;
 			std::atomic<bool> bWasCancelled {};
+			std::string QueueName;
 
 		public:
-			OperationQueue(asio::io_context& OwningContext) : OperationInProgress(false), NumWaiters(0)
+			OperationQueue(asio::io_context& OwningContext, const char* QueueName)
+				: OperationInProgress(false),
+				  NumWaiters(0),
+				  QueueName(QueueName)
 			// QueueImpl(OwningContext, std::chrono::steady_clock::time_point::max())
 			{}
 			OperationQueue(const OperationQueue& Other) = delete;
@@ -124,6 +129,7 @@ namespace Modio
 					// Preserve the associated executor of the queued operation
 
 					QueueImpl.push_back(std::forward<OperationType>(Operation));
+					MODIO_PROFILE_COUNTER_SET_NAMED(QueueName.c_str(), NumWaiters.load());
 				}
 				else
 				{
@@ -147,6 +153,7 @@ namespace Modio
 					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 							   std::move(QueueImpl.front()));
 					QueueImpl.pop_front();
+					MODIO_PROFILE_COUNTER_SET_NAMED(QueueName.c_str(), NumWaiters.load());
 				}
 			}
 

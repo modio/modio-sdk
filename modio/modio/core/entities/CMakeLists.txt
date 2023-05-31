@@ -22,3 +22,4 @@ add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioProfileMaturity.ipp
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioURLList.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioTerms.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioUser.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioToken.ipp)

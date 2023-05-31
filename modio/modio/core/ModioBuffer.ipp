@@ -11,6 +11,7 @@
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "modio/core/ModioBuffer.h"
 #endif
+
 #include "modio/detail/ModioProfiling.h"
 #include <limits>
 
@@ -54,6 +55,7 @@ namespace Modio
 		Buffer Buffer::CopyRange(std::size_t BeginIndex, std::size_t EndIndex)
 		{
 			MODIO_PROFILE_SCOPE(BufferCopyRange);
+			EndIndex = std::min(EndIndex, Size);
 			Buffer RangedCopy = Buffer(EndIndex - BeginIndex, Alignment);
 			std::copy(begin() + BeginIndex, begin() + EndIndex, RangedCopy.begin());
 			return RangedCopy;
@@ -62,6 +64,10 @@ namespace Modio
 		Buffer Buffer::CopyRange(const_iterator Start, const_iterator End)
 		{
 			MODIO_PROFILE_SCOPE(BufferCopyRange);
+			if (End <= Start)
+			{
+				return Buffer(0, Alignment);
+			}
 			Buffer RangedCopy = Buffer(End - Start, Alignment);
 			std::copy(Start, End, RangedCopy.begin());
 			return RangedCopy;
@@ -210,7 +216,7 @@ namespace Modio
 			{
 				if (CurrentBuffer.Data() == nullptr)
 				{
-					//throw;
+					// throw;
 				}
 				CumulativeSize += CurrentBuffer.GetSize();
 			}
@@ -452,8 +458,7 @@ namespace Modio
 									 Source.data());
 		}
 
-		std::size_t BufferCopy(Modio::Detail::DynamicBuffer& Destination,
-									  const Modio::Detail::DynamicBuffer Source)
+		std::size_t BufferCopy(Modio::Detail::DynamicBuffer& Destination, const Modio::Detail::DynamicBuffer Source)
 		{
 			MODIO_PROFILE_SCOPE(DynamicBufferCopyToDynamic);
 			Modio::Detail::DynamicBuffer::Sequence SourceBufferView = Source.data();

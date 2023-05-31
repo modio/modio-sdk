@@ -133,7 +133,7 @@ namespace Modio
 						if (Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().FileExists(
 								DownloadPath))
 						{
-							Modio::Detail::File DownloadedFile(DownloadPath, Modio::Detail::FileMode::ReadWrite);
+							Modio::Detail::File DownloadedFile(DownloadPath, Modio::Detail::FileMode::ReadOnly);
 							if (DownloadedFile.GetFileSize() ==
 								MPI->GetTotalProgress(Modio::ModProgressInfo::EModProgressState::Downloading))
 							{

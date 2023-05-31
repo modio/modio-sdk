@@ -14,11 +14,11 @@ Welcome to the mod.io SDK repository, built using C++. It allows game developers
 * Async callback-based interface
 * Non-blocking IO with a 'bring your own thread' model
 * Automatic downloads and updates
-* Email / Steam / GoG authentication
+* Email / Steam / EGS / Consoles / Custom SSO authentication
 * Mod Browsing / Filtering
 * Header-only support with C++17 compiler or later
 * C++14 codebases can use a static library or direct compilation
-* Native Unreal Engine integration available via our https://github.com/modio/modio-ue4[dedicated plugin]
+* Native Unreal Engine integration available via our https://github.com/modio/modio-ue[dedicated plugin]
 
 == Platform Support
 
@@ -42,7 +42,7 @@ Welcome to the mod.io SDK repository, built using C++. It allows game developers
 
 == Download repository
 
-Pre-requisites to compile this SDK are listed in link:doc/getting-started.adoc[Getting Started documentation]
+Pre-requisites to compile this SDK are listed in https://go.mod.io/sdk-docs[Getting Started documentation]
 
 It is possible to download the source code as a zip file from this webpage. However, a recursive clone downloads all dependencies. Therefore, the suggestion is to perform the following:
 
@@ -188,7 +188,7 @@ cmake --build <modio-sdk folder>/out/build/win
 cmake --install <modio-sdk folder>/out/build/win
 ```
 
-If you are using the `clang` compiler with Visual studio, check section link:https://github.com/modio/modio-sdk/blob/main/doc/getting-started.adoc#clang-win[Clang compiler in Visual Studio] for further details
+If you are using the `clang` compiler with Visual studio, check section https://go.mod.io/sdk-docs#clang-win[Clang compiler in Visual Studio] for further details
 
 ==== Custom FMT library
 If you have a custom version of the FMT library, you can modify the linking stage defining `MODIO_USE_CUSTOM_FMT`. This define signals the CMake build system to use a custom version of the library. Also, it requires that you define `MODIO_CUSTOM_FMT_PATH` to the system path that contains the FMT library to use.
@@ -221,15 +221,15 @@ FILE HEADER VALUES
 
 == Usage
 
-Please see the link:doc/getting-started.adoc[Getting Started documentation] for a breakdown of the mod.io SDK's concepts and usage, including:
+Please see the https://go.mod.io/sdk-docs[Getting Started documentation] for a breakdown of the mod.io SDK's concepts and usage, including:
 
-* link:doc/getting-started.adoc#sdk-quick-start-initialization-and-teardown[SDK initialization and event loop]
-* link:doc/getting-started.adoc#sdk-quick-start-user-authentication[Authentication]
-* link:doc/getting-started.adoc#sdk-quick-start-browsing-available-mods[Mod Browsing]
-* link:doc/getting-started.adoc#sdk-quick-start-mod-subscriptions-and-management[Mod Subscription Management]
+* https://go.mod.io/sdk-docs#_sdk_quick_start_initialization_and_teardown[SDK initialization and event loop]
+* https://go.mod.io/sdk-docs#_sdk_quick_start_user_authentication[Authentication]
+* https://go.mod.io/sdk-docs#_sdk_quick_start_browsing_available_mods[Mod Browsing]
+* https://go.mod.io/sdk-docs#_sdk_quick_start_mod_management_and_subscriptions[Mod Subscription Management]
 
 == Game studios and Publishers [[contact-us]]
-A private, white-label option is available for license. If you want a fully-featured platform that you control and host in-house send us a message mailto:developers@mod.io[Contact us,Whitelabel Inquiry] to discuss.
+If you need assistance with 1st party approvals, or require a private, white-label UGC solution. mailto:developers@mod.io[Contact us] to discuss.
 
 == Contributions Welcome
 Our SDK is public and open source. Game developers are welcome to utilize it directly, to add support for mods in their games, or fork it for their customized use. If you want to contribute to the SDK, submit a pull request with your recommended changes for review.

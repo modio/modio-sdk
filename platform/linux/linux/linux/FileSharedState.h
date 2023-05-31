@@ -198,6 +198,7 @@ namespace Modio
 
 		public:
 			io_uring UringState;
+			bool bCancelRequested = false;
 
 			Modio::ErrorCode Initialize()
 			{

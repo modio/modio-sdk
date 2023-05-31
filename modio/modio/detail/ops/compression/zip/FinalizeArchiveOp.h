@@ -188,6 +188,9 @@ namespace Modio
 						.FollowedBy<std::uint16_t>(0); // Length of comment
 
 					yield OutputFile->WriteAsync(std::move(*RecordBuffer), std::move(Self));
+					// Close Handle of any used file
+					OutputFile.reset();
+
 					Self.complete(ec);
 					return;
 				}

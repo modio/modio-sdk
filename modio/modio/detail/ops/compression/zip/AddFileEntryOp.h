@@ -47,7 +47,7 @@ namespace Modio
 				  ProgressInfo(ProgressInfo)
 			{
 				InputFile =
-					std::make_unique<Modio::Detail::File>(SourceFilePath, Modio::Detail::FileMode::ReadWrite, false);
+					std::make_unique<Modio::Detail::File>(SourceFilePath, Modio::Detail::FileMode::ReadOnly, false);
 				OutputFile = std::make_unique<Modio::Detail::File>(ArchiveFile->FilePath,
 																   Modio::Detail::FileMode::ReadWrite, false);
 				CompressionStream = std::make_unique<boost::beast::zlib::deflate_stream>();
@@ -286,6 +286,11 @@ namespace Modio
 										  ArchiveFileImplementation::CompressionMethod::Deflate, InputCRC);
 
 					*RollingFileHash = *RollingFileHash ^ InputCRC;
+
+					// Close Handle of any used file
+					InputFile.reset();
+					OutputFile.reset();
+
 					Self.complete({});
 					return;
 				}

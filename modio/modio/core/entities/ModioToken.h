@@ -11,14 +11,24 @@
 #pragma once
 
 #include "modio/core/ModioStdTypes.h"
-#include "modio/core/ModioLogger.h"
-#include "modio/detail/schema/AccessTokenObject.h"
+#include "modio/detail/JsonWrapper.h"
 #include <memory>
 
 namespace Modio
 {
 	namespace Detail
 	{
+
+		struct AccessTokenObject
+		{
+			std::int32_t HttpResponseCode;
+			std::string AccessToken;
+			Modio::Timestamp DateExpires;
+		};
+
+		/// @docnone
+		MODIO_IMPL void from_json(const nlohmann::json& Json, AccessTokenObject& AccessToken);
+
 		enum class OAuthTokenState : std::uint8_t
 		{
 			Valid,
@@ -34,13 +44,11 @@ namespace Modio
 				  ExpireDate(InExpireDate),
 				  State(OAuthTokenState::Valid)
 			{}
-			OAuthToken(Modio::Detail::Schema::AccessTokenObject AccessToken)
+			OAuthToken(Modio::Detail::AccessTokenObject AccessToken)
 				: OAuthToken(AccessToken.AccessToken, AccessToken.DateExpires)
 			{}
 			void SetInvalidState()
 			{
-				Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::User,
-											"Setting current user's OAuth token state to invalid");
 				State = OAuthTokenState::Invalid;
 			}
 			OAuthTokenState GetTokenState() const
@@ -71,36 +79,10 @@ namespace Modio
 			static MODIO_IMPL Modio::Optional<std::string> NoToken;
 
 			/// @docnone
-			friend void from_json(const nlohmann::json& Json, Modio::Detail::OAuthToken& InToken)
-			{
-				Detail::ParseSafe(Json, InToken.ExpireDate, "expiry");
-				Detail::ParseSafe(Json, InToken.State, "status");
-				std::string TokenString = "";
-
-				if (Detail::ParseSafe(Json, TokenString, "token"))
-				{
-					InToken.Token = TokenString;
-				}
-				else
-				{
-					InToken.State = OAuthTokenState::Invalid;
-				}
-			}
+			friend MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::Detail::OAuthToken& InToken);
 
 			/// @docnone
-			friend void to_json(nlohmann::json& Json, const Modio::Detail::OAuthToken& InToken)
-			{
-				if (InToken.State == OAuthTokenState::Valid && InToken.Token.has_value())
-				{
-					Json = nlohmann::json {{"expiry", InToken.ExpireDate},
-										   {"status", InToken.State},
-										   {"token", InToken.Token.value()}};
-				}
-				else
-				{
-					Json = nlohmann::json {{"expiry", InToken.ExpireDate}, {"status", OAuthTokenState::Invalid}};
-				}
-			}
+			friend MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::Detail::OAuthToken& InToken);
 
 		private:
 			// Optional here so that the accessors can return references to avoid memcpy, will always be set
@@ -120,3 +102,6 @@ namespace Modio
 	} // namespace Detail
 } // namespace Modio
 
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "modio/core/entities/ModioToken.ipp"
+#endif

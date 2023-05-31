@@ -25,18 +25,18 @@ namespace Modio
 
 		/// @docpublic
 		/// @brief Explicit and preferred constructor with the necessary variables to store
-		/// @param GameID Mod.io provided to identify the game
-		/// @param APIKey Mod.io provided key associated with the game
-		/// @param GameEnvironment Mod.io environment to use, listed in the enumeration Modio::Environment
+		/// @param GameID The mod.io provided ID to identify the game
+		/// @param APIKey The mod.io provided key associated with the game
+		/// @param GameEnvironment The mod.io environment to use, listed in the enumeration Modio::Environment
 		/// @param PortalInUse The service portal to use, listed in the enumeration Modio::Portal
 		/// @param LocalSessionIdentifier A unique identifier for the local session. This local session can have a single mod.io user account associated with it.
 		MODIO_IMPL explicit InitializeOptions(Modio::GameID GameID, Modio::ApiKey APIKey,
 											  Modio::Environment GameEnvironment, Modio::Portal PortalInUse,
 											  Modio::UserHandleType LocalSessionIdentifier);
 
-		/// @brief The Mod.io-provided ID for the game.
+		/// @brief The mod.io-provided ID for the game.
 		Modio::GameID GameID = Modio::GameID::InvalidGameID();
-		/// @brief The Mod.io-provided API key for your application or game.
+		/// @brief The mod.io-provided API key for your application or game.
 		Modio::ApiKey APIKey = Modio::ApiKey::InvalidAPIKey();
 		/// @brief Unique identifier for the local session, which will optionally contain user data for an authenticated mod.io user (once authentication is completed).
 		Modio::UserHandleType User;

@@ -87,7 +87,7 @@ namespace Modio
 	MODIOSDK_API void ShutdownAsync(std::function<void(Modio::ErrorCode)> OnShutdownComplete);
 
 	/// @docpublic
-	/// @brief Sends a request to the Mod.io server to add the specified mod to the user's list of subscriptions, and
+	/// @brief Sends a request to the mod.io server to add the specified mod to the user's list of subscriptions, and
 	/// marks the mod for local installation by the SDK
 	/// @param ModToSubscribeTo Mod ID of the mod requiring a subscription.
 	/// @param OnSubscribeComplete Callback invoked when the subscription request is completed.
@@ -107,7 +107,7 @@ namespace Modio
 										  std::function<void(Modio::ErrorCode)> OnSubscribeComplete);
 
 	/// @docpublic
-	/// @brief Sends a request to the Mod.io server to remove the specified mod from the user's list of subscriptions.
+	/// @brief Sends a request to the mod.io server to remove the specified mod from the user's list of subscriptions.
 	/// If no other local users are subscribed to the specified mod this function will also mark the mod for
 	/// uninstallation by the SDK.
 	/// @param ModToUnsubscribeFrom Mod ID of the mod requiring unsubscription.
@@ -251,13 +251,13 @@ namespace Modio
 	MODIOSDK_API void RefreshUserDataAsync(std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
-	/// @brief Fetches the currently authenticated Mod.io user profile if there is one associated with the current
+	/// @brief Fetches the currently authenticated mod.io user profile if there is one associated with the current
 	/// platform user
 	/// @return Optional Modio::User object containing profile information
 	MODIOSDK_API Modio::Optional<Modio::User> QueryUserProfile();
 
 	/// @docpublic
-	/// @brief Uses platform-specific authentication to associate a Mod.io user account with the current platform user
+	/// @brief Uses platform-specific authentication to associate a mod.io user account with the current platform user
 	/// @param User Authentication payload data to submit to the provider. Any AuthToken string that contains special
 	/// characters (ex. "+, /, =") requires the boolean "bURLEncodeAuthToken" set as "True" to encode the text
 	/// accordingly
@@ -267,6 +267,9 @@ namespace Modio
 	/// @requires no-rate-limiting
 	/// @requires no-authenticated-user
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @errorcategory ConfigurationError|The SDK's configuration is not valid
+	/// @errorcategory InvalidArgsError|The arguments passed to the function have failed validation
+	/// @errorcategory UserTermsOfUseError|The user has not yet accepted the mod.io Terms of Use
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserAuthError::AlreadyAuthenticated|Authenticated user already signed-in. Call ClearUserDataAsync to
 	/// de-authenticate the old user, then Shutdown() and reinitialize the SDK first.
@@ -465,7 +468,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Begins email authentication for the current session by requesting a one-time code be sent to the
-	/// specified email address if it is associated with a Mod.io account
+	/// specified email address if it is associated with a mod.io account
 	/// @param EmailAddress The email address to send the code to
 	/// @param Callback Callback providing a status code indicating the outcome of the request
 	/// @requires initialized-sdk
@@ -496,7 +499,7 @@ namespace Modio
 												 std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
-	/// @brief De-authenticates the current Mod.io user for the current session, and clears all user-specific data
+	/// @brief De-authenticates the current mod.io user for the current session, and clears all user-specific data
 	/// stored on the current device. Any subscribed mods that are installed but do not have other local users
 	/// subscribed will be uninstalled
 	/// @param Callback Callback providing a status code indicating the outcome of clearing the user data. Error codes

@@ -43,7 +43,7 @@ namespace Modio
 								RootPath / "user.json"))
 						{
 							DestinationFile = std::make_unique<Modio::Detail::File>(
-								RootPath / "user.json", Modio::Detail::FileMode::ReadWrite, false);
+								RootPath / "user.json", Modio::Detail::FileMode::ReadOnly, false);
 
 							yield DestinationFile->ReadAsync(DestinationFile->GetFileSize(), DataBuffer,
 															 std::move(Self));

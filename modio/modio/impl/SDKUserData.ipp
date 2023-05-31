@@ -24,6 +24,7 @@
 #include "modio/detail/ops/auth/AuthenticateUserByGog.h"
 #include "modio/detail/ops/auth/AuthenticateUserByItch.h"
 #include "modio/detail/ops/auth/AuthenticateUserByOculus.h"
+#include "modio/detail/ops/auth/AuthenticateUserByOpenID.h"
 #include "modio/detail/ops/auth/AuthenticateUserByPSN.h"
 #include "modio/detail/ops/auth/AuthenticateUserBySteam.h"
 #include "modio/detail/ops/auth/AuthenticateUserBySwitchID.h"
@@ -75,10 +76,6 @@ namespace Modio
 
 		switch (Provider)
 		{
-			// @todo: Add Epic when we support Epic
-			/*case AuthenticationProvider::Epic:
-				AuthenticateUserWithEpicAsync(User, Callback);
-				break;*/
 			case AuthenticationProvider::GoG:
 				Modio::Detail::AuthenticateUserByGoGAsync(User, Callback);
 				break;
@@ -111,6 +108,9 @@ namespace Modio
 					return;
 				}
 				Modio::Detail::AuthenticateUserByOculusAsync(User, Callback);
+				break;
+			case AuthenticationProvider::OpenID:
+				Modio::Detail::AuthenticateUserByOpenIDAsync(User, Callback);
 				break;
 		}
 	}

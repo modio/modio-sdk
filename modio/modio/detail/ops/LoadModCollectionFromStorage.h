@@ -38,7 +38,7 @@ namespace Modio
 					DestinationFile = std::make_unique<Modio::Detail::File>(
 						Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().LocalMetadataFolder() /
 							"state.json",
-						Modio::Detail::FileMode::ReadWrite, false);
+						Modio::Detail::FileMode::ReadOnly, false);
 					if (DestinationFile->GetFileSize() == -1)
 					{
 						Self.complete(Modio::make_error_code(Modio::FilesystemError::FileNotFound));

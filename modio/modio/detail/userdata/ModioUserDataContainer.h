@@ -12,6 +12,7 @@
 #include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioUser.h"
+#include "modio/detail/ModioJsonHelpers.h"
 #include "modio/detail/userdata/ModioUserProfile.h"
 #include <vector>
 
@@ -71,7 +72,7 @@ namespace Modio
 						UserData.UserModDirectoryOverride.value().u8string();
 				}
 			}
-			
+
 			/// @docnone
 			friend void from_json(const nlohmann::json& Json, Modio::Detail::UserDataContainer& UserData)
 			{

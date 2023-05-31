@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/entities/ModioGameStats.h"
 #include "modio/core/entities/ModioModTagOptions.h"
 #include "modio/detail/JsonWrapper.h"
@@ -88,6 +89,8 @@ namespace Modio
 		Modio::GameStats Stats = {};
 		/// @brief Creator defined URLs to share
 		std::vector<Modio::OtherUrl> OtherUrls = {};
+		/// @brief Platforms that are supported by this title
+		std::vector<Modio::ModfilePlatform> Platforms = {};
 	};
 
 	/// @docnone

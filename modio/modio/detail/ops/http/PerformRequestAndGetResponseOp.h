@@ -166,7 +166,7 @@ namespace Modio
 
 								Impl->CurrentPayloadFile = std::make_unique<Modio::Detail::File>(
 									Impl->PayloadElement->second.PathToFile.value(),
-									Modio::Detail::FileMode::ReadWrite);
+									Modio::Detail::FileMode::ReadOnly);
 
 								while (Impl->CurrentPayloadFileBytesRead < Impl->CurrentPayloadFile->GetFileSize())
 								{

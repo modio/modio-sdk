@@ -14,6 +14,7 @@ namespace Modio
 {
 	namespace Detail
 	{
+		
 		/// @brief Stub struct for handling internal-only initialization options
 		struct ExtendedInitParamHandler
 		{

@@ -81,6 +81,9 @@ namespace Modio
 					// Set the file data offset to "LocalHeaderOffset" to easily allocate the LDHS in the file
 					ArchiveFile->AddEntry(DirectoryPath.generic_u8string(), LocalHeaderOffset, 0, 0,
 										  ArchiveFileImplementation::CompressionMethod::Store, 0, true);
+					// Close Handle of any used file
+					OutputFile.reset();
+
 					Self.complete({});
 					return;
 				}

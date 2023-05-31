@@ -293,7 +293,7 @@ namespace Modio
 				switch (Modio::Detail::SDKSessionData::GetEnvironment())
 				{
 					case Environment::Live:
-						return "api.mod.io";
+						return fmt::format("g-{}.modapi.io", SDKSessionData::CurrentGameID());
 					case Environment::Test:
 						return "api.test.mod.io";
 				}
@@ -500,7 +500,15 @@ namespace Modio
 			// Default headers
 			if (bSuppressPlatformHeader == false)
 			{
-				Headers.push_back({"x-modio-platform", MODIO_TARGET_PLATFORM_HEADER});	
+				Modio::Optional<std::string> PlatformOverride = SDKSessionData::GetPlatformOverride();
+				if (PlatformOverride.has_value())
+				{
+					Headers.push_back({ "x-modio-platform", *PlatformOverride});
+				} else
+				{
+					Headers.push_back({"x-modio-platform", MODIO_TARGET_PLATFORM_HEADER});
+				}
+
 			}
 
 			switch (Modio::Detail::SDKSessionData::GetPortal())

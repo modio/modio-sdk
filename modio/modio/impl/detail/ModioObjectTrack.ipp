@@ -20,6 +20,23 @@ namespace Modio
 {
 	namespace Detail
 	{
+
+	OperationTracker& OperationTracker::operator=(OperationTracker&& Other)
+	{
+		OpName = Other.OpName;
+		Other.bMovedFrom = true;
+		return *this;
+	}
+
+	OperationTracker::~OperationTracker() 
+	{
+		if (!bMovedFrom)
+		{
+			OperationMap().erase(OpPtr);
+		}
+	}
+
+
 #if MODIO_TRACK_OPS
 		template<typename Base>
 		BaseOperation<Base>::BaseOperation()
