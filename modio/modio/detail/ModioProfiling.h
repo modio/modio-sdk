@@ -127,14 +127,15 @@ namespace Modio
 #define MODIO_PROFILE_END() modio_profile_stop()
 #define MODIO_PROFILE_SAVE(FileName) modio_profile_save(#FileName)
 
-#define MODIO_PROFILE_COUNTER_INC(Name) modio_profile_counter_increment(#Name)
-#define MODIO_PROFILE_COUNTER_DEC(Name) modio_profile_counter_decrement(#Name)
+#define MODIO_PROFILE_COUNTER_INC(Name, Value) modio_profile_counter_increment(#Name, Value)
+#define MODIO_PROFILE_COUNTER_DEC(Name, Value) modio_profile_counter_decrement(#Name, Value)
 #define MODIO_PROFILE_COUNTER_SET(Name, Value) modio_profile_counter_set(#Name, Value)
 
-#define MODIO_PROFILE_COUNTER_INC_NAMED(Name) modio_profile_counter_increment(Name)
-#define MODIO_PROFILE_COUNTER_DEC_NAMED(Name) modio_profile_counter_decrement(Name)
-#define MODIO_PROFILE_COUNTER_SET_NAMED(Name, Value) modio_profile_counter_set(Name, Value)
+#define MODIO_PROFILE_COUNTER_INC_NAMED(Name, Value) modio_profile_counter_increment(Name, Value)
+#define MODIO_PROFILE_COUNTER_DEC_NAMED(Name, Value) modio_profile_counter_decrement(Name, Value)
+#define MODIO_PROFILE_COUNTER_SET_NAMED(Name, Value) modio_profile_counter_set(Name, Value) 
 
+#define MODIO_PROFILE_TAG_SET(Name, Value) modio_profile_tag_set(#Name, Value)
 
 #define MODIO_PROFILE_SCOPE(Name) \
 	Modio::Detail::ScopedProfileEvent ScopedEvent_##Name = Modio::Detail::ScopedProfileEvent(#Name)

@@ -39,7 +39,13 @@ namespace Modio
 		
 		/// @docpublic
 		/// @brief Optional override for the mod's visibility status. Defaults to true (visible)
+		/// @deprecated 2023.6 Use Visibility property and Modio::ObjectVisibility enum
+		MODIO_DEPRECATED("Release 2023.6", "Modio::Optional<Modio::ObjectVisibility> Visibility")
 		Modio::Optional<bool> bVisible;
+		
+		/// @docpublic
+		/// @brief Optional override for the mod's visibility status. Defaults to Public (1)
+		Modio::Optional<Modio::ObjectVisibility> Visibility;
 
 		/// @docpublic
 		/// @brief Optional long description of the mod

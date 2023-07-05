@@ -279,7 +279,7 @@ namespace Modio
 				  CurrentAPIVersion(Modio::Detail::APIVersion::V1)
 			{}
 
-			MODIO_IMPL Modio::Detail::Buffer GetRequestBuffer(bool bPerformURLEncoding = false) const;
+			MODIO_IMPL Modio::Detail::Buffer GetRequestBuffer() const;
 			MODIO_IMPL static Modio::Optional<HttpRequestParams> FileDownload(
 				std::string URL, Modio::Optional<Modio::Detail::HttpRequestParams> FromRedirect = {});
 

@@ -508,7 +508,6 @@ namespace Modio
 				{
 					Headers.push_back({"x-modio-platform", MODIO_TARGET_PLATFORM_HEADER});
 				}
-
 			}
 
 			switch (Modio::Detail::SDKSessionData::GetPortal())
@@ -628,7 +627,7 @@ namespace Modio
 			  CurrentAPIVersion(Modio::Detail::APIVersion::V1)
 		{}
 
-		Modio::Detail::Buffer HttpRequestParams::GetRequestBuffer(bool bPerformURLEncoding) const
+		Modio::Detail::Buffer HttpRequestParams::GetRequestBuffer() const
 		{
 			MODIO_PROFILE_SCOPE(HttpRequestBuildRawRequestBuffer);
 
@@ -641,18 +640,8 @@ namespace Modio
 			auto CurrentPayloadString = GetUrlEncodedPayload();
 			if (CurrentPayloadString.has_value())
 			{
-				if (bPerformURLEncoding)
-				{
-					std::string EncodedPayload = Modio::Detail::String::URLEncode(CurrentPayloadString.value());
-					HeaderString += fmt::format("content-length: {0}\r\n", EncodedPayload.size());
-					HeaderString += fmt::format("\r\n{0}\r\n", EncodedPayload);
-				}
-				else
-
-				{
-					HeaderString += fmt::format("content-length: {0}\r\n", CurrentPayloadString->length());
-					HeaderString += fmt::format("\r\n{0}\r\n", CurrentPayloadString.value());
-				}
+				HeaderString += fmt::format("content-length: {0}\r\n", CurrentPayloadString->length());
+				HeaderString += fmt::format("\r\n{0}\r\n", CurrentPayloadString.value());
 			}
 
 			// In linux and possibly in other platforms, it is necessary to append the content-length with the size
@@ -673,7 +662,7 @@ namespace Modio
 			std::string URL, Modio::Optional<Modio::Detail::HttpRequestParams> FromRedirect)
 		{
 			std::string Regex = "^(http[s]?:\\/\\/)?([-a-zA-Z0-9@:%._\\+~#?&\\/"
-								"=]{2,256}\\.[a-z]{2,6}\\b[-a-zA-Z0-9@:%._\\+~#?&=]*)(.+)$";
+								"=][^\\/]{2,256}\\.[a-z]{2,6}\\b[-a-zA-Z0-9@:%._\\+~#?&=]*)(.+)$";
 			std::regex URLPattern(Regex, std::regex::icase);
 			std::smatch MatchInfo;
 			if (std::regex_search(URL, MatchInfo, URLPattern) == false || MatchInfo.size() != 4)

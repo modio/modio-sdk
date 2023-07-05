@@ -468,6 +468,16 @@ It is worth considering that the "LocalProfileName" is used by the mod.io SDK to
 * The error-handling in this sample is deliberately kept brief. See <<SDK quick-start: Error Handling>> for more information on error handling.
 * You can perform calls to other functions, such as something that shows your mod browser UI implementation, directly in the callback. The primary caveat to doing much processing here is that you'll be running in the context of, and therefore blocking, the thread running the callback, which is the thread running <<RunPendingHandlers>>.
 
+==== Extended Initialization Parameters
+
+The `ExtendedParameters` field on <<InitializeOptions>> is a set of key-value pairs intended for platform-specific or special-case parameters that need to be passed to the SDK.
+Simply set the value before passing your initialization parameters in to <<InitializeAsync>>.
+
+[source,cpp]
+----
+Options.ExtendedParameters["SomeParameterName"] = "SomeParameterValue";
+
+----
 
 To finalize and shut down the mod.io SDK is equally simple:
 [source, cpp]

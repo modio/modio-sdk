@@ -192,7 +192,8 @@ namespace Modio
 		{
 			// clang-format off
 			bool bHasValidParameter = 
-				Params.bVisible.has_value() || 
+				// When bVisible is removed from deprecation, remove the check below
+				(Params.Visibility.has_value() || Params.bVisible.has_value()) || 
 				Params.Description.has_value() || 
 				Params.HomepageURL.has_value() ||
 				Params.MaturityRating.has_value() || 

@@ -76,7 +76,7 @@ namespace Modio
 
 					// Add user-agent header
 					// generate payload/http data here, making sure the request does not perform URLEncoding
-					Payload.AppendBuffer(Request->GetParameters().GetRequestBuffer(false));
+					Payload.AppendBuffer(Request->GetParameters().GetRequestBuffer());
 
 					{
 						Modio::Detail::Buffer End(2);

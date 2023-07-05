@@ -89,6 +89,8 @@ namespace Modio
 								? Modio::make_error_code(Modio::ModManagementError::UploadCancelled)
 								: ec});
 						Modio::Detail::SDKSessionData::CancelModDownloadOrUpdate(CurrentModID);
+
+						Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(ArchivePath);
 						Self.complete(ec);
 						return;
 					}
@@ -99,6 +101,8 @@ namespace Modio
 
 						if (ec)
 						{
+							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(ArchivePath);
+
 							Self.complete(ec);
 							return;
 						}
@@ -126,6 +130,8 @@ namespace Modio
 							Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(
 								Modio::ModManagementEvent {CurrentModID, Modio::ModManagementEvent::EventType::Uploaded,
 														   ec});
+
+							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(ArchivePath);
 							Self.complete(ec);
 							return;
 						}
@@ -139,6 +145,8 @@ namespace Modio
 							Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(
 								Modio::ModManagementEvent {CurrentModID, Modio::ModManagementEvent::EventType::Uploaded,
 														   ec});
+
+							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(ArchivePath);
 							Self.complete(ec);
 							return;
 						}
@@ -157,6 +165,13 @@ namespace Modio
 						yield Modio::Detail::UploadFileAsync(ResponseBuffer,
 															 SubmitParams.AppendPayloadFile("filedata", ArchivePath),
 															 ProgressInfo, std::move(Self));
+					}
+
+					// Delete zip file when the upload is done
+					if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(ArchivePath))
+					{
+						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::ModManagement,
+							"Failed to delete temp archive {}", ArchivePath.string());
 					}
 
 					if (ec)
@@ -252,6 +267,10 @@ namespace Modio
 							case (Modio::ModfilePlatform::Oculus):
 								RequestParams = RequestParams.AppendPayloadValue(
 									fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::Oculus);
+								break;
+							case (Modio::ModfilePlatform::Source):
+								RequestParams = RequestParams.AppendPayloadValue( 
+									fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::Source);
 								break;
 							default:
 								Modio::Detail::Logger().Log(

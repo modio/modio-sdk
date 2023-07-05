@@ -152,29 +152,29 @@ namespace Modio
 		/// @return if the mod's last error was one that permits retries
 		MODIO_IMPL bool ShouldRetry();
 
-		/// @docpublic
+		/// @docinternal
 		/// @return Modio::ModState enum representing current state of the mod
 		MODIO_IMPL Modio::ModState GetModState() const;
 
-		/// @docpublic
+		/// @docinternal
 		/// @return Mod ID
 		MODIO_IMPL Modio::ModID GetID() const;
 
-		/// @docpublic
+		/// @docinternal
 		/// @return Modio::ModInfo containing mod profile data
 		MODIO_IMPL Modio::ModInfo GetModProfile() const;
 
-		/// @docpublic
+		/// @docinternal
 		/// @return Path to the mod's installation folder on disk
 		/// NOTE: If the mod is not yet installed this path may not yet exist. Check
 		/// @doc_xref{ModCollectionEntry::GetModState} before trying to load files in this location
 		MODIO_IMPL std::string GetPath() const;
 
-		/// @docpublic
+		/// @docinternal
 		/// @return Size on disk if the mod has been installed, or empty optional if installation is in progress
 		MODIO_IMPL Modio::Optional<Modio::FileSize> GetSizeOnDisk() const;
 
-		/// @docpublic
+		/// @docinternal
 		/// @brief Updates the size of the mod on disk in the collection entry. Called by the archive extraction code on
 		/// successful extraction/installation
 		/// @param NewSize The total size on disk of all files in the mod
@@ -202,7 +202,8 @@ namespace Modio
 	class ModProgressInfo
 	{
 	public:
-		
+
+		/// @docpublic
 		/// @brief Enum representing which state the currently processing mod is in
 		enum class EModProgressState
 		{
@@ -213,6 +214,7 @@ namespace Modio
 			Uploading // Mod archive is uploading to mod.io servers
 		};
 
+		/// @docpublic
 		/// @brief Retrieves the state of the currently processing mod
 		/// @return Enum value indicating the current state
 		EModProgressState GetCurrentState() const
@@ -220,6 +222,7 @@ namespace Modio
 			return CurrentState;
 		}
 
+		/// @docpublic
 		/// @brief Retrieves the progress value for the specified state. CurrentProgress == TotalProgress for states
 		/// which have completed, for example if a mod is currently Extracting, then passing in Downloading would give
 		/// you a value equal to the total download size
@@ -242,6 +245,7 @@ namespace Modio
 			}
 		}
 
+		/// @docpublic
 		/// @brief Retrieves the total amount of progress required for the specified state.
 		/// @param State which state to query total progress for
 		/// @return Modio::FileSize for total progress in bytes
@@ -278,25 +282,39 @@ namespace Modio
 			  CurrentState(EModProgressState::Initializing) {};
 
 	private:
+		/// @docnone
 		Modio::FileSize DownloadCurrent;
+		/// @docnone
 		Modio::FileSize DownloadTotal;
-
+		/// @docnone
 		Modio::FileSize ExtractCurrent;
+		/// @docnone
 		Modio::FileSize ExtractTotal;
-
+		/// @docnone
 		Modio::FileSize CompressCurrent;
+		/// @docnone
 		Modio::FileSize CompressTotal;
-
+		/// @docnone
 		Modio::FileSize UploadCurrent;
+		/// @docnone
 		Modio::FileSize UploadTotal;
-
+		/// @docnone
 		EModProgressState CurrentState;
 
+		/// @docnone
 		friend MODIO_IMPL void SetState(Modio::ModProgressInfo& Info, Modio::ModProgressInfo::EModProgressState State);
+		
+		/// @docnone
 		friend MODIO_IMPL void SetCurrentProgress(Modio::ModProgressInfo& Info, Modio::FileSize NewValue);
+		
+		/// @docnone
 		friend MODIO_IMPL void IncrementCurrentProgress(Modio::ModProgressInfo& Info, Modio::FileSize NewValue);
+		
+		/// @docnone
 		friend MODIO_IMPL void CompleteProgressState(Modio::ModProgressInfo& Info,
 													 Modio::ModProgressInfo::EModProgressState State);
+		
+		/// @docnone
 		friend MODIO_IMPL void SetTotalProgress(Modio::ModProgressInfo& Info,
 												Modio::ModProgressInfo::EModProgressState State,
 												Modio::FileSize NewTotal);
@@ -307,32 +325,32 @@ namespace Modio
 	class UserSubscriptionList
 	{
 	public:
-		/// @docpublic
+		/// @docinternal
 		/// @brief Constructs an empty subscription list
 		MODIO_IMPL UserSubscriptionList();
 
-		/// @docpublic
+		/// @docinternal
 		/// @brief Constructs a User subscription list by copying Mod IDs from the provided vector
 		/// @param NewIDs The source Mod IDs to use
 		MODIO_IMPL UserSubscriptionList(std::vector<Modio::ModID> NewIDs);
 
-		/// @docpublic
+		/// @docinternal
 		/// @brief Constructs a User subscription list by consuming Mod IDs from the provided vector
 		/// @param NewIDs The source Mod IDs to use
 		MODIO_IMPL UserSubscriptionList(std::vector<Modio::ModID>&& NewIDs);
 
-		/// @docpublic
+		/// @docinternal
 		/// @brief Adds a new mod to the subscription list
 		/// @param Mod Mod info object to add
 		/// @return True if the mod was added, false if already in the list
 		MODIO_IMPL bool AddMod(Modio::ModInfo Mod);
 
-		/// @docpublic
+		/// @docinternal
 		/// @brief Removes a mod from the subscription list
 		/// @param Mod Mod ID to remove from the list
 		MODIO_IMPL void RemoveMod(Modio::ModID Mod);
 
-		/// @docpublic
+		/// @docinternal
 		/// @brief Retrieve a set of ModID
 		MODIO_IMPL const std::set<Modio::ModID>& Get() const;
 
@@ -345,7 +363,7 @@ namespace Modio
 			Removed
 		};
 
-		/// @docpublic
+		/// @docinternal
 		/// @brief Calculates removals or additions between the two user subscription lists
 		/// @param Original The original list of subscriptions
 		/// @param Updated The updated list of subscriptions
@@ -392,6 +410,7 @@ namespace Modio
 			Uploaded /** Mod event that upload completed **/
 		};
 
+		/// @docnone
 		friend auto format_as(Modio::ModManagementEvent::EventType EnumValue)
 		{
 			return static_cast<std::underlying_type_t<Modio::ModManagementEvent::EventType>>(EnumValue);

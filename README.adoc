@@ -188,6 +188,12 @@ cmake --build <modio-sdk folder>/out/build/win
 cmake --install <modio-sdk folder>/out/build/win
 ```
 
+Note that when using the Visual Studio code generator, you have to pass in the target configuration (ie Release or Debug) as well, for instance:
+
+```
+cmake -S <modio-sdk folder> --preset=win -G "Visual Studio 16 2019" --Config=Release
+```
+
 If you are using the `clang` compiler with Visual studio, check section https://go.mod.io/sdk-docs#clang-win[Clang compiler in Visual Studio] for further details
 
 ==== Custom FMT library

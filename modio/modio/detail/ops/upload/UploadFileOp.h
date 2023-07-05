@@ -203,6 +203,9 @@ namespace Modio
 										}
 									}
 								}
+
+								// Close File Handle
+								Impl->CurrentPayloadFile.reset();
 							}
 							else if (Impl->PayloadElement->second.RawBuffer.has_value() &&
 									 (*(Impl->PayloadElement->second.RawBuffer)).GetSize())

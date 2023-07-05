@@ -550,6 +550,14 @@ namespace Modio
 		Negative = -1
 	};
 
+	/// @docpublic
+	/// @brief The visiblility of a mod.
+	enum class ObjectVisibility : int8_t
+	{
+		Hidden = 0,
+		Public = 1
+	};
+
 } // namespace Modio
 
 namespace Modio

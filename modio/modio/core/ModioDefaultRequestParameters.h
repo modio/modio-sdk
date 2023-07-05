@@ -109,8 +109,11 @@ namespace Modio
         static const HttpRequestParams ExchangeEmailSecurityCodeRequest { Modio::Detail::Verb::POST, "/oauth/emailexchange" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams RequestEmailSecurityCodeRequest { Modio::Detail::Verb::POST, "/oauth/emailrequest" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams LogoutRequest { Modio::Detail::Verb::POST, "/oauth/logout" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams CreateOauthAccessTokenRequest { Modio::Detail::Verb::POST, "/oauth/token" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams ExchangeOauthRefreshTokenRequest { Modio::Detail::Verb::POST, "/oauth/token/refresh" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams SubmitReportRequest { Modio::Detail::Verb::POST, "/report" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams UnmuteAUserRequest { Modio::Detail::Verb::DELETE, "/users/{user-id}/mute" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams MuteAUserRequest { Modio::Detail::Verb::POST, "/users/{user-id}/mute" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams ProcessWebsocketMessageRequest { Modio::Detail::Verb::POST, "/websocket/message" , "application/x-www-form-urlencoded" }; 
     }
 }

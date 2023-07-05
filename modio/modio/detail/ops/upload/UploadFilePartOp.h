@@ -202,12 +202,62 @@ namespace Modio
 					// modfiles for the specified mod With that in context, a 400 might be able to continue with the
 					// next part, whereas a 403 should stop trying to upload any more parts of the file.
 
-					if (Request->GetResponseCode() == 403)
+					Modio::Detail::SDKSessionData::ClearLastValidationError();
+					if (Request->GetResponseCode() < 200 || Request->GetResponseCode() > 204)
 					{
-						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
-													"Multipart upload failed related to permission to upload");
-						Self.complete(Modio::make_error_code(Modio::HttpError::InsufficientPermissions));
-						return;
+						// Servers massively overloaded, so we return a http page instead
+						if (Request->GetResponseCode() == 502)
+						{
+							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+														"mod.io servers overloaded, please try again later");
+
+							Self.complete(Modio::make_error_code(Modio::HttpError::ServersOverloaded));
+							return;
+						}
+
+						// Inspect the error ref, only treat it as an error if it isn't a no-op
+						Modio::Optional<ResponseError> Error = TryMarshalResponse<ResponseError>(ResponseBuffer);
+						if (Error.has_value())
+						{
+							Modio::ErrorCode ErrRef =
+								Modio::make_error_code(static_cast<Modio::ApiError>(Error->ErrorRef));
+							if (Error->ExtendedErrorInformation.has_value())
+							{
+								Modio::Detail::SDKSessionData::SetLastValidationError(
+									Error->ExtendedErrorInformation.value());
+							}
+							if (ErrRef != Modio::ErrorConditionTypes::ApiErrorRefSuccess)
+							{
+								// No need to log rate-limited response out
+								if (ErrRef == Modio::ApiError::Ratelimited)
+								{
+									Modio::Detail::SDKSessionData::MarkAsRateLimited();
+								}
+								else
+								{
+									Modio::Detail::Buffer ResultBuffer(ResponseBuffer.size());
+									Modio::Detail::BufferCopy(ResultBuffer, ResponseBuffer);
+
+									Modio::Detail::Logger().Log(
+										Modio::LogLevel::Error, Modio::LogCategory::Http,
+										"Non 200-204 response received: {}",
+										std::string(ResultBuffer.begin(), ResultBuffer.end()));
+								}
+							}
+							// Return the error-ref regardless, defer upwards to Subscribe/Unsubscribe etc to handle as
+							// success
+							Self.complete(Modio::make_error_code(static_cast<Modio::ApiError>(Error->ErrorRef)));
+							return;
+						}
+						else
+						{
+							// we have a raw HTTP response error but no error ref (ie probably we have a cloudflare
+							// error)
+							// Self.complete(Modio::make_error_code(static_cast<Modio::RawHttpError>(ResponseCode);
+							// return;
+							Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
+							return;
+						}
 					}
 
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,

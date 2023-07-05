@@ -70,6 +70,16 @@ namespace Modio
 
 				reenter(CoroutineState)
 				{
+					// In case a file uses a double dot within its file name, the operation will fail
+					if (InputFile->GetPath().filename().string().find("..") != std::string::npos)
+					{
+						Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File,
+													"File `{}` uses more than one dot in its name, which is forbidden",
+													InputFile->GetPath().filename().string());
+						Self.complete(Modio::make_error_code(Modio::FilesystemError::ReadError));
+						return;
+					}
+
 					OutputFile->Seek(Modio::FileOffset(OutputFile->GetFileSize()));
 					LocalHeaderOffset = OutputFile->Tell();
 
