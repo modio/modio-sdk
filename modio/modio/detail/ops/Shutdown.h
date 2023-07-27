@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -58,15 +58,11 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
-
-				
 				reenter(CoroutineState)
 				{
-					yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
-
-					while (!ContextToFlush->stopped())
+					while (ContextToFlush->poll_one())
 					{
-						ContextToFlush->run_one_for(std::chrono::milliseconds(1));
+						yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 						// If we use the op, then we get stack overflow if the shutdown takes a long time
 						// yield ShutdownRunOneAsync(ContextToFlush, std::move(Self));
 					}
@@ -77,7 +73,9 @@ namespace Modio
 		private:
 			asio::coroutine CoroutineState;
 			std::shared_ptr<asio::io_context> ContextToFlush;
+			int numRun = 0;
 		};
+
 	} // namespace Detail
 } // namespace Modio
 #include <asio/unyield.hpp>

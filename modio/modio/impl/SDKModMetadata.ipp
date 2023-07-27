@@ -38,39 +38,48 @@ namespace Modio
 	void ListAllModsAsync(FilterParams Filter,
 						  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
-		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>,
-									   void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>(
-				Modio::Detail::ListAllModsOp(Modio::Detail::SDKSessionData::CurrentGameID(), std::move(Filter)),
-				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
-		}
+		Modio::Detail::SDKSessionData::EnqueueTask(
+			[Filter = std::move(Filter), Callback = std::move(Callback)]() mutable {
+				if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
+				{
+					asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>,
+										void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>(
+						Modio::Detail::ListAllModsOp(Modio::Detail::SDKSessionData::CurrentGameID(), std::move(Filter)),
+						Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+				}
+			});
 	}
 
 	void ListUserCreatedModsAsync(FilterParams Filter,
 								  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
-			Modio::Detail::RequireUserIsAuthenticated(Callback))
-		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>,
-									   void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>(
-				Modio::Detail::ListUserCreatedModsOp(Modio::Detail::SDKSessionData::CurrentGameID(), std::move(Filter)),
-				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
-		}
+		Modio::Detail::SDKSessionData::EnqueueTask([Filter = std::move(Filter),
+													Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireUserIsAuthenticated(Callback))
+			{
+				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>,
+									void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>(
+					Modio::Detail::ListUserCreatedModsOp(Modio::Detail::SDKSessionData::CurrentGameID(), Filter),
+					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
+		});
 	}
 
 	void GetModInfoAsync(Modio::ModID ModId,
 						 std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
-		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>,
-									   void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>(
-				Modio::Detail::GetModInfoOp(Modio::Detail::SDKSessionData::CurrentGameID(),
-											Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId),
-				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
-		}
+		Modio::Detail::SDKSessionData::EnqueueTask([ModId, Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireValidModID(ModId, Callback))
+			{
+				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>,
+									void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>(
+					Modio::Detail::GetModInfoOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+												Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId),
+					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
+		});
 	}
 // Disabled
 #if (0)
@@ -87,74 +96,94 @@ namespace Modio
 	void GetModMediaAsync(Modio::ModID ModId, Modio::LogoSize LogoSize,
 						  std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
-		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)>,
-									   void(Modio::ErrorCode, Modio::Optional<std::string>)>(
-				Modio::Detail::GetModMediaLogoOp(Modio::Detail::SDKSessionData::CurrentGameID(),
-												 Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId, LogoSize),
-				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
-		}
+		Modio::Detail::SDKSessionData::EnqueueTask([ModId, LogoSize, Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireValidModID(ModId, Callback))
+			{
+				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)>,
+									void(Modio::ErrorCode, Modio::Optional<std::string>)>(
+					Modio::Detail::GetModMediaLogoOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+													 Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId, LogoSize),
+					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
+		});
 	}
 
 	void GetModMediaAsync(Modio::ModID ModId, Modio::AvatarSize AvatarSize,
 						  std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
-		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)>,
-									   void(Modio::ErrorCode, Modio::Optional<std::string>)>(
-				Modio::Detail::GetModMediaAvatarOp(Modio::Detail::SDKSessionData::CurrentGameID(),
-												   Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId, AvatarSize),
-				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
-		}
+		Modio::Detail::SDKSessionData::EnqueueTask([ModId, AvatarSize, Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireValidModID(ModId, Callback))
+			{
+				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)>,
+									void(Modio::ErrorCode, Modio::Optional<std::string>)>(
+					Modio::Detail::GetModMediaAvatarOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+													   Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId,
+													   AvatarSize),
+					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
+		});
 	}
 
 	void GetModMediaAsync(Modio::ModID ModId, Modio::GallerySize GallerySize, Modio::GalleryIndex Index,
 						  std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
-		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)>,
-									   void(Modio::ErrorCode, Modio::Optional<std::string>)>(
-				Modio::Detail::GetModMediaGalleryOp(Modio::Detail::SDKSessionData::CurrentGameID(),
-													Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId, GallerySize,
-													Index),
-				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
-		}
+		Modio::Detail::SDKSessionData::EnqueueTask(
+			[ModId, GallerySize, Index, Callback = std::move(Callback)]() mutable {
+				if (Modio::Detail::RequireSDKIsInitialized(Callback) &&
+					Modio::Detail::RequireNotRateLimited(Callback) && Modio::Detail::RequireValidModID(ModId, Callback))
+				{
+					asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)>,
+										void(Modio::ErrorCode, Modio::Optional<std::string>)>(
+						Modio::Detail::GetModMediaGalleryOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+															Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId,
+															GallerySize, Index),
+						Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+				}
+			});
 	}
 
 	void GetModTagOptionsAsync(std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
-		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)>,
-									   void(Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)>(
-				Modio::Detail::GetModTagsOp(), Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
-		}
+		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
+			{
+				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)>,
+									void(Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)>(
+					Modio::Detail::GetModTagsOp(), Callback,
+					Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
+		});
 	}
 
 	void SubmitModRatingAsync(Modio::ModID ModID, Modio::Rating Rating, std::function<void(Modio::ErrorCode)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
-			Modio::Detail::RequireUserIsAuthenticated(Callback))
-		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-				Modio::Detail::SubmitModRatingOp(ModID, Rating), Callback,
-				Modio::Detail::Services::GetGlobalContext().get_executor());
-		}
+		Modio::Detail::SDKSessionData::EnqueueTask([ModID, Rating, Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireUserIsAuthenticated(Callback) &&
+				Modio::Detail::RequireValidModID(ModID, Callback))
+			{
+				asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
+					Modio::Detail::SubmitModRatingOp(ModID, Rating), Callback,
+					Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
+		});
 	}
 
 	void GetModDependenciesAsync(
 		Modio::ModID ModID,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
-		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList>)>,
-									   void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList>)>(
-				Modio::Detail::GetModDependenciesOp(ModID, Modio::Detail::SDKSessionData::CurrentGameID()), Callback,
-				Modio::Detail::Services::GetGlobalContext().get_executor());
-		}
+		Modio::Detail::SDKSessionData::EnqueueTask([ModID, Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireValidModID(ModID, Callback))
+			{
+				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList>)>,
+									void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList>)>(
+					Modio::Detail::GetModDependenciesOp(ModID, Modio::Detail::SDKSessionData::CurrentGameID()),
+					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
+		});
 	}
 } // namespace Modio

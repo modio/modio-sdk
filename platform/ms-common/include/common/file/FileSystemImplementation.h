@@ -91,7 +91,7 @@ namespace Modio
 				Implementation = std::move(OtherImplementation);
 			}
 
-			void Shutdown()
+			void Shutdown() override 
 			{
 				if (SharedState)
 				{
@@ -174,23 +174,23 @@ namespace Modio
 			}
 
 			// do we need to maintain a cache of temporary files?
-			Modio::filesystem::path MakeTempFilePath(std::string FileName) const
+			Modio::filesystem::path MakeTempFilePath(std::string FileName) const override 
 			{
 				return RootTempPath / FileName;
 			}
 
-			Modio::filesystem::path MakeModPath(Modio::ModID ModID) const
+			Modio::filesystem::path MakeModPath(Modio::ModID ModID) const override
 			{
 				return RootLocalStoragePath / fmt::format("{}/mods/{}", CurrentGameID, ModID);
 			}
 
-			Modio::filesystem::path GetModRootInstallationPath() const
+			Modio::filesystem::path GetModRootInstallationPath() const override
 			{
 				return RootLocalStoragePath / fmt::format("{}/mods/", CurrentGameID);
 			}
 
 			Modio::filesystem::path MakeModMediaFilePath(Modio::ModID ModID, Modio::LogoSize Size,
-														 const std::string& OriginalFilename) const
+														 const std::string& OriginalFilename) const override
 			{
 				const Modio::filesystem::path OriginalFilePath = OriginalFilename;
 				return MakeLogoFolderPath(ModID) / fmt::format("{}_{}{}", OriginalFilePath.stem().u8string(),
@@ -200,7 +200,7 @@ namespace Modio
 
 			Modio::filesystem::path MakeModMediaFilePath(Modio::ModID ModID, Modio::GallerySize Size,
 														 Modio::GalleryIndex ImageIndex,
-														 const std::string& OriginalFileName) const
+														 const std::string& OriginalFileName) const override
 			{
 				const Modio::filesystem::path OriginalFilePath = OriginalFileName;
 				return MakeGalleryFolderPath(ModID, ImageIndex) /
@@ -208,13 +208,13 @@ namespace Modio
 								   OriginalFilePath.extension().u8string());
 			}
 
-			Modio::filesystem::path MakeLogoFolderPath(Modio::ModID ModID) const
+			Modio::filesystem::path MakeLogoFolderPath(Modio::ModID ModID) const override
 			{
 				// @todonow: Change this to temporary storage
 				return RootLocalStoragePath / fmt::format("{}/cache/mods/{}/logos/", CurrentGameID, ModID);
 			}
 
-			Modio::filesystem::path MakeGalleryFolderPath(Modio::ModID ModID, Modio::GalleryIndex ImageIndex) const
+			Modio::filesystem::path MakeGalleryFolderPath(Modio::ModID ModID, Modio::GalleryIndex ImageIndex) const override
 			{
 				// @todonow: Change this to temporary storage
 				return RootLocalStoragePath /
@@ -222,7 +222,7 @@ namespace Modio
 			}
 
 			Modio::filesystem::path MakeUserMediaFilePath(Modio::UserID UserId, Modio::AvatarSize Size,
-														  const std::string& OriginalFilename) const
+														  const std::string& OriginalFilename) const override
 			{
 				const Modio::filesystem::path OriginalFilePath = OriginalFilename;
 				return MakeAvatarFolderPath(UserId) / fmt::format("{}_{}{}", OriginalFilePath.stem().u8string(),
@@ -230,7 +230,7 @@ namespace Modio
 																  OriginalFilePath.extension().u8string());
 			}
 
-			Modio::filesystem::path MakeAvatarFolderPath(Modio::UserID UserId) const
+			Modio::filesystem::path MakeAvatarFolderPath(Modio::UserID UserId) const override
 			{
 				// @todonow: Change this to temporary storage
 				return RootLocalStoragePath / fmt::format("{}/cache/users/{}/avatars/", CurrentGameID, UserId);
@@ -247,7 +247,7 @@ namespace Modio
 				return false;
 			}
 
-			bool CreateFolder(const Modio::filesystem::path& FolderPath) const
+			bool CreateFolder(const Modio::filesystem::path& FolderPath) const override
 			{
 				std::error_code ec;
 				// Using function calling taking ec as it doesn't throw when failing
@@ -274,7 +274,7 @@ namespace Modio
 				return Result;
 			}
 
-			bool FileExists(const Modio::filesystem::path& FilePath) const
+			bool FileExists(const Modio::filesystem::path& FilePath) const override
 			{
 				namespace fs = Modio::filesystem;
 
@@ -368,7 +368,7 @@ namespace Modio
 				}
 			}
 
-			const Modio::filesystem::path& UserDataFolder() const
+			const Modio::filesystem::path& UserDataFolder() const override
 			{
 				return UserDataPath;
 			}
@@ -425,36 +425,6 @@ namespace Modio
 				{
 					return false;
 				}
-			}
-
-			Modio::ErrorCode CheckExtractionPath(const Modio::filesystem::path& FilePath,
-												 const Modio::filesystem::path& RootOutputPath) const override
-			{
-				Modio::ErrorCode ec;
-				Modio::filesystem::path LexPath = Modio::filesystem::relative(FilePath, RootOutputPath, ec);
-
-				// In case the platform does not support symlinks, the LexPath here would not correctly identify if
-				// FilePath tries to access parent folders relative to CurrentPath. This will double check no ".."
-				// is in FilePath
-				if (LexPath.string() == "")
-				{
-					std::string PreFolder = "..";
-					std::string AbsFolder = "\\";
-
-					// This case means that the path does not have a reference to folders above the current location.
-					if (FilePath.string().find(PreFolder) == std::string::npos &&
-						FilePath.string().find(AbsFolder) != 0)
-					{
-						return {};
-					}
-				}
-				if (ec)
-				{
-					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression,
-												"FilePath {} returned a system error with message: {}",
-												FilePath.string(), ec.message());
-				}
-				return Modio::make_error_code(Modio::FilesystemError::NoPermission);
 			}
 		};
 	} // namespace Detail

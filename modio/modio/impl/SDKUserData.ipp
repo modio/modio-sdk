@@ -40,137 +40,158 @@ namespace Modio
 {
 	void RequestEmailAuthCodeAsync(Modio::EmailAddress EmailAddress, std::function<void(Modio::ErrorCode)> Callback)
 	{
-		return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-			Modio::Detail::RequestEmailAuthCodeOp(EmailAddress), Callback,
-			Modio::Detail::Services::GetGlobalContext().get_executor());
+		Modio::Detail::SDKSessionData::EnqueueTask([EmailAddress, Callback = std::move(Callback)]() mutable {
+			asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
+				Modio::Detail::RequestEmailAuthCodeOp(EmailAddress), Callback,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		});
 	}
 
 	void GetTermsOfUseAsync(Modio::AuthenticationProvider Provider, Modio::Language Locale,
 							std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms> Terms)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback))
-		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)>,
-									   void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)>(
-				Modio::Detail::GetTermsOfUseOp(Provider, Locale), Callback,
-				Modio::Detail::Services::GetGlobalContext().get_executor());
-		}
+		Modio::Detail::SDKSessionData::EnqueueTask([Provider, Locale, Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback))
+			{
+				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)>,
+									void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)>(
+					Modio::Detail::GetTermsOfUseOp(Provider, Locale), Callback,
+					Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
+		});
 	}
 
 	void AuthenticateUserExternalAsync(Modio::AuthenticationParams User, Modio::AuthenticationProvider Provider,
 									   std::function<void(Modio::ErrorCode)> Callback)
 	{
+		Modio::Detail::SDKSessionData::EnqueueTask([User, Provider, Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) == false &&
+				Modio::Detail::RequireNotRateLimited(Callback) == false)
+			{
+				return;
+			}
+
+			// Check if the User's AuthToken needs URL encoding
+			if (User.bURLEncodeAuthToken == true)
+			{
+				User.AuthToken = Modio::Detail::String::URLEncode(User.AuthToken);
+			}
+
+			switch (Provider)
+			{
+				case AuthenticationProvider::GoG:
+					Modio::Detail::AuthenticateUserByGoGAsync(User, Callback);
+					break;
+				case AuthenticationProvider::Itch:
+					Modio::Detail::AuthenticateUserByItchAsync(User, Callback);
+					break;
+				case AuthenticationProvider::Steam:
+					Modio::Detail::AuthenticateUserBySteamAsync(User, Callback);
+					break;
+				case AuthenticationProvider::XboxLive:
+					Modio::Detail::AuthenticateUserByXBoxLiveAsync(User, Callback);
+					break;
+				case AuthenticationProvider::Switch:
+					Modio::Detail::AuthenticateUserBySwitchIDAsync(User, Callback);
+					break;
+				case AuthenticationProvider::Discord:
+					Modio::Detail::AuthenticateUserByDiscordAsync(User, Callback);
+					break;
+				case AuthenticationProvider::PSN:
+					Modio::Detail::AuthenticateUserByPSNAsync(User, Callback);
+					break;
+				case AuthenticationProvider::Epic:
+					Modio::Detail::AuthenticateUserByEpicAsync(User, Callback);
+					break;
+				case AuthenticationProvider::Oculus:
+					// Oculus requires extended parameters to be sent along, so we validate the parameters
+					// with our precondition check here.
+					if (Modio::Detail::RequireValidOculusExtendedParameters(User, Callback) == false)
+					{
+						return;
+					}
+					Modio::Detail::AuthenticateUserByOculusAsync(User, Callback);
+					break;
+				case AuthenticationProvider::OpenID:
+					Modio::Detail::AuthenticateUserByOpenIDAsync(User, Callback);
+					break;
+			}
+		});
 		// Return immediatelly if the SDK is not initialized and
 		// The API rate limit is reached
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) == false &&
-			Modio::Detail::RequireNotRateLimited(Callback) == false)
-		{
-			return;
-		}
-
-		// Check if the User's AuthToken needs URL encoding
-		if (User.bURLEncodeAuthToken == true)
-		{
-			User.AuthToken = Modio::Detail::String::URLEncode(User.AuthToken);
-		}
-
-		switch (Provider)
-		{
-			case AuthenticationProvider::GoG:
-				Modio::Detail::AuthenticateUserByGoGAsync(User, Callback);
-				break;
-			case AuthenticationProvider::Itch:
-				Modio::Detail::AuthenticateUserByItchAsync(User, Callback);
-				break;
-			case AuthenticationProvider::Steam:
-				Modio::Detail::AuthenticateUserBySteamAsync(User, Callback);
-				break;
-			case AuthenticationProvider::XboxLive:
-				Modio::Detail::AuthenticateUserByXBoxLiveAsync(User, Callback);
-				break;
-			case AuthenticationProvider::Switch:
-				Modio::Detail::AuthenticateUserBySwitchIDAsync(User, Callback);
-				break;
-			case AuthenticationProvider::Discord:
-				Modio::Detail::AuthenticateUserByDiscordAsync(User, Callback);
-				break;
-			case AuthenticationProvider::PSN:
-				Modio::Detail::AuthenticateUserByPSNAsync(User, Callback);
-				break;
-			case AuthenticationProvider::Epic:
-				Modio::Detail::AuthenticateUserByEpicAsync(User, Callback);
-				break;
-			case AuthenticationProvider::Oculus:
-				// Oculus requires extended parameters to be sent along, so we validate the parameters
-				// with our precondition check here.
-				if (Modio::Detail::RequireValidOculusExtendedParameters(User, Callback) == false)
-				{
-					return;
-				}
-				Modio::Detail::AuthenticateUserByOculusAsync(User, Callback);
-				break;
-			case AuthenticationProvider::OpenID:
-				Modio::Detail::AuthenticateUserByOpenIDAsync(User, Callback);
-				break;
-		}
 	}
 
 	void AuthenticateUserEmailAsync(Modio::EmailAuthCode AuthenticationCode,
 									std::function<void(Modio::ErrorCode)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
-		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-				Modio::Detail::AuthenticateUserByEmailOp(AuthenticationCode), Callback,
-				Modio::Detail::Services::GetGlobalContext().get_executor());
-		}
+		Modio::Detail::SDKSessionData::EnqueueTask([AuthenticationCode, Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
+			{
+				return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
+					Modio::Detail::AuthenticateUserByEmailOp(AuthenticationCode), Callback,
+					Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
+		});
 	}
 
 	void ClearUserDataAsync(std::function<void(Modio::ErrorCode)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
-			Modio::Detail::RequireUserIsAuthenticated(Callback))
-		{
-			return Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>().ClearUserDataAsync(
-				Callback);
-		}
+		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireUserIsAuthenticated(Callback))
+			{
+				return Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>().ClearUserDataAsync(
+					Callback);
+			}
+		});
 	}
 
 	void VerifyUserAuthenticationAsync(std::function<void(Modio::ErrorCode)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
-			Modio::Detail::RequireUserIsAuthenticated(Callback))
-		{
-			Modio::Detail::VerifyUserAuthenticationAsync(Callback);
-		}
+		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireUserIsAuthenticated(Callback))
+			{
+				Modio::Detail::VerifyUserAuthenticationAsync(Callback);
+			}
+		});
 	}
 
 	void RefreshUserDataAsync(std::function<void(Modio::ErrorCode)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
-			Modio::Detail::RequireUserIsAuthenticated(Callback))
-		{
-			Modio::Detail::RefreshUserDataAsync(Callback);
-		}
+		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireUserIsAuthenticated(Callback))
+			{
+				Modio::Detail::RefreshUserDataAsync(Callback);
+			}
+		});
 	}
 
 	Modio::Optional<Modio::User> QueryUserProfile()
 	{
-		return Modio::Detail::SDKSessionData::GetAuthenticatedUser();
+		auto Lock = Modio::Detail::SDKSessionData::GetReadLock();
+		if (Modio::Detail::SDKSessionData::IsInitialized())
+		{
+			return Modio::Detail::SDKSessionData::GetAuthenticatedUser();
+		}
+		return {};
 	}
 
 	void GetUserMediaAsync(Modio::AvatarSize AvatarSize,
 						   std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
 	{
-		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
-			Modio::Detail::RequireUserIsAuthenticated(Callback))
-		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)>,
-									   void(Modio::ErrorCode, Modio::Optional<std::string>)>(
-				Modio::Detail::GetUserMediaOp(Modio::Detail::SDKSessionData::CurrentGameID(),
-											  Modio::Detail::SDKSessionData::CurrentAPIKey(), AvatarSize),
-				Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
-		}
+		Modio::Detail::SDKSessionData::EnqueueTask([AvatarSize, Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireUserIsAuthenticated(Callback))
+			{
+				return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)>,
+										   void(Modio::ErrorCode, Modio::Optional<std::string>)>(
+					Modio::Detail::GetUserMediaOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+												  Modio::Detail::SDKSessionData::CurrentAPIKey(), AvatarSize),
+					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
+		});
 	}
 
 } // namespace Modio

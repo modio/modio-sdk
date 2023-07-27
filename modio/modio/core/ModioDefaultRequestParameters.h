@@ -19,6 +19,7 @@ namespace Modio
         static const HttpRequestParams GetCurrentAgreementRequest { Modio::Detail::Verb::GET, "/agreements/types/{agreement-type-id}/current" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetAgreementVersionRequest { Modio::Detail::Verb::GET, "/agreements/versions/{agreement-version-id}" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams TermsRequest { Modio::Detail::Verb::GET, "/authenticate/terms" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams SignInWithModioRequest { Modio::Detail::Verb::GET, "/authorize" }; 
         static const HttpRequestParams AuthenticateViaDiscordRequest { Modio::Detail::Verb::POST, "/external/discordauth" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AuthenticateViaEpicgamesRequest { Modio::Detail::Verb::POST, "/external/epicgamesauth" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AuthenticateViaFacebookRequest { Modio::Detail::Verb::POST, "/external/facebookauth" , "application/x-www-form-urlencoded" }; 
@@ -50,7 +51,7 @@ namespace Modio
         static const HttpRequestParams AddModRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods" , "multipart/form-data" }; 
         static const HttpRequestParams GetModsEventsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/events" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetModsStatsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/stats" , "application/x-www-form-urlencoded" }; 
-        static const HttpRequestParams DeleteModRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}" , "multipart/form-data" }; 
+        static const HttpRequestParams DeleteModRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetModRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}" }; 
         static const HttpRequestParams EditModRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}" , "multipart/form-data" }; 
         static const HttpRequestParams GetModCommentsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/comments" , "application/x-www-form-urlencoded" }; 
@@ -114,6 +115,5 @@ namespace Modio
         static const HttpRequestParams SubmitReportRequest { Modio::Detail::Verb::POST, "/report" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams UnmuteAUserRequest { Modio::Detail::Verb::DELETE, "/users/{user-id}/mute" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams MuteAUserRequest { Modio::Detail::Verb::POST, "/users/{user-id}/mute" , "application/x-www-form-urlencoded" }; 
-        static const HttpRequestParams ProcessWebsocketMessageRequest { Modio::Detail::Verb::POST, "/websocket/message" , "application/x-www-form-urlencoded" }; 
     }
 }

@@ -16,6 +16,7 @@ add_subdirectory(filesystem EXCLUDE_FROM_ALL)
 add_subdirectory(fmt EXCLUDE_FROM_ALL)
 add_subdirectory(utfcpp EXCLUDE_FROM_ALL)
 add_subdirectory(function2 EXCLUDE_FROM_ALL)
+add_subdirectory(concurrentqueue EXCLUDE_FROM_ALL)
 
 include(json.cmake)
 include(asio.cmake)
@@ -88,6 +89,12 @@ install(
 )
 
 install(
+	FILES ${CMAKE_CURRENT_LIST_DIR}/concurrentqueue/concurrentqueue.h
+	DESTINATION ${CMAKE_INSTALL_PREFIX}/header_only/ext
+	COMPONENT header_only
+)
+
+install(
 	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/fmt/include/
 	DESTINATION ${CMAKE_INSTALL_PREFIX}/static/inc
 	COMPONENT static_library
@@ -95,6 +102,7 @@ install(
 	PATTERN "*.h"
 	PATTERN "*.hpp"
 )
+
 
 # Filesystem should no longer be a public dependency
 #install(

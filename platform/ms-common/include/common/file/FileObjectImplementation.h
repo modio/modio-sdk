@@ -15,6 +15,7 @@
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioOperationQueue.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/file/IFileObjectImplementation.h"
 #include <atomic>
 #include <chrono>
@@ -49,14 +50,15 @@ namespace Modio
 
 				  CurrentSeekOffset(0)
 			{
-				OperationQueue = std::make_shared<Modio::Detail::OperationQueue>(ParentContext, BasePath.u8string().c_str());
+				OperationQueue =
+					std::make_shared<Modio::Detail::OperationQueue>(ParentContext, BasePath.u8string().c_str());
 			}
 
 			~FileObjectImplementation()
 			{
 				Destroy();
 			}
-			void Destroy()
+			void Destroy() override
 			{
 				if (FileHandle != INVALID_HANDLE_VALUE)
 				{
@@ -79,41 +81,9 @@ namespace Modio
 				return CancelRequested;
 			}
 
-			template<typename OperationType>
-			void BeginExclusiveOperation(OperationType&& Operation)
-			{
-				CurrentTicket = std::make_unique<Modio::Detail::OperationQueue::Ticket>(OperationQueue);
-				CurrentTicket->WaitForTurnAsync(std::forward<OperationType>(Operation));
-				/*
-								if (OperationInProgress.exchange(true))
-								{
-									++NumWaiters;
-									OperationQueue.async_wait(
-										asio::bind_executor(Modio::Detail::Services::GetGlobalContext().get_executor(),
-															[Op = std::move(Operation)](asio::error_code ec) mutable {
-				   Op(); }));
-								}
-								else
-								{
-									asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
-				   std::move(Operation));
-								}
-				*/
-			}
+			
 
-			void FinishExclusiveOperation()
-			{
-				/*OperationInProgress.exchange(false);
-
-				if (NumWaiters > 0)
-				{
-					--NumWaiters;
-					OperationQueue.cancel_one();
-				}*/
-				CurrentTicket.reset();
-			}
-
-			Modio::filesystem::path GetPath()
+			Modio::filesystem::path GetPath() override
 			{
 				return FilePath;
 			}
@@ -193,12 +163,12 @@ namespace Modio
 				return CurrentSeekOffset;
 			}
 
-			void SetFileStrand(asio::strand<asio::io_context::executor_type>& FileStrand)
+			void SetFileStrand(asio::strand<asio::io_context::executor_type>& FileStrand) override
 			{
 				Strand = &FileStrand;
 			}
 
-			asio::strand<asio::io_context::executor_type>& GetFileStrand()
+			asio::strand<asio::io_context::executor_type>& GetFileStrand() override
 			{
 				return *Strand;
 			}
@@ -214,7 +184,7 @@ namespace Modio
 			}
 
 			Modio::ErrorCode OpenFile(Modio::filesystem::path OpenFilePath, Modio::Detail::FileMode NewMode,
-									  bool bOverwrite = false)
+									  bool bOverwrite = false) override
 			{
 				if (FileHandle != INVALID_HANDLE_VALUE)
 				{

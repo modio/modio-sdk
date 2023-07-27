@@ -49,7 +49,7 @@ public:
 				return;
 			}
 
-			*SharedState = HttpSharedStateBase(CurrentSession);
+			*SharedState = std::move(HttpSharedStateBase(CurrentSession));
 
 			SharedStateHolder::Get().SharedStatePtr = SharedState;
 			SharedStateHolder::Get().CurrentSessionId.store((uint64_t) CurrentSession);

@@ -293,5 +293,67 @@ namespace Modio
 					   });
 			return false;
 		}
+
+		template<typename... OtherArgs>
+		bool RequireValidModID(const Modio::ModID& ID, std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
+		{
+			if (ID.IsValid())
+			{
+				return true;
+			}
+			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					   [CompletionHandler =
+							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
+						   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
+											 (OtherArgs {})...);
+					   });
+			return false;
+		}
+		template<typename... OtherArgs>
+		bool RequireValidGameID(const Modio::GameID& ID, std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
+		{
+			if (ID.IsValid())
+			{
+				return true;
+			}
+			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					   [CompletionHandler =
+							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
+						   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
+											 (OtherArgs {})...);
+					   });
+			return false;
+		}
+		template<typename... OtherArgs>
+		bool RequireValidUserID(const Modio::UserID& ID, std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
+		{
+			if (ID.IsValid())
+			{
+				return true;
+			}
+			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					   [CompletionHandler =
+							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
+						   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
+											 (OtherArgs {})...);
+					   });
+			return false;
+		}
+		template<typename... OtherArgs>
+		bool RequireValidReportParams(const Modio::ReportParams& Params,
+									  std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
+		{
+			if (Params.IsResourceIdValid())
+			{
+				return true;
+			}
+			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					   [CompletionHandler =
+							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
+						   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
+											 (OtherArgs {})...);
+					   });
+			return false;
+		}
 	} // namespace Detail
 } // namespace Modio

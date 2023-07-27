@@ -102,7 +102,8 @@ namespace Modio
 					std::shared_ptr<Modio::Detail::OperationQueue> AssociatedQueue = Impl->AssociatedQueue.lock();
 					if (AssociatedQueue == nullptr)
 					{
-						asio::post(asio::get_associated_executor(Operation), [Op = std::move(Operation)]() mutable {
+						auto Ex_ = asio::get_associated_executor(Operation);
+						asio::post(Ex_, [Op = std::move(Operation)]() mutable {
 							Op(Modio::make_error_code(Modio::GenericError::QueueClosed));
 						});
 						return;

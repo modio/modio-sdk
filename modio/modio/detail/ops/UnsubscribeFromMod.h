@@ -66,6 +66,15 @@ namespace Modio
 					}
 					else if (ec)
 					{
+						if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::EntityNotFoundError))
+						{
+							Modio::Detail::Logger().Log(
+								Modio::LogLevel::Info, Modio::LogCategory::ModManagement,
+								"Attempted to unsubscribe from mod {} but that mod does not exist. Returning success",
+								ModId);
+							Self.complete({});
+							return;
+						}
 						if (ec != Modio::GenericError::OperationCanceled)
 						{
 							Modio::Detail::SDKSessionData::AddToDeferredUnsubscriptions(ModId);

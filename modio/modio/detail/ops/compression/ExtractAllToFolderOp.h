@@ -115,10 +115,10 @@ namespace Modio
 					{
 						if (!Impl->ProgressInfo->expired())
 						{
-							auto Info =
-								Impl->ProgressInfo->lock();
+							auto Info = Impl->ProgressInfo->lock();
 							SetState(*Info.get(), Modio::ModProgressInfo::EModProgressState::Extracting);
-							SetTotalProgress(*Info.get(), ModProgressInfo::EModProgressState::Extracting, Impl->ArchiveView.GetTotalExtractedSize());
+							SetTotalProgress(*Info.get(), ModProgressInfo::EModProgressState::Extracting,
+											 Impl->ArchiveView.GetTotalExtractedSize());
 						}
 						else
 						{
@@ -136,13 +136,24 @@ namespace Modio
 					{
 						if (Impl->CurrentEntryIterator->FilePath.has_parent_path())
 						{
-							ec = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
-								.CheckExtractionPath(Impl->CurrentEntryIterator->FilePath, Impl->RootOutputPath);
-						}
-						if (ec)
-						{
-							Self.complete(ec, Modio::FileSize(0));
-							return;
+							// Security checks for file paths that attempt to escape from their intended destination
+							// Blocks relative paths, double dots, and absolute paths
+							if ((Impl->CurrentEntryIterator->FilePath.string().find(".\\") != std::string::npos) ||
+								(Impl->CurrentEntryIterator->FilePath.string().find("./") != std::string::npos) ||
+								(Impl->CurrentEntryIterator->FilePath.string().find("..") != std::string::npos) ||
+								(Impl->CurrentEntryIterator->FilePath.string().find("\\") == 0) ||
+								(Impl->CurrentEntryIterator->FilePath.string().find("/") == 0) ||
+								(Impl->CurrentEntryIterator->FilePath.is_absolute()))
+							{
+								Modio::Detail::Logger().Log(
+									Modio::LogLevel::Error, Modio::LogCategory::Http,
+									"The path of the file to extract {} contains a forbidden sequence of characters",
+									Impl->CurrentEntryIterator->FilePath.string());
+
+								ec = Modio::make_error_code(Modio::FilesystemError::NoPermission);
+								Self.complete(ec, Modio::FileSize(0));
+								return;
+							}
 						}
 						// If the current entry has no filename (ie it is just a directory), create that directory
 						if (!Impl->CurrentEntryIterator->FilePath.has_filename() ||

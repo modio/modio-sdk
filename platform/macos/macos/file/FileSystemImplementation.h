@@ -413,36 +413,6 @@ namespace Modio
 					return false;
 				}
 			}
-
-			Modio::ErrorCode CheckExtractionPath(const Modio::filesystem::path& FilePath,
-												 const Modio::filesystem::path& RootOutputPath) const override
-			{
-				Modio::ErrorCode ec;
-				Modio::filesystem::path LexPath = Modio::filesystem::relative(FilePath, RootOutputPath, ec);
-
-				// In case the platform does not support symlinks, the LexPath here would not correctly identify if
-				// FilePath tries to access parent folders relative to CurrentPath. This will double check no ".."
-				// is in FilePath
-				if (LexPath.string() == "")
-				{
-					std::string PreFolder = "..";
-					std::string AbsFolder = "\\";
-
-					// This case means that the path does not have a reference to folders above the current location.
-					if (FilePath.string().find(PreFolder) == std::string::npos &&
-						FilePath.string().find(AbsFolder) != 0)
-					{
-						return {};
-					}
-				}
-				if (ec)
-				{
-					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Compression,
-												"FilePath {} returned a system error with message: {}",
-												FilePath.string(), ec.message());
-				}
-				return Modio::make_error_code(Modio::FilesystemError::NoPermission);
-			}
 		};
 	} // namespace Detail
 } // namespace Modio

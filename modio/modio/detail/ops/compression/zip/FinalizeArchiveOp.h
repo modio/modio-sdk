@@ -17,6 +17,8 @@
 #include "modio/file/ModioFile.h"
 #include <memory>
 
+// For reference: https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
+
 namespace Modio
 {
 	namespace Detail
@@ -35,92 +37,144 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
-				uint64_t LocalFileOffset = 0;
-
 				reenter(CoroutineState)
 				{
-					// For reference: https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
+					// Determine the start of the central directory
 					OutputFile->Seek(Modio::FileOffset(OutputFile->GetFileSize()));
 					StartOfCentralDirectory = OutputFile->Tell();
-                    
-                    // In case the Central Directory is outside of "4294967295" bytes, then tag it as Zip64
-                    if (StartOfCentralDirectory >= Constants::ZipTag::MAX32)
-                    {
-                        ArchiveFile->bIsZip64 = true;
-                    }
-                    
-                    // In case the number of files is larger than "65535", then tag it as Zip64
-                    if (ArchiveFile->GetNumberOfEntries() >= Constants::ZipTag::MAX16)
-                    {
-                        ArchiveFile->bIsZip64 = true;
-                    }
-                    
+
+					// If the central directory is outside of "4294967295" bytes, tag the archive as Zip64
+					if (StartOfCentralDirectory >= Constants::ZipTag::MAX32)
+					{
+						ArchiveFile->bIsZip64 = true;
+					}
+					// If the total number of files is greater than "65535", tag the archive as Zip64
+					if (ArchiveFile->GetNumberOfEntries() >= Constants::ZipTag::MAX16)
+					{
+						ArchiveFile->bIsZip64 = true;
+					}
+
 					// The iterator will be safe to dereference across a `yield` because it's pointing to a vector
-					// stored in the shared_ptr, ie moving this operation won't change the location in memory of the
+					// stored in the shared_ptr, i.e. moving this operation won't change the location in memory of the
 					// object in ArchiveFile
 					CurrentArchiveEntry = ArchiveFile->begin();
 					while (CurrentArchiveEntry != ArchiveFile->end())
 					{
 						{
-							uint64_t HeaderSize = 46 + CurrentArchiveEntry->FilePath.generic_u8string().size() +
-												  Constants::ZipTag::TotalExtraFieldSizeFileEntries;
-							LocalFileOffset = CurrentArchiveEntry->FileOffset;
-							// Calculate the size of the record buffer;
-							RecordBuffer = std::make_unique<Modio::Detail::Buffer>(HeaderSize);
+							// Offset from start of archive file to this file's local directory header
+							uint64_t LocalFileOffset = CurrentArchiveEntry->FileOffset;
 
-							bool ExtraFieldMax = (CurrentArchiveEntry->CompressedSize >= Constants::ZipTag::MAX32) ||
-												 (CurrentArchiveEntry->UncompressedSize >= Constants::ZipTag::MAX32) ||
-												 (LocalFileOffset >= Constants::ZipTag::MAX32);
+							// Check if Zip64 extra field information is required for the size and/or offset fields
+							bool bIncludeExtraFieldSizes =
+								(CurrentArchiveEntry->CompressedSize >= Constants::ZipTag::MAX32) ||
+								(CurrentArchiveEntry->UncompressedSize >= Constants::ZipTag::MAX32);
+							bool bIncludeExtraFieldOffset = LocalFileOffset >= Constants::ZipTag::MAX32;
 
-							Modio::Detail::TypedBufferWrite(Constants::ZipTag::CentralDirectoryFileHeader,
-															*RecordBuffer, 0)
-								.FollowedBy<std::uint16_t>(
-									Constants::ZipTag::ZipVersion) // Zip version used for creating the archive
-								.FollowedBy<std::uint16_t>(
-									ArchiveFile->bIsZip64 ? Constants::ZipTag::ZipVersion
-														  : Constants::ZipTag::Zip64Version) // Minimum zip version
-																							 // required for extraction
-								.FollowedBy<std::uint16_t>(0) // General purpose bit flag
-								.FollowedBy<std::uint16_t>(static_cast<uint16_t>(CurrentArchiveEntry->Compression))
-								.FollowedBy<std::uint16_t>(0) // Last modified time
-								.FollowedBy<std::uint16_t>(0) // Last modified date
-								.FollowedBy<std::uint32_t>(CurrentArchiveEntry->CRCValue)
-								.FollowedBy<std::uint32_t>(ExtraFieldMax ? Constants::ZipTag::MAX32
-																		 : static_cast<std::uint32_t>(CurrentArchiveEntry->CompressedSize))
-								.FollowedBy<std::uint32_t>(ExtraFieldMax ? Constants::ZipTag::MAX32
-																		 : static_cast<std::uint32_t>(CurrentArchiveEntry->UncompressedSize))
-								.FollowedBy<std::uint16_t>(
-									(std::uint16_t) CurrentArchiveEntry->FilePath.generic_u8string().size())
-								.FollowedBy<std::uint16_t>(
-									Constants::ZipTag::TotalExtraFieldSizeFileEntries) // Extra field length
-								.FollowedBy<std::uint16_t>(0) // File comment length
-								.FollowedBy<std::uint16_t>(0) // Disk number (will always be a single disk)
-								.FollowedBy<std::uint16_t>(0) // Internal file attributes
-								.FollowedBy<std::uint32_t>(
-									CurrentArchiveEntry->bIsDirectory ? 0x10 : 0) // External file attributes
-								.FollowedBy<std::uint32_t>(
-									// Offset of local file header from start of disk (only one disk, so offset from
-									// start of file)
-									ExtraFieldMax ? Constants::ZipTag::MAX32 : static_cast<std::uint32_t>(LocalFileOffset));
-						}
+							// If we require any extra fields, the first 4 bytes (signature + size) are always
+							// required
+							uint16_t ExtraFieldLength = (bIncludeExtraFieldSizes || bIncludeExtraFieldOffset) ? 4 : 0;
+							if (bIncludeExtraFieldSizes)
+							{
+								// Include 8 bytes each for compressed and uncompressed data size fields
+								ExtraFieldLength += 16;
+							}
+							if (bIncludeExtraFieldOffset)
+							{
+								// Include 8 bytes for offset of local header record field
+								ExtraFieldLength += 8;
+							}
 
-						{
 							std::string FileName = CurrentArchiveEntry->FilePath.generic_u8string();
-							std::copy(FileName.begin(), FileName.end(), RecordBuffer->Data() + 46);
+
+							SizeOfCentralDirectory +=
+								(Constants::ZipTag::CentralFileHeaderFixedSize + FileName.size() + ExtraFieldLength);
+
+							// Marshal central directory header fields into a buffer
+							RecordBuffer = std::make_unique<Modio::Detail::Buffer>(
+								Constants::ZipTag::CentralFileHeaderFixedSize + FileName.size() + ExtraFieldLength);
+							// Header signature
+							Modio::Detail::TypedBufferWrite(Constants::ZipTag::CentralFileHeaderSignature,
+															*RecordBuffer, 0)
+								// Zip version used for creating the archive
+								.FollowedBy<std::uint16_t>(Constants::ZipTag::ZipVersion)
+								// Minimum zip version required for extraction
+								.FollowedBy<std::uint16_t>((ArchiveFile->bIsZip64 || ExtraFieldLength > 0)
+															   ? Constants::ZipTag::Zip64Version
+															   : Constants::ZipTag::ZipVersion)
+								// General purpose bit-flag
+								.FollowedBy<std::uint16_t>(0)
+								// Compression method
+								.FollowedBy<std::uint16_t>(static_cast<uint16_t>(CurrentArchiveEntry->Compression))
+								// Last modified time
+								.FollowedBy<std::uint16_t>(0)
+								// Last modified date
+								.FollowedBy<std::uint16_t>(0)
+								// CRC-32
+								.FollowedBy<std::uint32_t>(CurrentArchiveEntry->CRCValue)
+								// Compressed size. Must be set to MAX32 if actual value is included in Zip64
+								// Extended Information
+								.FollowedBy<std::uint32_t>(
+									bIncludeExtraFieldSizes
+										? Constants::ZipTag::MAX32
+										: static_cast<std::uint32_t>(CurrentArchiveEntry->CompressedSize))
+								// Uncompressed size. Must be set to MAX32 if actual value is included in Zip64
+								// Extended Information
+								.FollowedBy<std::uint32_t>(
+									bIncludeExtraFieldSizes
+										? Constants::ZipTag::MAX32
+										: static_cast<std::uint32_t>(CurrentArchiveEntry->UncompressedSize))
+								// File name length
+								.FollowedBy<std::uint16_t>((std::uint16_t) FileName.size())
+								// Extra field length
+								.FollowedBy<std::uint16_t>(ExtraFieldLength)
+								// File comment length
+								.FollowedBy<std::uint16_t>(0)
+								// Disk number (will always be a single disk)
+								.FollowedBy<std::uint16_t>(0)
+								// Internal file attributes
+								.FollowedBy<std::uint16_t>(0)
+								// External file attributes
+								.FollowedBy<std::uint32_t>(CurrentArchiveEntry->bIsDirectory ? 0x10 : 0)
+								// Offset of local file header from start of disk (only one disk, so start of file)
+								// Must be set to MAX32 if actual value is included in Zip64 Extended Information
+								.FollowedBy<std::uint32_t>(bIncludeExtraFieldOffset
+															   ? Constants::ZipTag::MAX32
+															   : static_cast<std::uint32_t>(LocalFileOffset));
+
+							// File name
+							std::copy(FileName.begin(), FileName.end(),
+									  RecordBuffer->Data() + Constants::ZipTag::CentralFileHeaderFixedSize);
+
+							// Zip64 Extended Information Extra Field
+							if (ExtraFieldLength > 0)
+							{
+								// Make sure the archive is marked as Zip64 for the End of Central Directory Record
+								ArchiveFile->bIsZip64 = true;
+
+								Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
+															"Including Zip64 Extended Information Extra Field in the "
+															"Central Directory for file {}",
+															FileName);
+
+								// Zip64 Extra Field Signature
+								Modio::Detail::TypedBufferWrite(
+									Constants::ZipTag::Zip64ExtraFieldSignature, *RecordBuffer,
+									Constants::ZipTag::CentralFileHeaderFixedSize + FileName.size())
+									// Size of this extra block, excluding leading 4 bytes (signature and size
+									// fields)
+									.FollowedBy<uint16_t>(ExtraFieldLength - 4)
+									// Uncompressed size
+									.ConditionalFollowedBy<uint64_t>(CurrentArchiveEntry->UncompressedSize,
+																	 bIncludeExtraFieldSizes)
+									// Compressed size
+									.ConditionalFollowedBy<uint64_t>(CurrentArchiveEntry->CompressedSize,
+																	 bIncludeExtraFieldSizes)
+									// Relative Header Offset
+									.ConditionalFollowedBy<uint64_t>(LocalFileOffset, bIncludeExtraFieldOffset);
+							}
 						}
 
-						// Add "Extra Field" information regardless of Zip64 status
-						{
-							Modio::Detail::TypedBufferWrite(
-								Constants::ZipTag::ExtendedInformationFieldHeaderID, *RecordBuffer,
-								46 + CurrentArchiveEntry->FilePath.generic_u8string().size())
-								.FollowedBy<uint16_t>(Constants::ZipTag::ExtraFieldSize)
-								.FollowedBy<uint64_t>(
-									CurrentArchiveEntry->UncompressedSize) // Original uncompressed file size
-								.FollowedBy<uint64_t>(CurrentArchiveEntry->CompressedSize) // Size of compressed data
-								.FollowedBy<uint64_t>(LocalFileOffset); // Offset of local header record
-						}
-
+						// Write out the central directory header for this entry
 						yield OutputFile->WriteAsync(std::move(*RecordBuffer), std::move(Self));
 						if (ec)
 						{
@@ -130,65 +184,88 @@ namespace Modio
 						CurrentArchiveEntry++;
 					}
 
-					if (ArchiveFile->bIsZip64 == true)
+					// Zip64 End of Central Directory Record and Locator
+					if (ArchiveFile->bIsZip64)
 					{
-						// When it is Zip64, the ECD in Zip32 needs to report the Zip64 size
-						SizeCentralDir = OutputFile->Tell() - StartOfCentralDirectory;
-						// Zip64 has to write first the End of Central Directory of the 64 bit versions
-						// plus the End of central directory locator
+						// Marshal required fields into buffer
+						// We omit the only variable sized field (zip64 extensible data sector) so can use a known fixed
+						// buffer size
 						RecordBuffer = std::make_unique<Modio::Detail::Buffer>(
-							Constants::ZipTag::EndCentralDirectoryHeaderSize64 +
-							Constants::ZipTag::EndCentralDirectoryLocatorSize64);
-						Modio::Detail::TypedBufferWrite(Constants::ZipTag::EndCentralDirectory64, *RecordBuffer, 0)
-							.FollowedBy<std::uint64_t>(44) // Size of the EOCD64 after this size record
-							.FollowedBy<std::uint16_t>(0) // Version made by
-							.FollowedBy<std::uint16_t>(Constants::ZipTag::Zip64Version) // Version needed to extract
-							.FollowedBy<std::uint32_t>(0) // Number of this disk
-							.FollowedBy<std::uint32_t>(0) // Disk where central directory starts
-							// Number of central directory records on this disk
-							.FollowedBy<std::uint64_t>(ArchiveFile->GetNumberOfEntries())
-							// Total number of central directory records
-							.FollowedBy<std::uint64_t>(ArchiveFile->GetNumberOfEntries())
-							// Size of central directory (bytes)
-							.FollowedBy<std::uint64_t>(SizeCentralDir)
-							// Offset of start of central directory, relative to start of archive
-							.FollowedBy<std::uint64_t>(StartOfCentralDirectory)
-							// Zip64 end of central dir locator signature "0x07064b50"
-							.FollowedBy<std::uint32_t>(Constants::ZipTag::EndCentralDirectoryLocator64)
-							// number of the disk with the start of the zip64 end of central directory
+							Constants::ZipTag::Zip64EndCentralDirectoryHeaderFixedSize +
+							Constants::ZipTag::Zip64EndCentralDirectoryLocatorSize);
+						// Zip64 EOCD signature
+						Modio::Detail::TypedBufferWrite(Constants::ZipTag::Zip64EndCentralDirectorySignature,
+														*RecordBuffer, 0)
+							// ZIP64 EOCD size, exclude leading 12 bytes (signature + size)
+							.FollowedBy<std::uint64_t>(Constants::ZipTag::Zip64EndCentralDirectoryHeaderFixedSize - 12)
+							// Version made by
+							.FollowedBy<std::uint16_t>(Constants::ZipTag::ZipVersion)
+							// Version needed to extract
+							.FollowedBy<std::uint16_t>(Constants::ZipTag::Zip64Version)
+							// this disk number
 							.FollowedBy<std::uint32_t>(0)
-							// Relative offset of the zip64 end of central directory record
+							// disk number with EOCD start
+							.FollowedBy<std::uint32_t>(0)
+							// central directory entries (this disk)
+							.FollowedBy<std::uint64_t>(ArchiveFile->GetNumberOfEntries())
+							// central directory entries (total)
+							.FollowedBy<std::uint64_t>(ArchiveFile->GetNumberOfEntries())
+							// central directory size
+							.FollowedBy<std::uint64_t>(SizeOfCentralDirectory)
+							// central directory offset with respect to the starting disk (only one disk, so from offset
+							// from start of file)
+							.FollowedBy<std::uint64_t>(StartOfCentralDirectory)
+							// zip64 EOCD locator signature
+							.FollowedBy<std::uint32_t>(Constants::ZipTag::Zip64EndCentralDirectoryLocatorSignature)
+							// disk number with Zip64 EOCD start
+							.FollowedBy<std::uint32_t>(0)
+							// relative offset of zip64 EOCD record
 							.FollowedBy<std::uint64_t>(OutputFile->Tell())
 							// total number of disks
 							.FollowedBy<std::uint32_t>(1);
 
-						// Write the ECD64 to file
+						// Write the Zip64 End of Central Directory Record and Locator to the archive file
 						yield OutputFile->WriteAsync(std::move(*RecordBuffer), std::move(Self));
 					}
 
-					RecordBuffer = std::make_unique<Modio::Detail::Buffer>(22);
-					Modio::Detail::TypedBufferWrite(Constants::ZipTag::EndCentralDirectory, *RecordBuffer, 0)
-						.FollowedBy<std::uint16_t>(0) // Number of this disk
-						.FollowedBy<std::uint16_t>(0) // Disk where central directory starts
-						.FollowedBy<std::uint16_t>(
-							ArchiveFile
-								->GetNumberOfEntries()) // Number of entries in the central directory on current disk
-						.FollowedBy<std::uint16_t>(
-							ArchiveFile->GetNumberOfEntries()) // Number of entries in the central directory
-						.FollowedBy<std::uint32_t>(ArchiveFile->bIsZip64 == true
-													   ? static_cast<std::uint32_t>(SizeCentralDir)
-													   : static_cast<std::uint32_t>(OutputFile->Tell() -
-															 StartOfCentralDirectory)) // Size of central directory
-						// For some reason, the macOS decompressor does not like tp have #Entries and Size of CD to
-						// "0xFF" when not necessary
-						.FollowedBy<std::uint32_t>(
-							ArchiveFile->bIsZip64 == true
-								? Constants::ZipTag::MAX32
-								: static_cast<std::uint32_t>(StartOfCentralDirectory)) // Position of central directory in file
-						.FollowedBy<std::uint16_t>(0); // Length of comment
+					// End of Central Directory Record (EOCD)
 
+					// Marshal required fields into buffer
+					// We omit the only variable sized field (.ZIP file comment) so can use a known fixed buffer size
+					RecordBuffer =
+						std::make_unique<Modio::Detail::Buffer>(Constants::ZipTag::EndOfCentralDirectoryFixedSize);
+
+					// EOCD signature
+					Modio::Detail::TypedBufferWrite(Constants::ZipTag::EndCentralDirectorySignature, *RecordBuffer, 0)
+						// this disk number
+						.FollowedBy<std::uint16_t>(0)
+						// disk number with EOCD start
+						.FollowedBy<std::uint16_t>(0)
+						// central directory entries (this disk).
+						// Must be set to MAX16 if actual value is included in Zip64 EOCD Record
+						.FollowedBy<std::uint16_t>(ArchiveFile->bIsZip64 ? Constants::ZipTag::MAX16
+																		 : ArchiveFile->GetNumberOfEntries())
+						// central directory entries (total).
+						// Must be set to MAX16 if actual value is included in Zip64 EOCD Record
+						.FollowedBy<std::uint16_t>(ArchiveFile->bIsZip64 ? Constants::ZipTag::MAX16
+																		 : ArchiveFile->GetNumberOfEntries())
+						// central directory size
+						// Must be set to MAX32 if actual value is included in Zip64 EOCD Record
+						.FollowedBy<std::uint32_t>(ArchiveFile->bIsZip64
+													   ? Constants::ZipTag::MAX32
+													   : static_cast<std::uint32_t>(SizeOfCentralDirectory))
+						// central directory offset with respect to the starting disk (only one disk, so from offset
+						// from start of file). Must be set to MAX32 if actual value is included in Zip64 EOCD Record
+						.FollowedBy<std::uint32_t>(ArchiveFile->bIsZip64
+													   ? Constants::ZipTag::MAX32
+													   : static_cast<std::uint32_t>(StartOfCentralDirectory))
+						// .ZIP file comment length
+						.FollowedBy<std::uint16_t>(0);
+
+					// Write the End of Central Directory Record to archive file
 					yield OutputFile->WriteAsync(std::move(*RecordBuffer), std::move(Self));
-					// Close Handle of any used file
+
+					// Close file handle
 					OutputFile.reset();
 
 					Self.complete(ec);
@@ -203,7 +280,7 @@ namespace Modio
 			std::unique_ptr<Modio::Detail::Buffer> RecordBuffer;
 			std::vector<Modio::Detail::ArchiveFileImplementation::ArchiveEntry>::const_iterator CurrentArchiveEntry;
 			Modio::FileOffset StartOfCentralDirectory;
-			std::uint64_t SizeCentralDir = 0;
+			std::uint64_t SizeOfCentralDirectory = 0;
 		};
 #include <asio/unyield.hpp>
 	} // namespace Detail

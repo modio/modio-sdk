@@ -431,6 +431,14 @@ namespace Modio
 	class ModCollection
 	{
 	public:
+		/// @docinternal
+		/// @brief Cloning constructor
+		/// @param Entries Raw entries from another mod collection
+		MODIO_IMPL ModCollection(std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> Entries);
+
+		/// @docinternal
+		/// @brief Default constructor
+		MODIO_IMPL ModCollection() : ModEntries {} {};
 		/// @docpublic
 		/// @brief Retrieve a ModCollection given a UserSubscriptionList
 		/// @param UserSubscriptionList patterns that would entitle a filter
@@ -447,7 +455,7 @@ namespace Modio
 		/// @docpublic
 		/// @brief Retrieve a dictionary of ModID - ModCollectionEntry stored in this ModCollection
 		/// @return Dictionary where keys are ModID and values are ModCollectionEntry
-		MODIO_IMPL const std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& Entries();
+		MODIO_IMPL const std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& Entries() const;
 
 		/// @docpublic
 		/// @brief Retrieve a single ModCollectionEntry if one is found using a ModID
@@ -526,7 +534,10 @@ namespace Modio
 			InternalData.clear();
 			return TmpLog;
 		}
-
+		inline std::size_t Size()
+		{
+			return InternalData.size();
+		}
 	private:
 		std::vector<Modio::ModManagementEvent> InternalData;
 	};

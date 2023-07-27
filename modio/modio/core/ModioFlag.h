@@ -50,71 +50,71 @@ namespace Modio
 		/// @brief Retrievet the StorageType inside the FlagImpl
 		constexpr StorageType RawValue()
 		{
-			return Value.disjunction(0).value();
+			return Value.disjunction(static_cast<StorageType>(0)).value();
 		}
 
 		/// @docnone
 		constexpr FlagImpl<T> operator|(const EnumType& EnumValue) const
 		{
-			return FlagImpl<T>(Value.disjunction(0).value() | Convert(EnumValue));
+			return FlagImpl<T>(Value.disjunction(static_cast<StorageType>(0)).value() | Convert(EnumValue));
 		}
 
 		/// @docnone
 		constexpr FlagImpl<T> operator|=(const EnumType& EnumValue)
 		{
-			Value = Value.disjunction(0).value() | Convert(EnumValue);
+			Value = Value.disjunction(static_cast<StorageType>(0)).value() | Convert(EnumValue);
 			return *this;
 		}
 
 		/// @docinternal
 		constexpr FlagImpl<T>& SetFlag(const EnumType& EnumValue)
 		{
-			Value = Value.disjunction(0).value() | Convert(EnumValue);
+			Value = Value.disjunction(static_cast<StorageType>(0)).value() | Convert(EnumValue);
 			return *this;
 		}
 
 		/// @docnone
 		constexpr bool operator&(const EnumType& EnumValue) const
 		{
-			return (Value.disjunction(0).value() & Convert(EnumValue)) == Convert(EnumValue);
+			return (Value.disjunction(static_cast<StorageType>(0)).value() & Convert(EnumValue)) == Convert(EnumValue);
 		}
 
 		/// @docnone
 		constexpr bool HasFlag(const EnumType& EnumValue) const
 		{
-			return (Value.disjunction(0).value() & Convert(EnumValue)) == Convert(EnumValue);
+			return (Value.disjunction(static_cast<StorageType>(0)).value() & Convert(EnumValue)) == Convert(EnumValue);
 		}
 
 		/// @docnone
 		constexpr bool operator^(const EnumType& EnumValue) const
 		{
-			return FlagImpl<T>(Value.disjunction(0).value() ^ Convert(EnumValue));
+			return FlagImpl<T>(Value.disjunction(static_cast<StorageType>(0)).value() ^ Convert(EnumValue));
 		}
 
 		/// @docnone
 		constexpr bool operator^=(const EnumType& EnumValue)
 		{
-			Value = Value.disjunction(0).value() ^ Convert(EnumValue);
+			Value = Value.disjunction(static_cast<StorageType>(0)).value() ^ Convert(EnumValue);
 			return *this;
 		}
 
 		/// @docnone
 		constexpr bool ToggleFlag(const EnumType& EnumValue)
 		{
-			Value = Value.disjunction(0).value() ^ Convert(EnumValue);
+			Value = Value.disjunction(static_cast<StorageType>(0)).value() ^ Convert(EnumValue);
 			return *this;
 		}
 
 		/// @docnone
 		constexpr FlagImpl<T> operator~() const
 		{
-			return FlagImpl<T>(~Value.disjunction(0).value());
+			return FlagImpl<T>(~Value.disjunction(static_cast<StorageType>(0)).value());
 		}
 
 		/// @docinternal
 		constexpr bool ClearFlag(EnumType EnumValue)
 		{
-			Value = Value.disjunction(0).value() & ~Convert(EnumValue);
+			Value = Value.disjunction(static_cast<StorageType>(0)).value() & ~Convert(EnumValue);
 			return *this;
 		}
 

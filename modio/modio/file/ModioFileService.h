@@ -82,7 +82,7 @@ namespace Modio
 			auto InitializeAsync(Modio::InitializeOptions InitParams, CompletionHandlerType&& Handler)
 			{
 				return PlatformImplementation->InitializeAsync(InitParams,
-															   std::forward<CompletionHandlerType>(std::move(Handler)));
+															   std::forward<CompletionHandlerType>(Handler));
 			}
 
 			template<typename CompletionTokenType>
@@ -90,7 +90,7 @@ namespace Modio
 								  Modio::Detail::Buffer Buffer, CompletionTokenType&& Token)
 			{
 				return PlatformImplementation->WriteSomeAtAsync(PlatformIOObject, Offset, std::move(Buffer),
-																std::forward<CompletionTokenType>(std::move(Token)));
+																std::forward<CompletionTokenType>(Token));
 			}
 
 			template<typename CompletionTokenType>
@@ -98,7 +98,7 @@ namespace Modio
 								 CompletionTokenType&& Token)
 			{
 				return PlatformImplementation->ReadSomeAtAsync(PlatformIOObject, Offset, Length,
-															   std::forward<CompletionTokenType>(std::move(Token)));
+															   std::forward<CompletionTokenType>(Token));
 			}
 
 			template<typename CompletionTokenType>
@@ -107,7 +107,7 @@ namespace Modio
 								 CompletionTokenType&& Token)
 			{
 				return PlatformImplementation->ReadSomeAtAsync(PlatformIOObject, Offset, MaxBytesToRead, Destination,
-															   std::forward<CompletionTokenType>(std::move(Token)));
+															   std::forward<CompletionTokenType>(Token));
 			}
 
 			template<typename CompletionTokenType>
@@ -115,7 +115,7 @@ namespace Modio
 						   Modio::Detail::DynamicBuffer Destination, CompletionTokenType&& Token)
 			{
 				return PlatformImplementation->ReadAsync(PlatformIOObject, MaxBytesToRead, Destination,
-														 std::forward<CompletionTokenType>(std::move(Token)));
+														 std::forward<CompletionTokenType>(Token));
 			}
 
 			template<typename CompletionTokenType>
@@ -123,14 +123,14 @@ namespace Modio
 							CompletionTokenType&& Token)
 			{
 				return PlatformImplementation->WriteAsync(PlatformIOObject, std::move(Buffer),
-														  std::forward<CompletionTokenType>(std::move(Token)));
+														  std::forward<CompletionTokenType>(Token));
 			}
 
 			template<typename CompletionTokenType>
 			auto DeleteFolderAsync(Modio::filesystem::path FolderPath, CompletionTokenType&& Token)
 			{
 				return PlatformImplementation->DeleteFolderAsync(FolderPath,
-																 std::forward<CompletionTokenType>(std::move(Token)));
+																 std::forward<CompletionTokenType>(Token));
 			}
 
 			Modio::ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string> Overrides)
@@ -322,16 +322,6 @@ namespace Modio
 			{
 				MODIO_PROFILE_SCOPE(CheckSpaceAvailable);
 				return PlatformImplementation->CheckSpaceAvailable(Destination, DesiredSize);
-			}
-
-			/// @brief Checks the path of a file being extracted to ensure it extracts to the expected location on disk
-			/// @param FilePath Path of the current entry being extracted
-			/// @param RootOutputPath Location to extract to
-			/// @return Modio::FilesystemError::NoPermission on failure, or empty Modio::ErrorCode on success
-			Modio::ErrorCode CheckExtractionPath(const Modio::filesystem::path& FilePath,
-												 const Modio::filesystem::path& RootOutputPath) const
-			{
-				return PlatformImplementation->CheckExtractionPath(FilePath, RootOutputPath);
 			}
 
 		private:

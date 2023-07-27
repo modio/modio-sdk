@@ -21,6 +21,8 @@
 #include <algorithm>
 #include <memory>
 
+// For reference: https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
+
 namespace Modio
 {
 	namespace Detail
@@ -33,10 +35,12 @@ namespace Modio
 								Modio::filesystem::path DirectoryPath)
 				: ArchiveFile(ArchiveFile),
 				  DirectoryPath(DirectoryPath),
-				  LocalFileHeaderBuffer(GetLocalFileHeaderSize())
+				  LocalFileHeaderBuffer(Constants::ZipTag::LocalFileHeaderSize +
+										DirectoryPath.generic_u8string().size())
 			{
 				OutputFile = std::make_unique<Modio::Detail::File>(ArchiveFile->FilePath,
 																   Modio::Detail::FileMode::ReadWrite, false);
+				FileName = DirectoryPath.generic_u8string();
 			};
 
 			template<typename CoroType>
@@ -44,31 +48,41 @@ namespace Modio
 			{
 				reenter(CoroutineState)
 				{
+					// Determine the offset for this new entry
+					// The central directory requires this value to locate this entry
 					OutputFile->Seek(Modio::FileOffset(OutputFile->GetFileSize()));
 					LocalHeaderOffset = OutputFile->Tell();
 
-					// Marshal fields into our local file header's data buffer
-					Modio::Detail::TypedBufferWrite(Constants::ZipTag::LocalDirectoryHeader, LocalFileHeaderBuffer,
-													0) // header signature
-						.FollowedBy<uint16_t>(Constants::ZipTag::ZipVersion) // Minimum version to extract
-						.FollowedBy<uint16_t>(0) // General Purpose bitflag
-						.FollowedBy<uint16_t>(Constants::ZipTag::Deflate) // Compression Method
-						.FollowedBy<uint16_t>(0) // Last Modified time
-						.FollowedBy<uint16_t>(0) // Last Modified date
-						.FollowedBy<uint32_t>(0) // CRC-32 of uncompressed data
-						.FollowedBy<uint32_t>(0) // Compressed size
-						.FollowedBy<uint32_t>(0) // Uncompressed size
-						.FollowedBy<uint16_t>(
-							(std::uint16_t) DirectoryPath.generic_u8string().size()) // Size of filename
+					// Marshal fields of fixed sizes into our local file header's data buffer
+					// Header signature
+					Modio::Detail::TypedBufferWrite(Constants::ZipTag::LocalFileHeaderSignature, LocalFileHeaderBuffer,
+													0)
+						// Minimum version to extract
+						.FollowedBy<uint16_t>(Constants::ZipTag::ZipVersion)
+						// General Purpose bit-flag
+						.FollowedBy<uint16_t>(0)
+						// Compression Method
+						.FollowedBy<uint16_t>(Constants::ZipTag::Store)
+						// Last Modified time
+						.FollowedBy<uint16_t>(0)
+						// Last Modified date
+						.FollowedBy<uint16_t>(0)
+						// CRC-32 of uncompressed data
+						.FollowedBy<uint32_t>(0)
+						// Compressed size
+						.FollowedBy<uint32_t>(0)
+						// Uncompressed size
+						.FollowedBy<uint32_t>(0)
+						// File name length
+						.FollowedBy<uint16_t>((std::uint16_t) FileName.size())
+						// Extra field length
 						.FollowedBy<uint16_t>(0);
 
-					// TypedBufferWrite doesn't currently handle strings so manually marshal the filename
-					{
-						std::string FileName = DirectoryPath.generic_u8string();
-						std::copy(FileName.begin(), FileName.end(), LocalFileHeaderBuffer.Data() + 30);
-					}
+					// Manually write (variable sized) file name
+					std::copy(FileName.begin(), FileName.end(),
+							  LocalFileHeaderBuffer.Data() + Constants::ZipTag::LocalFileHeaderSize);
 
-					// Write the local file header
+					// Write out this local file header
 					yield OutputFile->WriteAsync(std::move(LocalFileHeaderBuffer), std::move(Self));
 					if (ec)
 					{
@@ -76,12 +90,12 @@ namespace Modio
 						return;
 					}
 
-					// Add the entry to the archive file so that it knows what to put in the central directory when it
-					// is finalized
-					// Set the file data offset to "LocalHeaderOffset" to easily allocate the LDHS in the file
-					ArchiveFile->AddEntry(DirectoryPath.generic_u8string(), LocalHeaderOffset, 0, 0,
+					// Add this entry to the archive file object
+					// These details will be written to the central directory
+					ArchiveFile->AddEntry(FileName, LocalHeaderOffset, 0, 0,
 										  ArchiveFileImplementation::CompressionMethod::Store, 0, true);
-					// Close Handle of any used file
+
+					// Close file handle
 					OutputFile.reset();
 
 					Self.complete({});
@@ -94,17 +108,9 @@ namespace Modio
 			std::unique_ptr<Modio::Detail::File> OutputFile;
 			Modio::filesystem::path DirectoryPath;
 			Modio::Detail::Buffer LocalFileHeaderBuffer;
-			// Use this to identify where the "Local directory header signature" in the zip file for this
-			// file is located
 			Modio::FileOffset LocalHeaderOffset;
 			asio::coroutine CoroutineState;
-			/// @brief Helper function so when we add zip64 support we can easily change how much space to allocate for
-			/// the local header
-			/// @return
-			std::size_t GetLocalFileHeaderSize()
-			{
-				return 30 + DirectoryPath.generic_u8string().size();
-			}
+			std::string FileName;
 		};
 #include <asio/unyield.hpp>
 	} // namespace Detail

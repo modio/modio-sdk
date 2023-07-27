@@ -65,22 +65,14 @@ namespace Modio
 	/// NOTE: This should be called while xref:InitializeAsync[Modio::InitializeAsync] and
 	/// xref:ShutdownAsync[Modio::ShutdownAsync] are running, as they both utilize the internal event loop for
 	/// functionality.
+	/// NOTE: `RunPendingHandlers` should never be called inside a callback you provide to the SDK. This will result in a deadlock.
 	MODIOSDK_API void RunPendingHandlers();
-
-	#if !defined(MODIO_NO_DEPRECATED)
-	
-	/// @docpublic
-	/// @brief Cancels any running internal operations, frees SDK resources, and invokes any pending callbacks with
-	/// Modio::GenericError::OperationCanceled . This function will block while the deinitialization occurs.
-	MODIO_DEPRECATED("Release 2023.4", "ShutdownAsync")
-	MODIOSDK_API void Shutdown();
-	
-	#endif
 
 	/// @docpublic
 	/// @brief Cancels any running internal operations and invokes any pending callbacks with
 	/// Modio::GenericError::OperationCanceled. This function does not block; you should keep calling
 	/// Modio::RunPendingHandlers until the callback you provide to this function is invoked.
+	/// NOTE: `ShutdownAsync` should *never* be called inside a callback you provide to the SDK. This will result in a deadlock.
 	/// @param OnShutdownComplete
 	/// @requires initialized-sdk
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
@@ -103,6 +95,7 @@ namespace Modio
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @error ModManagementError::ModBeingProcessed|Specified mod is pending uninstall. Wait until the uninstall
 	/// process is complete before subscribing again.
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void SubscribeToModAsync(Modio::ModID ModToSubscribeTo,
 										  std::function<void(Modio::ErrorCode)> OnSubscribeComplete);
 
@@ -121,6 +114,7 @@ namespace Modio
 	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
 	/// @error UserDataError::InvalidUser|No authenticated user
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void UnsubscribeFromModAsync(Modio::ModID ModToUnsubscribeFrom,
 											  std::function<void(Modio::ErrorCode)> OnUnsubscribeComplete);
 
@@ -173,6 +167,7 @@ namespace Modio
 	/// @param IDToPrioritize The ID for the mod to prioritize. This mod must be pending upload, install, or update.
 	/// @return Error code indicating there is no pending upload, install, or update associated with the provided
 	/// priority mod ID.
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid or not present in the list of pending operations
 	MODIOSDK_API Modio::ErrorCode PrioritizeTransferForMod(Modio::ModID IDToPrioritize);
 
 	/// @docpublic
@@ -221,6 +216,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserDataError::InvalidUser|No authenticated user
 	/// @error ModManagementError::AlreadySubscribed|User is still subscribed to the specified mod
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void ForceUninstallModAsync(Modio::ModID ModToRemove, std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
@@ -328,7 +324,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory InvalidArgsError|Some of the information in the EditModParams did not pass validation
 	/// @error UserDataError::InvalidUser|No authenticated user
-	/// @error GenericError::BadParameter|No fields selected for modification in Params
+	/// @error GenericError::BadParameter|No fields selected for modification in Params, or the supplied mod ID is invalid
 	MODIOSDK_API void SubmitModChangesAsync(
 		Modio::ModID Mod, Modio::EditModParams Params,
 		std::function<void(Modio::ErrorCode ec, Modio::Optional<Modio::ModInfo>)> Callback);
@@ -343,6 +339,7 @@ namespace Modio
 	/// @requires no-rate-limiting
 	/// @requires authenticated-user
 	/// @requires management-enabled
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void SubmitNewModFileForMod(Modio::ModID Mod, Modio::CreateModFileParams Params);
 
 	/// @docpublic
@@ -370,6 +367,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void GetModInfoAsync(Modio::ModID ModId,
 									  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)> Callback);
 
@@ -386,6 +384,7 @@ namespace Modio
 	/// @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
 	/// @error FilesystemError::InsufficientSpace|Not enough space for the file
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void GetModMediaAsync(Modio::ModID ModId, Modio::LogoSize LogoSize,
 									   std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback);
 
@@ -403,6 +402,7 @@ namespace Modio
 	/// @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
 	/// @error FilesystemError::InsufficientSpace|Not enough space for the file
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void GetModMediaAsync(Modio::ModID ModId, Modio::GallerySize GallerySize, Modio::GalleryIndex Index,
 									   std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback);
 
@@ -420,6 +420,7 @@ namespace Modio
 	/// @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
 	/// @error FilesystemError::InsufficientSpace|Not enough space for the file
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void GetModMediaAsync(Modio::ModID ModId, Modio::AvatarSize AvatarSize,
 									   std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback);
 
@@ -436,6 +437,7 @@ namespace Modio
 	/// @errorcategory EntityNotFoundError|Specified mod could not be found
 	/// @error UserDataError::InvalidUser|No authenticated user
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void SubmitModRatingAsync(Modio::ModID ModID, Modio::Rating Rating,
 										   std::function<void(Modio::ErrorCode)> Callback);
 
@@ -462,6 +464,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @experimental
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void GetModDependenciesAsync(
 		Modio::ModID ModID,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback);
@@ -545,6 +548,7 @@ namespace Modio
 	/// @errorcategory NetworkError|Couldn't Connect to mod.io servers
 	/// @errorcategory InvalidArgsError|Required information in the report did not pass validation
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The mod ID, game ID, or user ID supplied to ReportParams is invalid
 	MODIOSDK_API void ReportContentAsync(Modio::ReportParams Report, std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
@@ -561,6 +565,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserDataError::InvalidUser|No authenticated user
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void AddOrUpdateModLogoAsync(Modio::ModID ModID, std::string LogoPath,
 											  std::function<void(Modio::ErrorCode)> Callback);
 
@@ -577,6 +582,7 @@ namespace Modio
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void ArchiveModAsync(Modio::ModID ModID, std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
@@ -610,6 +616,7 @@ namespace Modio
 	/// @param UserID ID of the User to mute
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error GenericError::BadParameter|The supplied user ID is invalid
 	MODIOSDK_API void MuteUserAsync(Modio::UserID UserID, std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
@@ -620,6 +627,7 @@ namespace Modio
 	/// @param UserID ID of the User to unmute
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error GenericError::BadParameter|The supplied user ID is invalid
 	MODIOSDK_API void UnmuteUserAsync(Modio::UserID UserID, std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
@@ -641,6 +649,7 @@ namespace Modio
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @errorcategory EntityNotFoundError|Specified game does not exist
+	/// @error GenericError::BadParameter|The supplied game ID is invalid
 	MODIOSDK_API void GetGameInfoAsync(
 		Modio::GameID GameID, std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfo>)> Callback);
 

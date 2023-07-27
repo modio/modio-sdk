@@ -15,6 +15,7 @@
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/ModioConstants.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/timer/ModioTimer.h"
 
 #include <asio/yield.hpp>
@@ -70,18 +71,19 @@ public:
 			Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled), {});
 			return;
 		}
+		MODIO_PROFILE_SCOPE(ReadSomeFromFile);
 
 		reenter(Coroutine)
 		{
-			// Wait for any other operations on the file to complete
-			// Possibly, we can make the release process for this 'lock' automatic
-			yield FileImpl->BeginExclusiveOperation(std::move(Self));
+			
 
 			if (Length == 0)
 			{
 				Self.complete({}, Modio::Detail::Buffer(0));
 				return;
 			}
+
+			yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
 										"Begin read of {} bytes from {} at {}", Length, FileImpl->GetPath().string(),
@@ -92,8 +94,7 @@ public:
 			if (!ReadOpParams->hEvent)
 			{
 				Self.complete(Modio::make_error_code(Modio::GenericError::CouldNotCreateHandle), {});
-				FileImpl->FinishExclusiveOperation();
-
+				
 				return;
 			}
 
@@ -110,8 +111,7 @@ public:
 												"ReadSomeFromFileOp ReadFile {} failed, error code = {}",
 												FileImpl->GetPath().string(), Error);
 					Self.complete(Modio::make_error_code(Modio::FilesystemError::ReadError), {});
-					FileImpl->FinishExclusiveOperation();
-
+					
 					return;
 				}
 			}
@@ -130,8 +130,7 @@ public:
 				{
 					Self.complete(std::error_code {}, std::move(Buffer));
 				}
-				FileImpl->FinishExclusiveOperation();
-
+				
 				return;
 			}
 
@@ -154,8 +153,7 @@ public:
 			{
 				Self.complete(std::error_code {}, std::move(Buffer));
 			}
-			FileImpl->FinishExclusiveOperation();
-
+			
 			return;
 		}
 	}

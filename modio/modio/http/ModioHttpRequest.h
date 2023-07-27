@@ -46,7 +46,7 @@ namespace Modio
 				// TODO: @Modio-core Double check if this is a pessimizing move
 				// TODO: @Modio-core prevent double-sending
 				get_service().SendRequestAsync(get_implementation(),
-											   std::forward<CompletionTokenType>(std::move(Token)));
+											   std::forward<CompletionTokenType>(Token));
 			}
 
 			/// @brief Begins the send operation for a request which requires a streamed upload
@@ -78,7 +78,7 @@ namespace Modio
 				// Must have sent the request first before we read headers
 
 				get_service().ReadResponseHeadersAsync(get_implementation(),
-													   std::forward<CompletionTokenType>(std::move(Token)));
+													   std::forward<CompletionTokenType>(Token));
 			}
 
 			// pass in a mutable buffer to read into as well?
@@ -86,7 +86,7 @@ namespace Modio
 			auto ReadSomeFromResponseBodyAsync(DynamicBuffer DynamicBufferInstance, CompletionTokenType&& Token)
 			{
 				get_service().ReadSomeFromResponseBodyAsync(get_implementation(), DynamicBufferInstance,
-															std::forward<CompletionTokenType>(std::move(Token)));
+															std::forward<CompletionTokenType>(Token));
 			}
 		};
 	} // namespace Detail

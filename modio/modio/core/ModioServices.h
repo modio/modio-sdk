@@ -11,6 +11,7 @@
 #pragma once
 #include "modio/core/ModioLogEnum.h"
 #include "modio/detail/AsioWrapper.h"
+#include <atomic>
 
 namespace Modio
 {
@@ -26,7 +27,7 @@ namespace Modio
 			/// @return reference to the global io_context object
 			static asio::io_context& GetGlobalContext()
 			{
-				return *(GetGlobalContextInternal().get());
+				return *(std::atomic_load(&GetGlobalContextInternal()).get());
 			}
 
 			/// @brief Restart the GlobalContext
@@ -36,8 +37,7 @@ namespace Modio
 				// Make a copy of the old context. Note this is not a reference, but an actual copy so lifetime is
 				// extended.
 				std::shared_ptr<asio::io_context> OldContext = GetGlobalContextInternal();
-				GetGlobalContextInternal().reset();
-				GetGlobalContextInternal() = std::make_shared<asio::io_context>(1);
+				std::atomic_exchange(&GetGlobalContextInternal(), std::make_shared<asio::io_context>(1));
 				return OldContext;
 			}
 

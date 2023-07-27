@@ -79,10 +79,8 @@ public:
 				return;
 			}
 
-			// Wait for any other operations on the file to complete
-			// Possibly, we can make the release process for this 'lock' automatic
-			yield FileImpl->BeginExclusiveOperation(std::move(Self));
-
+			yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+			
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
 										"Begin read of {} bytes from {}", Length, FileImpl->GetPath().string());
 
@@ -91,8 +89,7 @@ public:
 			if (!ReadOpParams->hEvent)
 			{
 				Self.complete(Modio::make_error_code(Modio::GenericError::CouldNotCreateHandle));
-				FileImpl->FinishExclusiveOperation();
-
+			
 				return;
 			}
 
@@ -110,7 +107,6 @@ public:
 												"StreamReadOp from {} failed, error code = {}",
 												FileImpl->GetPath().string(), Error);
 					Self.complete(Modio::make_error_code(Modio::FilesystemError::ReadError));
-					FileImpl->FinishExclusiveOperation();
 					return;
 				}
 			}
@@ -130,8 +126,7 @@ public:
 					Destination.AppendBuffer(std::move(Buffer));
 				}
 				Self.complete(std::error_code {});
-				FileImpl->FinishExclusiveOperation();
-
+				
 				return;
 			}
 
@@ -156,8 +151,7 @@ public:
 				Destination.AppendBuffer(std::move(Buffer));
 			}
 			Self.complete(std::error_code {});
-			FileImpl->FinishExclusiveOperation();
-
+			
 			return;
 		}
 	}

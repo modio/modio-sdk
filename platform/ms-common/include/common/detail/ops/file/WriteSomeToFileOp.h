@@ -96,9 +96,7 @@ public:
 				return;
 			}
 
-			// Wait for any existing and queued IO operations on this file
-			yield FileImpl->BeginExclusiveOperation(std::move(Self));
-
+			yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
 										"Begin write of {} bytes to {} at {}", Buffer.GetSize(),
 										FileImpl->GetPath().string(), FileOffset);
@@ -111,7 +109,6 @@ public:
 				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
 											"Could not create event handle");
 				Self.complete(Modio::make_error_code(Modio::GenericError::CouldNotCreateHandle));
-				FileImpl->FinishExclusiveOperation();
 				return;
 			}
 
@@ -129,7 +126,6 @@ public:
 												"WriteSomeToFileOp Write to file {} failed, error code = {}",
 												FileImpl->GetPath().string(), Error);
 					Self.complete(Modio::make_error_code(Modio::FilesystemError::WriteError));
-					FileImpl->FinishExclusiveOperation();
 					return;
 				}
 			}
@@ -139,7 +135,6 @@ public:
 				Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Finish write to {}",
 											FileImpl->GetPath().string());
 				Self.complete(std::error_code {});
-				FileImpl->FinishExclusiveOperation();
 				return;
 			}
 
@@ -153,7 +148,6 @@ public:
 										FileImpl->GetPath().string());
 
 			Self.complete(std::error_code {});
-			FileImpl->FinishExclusiveOperation();
 			return;
 		}
 	}

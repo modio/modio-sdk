@@ -13,12 +13,16 @@
 #include "modio/core/ModioCreateModFileParams.h"
 #include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/entities/ModioUser.h"
+#include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/userdata/ModioUserDataContainer.h"
 #include "modio/detail/userdata/ModioUserProfile.h"
+#include "modio/detail/ConcurrentQueueWrapper.h"
+#include "function2/function2.hpp"
 
 #include <chrono>
 #include <map>
 #include <memory>
+#include <shared_mutex>
 #include <vector>
 
 namespace Modio
@@ -134,6 +138,10 @@ namespace Modio
 			MODIO_IMPL static void SetPlatformOverride(std::string Override);
 			MODIO_IMPL static Modio::Optional<std::string> GetPlatformOverride();
 
+			MODIO_IMPL static void SetPlatformStatusFilter(std::string PendingOnlyResults);
+			MODIO_IMPL static Modio::PlatformStatus GetPlatformStatusFilter();
+			MODIO_IMPL static std::string GetPlatformStatusFilterString();
+
 			MODIO_IMPL static Modio::Optional<Modio::ModID> ResolveModCreationHandle(Modio::ModCreationHandle Handle);
 			MODIO_IMPL static void LinkModCreationHandle(Modio::ModCreationHandle Handle, Modio::ModID ID);
 
@@ -144,6 +152,16 @@ namespace Modio
 			MODIO_IMPL static void InvalidateModCache(Modio::ModID ID);
 			MODIO_IMPL static void ClearModCacheInvalid(Modio::ModID ID);
 			MODIO_IMPL static bool IsModCacheInvalid(Modio::ModID ID);
+
+			MODIO_IMPL static void EnqueueTask(fu2::unique_function<void()> Task);
+			MODIO_IMPL static void PushQueuedTasksToGlobalContext();
+
+			MODIO_IMPL static std::shared_timed_mutex& GetRWMutex();
+			MODIO_IMPL static std::shared_timed_mutex& GetShutdownMutex();
+
+			MODIO_IMPL MODIO_NODISCARD static std::shared_lock<std::shared_timed_mutex> GetReadLock();
+			MODIO_IMPL MODIO_NODISCARD static std::unique_lock<std::shared_timed_mutex> GetWriteLock();
+			MODIO_IMPL MODIO_NODISCARD static std::unique_lock<std::shared_timed_mutex> GetShutdownLock();
 
 		private:
 			enum class InitializationState
@@ -164,6 +182,7 @@ namespace Modio
 			Modio::Environment Environment;
 			Modio::Optional<std::string> EnvironmentOverrideUrl;
 			Modio::Optional<std::string> PlatformOverride;
+			Modio::PlatformStatus PlatformStatusFilter;
 			Modio::Portal PortalInUse;
 			InitializationState CurrentInitializationState = InitializationState::NotInitialized;
 			bool bModManagementEnabled = false;
@@ -184,6 +203,7 @@ namespace Modio
 			std::map<Modio::ModID, Modio::CreateModFileParams> PendingModUploads;
 			bool bSubscriptionCacheInvalid = false;
 			std::unordered_map<std::int64_t, bool> ModCacheInvalidMap;
+			moodycamel::ConcurrentQueue < fu2::unique_function < void()>> IncomingTaskQueue;
 		};
 	} // namespace Detail
 } // namespace Modio

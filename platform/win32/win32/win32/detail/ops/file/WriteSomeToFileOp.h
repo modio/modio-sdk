@@ -16,6 +16,7 @@
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioObjectTrack.h"
+#include "modio/detail/ModioProfiling.h"
 #include "modio/timer/ModioTimer.h"
 
 #include <asio/yield.hpp>
@@ -86,7 +87,7 @@ public:
 			self.complete(Modio::make_error_code(Modio::FilesystemError::NoPermission));
 			return;
 		}
-
+		MODIO_PROFILE_SCOPE(WriteSomeToFileOp);
 		reenter(Coroutine)
 		{
 			if (Buffer.GetSize() == 0)
@@ -95,9 +96,7 @@ public:
 				return;
 			}
 
-			// Wait for any existing and queued IO operations on this file
-			yield FileImpl->BeginExclusiveOperation(std::move(Self));
-
+			yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
 										"Begin write of {} bytes to {} at {}", Buffer.GetSize(),
 										FileImpl->GetPath().string(), FileOffset);
@@ -110,7 +109,6 @@ public:
 				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
 											"Could not create event handle");
 				Self.complete(Modio::make_error_code(Modio::GenericError::CouldNotCreateHandle));
-				FileImpl->FinishExclusiveOperation();
 				return;
 			}
 
@@ -127,7 +125,6 @@ public:
 												"WriteSomeToFile to file {} failed, error code = {}",
 												FileImpl->GetPath().string(), Error);
 					Self.complete(Modio::make_error_code(Modio::FilesystemError::WriteError));
-					FileImpl->FinishExclusiveOperation();
 					return;
 				}
 			}
@@ -136,8 +133,8 @@ public:
 				// File write completed synchronously so no need to wait, complete the operation
 				Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Finish write to {}",
 											FileImpl->GetPath().string());
+				Buffer.~Buffer();
 				Self.complete(std::error_code {});
-				FileImpl->FinishExclusiveOperation();
 				return;
 			}
 
@@ -150,9 +147,8 @@ public:
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Finish write to {}",
 										FileImpl->GetPath().string());
-
+			Buffer.~Buffer();
 			Self.complete(std::error_code {});
-			FileImpl->FinishExclusiveOperation();
 			return;
 		}
 	}

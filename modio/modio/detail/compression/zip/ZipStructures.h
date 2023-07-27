@@ -12,6 +12,7 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/FilesystemWrapper.h"
+#include "modio/detail/ModioProfiling.h"
 #include <cstdint>
 #include <vector>
 
@@ -23,33 +24,56 @@ namespace Modio
 		{
 			namespace ZipTag
 			{
-				// Zip64
-				constexpr uint32_t EndCentralDirectory64 = 0x06064b50; // End of central directory signature Zip64
-				constexpr uint32_t EndCentralDirectoryLocator64 = 0x07064b50; // End of central directory locator
-				constexpr uint32_t EndCentralDirectoryHeaderSize64 = 56; // End of central directory header size Zip64
-				constexpr uint32_t EndCentralDirectoryLocatorSize64 = 20; // End of central directory locator size
-				constexpr uint16_t ExtendedInformationFieldHeaderID = 0x0001; // Extended information field header ID
-				constexpr uint32_t DataDescriptorID = 0x08074b50; // Data descriptor ID
-				constexpr uint32_t DataDescriptorSize64 = 24; // Data descriptor size Zip64
-				constexpr uint16_t TotalExtraFieldSizeFileEntries = 28; // Total Extra Field Size used in File Entries
-				constexpr uint16_t ExtraFieldSize = 24; // Extra Field Size with (un)compressed and offset
-				constexpr uint16_t Zip64Version = 45; // Min version required for Zip64 decompression
+				// Zip64 Extended information Extra Field
+				constexpr static uint16_t Zip64ExtraFieldSignature = 0x0001;
+				// Local directory header signature
+				constexpr static uint32_t LocalFileHeaderSignature = 0x04034b50;
+				// (Optional) Data descriptor ID
+				constexpr static uint32_t DataDescriptorSignature = 0x08074b50;
+				// Central directory file header signature
+				constexpr static uint32_t CentralFileHeaderSignature = 0x02014b50;
+				// End of central directory signature
+				constexpr static uint32_t EndCentralDirectorySignature = 0x06054b50;
+				// Zip64 End of central directory signature
+				constexpr static uint32_t Zip64EndCentralDirectorySignature = 0x06064b50;
+				// End of central directory locator
+				constexpr static uint32_t Zip64EndCentralDirectoryLocatorSignature = 0x07064b50;
 
-				// Zip
-				constexpr static uint32_t EndCentralDirectory = 0x06054b50; // End of central directory signature
-				constexpr static uint32_t CentralDirectoryFileHeader =
-					0x02014b50; // Central directory file header signature
-				constexpr static uint32_t OptionalDataDescriptor = 0x08074b50; // Optional data descriptor signature
-				constexpr static uint32_t LocalDirectoryHeader = 0x04034b50; // Local directory header signature
-				constexpr static uint32_t LocalDirectoryHeaderSize = 30; // Local directory header size
-				constexpr static uint32_t CentralDirectoryHeaderSize = 30; // Central directory header size
-				constexpr static uint32_t EndCentralDirectoryHeaderSize = 22; // End of central directory header size
-				constexpr static uint32_t DataDescriptorSize = 16; // Data descriptor size
-				constexpr static uint16_t ZipVersion = 20; // Min version required for Zip64 decompression
+				// Size (bytes) of various headers
 
-				constexpr static uint32_t MAX32 = 0xffffffff; // Signal used to denote out-of-bounds
-				constexpr static uint16_t MAX16 = 0xffff; // Signal used to denote out-of-bounds
-				constexpr static uint16_t Deflate = 8; // Compression with DEFLATE
+				// Local directory file header size, excluding variable sized fields
+				constexpr static uint32_t LocalFileHeaderSize = 30;
+				// Extra field size for a local directory file header
+				// Local directory has no fields for disk number or offset
+				constexpr static uint16_t Zip64LocalFileExtraFieldSize = 20;
+				// Data descriptor size
+				constexpr static uint32_t DataDescriptorSize = 16;
+				// Zip64 Data descriptor size
+				constexpr static uint32_t Zip64DataDescriptorSize = 24;
+				// Size of a central directory file header, excluding variable sized fields
+				constexpr static uint8_t CentralFileHeaderFixedSize = 46;
+				// Size of Zip64 End Of Central Directory, excluding variable sized fields
+				constexpr static uint32_t Zip64EndCentralDirectoryHeaderFixedSize = 56;
+				// Size of Zip64 End of central directory locator
+				constexpr static uint32_t Zip64EndCentralDirectoryLocatorSize = 20;
+				// Size of End of Central Directory Record, excluding variable sized field
+				constexpr static uint8_t EndOfCentralDirectoryFixedSize = 22;
+
+				// Other useful constants
+
+				// Signal used to denote out-of-bounds
+				constexpr static uint32_t MAX32 = 0xffffffff;
+				// Signal used to denote out-of-bounds
+				constexpr static uint16_t MAX16 = 0xffff;
+				// Compression with STORE
+				constexpr static uint16_t Store = 0;
+				// Compression with DEFLATE
+				constexpr static uint16_t Deflate = 8;
+				// Min version for zip32 with Deflate compression
+				constexpr static uint16_t ZipVersion = 20;
+				// Min version required for Zip64 decompression
+				constexpr static uint16_t Zip64Version = 45;
+
 			} // namespace ZipTag
 		} // namespace Constants
 
@@ -60,34 +84,60 @@ namespace Modio
 				return (Size == 8) || (Size == 16) || (Size == 24) || (Size == 28);
 			}
 
-			static std::pair<std::uintmax_t, bool> FindOffsetInBuffer(Modio::Detail::Buffer& Chunk, bool PreZip64)
+			static std::tuple<std::uintmax_t, bool, std::uint64_t> FindOffsetInBuffer(Modio::Detail::Buffer& Chunk,
+																					  bool PreZip64)
 			{
-				std::uintmax_t LocalPosition = Chunk.GetSize() - 4;
+				MODIO_PROFILE_SCOPE(ArchiveFindOffsetInBuffer);
+
 				bool IsZip64 = false;
+				std::uintmax_t LocalPosition = Chunk.GetSize() - 4;
 				std::uintmax_t MagicOffset = 0;
+				std::uint32_t BytesPastEOCD = 0;
+				std::uint64_t Zip64EndCentralDirectoryLocation = 0;
 
 				for (; LocalPosition > 0; LocalPosition--)
 				{
 					uint32_t Value = Modio::Detail::TypedBufferRead<std::uint32_t>(Chunk, LocalPosition);
-					// Prioritize reading the Zip64 signature, which contains accurate information
-					// with large files.
-					if (Value == Constants::ZipTag::EndCentralDirectory64)
+
+					// Look for the standard EOCD signature, which is always included
+					if (Value == Constants::ZipTag::EndCentralDirectorySignature && PreZip64 == false)
+					{
+						MagicOffset = LocalPosition;
+					}
+					// Look for the Zip64 locator to quickly find the Zip64 EOCD location
+					else if (Value == Constants::ZipTag::Zip64EndCentralDirectoryLocatorSignature)
+					{
+						IsZip64 = true;
+						// Check that all data is on a single disk, and find Zip64EOCD location
+						std::uint32_t StartDisk =
+							Modio::Detail::TypedBufferRead<std::uint32_t>(Chunk, LocalPosition + 4);
+						if (StartDisk == 0)
+						{
+							Zip64EndCentralDirectoryLocation =
+								Modio::Detail::TypedBufferRead<std::uint64_t>(Chunk, LocalPosition + 8);
+							break;
+						}
+					}
+					// Look for the Zip64 EOCD itself
+					else if (Value == Constants::ZipTag::Zip64EndCentralDirectorySignature)
 					{
 						IsZip64 = true;
 						MagicOffset = LocalPosition;
 						break;
 					}
-					// When a file is larger than UINT32_MAX, it is expected to be a Zip64.
-					// Here we force the parser to find the ECDS64 instead of reading the
-					// base ECDS, which is included in all zip files regardless
-					else if (Value == Constants::ZipTag::EndCentralDirectory && PreZip64 == false)
+					// Even if we've already found the MagicOffset for a Zip32 file, we should still check for a Zip64
+					// locator to account for edge cases where it may still be included. This check ensures we continue
+					// to look for Zip64 information, but only for the expected distance past the Zip32 EOCD
+					if (!PreZip64 && MagicOffset != 0)
 					{
-						MagicOffset = LocalPosition;
-						break;
+						if (BytesPastEOCD > Constants::ZipTag::Zip64EndCentralDirectoryLocatorSize)
+						{
+							break;
+						}
+						BytesPastEOCD++;
 					}
 				}
-
-				return {MagicOffset, IsZip64};
+				return std::make_tuple(MagicOffset, IsZip64, Zip64EndCentralDirectoryLocation);
 			}
 
 			static std::tuple<uint64_t, uint64_t, uint64_t> ReadCentralDirectory(Modio::Detail::Buffer& Chunk,
@@ -154,7 +204,7 @@ namespace Modio
 						std::uint16_t HeaderFind = Modio::Detail::TypedBufferRead<std::uint16_t>(FChunk, i);
 						std::uint32_t HeaderSignature = Modio::Detail::TypedBufferRead<std::uint32_t>(FChunk, i);
 
-						if (HeaderSignature == Constants::ZipTag::CentralDirectoryFileHeader)
+						if (HeaderSignature == Constants::ZipTag::CentralFileHeaderSignature)
 						{
 							// This case means that the payload did not have the header signature for the extra field
 							// and the header size did not match any of the expected sizes and reading FChunk we
@@ -163,12 +213,12 @@ namespace Modio
 							return std::tuple<ArchiveFileImplementation::ArchiveEntry, std::uint64_t,
 											  Modio::ErrorCode> {
 								ArchiveFileImplementation::ArchiveEntry(), 0,
-									Modio::make_error_code(Modio::ArchiveError::InvalidHeader)};
+								Modio::make_error_code(Modio::ArchiveError::InvalidHeader)};
 						}
 
 						// When "HeaderFind" matches the "Extended information field header ID" accompanied by a valid
 						// size, then at that moment we are able to read the (un)compressed attributes
-						if (HeaderFind == Constants::ZipTag::ExtendedInformationFieldHeaderID &&
+						if (HeaderFind == Constants::ZipTag::Zip64ExtraFieldSignature &&
 							ValidSignatureSize(HeaderSize) == true)
 						{
 							// After the header, there are two bytes with "Size of the extra field chunk (8, 16, 24 or

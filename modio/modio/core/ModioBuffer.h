@@ -178,6 +178,18 @@ namespace Modio
 			{
 				return TypedBufferWrite<SourceType>(Source, Target, Offset);
 			}
+			template<typename SourceType>
+			TypedWriteHelper ConditionalFollowedBy(const SourceType& Source, bool bWriteCondition) &&
+			{
+				if (bWriteCondition)
+				{
+					return TypedBufferWrite<SourceType>(Source, Target, Offset);
+				}
+				else
+				{
+					return *this;
+				}
+			}
 		};
 
 		template<typename SourceType>
@@ -195,10 +207,11 @@ namespace Modio
 		/// @param Destination The fixed-size buffer to store the data in. Must have size >= Source.size();
 		/// @param Source The dynamic buffer to copy the data from
 		/// @return The number of bytes copied
-		MODIO_IMPL std::size_t BufferCopy(Modio::Detail::Buffer& Destination, const Modio::Detail::DynamicBuffer Source);
+		MODIO_IMPL std::size_t BufferCopy(Modio::Detail::Buffer& Destination,
+										  const Modio::Detail::DynamicBuffer Source);
 
 		MODIO_IMPL std::size_t BufferCopy(Modio::Detail::DynamicBuffer& Destination,
-									  const Modio::Detail::DynamicBuffer Source);
+										  const Modio::Detail::DynamicBuffer Source);
 	} // namespace Detail
 } // namespace Modio
 

@@ -25,6 +25,7 @@ if(MODIO_PLATFORM STREQUAL "WIN" OR MODIO_FORCE_MS_COMMON)
 	target_include_directories(platform INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
 
 	add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/include/common/HttpSharedState.ipp)
+	add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/include/common/http/HttpRequestImplementation.ipp)
 
 	if (MODIO_BUILD_TESTS)
 		add_subdirectory(tests EXCLUDE_FROM_ALL)

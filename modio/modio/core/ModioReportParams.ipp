@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *  
+ *
  */
 
 #ifdef MODIO_SEPARATE_COMPILATION
@@ -59,13 +59,15 @@ namespace Modio
 		}
 
 		Modio::Detail::HttpRequestParams Request = Modio::Detail::SubmitReportRequest;
-		if (Params.ReporterName) 
+		if (Params.ReporterName)
 		{
-			Request.AppendPayloadValue(Modio::Detail::Constants::APIStrings::ReportSubmitterName, Params.ReporterName.value());
+			Request.AppendPayloadValue(Modio::Detail::Constants::APIStrings::ReportSubmitterName,
+									   Params.ReporterName.value());
 		}
-		if (Params.ReporterContact) 
+		if (Params.ReporterContact)
 		{
-		Request.AppendPayloadValue(Modio::Detail::Constants::APIStrings::ReportSubmitterContact, Params.ReporterContact.value());
+			Request.AppendPayloadValue(Modio::Detail::Constants::APIStrings::ReportSubmitterContact,
+									   Params.ReporterContact.value());
 		}
 
 		return Request.AppendPayloadValue(Modio::Detail::Constants::APIStrings::ReportResourceType, ResourceString)
@@ -74,5 +76,20 @@ namespace Modio
 			.AppendPayloadValue(Modio::Detail::Constants::APIStrings::ReportType,
 								fmt::format("{}", static_cast<uint8_t>(Params.Type)))
 			.AppendPayloadValue(Modio::Detail::Constants::APIStrings::ReportSummary, Params.ReportDescription);
+	}
+
+	bool ReportParams::IsResourceIdValid() const
+	{
+		switch (ReportedResourceType)
+		{
+			case ResourceType::Game:
+				return Modio::GameID::InvalidGameID() != Modio::GameID(ResourceID);
+			case ResourceType::Mod:
+				return Modio::ModID::InvalidModID() != Modio::ModID(ResourceID);
+			case ResourceType::User:
+				return Modio::UserID::InvalidUserID() != Modio::UserID(ResourceID);
+			default:
+				return false;
+		}
 	}
 } // namespace Modio

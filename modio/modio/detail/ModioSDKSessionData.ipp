@@ -50,12 +50,13 @@ namespace Modio
 		void SDKSessionData::Deinitialize()
 		{
 			Get().FlushModManagementLog();
-
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 			Get().CurrentInitializationState = InitializationState::NotInitialized;
 		}
 
 		void SDKSessionData::ConfirmInitialize()
 		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 			Get().CurrentInitializationState = InitializationState::InitializationComplete;
 		}
 
@@ -125,6 +126,7 @@ namespace Modio
 
 		void SDKSessionData::InitializeForUser(Modio::User AuthenticatedUser, Modio::Detail::OAuthToken AuthToken)
 		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 			Get().UserData.InitializeForUser(std::move(AuthenticatedUser), std::move(AuthToken));
 		}
 
@@ -151,6 +153,7 @@ namespace Modio
 
 		bool SDKSessionData::DeserializeUserDataFromBuffer(Modio::Detail::Buffer UserDataBuffer)
 		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 			MODIO_PROFILE_SCOPE(DeserializeUserData);
 			nlohmann::json UserDataJson = Modio::Detail::ToJson(std::move(UserDataBuffer));
 			from_json(UserDataJson, Get().UserData);
@@ -159,11 +162,13 @@ namespace Modio
 
 		void SDKSessionData::ClearUserData()
 		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 			Get().UserData.ResetUserData();
 		}
 
 		void SDKSessionData::InvalidateOAuthToken()
 		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 			Get().UserData.InvalidateOAuthToken();
 		}
 
@@ -215,9 +220,17 @@ namespace Modio
 		{
 			if (auto&& Callback = Get().ModManagementEventCallback)
 			{
-				for (auto&& Event : Get().EventLog.ClearLog())
+				if (Get().EventLog.Size())
 				{
-					Callback(Event);
+					std::vector<ModManagementEvent> Events;
+					{
+						auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
+						Events = Get().EventLog.ClearLog();
+					}
+					for (auto&& Event : Events)
+					{
+						Callback(Event);
+					}
 				}
 			}
 		}
@@ -229,6 +242,7 @@ namespace Modio
 
 		void SDKSessionData::SetLastValidationError(std::vector<FieldError> ExtendedErrorInformation)
 		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 			Get().LastValidationError = ExtendedErrorInformation;
 		}
 
@@ -239,6 +253,7 @@ namespace Modio
 
 		void SDKSessionData::ClearLastValidationError()
 		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 			Get().LastValidationError.clear();
 		}
 
@@ -339,6 +354,7 @@ namespace Modio
 
 		std::weak_ptr<Modio::ModProgressInfo> SDKSessionData::StartModDownloadOrUpdate(Modio::ModID ID)
 		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 			if (Get().CurrentModInProgress != nullptr)
 			{
 				return std::weak_ptr<Modio::ModProgressInfo>();
@@ -352,11 +368,12 @@ namespace Modio
 
 		bool SDKSessionData::CancelModDownloadOrUpdate(Modio::ModID ID)
 		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 			if (Get().CurrentModInProgress != nullptr)
 			{
 				if (Get().CurrentModInProgress->ID == ID)
 				{
-					FinishModDownloadOrUpdate();
+					Get().CurrentModInProgress.reset();
 					return true;
 				}
 			}
@@ -365,6 +382,8 @@ namespace Modio
 
 		void SDKSessionData::FinishModDownloadOrUpdate()
 		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
+
 			Get().CurrentModInProgress.reset();
 		}
 
@@ -411,6 +430,8 @@ namespace Modio
 
 		void SDKSessionData::LinkModCreationHandle(Modio::ModCreationHandle Handle, Modio::ModID ID)
 		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
+
 			if (Get().CreationHandles.find(Handle) != Get().CreationHandles.end())
 			{
 				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
@@ -437,6 +458,38 @@ namespace Modio
 		Modio::Optional<std::string> SDKSessionData::GetEnvironmentOverrideUrl()
 		{
 			return Get().EnvironmentOverrideUrl;
+		}
+
+		void SDKSessionData::SetPlatformStatusFilter(std::string PendingOnlyResults)
+		{
+			if (PendingOnlyResults == "true")
+			{
+				Get().PlatformStatusFilter = Modio::PlatformStatus::PendingOnly;
+			}
+			else
+			{
+				Get().PlatformStatusFilter = Modio::PlatformStatus::ApprovedOnly;
+			}
+		}
+
+		Modio::PlatformStatus SDKSessionData::GetPlatformStatusFilter()
+		{
+			return Get().PlatformStatusFilter;
+		}
+
+		std::string SDKSessionData::GetPlatformStatusFilterString()
+		{
+			switch (Get().PlatformStatusFilter)
+			{
+				case PlatformStatus::ApprovedOnly:
+					return "1";
+				case PlatformStatus::LiveAndPending:
+					return "0,1";
+				case PlatformStatus::PendingOnly:
+					return "0,1";
+				default:
+					return "1";
+			}
 		}
 
 		void SDKSessionData::InvalidateSubscriptionCache()
@@ -474,9 +527,9 @@ namespace Modio
 			{
 				CacheEntryIterator->second = false;
 			}
-			else 
+			else
 			{
-				Get().ModCacheInvalidMap.emplace(std::make_pair(ID,false));
+				Get().ModCacheInvalidMap.emplace(std::make_pair(ID, false));
 			}
 		}
 
@@ -488,6 +541,47 @@ namespace Modio
 				return CacheEntryIterator->second;
 			}
 			return false;
+		}
+
+		void SDKSessionData::EnqueueTask(fu2::unique_function<void()> Task)
+		{
+			Get().IncomingTaskQueue.enqueue(std::move(Task));
+		}
+
+		void SDKSessionData::PushQueuedTasksToGlobalContext()
+		{
+			fu2::unique_function<void()> Task;
+			while (Get().IncomingTaskQueue.size_approx() > 0)
+			{
+				if (Get().IncomingTaskQueue.try_dequeue(Task))
+				{
+					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Task));
+				}
+			}
+		}
+
+		std::shared_timed_mutex& SDKSessionData::GetRWMutex()
+		{
+			static std::shared_timed_mutex Underlying;
+			return Underlying;
+		}
+		std::shared_timed_mutex& SDKSessionData::GetShutdownMutex()
+		{
+			static std::shared_timed_mutex Underlying;
+			return Underlying;
+		}
+
+		MODIO_NODISCARD std::shared_lock<std::shared_timed_mutex> SDKSessionData::GetReadLock()
+		{
+			return std::shared_lock<std::shared_timed_mutex>(GetRWMutex());
+		}
+		MODIO_NODISCARD std::unique_lock<std::shared_timed_mutex> SDKSessionData::GetWriteLock()
+		{
+			return std::unique_lock<std::shared_timed_mutex>(GetRWMutex());
+		}
+		MODIO_NODISCARD std::unique_lock<std::shared_timed_mutex> SDKSessionData::GetShutdownLock()
+		{
+			return std::unique_lock<std::shared_timed_mutex>(GetShutdownMutex());
 		}
 
 		SDKSessionData::SDKSessionData() {}

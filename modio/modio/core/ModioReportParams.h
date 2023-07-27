@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -102,7 +102,14 @@ namespace Modio
 		/// @param Params the report to submit
 		/// @return the request parameters for use with PerformRequestAndGetResponseAsync
 		MODIO_IMPL friend Modio::Detail::HttpRequestParams ToRequest(const Modio::ReportParams& Params);
-	}; //class ReportParams
+
+	public:
+
+		/// @brief Checks the underlying ID for the reported Mod, Game, or User, is valid
+		/// @return True if the ID is valid
+		MODIO_IMPL bool IsResourceIdValid() const;
+
+	}; // class ReportParams
 } // namespace Modio
 
 #ifndef MODIO_SEPARATE_COMPILATION

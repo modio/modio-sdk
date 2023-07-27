@@ -1,0 +1,82 @@
+== mod.io Windows SDK Integration
+
+The use of Windows with the mod.io SDK is ready by default. You can find the `win32` directory in the platform subdirectory of your SDK installation.
+You can then target `WIN` to compile the mod.io SDK for Windows SDK.
+
+== Windows SDK Versions
+
+The mod.io SDK is built and tested against Windows using Visual Studio 2019 & 2022. Using different versions of the Windows SDK may result in compilation issues.
+
+In case you plan to use CMake to compile the mod.io SDK build outside of Visual Studio, you can take advantage of the default "CMake Extensions" typically found here:
+
+[source,cmake]
+----
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin
+----
+
+This folder, or a similar with respect to your installation, contain the relevant CMake binaries to start configuring with CMake. The CMake FlagTables file is located at C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Templates\MSBuild\FlagTables` (or equivalent VS and CMake installation directory)
+
+=== Inside a CMake project
+
+. Unzip the archive
+. Confirm `your_project` uses CMake 3.20 or later
++
+[source,cmake]
+----
+cmake_minimum_required(VERSION 3.20)
+----
+. Specify the target platform with ORBIS
++
+[source,cmake]
+----
+set (MODIO_PLATFORM WIN)
+----
+. Add the SDK subdirectory to your project
++
+[source,cmake]
+----
+add_subdirectory(<modio-sdk folder> EXCLUDE_FROM_ALL)
+----
+. Link the library to your project
++
+* To use the header-only configuration:
++
+[source,cmake]
+----
+target_compile_features(your_project PUBLIC cxx_std_17)
+target_link_libraries(your_project PUBLIC modio)
+----
+* Or to use the static library configuration:
++
+[source,cmake]
+----
+target_compile_features(your_project PUBLIC cxx_std_14)
+target_link_libraries(your_project PUBLIC modioStatic)
+----
+
+To simplify the CMake configuration, the folder `cmake/` has the file `CMakePresets.json` with the basic configuration required to guide the mod.io SDK compilation using the Windows SDK. If you copy that file to the folder root, it can be used as follows:
+
+[source,cmake]
+----
+cmake --preset win
+----
+
+== Backend environment
+
+If you wish to use a different mod.io backend environment than the default `LIVE` environment (possibly `TEST`), please specify this as the `MODIO_DEFAULT_SERVER` parameter during the `cmake configuration` step. Similarly, you can add this variable to your `CMakePresets.json` file as follows:
+
+[source,json]
+----
+...
+"cacheVariables": 
+{
+    "MODIO_DEFAULT_SERVER": 
+    {
+    "type": "STRING",
+    "value": "LIVE"
+    },
+}
+...
+----
+
+For more details, follow the general details described in the https://github.com/modio/modio-sdk[mod.io repository]

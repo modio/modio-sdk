@@ -55,11 +55,14 @@ namespace Modio
 						}
 					}
 
-					yield Modio::Detail::PerformRequestAndGetResponseAsync(
-						ResponseBodyBuffer,
-						Modio::Detail::GetModsRequest.SetGameID(GameID).SetFilterString(Filter.ToString()),
-						Modio::Detail::CachedResponse::Allow, std::move(Self));
-
+						yield Modio::Detail::PerformRequestAndGetResponseAsync(
+							ResponseBodyBuffer,
+								Modio::Detail::GetModsRequest.SetGameID(GameID).SetFilterString(
+									fmt::format("{}&platform_status={}&status-in={}", Filter.ToString(),
+												Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetPlatformStatusFilter()),
+								Modio::Detail::SDKSessionData::GetPlatformStatusFilterString())),
+							Modio::Detail::CachedResponse::Allow, std::move(Self));
+					
 					if (ec)
 					{
 						// Marshal all raw HTTP errors into generic RequestError

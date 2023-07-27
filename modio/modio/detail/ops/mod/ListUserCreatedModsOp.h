@@ -57,7 +57,12 @@ namespace Modio
 					
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer,
-						Modio::Detail::GetUserModsRequest.SuppressPlatformHeader().SetGameID(GameID).SetFilterString(Filter.ToString() + "&game_id=" + std::string(ToString(GameID))),
+						Modio::Detail::GetUserModsRequest.SuppressPlatformHeader().SetGameID(GameID).SetFilterString(
+							fmt::format(
+								Filter.ToString() + "&game_id={}&platform_status-in={}&status={}",
+								std::string(ToString(GameID)),
+								Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetPlatformStatusFilter()),
+								Modio::Detail::SDKSessionData::GetPlatformStatusFilterString())),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 
 					if (ec)

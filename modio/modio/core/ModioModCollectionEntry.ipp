@@ -454,7 +454,13 @@ namespace Modio
 			from_json(j, List.InternalList);
 		}
 	}
-
+	ModCollection::ModCollection(std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> Entries)
+	{
+		for (auto& ModEntry : Entries)
+		{
+			ModEntries.emplace(std::make_pair(ModEntry.first, std::make_shared<Modio::ModCollectionEntry>(*ModEntry.second)));
+		}
+	}
 	const Modio::ModCollection ModCollection::FilterByUserSubscriptions(
 		const UserSubscriptionList& UserSubscriptions) const
 	{
@@ -491,7 +497,7 @@ namespace Modio
 		}
 	}
 
-	const std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& ModCollection::Entries()
+	const std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& ModCollection::Entries() const
 	{
 		return ModEntries;
 	}

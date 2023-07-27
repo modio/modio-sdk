@@ -60,6 +60,14 @@ extern "C"
 
 	MODIO_WEAK(modio_profile_push) void modio_profile_push(const char*) MODIO_WEAK_STUB_IMPL;
 	MODIO_WEAK(modio_profile_pop) void modio_profile_pop() MODIO_WEAK_STUB_IMPL;
+
+	/// @brief Open a scoped profiling event for a thread
+	/// @param Scope Name of the scope to profile
+	MODIO_WEAK(modio_profile_thread) void modio_profile_thread(const char* Scope) MODIO_WEAK_STUB_IMPL;
+	
+	/// @brief Capture a frame profiling event
+	/// @param Scope Name of the frame to profile
+	MODIO_WEAK(modio_profile_frame) void modio_profile_frame(const char* Scope) MODIO_WEAK_STUB_IMPL;
 }
 
 namespace Modio
@@ -142,6 +150,9 @@ namespace Modio
 
 #define MODIO_PROFILE_PUSH(Name) modio_profile_push(#Name)
 #define MODIO_PROFILE_POP() modio_profile_pop()
+
+#define MODIO_PROFILE_THREAD(Scope) modio_profile_thread(#Scope)
+#define MODIO_PROFILE_FRAME(Scope) modio_profile_frame(#Scope)
 
 #ifndef MODIO_SEPARATE_COMPILATION
 	#include "modio/detail/ModioProfiling.ipp"

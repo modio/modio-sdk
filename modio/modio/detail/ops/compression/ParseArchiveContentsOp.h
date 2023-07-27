@@ -34,6 +34,8 @@ namespace Modio
 			std::uintmax_t BytesToRead = 20;
 
 		public:
+			ParseArchiveContentsOp(ParseArchiveContentsOp&& Other) = default;
+			ParseArchiveContentsOp(const ParseArchiveContentsOp& Other) = default;
 			ParseArchiveContentsOp(std::shared_ptr<ArchiveFileImplementation> ArchiveState)
 				: ArchiveState(ArchiveState) {};
 
@@ -57,7 +59,6 @@ namespace Modio
 						// it is automatically a Zip64 file
 						if (FileSize >= (UINT32_MAX - 1))
 						{
-							BytesToRead = 48;
 							ArchiveState->bIsZip64 = true;
 						}
 					}
@@ -79,10 +80,19 @@ namespace Modio
 								if (Chunk.GetSize() >= 4)
 								{
 									// Use a helper function to search the "Zip Magic Offset" in a buffer
-									std::tie(ArchiveState->ZipMagicOffset, ArchiveState->bIsZip64) =
+									std::uint64_t Zip64EndCentralDirectoryLocation = 0;
+									std::tie(ArchiveState->ZipMagicOffset, ArchiveState->bIsZip64,
+											 Zip64EndCentralDirectoryLocation) =
 										ZipStructures::FindOffsetInBuffer(Chunk, ArchiveState->bIsZip64);
-									// Add what has been Currently Searched
-									ArchiveState->ZipMagicOffset += CurrentSearchOffset;
+
+									if (Zip64EndCentralDirectoryLocation != 0)
+									{
+										ArchiveState->ZipMagicOffset = Zip64EndCentralDirectoryLocation;
+									}
+									else
+									{
+										ArchiveState->ZipMagicOffset += CurrentSearchOffset;
+									}
 								}
 								else
 								{
@@ -145,6 +155,19 @@ namespace Modio
 								 ArchiveState->CentralDirectoryOffset) =
 							ZipStructures::ReadCentralDirectory(FileChunk.value(), ArchiveState->bIsZip64);
 
+						// Extra warning in case we missed an edge case when determining Zip64 status
+						if (!ArchiveState->bIsZip64)
+						{
+							if ((ArchiveState->NumberOfRecords == Constants::ZipTag::MAX16) ||
+								(ArchiveState->CentralDirectorySize == Constants::ZipTag::MAX32) ||
+								(ArchiveState->CentralDirectoryOffset == Constants::ZipTag::MAX32))
+							{
+								Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Compression,
+															"Archive file's End of Central Directory Record contains "
+															"fields set to maximum values, but is not marked as Zip64");
+							}
+						}
+
 						yield ArchiveFileOnDisk->ReadSomeAtAsync(ArchiveState->CentralDirectoryOffset,
 																 ArchiveState->CentralDirectorySize, std::move(Self));
 
@@ -162,6 +185,7 @@ namespace Modio
 
 						for (std::uint64_t RecordIndex = 0; RecordIndex < ArchiveState->NumberOfRecords; RecordIndex++)
 						{
+							MODIO_PROFILE_SCOPE(PopulateArchiveEntry);
 							ArchiveFileImplementation::ArchiveEntry Entry;
 							Modio::ErrorCode Err;
 							std::tie(Entry, CurrentRecordOffset, Err) =
@@ -196,27 +220,32 @@ namespace Modio
 						for (CurrentFixupEntryIndex = 0; CurrentFixupEntryIndex < PendingEntries.size();
 							 CurrentFixupEntryIndex++)
 						{
+							{
+								MODIO_PROFILE_SCOPE(ArchiveFixupPendingEntryPreRead);
+							}
 							yield ArchiveFileOnDisk->ReadSomeAtAsync(PendingEntries[CurrentFixupEntryIndex].FileOffset,
 																	 30, std::move(Self));
-
-							if (ec && ec != Modio::GenericError::EndOfFile)
 							{
-								Self.complete(ec);
-								return;
-							}
-							if (!FileChunk.has_value())
-							{
-								Self.complete(Modio::make_error_code(Modio::FilesystemError::ReadError));
-								return;
-							}
+								MODIO_PROFILE_SCOPE(ArchiveFixupPendingEntry);
+								if (ec && ec != Modio::GenericError::EndOfFile)
+								{
+									Self.complete(ec);
+									return;
+								}
+								if (!FileChunk.has_value())
+								{
+									Self.complete(Modio::make_error_code(Modio::FilesystemError::ReadError));
+									return;
+								}
 
-							std::uint16_t LocalFileLength =
-								Modio::Detail::TypedBufferRead<std::uint16_t>(FileChunk.value(), 26);
-							std::uint16_t LocalExtraFieldLength =
-								Modio::Detail::TypedBufferRead<std::uint16_t>(FileChunk.value(), 28);
-							PendingEntries[CurrentFixupEntryIndex].FileOffset +=
-								30 + LocalFileLength + LocalExtraFieldLength;
-							ArchiveState->AddEntry(PendingEntries[CurrentFixupEntryIndex]);
+								std::uint16_t LocalFileLength =
+									Modio::Detail::TypedBufferRead<std::uint16_t>(FileChunk.value(), 26);
+								std::uint16_t LocalExtraFieldLength =
+									Modio::Detail::TypedBufferRead<std::uint16_t>(FileChunk.value(), 28);
+								PendingEntries[CurrentFixupEntryIndex].FileOffset +=
+									30 + LocalFileLength + LocalExtraFieldLength;
+								ArchiveState->AddEntry(PendingEntries[CurrentFixupEntryIndex]);
+							}
 						}
 
 						ArchiveFileOnDisk.reset();

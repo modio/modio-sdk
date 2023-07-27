@@ -67,7 +67,7 @@ namespace Modio
 			auto WaitAsync(implementation_type& PlatformIOObject, CompletionTokenType&& Token)
 			{
 				PlatformImplementation->WaitAsync(PlatformIOObject,
-												  std::forward<CompletionTokenType>(std::move(Token)));
+												  std::forward<CompletionTokenType>(Token));
 			}
 
 		private:

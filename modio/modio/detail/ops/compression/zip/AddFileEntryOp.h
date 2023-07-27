@@ -29,6 +29,8 @@ MODIO_DIAGNOSTIC_PUSH
 
 MODIO_ALLOW_DEPRECATED_SYMBOLS
 
+// For reference: https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
+
 namespace Modio
 {
 	namespace Detail
@@ -43,7 +45,6 @@ namespace Modio
 				: ArchiveFile(ArchiveFile),
 				  PathInsideArchive(PathInsideArchive),
 				  CompressedOutputBuffer(1),
-				  LocalFileHeaderBuffer(GetLocalFileHeaderSize()),
 				  ProgressInfo(ProgressInfo)
 			{
 				InputFile =
@@ -51,6 +52,7 @@ namespace Modio
 				OutputFile = std::make_unique<Modio::Detail::File>(ArchiveFile->FilePath,
 																   Modio::Detail::FileMode::ReadWrite, false);
 				CompressionStream = std::make_unique<boost::beast::zlib::deflate_stream>();
+				FileName = PathInsideArchive.generic_u8string();
 				InputFileSize = InputFile->GetFileSize();
 				IsZip64 = InputFileSize >= (UINT32_MAX - 1);
 				RollingFileHash = FileHash;
@@ -70,7 +72,7 @@ namespace Modio
 
 				reenter(CoroutineState)
 				{
-					// In case a file uses a double dot within its file name, the operation will fail
+					// If a file name uses a double dot the operation will fail
 					if (InputFile->GetPath().filename().string().find("..") != std::string::npos)
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File,
@@ -80,14 +82,29 @@ namespace Modio
 						return;
 					}
 
+					// Determine the start of this local file entry in the archive
+					// This value will be used to locate this entry as needed
 					OutputFile->Seek(Modio::FileOffset(OutputFile->GetFileSize()));
 					LocalHeaderOffset = OutputFile->Tell();
 
-					// Skip forward, leaving enough space for our local file header as we have to write that when we're
-					// done
-					OutputFile->Seek(Modio::FileOffset(GetLocalFileHeaderSize()), SeekDirection::Forward);
+					if (IsZip64)
+					{
+						// Include Zip64 Extended Information Extra Field
+						LocalHeaderSize = Constants::ZipTag::LocalFileHeaderSize + FileName.size() +
+										  Constants::ZipTag::Zip64LocalFileExtraFieldSize;
+						// Mark the ArchiveFile to handle Zip64 when writing the Central Directory
+						ArchiveFile->bIsZip64 = true;
+					}
+					else
+					{
+						LocalHeaderSize = Constants::ZipTag::LocalFileHeaderSize + FileName.size();
+					}
+
+					// Determine the offset for the file data, located immediately after the header
+					OutputFile->Seek(Modio::FileOffset(LocalHeaderSize), SeekDirection::Forward);
 					FileDataOffset = OutputFile->Tell();
 
+					// Process and compress the file data
 					while (BytesProcessed < InputFileSize)
 					{
 						// Set a property to the maximum bytes to read. If the file is smaller than "ChunkOfBytes",
@@ -109,7 +126,7 @@ namespace Modio
 							// Compress the current sub-buffer
 							CompressionState.avail_in = NextBuf->GetSize();
 							CompressionState.next_in = NextBuf->Data();
-							// A slighly larger CompressedOutputBuffer helps to avoid a case where avail_in
+							// A slightly larger CompressedOutputBuffer helps to avoid a case where avail_in
 							// does not process all input into the avail_out
 							CompressedOutputBuffer = Modio::Detail::Buffer(MaxBytesToRead + 100);
 							CompressionState.avail_out = CompressedOutputBuffer.GetSize();
@@ -173,7 +190,7 @@ namespace Modio
 							}
 						}
 
-						// BytesProcessed is correctly assesed after CompressionStream has written
+						// BytesProcessed is correctly assessed after CompressionStream has written
 						// all the bytes to the CompressionStream
 						BytesProcessed = Modio::FileSize(CompressionState.total_in);
 						// Update The ProgressInfo with MaxBytesToRead
@@ -217,87 +234,82 @@ namespace Modio
 						}
 					}
 
+					// Determine the end of this local file entry in the archive
 					EndOffset = OutputFile->Tell();
 
-					if (IsZip64 == false)
-					{
-						// Marshal fields into our local file header's data buffer
-						Modio::Detail::TypedBufferWrite(Constants::ZipTag::LocalDirectoryHeader, LocalFileHeaderBuffer,
-														0) // header signature
-							.FollowedBy<uint16_t>(Constants::ZipTag::ZipVersion) // Minimum version to extract
-							.FollowedBy<uint16_t>(0) // General Purpose bitflag
-							.FollowedBy<uint16_t>(Constants::ZipTag::Deflate) // Compression Method
-							.FollowedBy<uint16_t>(0) // Last Modified time
-							.FollowedBy<uint16_t>(0) // Last Modified date
-							.FollowedBy<uint32_t>(InputCRC) // CRC32 of input data
-							.FollowedBy<uint32_t>((std::uint32_t) CompressionState.total_out) // Size of output data
-							.FollowedBy<uint32_t>((std::uint32_t) CompressionState.total_in) // Size of Input Data
-							.FollowedBy<uint16_t>(
-								(std::uint16_t) PathInsideArchive.generic_u8string().size()) // Size of filename
-							// Size of extra field is 28: Header ID + Size Extra Field +
-							// Original uncompressed + Size of compressed data + Offset of local header record
-							.FollowedBy<uint16_t>(Constants::ZipTag::TotalExtraFieldSizeFileEntries);
-					}
-					else
-					{
-						// Mark the ArchiveFile to handle Zip64 when it will write the Central Directory
-						ArchiveFile->bIsZip64 = true;
+					// Marshal fields of fixed sizes into our local file header's data buffer
+					LocalFileHeaderBuffer = std::make_unique<Modio::Detail::Buffer>(LocalHeaderSize);
+					// Header signature
+					Modio::Detail::TypedBufferWrite(Constants::ZipTag::LocalFileHeaderSignature, *LocalFileHeaderBuffer,
+													0)
+						// Minimum version to extract
+						.FollowedBy<uint16_t>(IsZip64 ? Constants::ZipTag::Zip64Version : Constants::ZipTag::ZipVersion)
+						// General Purpose bit-flag
+						.FollowedBy<uint16_t>(0)
+						// Compression Method
+						.FollowedBy<uint16_t>(Constants::ZipTag::Deflate)
+						// Last modified time
+						.FollowedBy<uint16_t>(0)
+						// Last modified date
+						.FollowedBy<uint16_t>(0)
+						// CRC-32 of uncompressed data
+						.FollowedBy<uint32_t>(InputCRC)
+						// Compressed size. Must be set to MAX32 if actual value is included in Zip64 Extended
+						// Information
+						.FollowedBy<uint32_t>(IsZip64 ? Constants::ZipTag::MAX32
+													  : (std::uint32_t) CompressionState.total_out)
+						// Uncompressed size. Must be set to MAX32 if actual value is included in Zip64 Extended
+						// Information
+						.FollowedBy<uint32_t>(IsZip64 ? Constants::ZipTag::MAX32
+													  : (std::uint32_t) CompressionState.total_in)
+						// File name length
+						.FollowedBy<uint16_t>((std::uint16_t) FileName.size())
+						// Extra field length
+						.FollowedBy<uint16_t>(IsZip64 ? Constants::ZipTag::Zip64LocalFileExtraFieldSize : 0);
 
-						// Marshal fields into our local file header's data buffer
-						Modio::Detail::TypedBufferWrite(Constants::ZipTag::LocalDirectoryHeader, LocalFileHeaderBuffer,
-														0) // header signature
-							.FollowedBy<uint16_t>(Constants::ZipTag::Zip64Version) // Minimum version to extract
-							.FollowedBy<uint16_t>(0) // General Purpose bitflag
-							.FollowedBy<uint16_t>(Constants::ZipTag::Deflate) // Compression Method
-							.FollowedBy<uint16_t>(0) // Last Modified time
-							.FollowedBy<uint16_t>(0) // Last Modified date
-							.FollowedBy<uint32_t>(InputCRC) // CRC32 of input data
-							.FollowedBy<uint32_t>(Constants::ZipTag::MAX32) // Size of output data
-							.FollowedBy<uint32_t>(Constants::ZipTag::MAX32) // Size of Input Data
-							.FollowedBy<uint16_t>(
-								(std::uint16_t) PathInsideArchive.generic_u8string().size()) // Size of filename
-							// Size of extra field is 28: Header ID + Size Extra Field +
-							// Original uncompressed + Size of compressed data + Offset of local header record
-							.FollowedBy<uint16_t>(Constants::ZipTag::TotalExtraFieldSizeFileEntries);
-					}
+					// Manually write (variable sized) file name
+					std::copy(FileName.begin(), FileName.end(),
+							  LocalFileHeaderBuffer->Data() + Constants::ZipTag::LocalFileHeaderSize);
 
-					// TypedBufferWrite doesn't currently handle strings so manually marshal the filename
+					// Include Zip64 Extended Information Extra Field if file size exceeds Zip32 limit
+					if (IsZip64)
 					{
-						std::string FileName = PathInsideArchive.generic_u8string();
-						std::copy(FileName.begin(), FileName.end(), LocalFileHeaderBuffer.Data() + 30);
-					}
+						Modio::Detail::Logger().Log(
+							Modio::LogLevel::Trace, Modio::LogCategory::File,
+							"Including Zip64 Extended Information Extra Field in the local directory for file {}",
+							FileName);
 
-					// Add "Extra Field" information regardless of Zip64 status
-					{
-						Modio::Detail::TypedBufferWrite(
-							Constants::ZipTag::ExtendedInformationFieldHeaderID, LocalFileHeaderBuffer,
-							30 + PathInsideArchive.generic_u8string()
-									 .size()) // header signature
-											  // Here we only need to mention the (un)compressed and offset bytes
-							.FollowedBy<uint16_t>(Constants::ZipTag::ExtraFieldSize)
-							.FollowedBy<uint64_t>(CompressionState.total_in) // Original uncompressed file size
-							.FollowedBy<uint64_t>(CompressionState.total_out) // Size of compressed data
-							.FollowedBy<uint64_t>(LocalHeaderOffset); // Offset of local header record
+						// Zip64 Extra Field Signature
+						Modio::Detail::TypedBufferWrite(Constants::ZipTag::Zip64ExtraFieldSignature,
+														*LocalFileHeaderBuffer,
+														Constants::ZipTag::LocalFileHeaderSize + FileName.size())
+							// Size of this extra block, excluding leading 4 bytes (signature and size fields)
+							.FollowedBy<uint16_t>(Constants::ZipTag::Zip64LocalFileExtraFieldSize - 4)
+							// Uncompressed size
+							.FollowedBy<uint64_t>(CompressionState.total_in)
+							// Compressed size
+							.FollowedBy<uint64_t>(CompressionState.total_out);
 					}
 
-					// Write the local file header at the correct offset so it's just before the compressed data
-					yield OutputFile->WriteSomeAtAsync(LocalHeaderOffset, std::move(LocalFileHeaderBuffer),
+					// Write the local file header immediately before the compressed data
+					yield OutputFile->WriteSomeAtAsync(LocalHeaderOffset, std::move(*LocalFileHeaderBuffer),
 													   std::move(Self));
+
 					if (ec)
 					{
 						Self.complete(ec);
 						return;
 					}
 
-					// Add the entry to the archive file so that it knows what to put in the central directory when it
-					// is finalized
-					ArchiveFile->AddEntry(PathInsideArchive.generic_u8string(), LocalHeaderOffset,
-										  CompressionState.total_out, CompressionState.total_in,
+					// Add this entry to the archive file object
+					// These details will be written to the central directory
+					ArchiveFile->AddEntry(FileName, LocalHeaderOffset, CompressionState.total_out,
+										  CompressionState.total_in,
 										  ArchiveFileImplementation::CompressionMethod::Deflate, InputCRC);
 
 					*RollingFileHash = *RollingFileHash ^ InputCRC;
 
-					// Close Handle of any used file
+					// Close file handles
 					InputFile.reset();
 					OutputFile.reset();
 
@@ -317,30 +329,22 @@ namespace Modio
 			Modio::filesystem::path PathInsideArchive;
 			Modio::Detail::DynamicBuffer InputFileBuffer;
 			Modio::Detail::Buffer CompressedOutputBuffer;
-			Modio::Detail::Buffer LocalFileHeaderBuffer;
+			std::unique_ptr<Modio::Detail::Buffer> LocalFileHeaderBuffer;
 			Modio::FileSize BytesProcessed;
 			Modio::FileOffset LocalHeaderOffset;
 			Modio::FileOffset FileDataOffset;
 			Modio::FileOffset EndOffset;
 			std::size_t MaxBytesToRead = 0;
+			std::size_t LocalHeaderSize = 0;
 			std::uint32_t InputCRC = 0;
 			asio::coroutine CoroutineState;
 			Modio::Optional<Modio::Detail::Buffer> NextBuf;
 			std::shared_ptr<uint64_t> RollingFileHash;
 			std::weak_ptr<Modio::ModProgressInfo> ProgressInfo;
-			/// @brief Helper function so when we add zip64 support we can easily change how much space to allocate for
-			/// the local header
-			/// @return
-			std::size_t GetLocalFileHeaderSize()
-			{
-				// Always include the "extra field" length even if it is not used (28 bytes at the end)
-				return 30 + PathInsideArchive.generic_u8string().size() +
-					   Constants::ZipTag::TotalExtraFieldSizeFileEntries;
-			}
+			std::string FileName;
 		};
 #include <asio/unyield.hpp>
 	} // namespace Detail
 } // namespace Modio
-
 
 MODIO_DIAGNOSTIC_POP

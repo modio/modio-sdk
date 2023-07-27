@@ -49,7 +49,9 @@ namespace Modio
 
 		Buffer::~Buffer()
 		{
+			MODIO_PROFILE_SCOPE(BufferDestructor);
 			InternalData.reset();
+			Size = 0;
 		}
 
 		Buffer Buffer::CopyRange(std::size_t BeginIndex, std::size_t EndIndex)
@@ -114,6 +116,7 @@ namespace Modio
 
 		Buffer& Buffer::operator=(Buffer&& Source) noexcept
 		{
+			MODIO_PROFILE_SCOPE(BufferMoveAssignment);
 			if (this != &Source)
 			{
 				InternalData = std::move(Source.InternalData);

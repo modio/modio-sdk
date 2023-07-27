@@ -25,7 +25,7 @@ class ReadSomeResponseBodyOp
 	std::shared_ptr<HttpRequestImplementation> Request;
 	Modio::Detail::DynamicBuffer DataBuffer;
 	std::unique_ptr<Modio::Detail::Buffer> ResponseChunkBuffer;
-	std::uintmax_t BufferSize;
+	std::uintmax_t BufferSize = 512 * 1024;
 	std::pair<std::uintptr_t, std::uintmax_t> ExtendedStatus;
 	std::weak_ptr<HttpSharedStateBase> SharedState;
 	asio::coroutine CoroutineState;

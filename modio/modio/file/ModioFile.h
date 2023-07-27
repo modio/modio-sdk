@@ -119,14 +119,14 @@ namespace Modio
 			auto WriteSomeAtAsync(std::uintmax_t Offset, Modio::Detail::Buffer Buffer, CompletionTokenType&& Token)
 			{
 				return get_service().WriteSomeAtAsync(get_implementation(), Offset, std::move(Buffer),
-													  std::forward<CompletionTokenType>(std::move(Token)));
+													  std::forward<CompletionTokenType>(Token));
 			}
 
 			template<typename CompletionTokenType>
 			auto ReadSomeAtAsync(std::uintmax_t Offset, std::uintmax_t Length, CompletionTokenType&& Token)
 			{
 				return get_service().ReadSomeAtAsync(get_implementation(), Offset, Length,
-													 std::forward<CompletionTokenType>(std::move(Token)));
+													 std::forward<CompletionTokenType>(Token));
 			}
 
 			template<typename CompletionTokenType>
@@ -134,7 +134,7 @@ namespace Modio
 								 Modio::Detail::DynamicBuffer Destination, CompletionTokenType&& Token)
 			{
 				return get_service().ReadSomeAtAsync(get_implementation(), Offset, MaxBytesToRead, Destination,
-													 std::forward<CompletionTokenType>(std::move(Token)));
+													 std::forward<CompletionTokenType>(Token));
 			}
 
 			template<typename CompletionTokenType>
@@ -142,14 +142,14 @@ namespace Modio
 						   CompletionTokenType&& Token)
 			{
 				return get_service().ReadAsync(get_implementation(), MaxBytesToRead, Destination,
-											   std::forward<CompletionTokenType>(std::move(Token)));
+											   std::forward<CompletionTokenType>(Token));
 			}
 
 			template<typename CompletionTokenType>
 			auto WriteAsync(Modio::Detail::Buffer Buffer, CompletionTokenType&& Token)
 			{
 				return get_service().WriteAsync(get_implementation(), std::move(Buffer),
-												std::forward<CompletionTokenType>(std::move(Token)));
+												std::forward<CompletionTokenType>(Token));
 			}
 		};
 	} // namespace Detail

@@ -50,21 +50,21 @@ namespace Modio
 			template<typename CompletionHandler>
 			auto InitializeAsync(CompletionHandler Handler)
 			{
-				return PlatformImplementation->InitializeHTTPAsync(std::forward<CompletionHandler>(std::move(Handler)));
+				return PlatformImplementation->InitializeHTTPAsync(std::forward<CompletionHandler>(Handler));
 			}
 
 			template<typename CompletionHandler>
 			auto SendRequestAsync(implementation_type& PlatformIOObject, CompletionHandler Handler)
 			{
 				return PlatformImplementation->SendRequestAsync(PlatformIOObject,
-																std::forward<CompletionHandler>(std::move(Handler)));
+																std::forward<CompletionHandler>(Handler));
 			}
 
 			template<typename CompletionHandler>
 			auto ReadResponseHeadersAsync(implementation_type& PlatformIOObject, CompletionHandler Handler)
 			{
 				return PlatformImplementation->ReadResponseHeadersAsync(
-					PlatformIOObject, std::forward<CompletionHandler>(std::move(Handler)));
+					PlatformIOObject, std::forward<CompletionHandler>(Handler));
 			}
 
 			template<typename CompletionHandler>
@@ -72,7 +72,7 @@ namespace Modio
 											   DynamicBuffer DynamicBufferInstance, CompletionHandler&& Handler)
 			{
 				return PlatformImplementation->ReadSomeFromResponseBodyAsync(
-					PlatformIOObject, DynamicBufferInstance, std::forward<CompletionHandler>(std::move(Handler)));
+					PlatformIOObject, DynamicBufferInstance, std::forward<CompletionHandler>(Handler));
 			}
 
 			template<typename CompletionHandler>

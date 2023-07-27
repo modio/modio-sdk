@@ -18,6 +18,10 @@
 
 #define JSON_NOEXCEPTION 
 
+#pragma push_macro("JSON_HAS_FILESYSTEM")
+
+#define JSON_HAS_FILESYSTEM 0
+
 #ifdef MODIO_PLATFORM_UNREAL
 
 	#include MODIO_UNREAL_PLATFORM_PREAMBLE
@@ -30,6 +34,8 @@
 #else
 	#include "nlohmann/json.hpp"
 #endif
+
+#pragma pop_macro("JSON_HAS_FILESYSTEM")
 
 #pragma pop_macro("JSON_NOEXCEPTION")
 

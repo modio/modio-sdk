@@ -54,7 +54,7 @@ add_public_header(${MODIO_TARGET_NAME} modio/ModioSDK.h)
 
 target_include_directories(${MODIO_TARGET_NAME} INTERFACE ${ModioGeneratedHeaderPath})
 
-target_link_libraries(${MODIO_TARGET_NAME} INTERFACE asio tl::optional platform nlohmann_json function2)
+target_link_libraries(${MODIO_TARGET_NAME} INTERFACE asio tl::optional platform nlohmann_json function2 concurrentqueue)
 
 # In case you have a custom FMT library, update accordingly below
 # The default linking of the library uses the FMT Header only mode

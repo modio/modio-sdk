@@ -353,6 +353,22 @@ namespace Modio
 		/// @docinternal
 		/// @brief Default constructor
 		UserID() : StrongInteger(-1) {};
+
+		/// @docinternal
+		/// @brief Compare the UserID to an invalid instance
+		constexpr bool IsValid() const
+		{
+			return *this != InvalidUserID();
+		}
+
+		/// @docinternal
+		/// @brief Static function to an invalid UserID
+		static constexpr UserID InvalidUserID()
+		{
+			constexpr UserID ID(-1);
+
+			return ID;
+		}
 	};
 
 	/// @docpublic
@@ -551,11 +567,20 @@ namespace Modio
 	};
 
 	/// @docpublic
+
 	/// @brief The visiblility of a mod.
 	enum class ObjectVisibility : int8_t
 	{
 		Hidden = 0,
 		Public = 1
+	};
+	
+	///	@brief File approval status to filter by. Passed in ExtendedInitializationParameters for the duration of a session.
+	enum class PlatformStatus
+	{
+		LiveAndPending,
+		PendingOnly,
+		ApprovedOnly
 	};
 
 } // namespace Modio
@@ -571,6 +596,24 @@ namespace Modio
 			ReadOnly,
 			ReadWrite
 		};
+
+		/// @docnone
+		///	@brief Transform the PlatformStatus to its query parameter string for appending to requests
+		inline std::string ToString(Modio::PlatformStatus Status)
+		{
+			switch (Status)
+			{
+				case PlatformStatus::PendingOnly:
+					return "pending_only";
+				case PlatformStatus::LiveAndPending:
+					return "live_and_pending";
+				case PlatformStatus::ApprovedOnly:
+					return "approved_only";
+			}
+
+			assert(false && "Invalid value to ToString(Modio::PlatformStatus)");
+			return "Unknown";
+		}
 
 		/// @docnone
 		/// @brief Transform a Language to its two letter string representation

@@ -30,3 +30,6 @@
 [submodule "ext/function2"]
 	path = ext/function2
 	url = https://github.com/Naios/function2.git
+[submodule "ext/concurrentqueue"]
+	path = ext/concurrentqueue
+	url = https://github.com/cameron314/concurrentqueue.git

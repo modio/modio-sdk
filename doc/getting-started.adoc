@@ -193,21 +193,6 @@ It is possible to employ the Clang compiler provided by Visual Studio Installer 
 }
 ```
 
-However, you must be aware that Visual Studio 2019 & 2022 had some issues compiling projects with CMake & Ninja, like the following error:
-
-```
-The C compiler
-  "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/Llvm/x64/bin/clang-cpp.exe"
-is not able to compile a simple test program.
-```
-
-To resolve this issue, you can add the following line to `CMakeList.txt` before the project definition
-
-```
-set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
-project(${MODIO_TARGET_NAME} C CXX )
-```
-
 ==== Custom `fmt` library
 If you have a custom version of the `fmt` library, you can modify the linking stage defining `MODIO_USE_CUSTOM_FMT`. This define signals the CMake build system to use a custom version of the library. Also, it requires that you define `MODIO_CUSTOM_FMT_PATH` to the system path that contains the `fmt` library to use.
 
@@ -263,13 +248,14 @@ FILE HEADER VALUES
 
 '''
 
-=== SDK structure and concepts
+== SDK structure and concepts
 
 The following diagram provides an overview of the mod.io SDK initialization procedure and its asynchronous nature.
 
 image:{gitplant}modio_sdk_flow-init.puml[alt:"mod.io SDK Initialization flow"]
 
-==== Flat API
+
+=== Flat API
 The mod.io SDK has a simple structure that primarily consists of a flat interface. These broadly have the following categories:
 
 * SDK management: Initialization, teardown, event loop
@@ -280,7 +266,8 @@ The mod.io SDK has a simple structure that primarily consists of a flat interfac
 
 See <<quick-start>> for basic guides for each of these categories.
 
-==== Value objects
+
+=== Value objects
 All data returned by the SDK uses a small set of classes, containing information such as:
 
 * Details for mods available for installation
@@ -291,17 +278,20 @@ These objects return as `pass-by-value`. In other words, if you want to hold ont
 
 This flexibility allows you to initialize the SDK, query the installed mods, and keep that list. Then shut down the SDK and stop running the SDK's event loop.
 
-==== UTF-8 guarantees
+
+=== UTF-8 guarantees
 
 The SDK uses UTF8 for all strings, stored in `std::string`, as does the mod.io REST API.
 
-==== Non-blocking, asynchronous interface
+
+=== Non-blocking, asynchronous interface
 
 The SDK communicates with the mod.io servers, the filesystem on the device it is running on, and platform-specific authentication services. All of these may not return results immediately; therefore, a large number of the SDK's public methods are non-blocking and asynchronous.
 
 NOTE: All asynchronous methods in the public API have the suffix `Async`.
 
-===== Callback conventions
+[discrete]
+==== Callback conventions
 These asynchronous methods take a `std::function`-derived callback, which will be invoked exactly once with the results of the requested operation.
 
 Every async callback takes an <<ErrorCode>> as its first parameter, with any results wrapped in <<Optional>> to check if a result is valid or empty.
@@ -310,15 +300,31 @@ Return values provided to your callback are passed `by-value`. The SDK does not 
 
 NOTE: Even if the SDK shuts down while asynchronous operations are pending, the remaining callbacks will still execute *exactly once*. In this case, the callback receives an <<ErrorCode>> to indicate a canceled state. Your project should handle gracefully this behavior as part of your error handling.
 
-===== Maintaining the SDK event loop
+[discrete]
+==== Maintaining the SDK event loop
 
 In order to provide a non-blocking implementation, the SDK operates an internal event loop. This event loop only runs on the thread which calls <<RunPendingHandlers>>.
 
-The event loop, all internal event handlers and callbacks provided to the mod.io SDK execute on the thread invoking <<RunPendingHandlers>>. It is necessary to execute <<RunPendingHandlers>> on the same thread, otherwise, its behavior is undefined.
+The event loop, all internal event handlers and callbacks provided to the mod.io SDK execute on the thread invoking <<RunPendingHandlers>>. <<RunPendingHandlers>> must only be called on one thread, otherwise, its behavior is undefined.
 
 NOTE: If you stop calling <<RunPendingHandlers>>, any pending asynchronous API methods will not complete and their associated callbacks will not be invoked. It also includes the internal data allocated for those operations, as well as the release of any allocated objects.
 
-==== Users and Local Profiles
+
+=== Thread Safety
+
+Given that <<RunPendingHandlers>> performs all the work of the SDK and executes the callbacks that you provide as handlers for the completion of async functions, your application needs to be calling it at regular intervals. However, you may not wish to do so on the main thread of your application, given that the function has to execute for long enough to actually 'get some work done'.
+
+The mod.io SDK now supports the execution of <<RunPendingHandlers>> on a background thread while your application invokes other SDK functions on the main thread, for example in response to user input in your application's user interface. 
+
+Whilst it is now safe to call all other SDK functions from a different thread to the one executing <<RunPendingHandlers>>, it is important to note that our existing guarantees are maintained, namely, you'll still receive exactly one callback invocation per asynchronous function you run, and **callbacks you provide to those methods will be executed on the thread running <<RunPendingHandlers>>**. 
+
+NOTE: <<RunPendingHandlers>> should still only be called on a single thread - it is not safe to call <<RunPendingHandlers>> from multiple threads, either simultaneously or sequentially.
+
+By using a background thread for <<RunPendingHandlers>>, you can decouple the frequency with which you perform SDK 'work' from the frequency of your application's main loop for greater performance. 
+
+See <<SDK quick-start: Multithreading>> for more information.
+
+=== Users and Local Profiles
 
 The mod.io SDK uses a "Local Profile" throughout its lifetime. The Local Profile may optionally contain an authenticated user, once you have successfully authenticated using the appropriate SDK function.
 These local profiles essentially create a 'scope' for the current user to live in, so that a single system can support multiple authenticated users side-by-side without requiring deauthentication of the previous user. 
@@ -353,7 +359,7 @@ NOTE: A call to <<ClearUserDataAsync>> removes the authenticated user from the l
 
 To add a newly authenticated user or switch to one already-authenticated without removing the current one, swap to another Local Profile by calling <<ShutdownAsync>>, then re-initialize via <<InitializeAsync>> specifying a different Local Profile name in the initialization parameters you supply.
 
-==== Error handling
+=== Error handling
 
 Callback functions in the SDK either return a value or provide an <<ErrorCode>> value. It is a numeric error code with a category and an associated string message.
 
@@ -361,7 +367,7 @@ The SDK doesn't attempt to predict what your error-handling logic or requirement
 
 For more details on the error codes and how to inspect their values, please see <<SDK quick-start: Error Handling>> and <<ErrorCode>>.
 
-==== Mod Data Directory
+=== Mod Data Directories
 
 The plugin stores mods in a game-specific directory in the following path by default:
 
@@ -390,7 +396,7 @@ Per-game, Local Profile-specific settings are stored in `${FolderID_LocalAppData
 +
 *Adding* a `RootLocalDataPath` element to this file will redirect the mod installation directory for this specific game only, for the current Local Profile. Removing this value will cause the game to revert back to the global value in `globalsettings.json`.
 
-==== Endpoint Environments
+=== Endpoint Environments
 
 The mod.io plugin can connect to different endpoint environments depending on the development stage your game is in. The 'test' environment is intended for use by developers while they perform initial integration of mod.io into their title.
 
@@ -417,13 +423,22 @@ The following guides are provided to help you through the basic functions of the
 * <<SDK quick-start: In-game mod submission>>
 * <<SDK quick-start: Edit an existing mod>>
 * <<SDK quick-start: User mute/unmute functions>>
+* <<SDK quick-start: Multithreading>>
 
 '''
 === SDK quick-start: Initialization and Teardown [[sdk-initialization]]
 
+==== Event Loop (RunPendingHandlers)
+
 As mentioned in <<Maintaining the SDK event loop>>, the SDK's internal event loop requires care and attention in the form of <<RunPendingHandlers>>.
 
-For optimal execution, <<RunPendingHandlers>> should be called at least once per frame. It could be located into your project's main loop or into a `tick`-style function on an appropriate controller/manager object.
+ALL SDK work is performed during executions of <<RunPendingHandlers>>, therefore calling it as often as possible will improve performance of the SDK's I/O operations.
+
+You can either call <<RunPendingHandlers>> on the main thread, or on a <<use-background-thread,dedicated background thread or existing thread of your choice>>.
+
+For optimal execution, <<RunPendingHandlers>> should be called at least once per frame. 
+
+For example, if you wish to call RunPendingHandlers on the main thread, it could be located into your project's main loop or into a `tick`-style function on an appropriate controller/manager object.
 
 [source,cpp]
 ----
@@ -435,6 +450,9 @@ while(bGameIsRunning == true)
 }
 ----
 
+NOTE: RunPendingHandlers is not reentrant-safe. Do not call <<RunPendingHandlers>> inside a callback you give to the SDK, or your application will deadlock. Callbacks are run inside <<RunPendingHandlers>>, and your inner <<RunPendingHandlers>> call will block infinitely waiting for the enclosing scope to exit.
+
+==== SDK Configuration and Initialization
 When you are ready to initialize the SDK for the current session, you'll need to call <<InitializeAsync>>, passing in your product's mod.io ID, your API key, the Local Profile Name, and a callback/handler so you know when the SDK is initialized correctly. Note that <<InitializeAsync>>'s callback will be invoked after calling <<RunPendingHandlers>> from your project's main loop.
 
 [source,cpp] 
@@ -479,6 +497,8 @@ Options.ExtendedParameters["SomeParameterName"] = "SomeParameterValue";
 
 ----
 
+==== Shutting Down
+
 To finalize and shut down the mod.io SDK is equally simple:
 [source, cpp]
 ----
@@ -497,6 +517,8 @@ while(!SDKShutdownComplete)
 }
 
 ----
+
+NOTE: <<ShutdownAsync>> uses a lock to ensure that global SDK state is not mutated out from underneath an invocation of <<RunPendingHandlers>>. It is not safe to call <<ShutdownAsync>> in any callback you provide to the SDK. Callbacks are executed during <<RunPendingHandlers>> execution, your application will deadlock while waiting for the enclosing <<RunPendingHandlers>> to complete. The lock is deliberately not implemented to support recursive locking, again because <<ShutdownAsync>> mutates data structures that <<RunPendingHandlers>> expects to remain unchanged for the duration of its scope.
 
 NOTE: You will need to continue to call <<RunPendingHandlers>> while the async shutdown is in progress to allow for intermediate handlers to finish running.
 
@@ -1158,3 +1180,54 @@ Modio::GetMutedUsersAsync([](Modio::ErrorCode ec, Modio::Optional<Modio::UserLis
 });
 
 ----
+
+'''
+
+=== SDK quick-start: Multithreading [[use-background-thread]]
+
+As mentioned in <<sdk-initialization,the quick-start section on initialization>>, the SDK supports <<RunPendingHandlers>> being run on a secondary thread that already exists or a dedicated background thread you create specifically to peform SDK work.
+
+NOTE: Callbacks you provide to the SDK will run **on the thread running <<RunPendingHandlers>>** - if you host <<RunPendingHandlers>> on a different thread, it is your responsibility to synchronize with the main thread if you wish to pass results back to it, through callbacks you provide to the SDK.
+
+This allows the SDK to avoid blocking the main thread of your application while performing IO.
+
+==== Using an existing secondary thread
+
+If you have an existing secondary thread which is not heavily utilized, you can call <<RunPendingHandlers>> on that thread:
+
+[source,cpp]
+----
+while(bRunBackgroundThread == true)
+{
+    // other stuff
+   Modio::RunPendingHandlers();
+    // other stuff
+}
+----
+
+Just remember, that performance of the SDK is proportional to the amount of CPU cycles you give it, so if you use an existing secondary thread you'll need to ensure that that thread's loop runs at a high enough frequency.
+
+==== Using a dedicated background thread
+
+Using a dedicated background thread for <<RunPendingHandlers>> will ensure the best performance for the SDK's I/O operations by allowing SDK functionality to execute at a rate not limited by your application's main loop frequency or existing background loop frequencies.
+
+[source,cpp]
+----
+//Assumption: bHaltBackgroundThread is a threadsafe flag or atomic boolean whose lifetime is guaranteed to be longer than that of the handler thread
+HandlerThread = std::thread([&bHaltBackgroundThread]() {
+	while (!bHaltBackgroundThread)
+	{
+		Modio::RunPendingHandlers();
+        //Use one of the following if you intend to call ShutdownAsync in your program:
+        std::this_thread::yield();
+        //Change the sleep duration here as appropriate
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	}
+});
+----
+
+NOTE: <<ShutdownAsync>> takes a lock on the SDK's internal state in order to finalize the pending task queue and shut down internal services. 
+If you call <<RunPendingHandlers>> in a background thread, especially a dedicated background thread, and invoke <<ShutdownAsync>> to close the SDK while your application continues to run, on certain platforms you may find the mutex/lock to be unfair to the point that the main thread cannot take the lock, because the background thread does not get suspended by the OS' scheduler often enough. 
+If this occurs, we recommend you use either a `yield` or high-resolution `sleep` after each invocation of RunPendingHandlers to allow the main thread to take the shutdown lock. Alternatively, you can use some kind of signaling mechanism to pause the background thread calling RunPendingHandlers, call ShutdownAsync, and then allow that background thread to resume looping. 
+If the SDK runs for the lifetime of your application and you do not call <<ShutdownAsync>> this is not necessary.
+

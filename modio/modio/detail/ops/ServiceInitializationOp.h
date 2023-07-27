@@ -68,6 +68,7 @@ public:
 		MODIO_PROFILE_SCOPE(ServiceInitialization);
 
 		Modio::Optional<std::string> PlatformOverride = GetExtendedParameterValue(InitParams, "PlatformOverride");
+		Modio::Optional<std::string> PendingOnlyResults = GetExtendedParameterValue(InitParams, "PendingOnlyResults");
 
 		reenter(CoroutineState)
 		{
@@ -83,6 +84,8 @@ public:
 			{
 				Modio::Detail::SDKSessionData::SetPlatformOverride(*PlatformOverride);
 			}
+			
+			Modio::Detail::SDKSessionData::SetPlatformStatusFilter(*PendingOnlyResults);
 
 			Modio::Detail::ExtendedInitParamHandler::PostSessionDataInit(InitParams);
 

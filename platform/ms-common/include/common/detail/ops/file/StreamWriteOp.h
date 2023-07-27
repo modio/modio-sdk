@@ -99,9 +99,8 @@ public:
 				return;
 			}
 
-			// Wait for any existing and queued IO operations on this file
-			yield FileImpl->BeginExclusiveOperation(std::move(Self));
-
+			yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+			
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
 										"Begin write of {} bytes to {}", Buffer.GetSize(),
 										FileImpl->GetPath().string());
@@ -114,7 +113,6 @@ public:
 				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
 											"Could not create event handle");
 				Self.complete(Modio::make_error_code(Modio::GenericError::CouldNotCreateHandle));
-				FileImpl->FinishExclusiveOperation();
 				return;
 			}
 
@@ -135,8 +133,7 @@ public:
 												"StreamWriteOp to file {} failed, error code = {}",
 												FileImpl->GetPath().string(), Error);
 					Self.complete(Modio::make_error_code(Modio::FilesystemError::WriteError));
-					FileImpl->FinishExclusiveOperation();
-
+				
 					return;
 				}
 			}
@@ -147,7 +144,6 @@ public:
 											FileImpl->GetPath().string());
 				FileImpl->Seek(Modio::FileOffset(Buffer.GetSize()), Modio::Detail::SeekDirection::Forward);
 				Self.complete({});
-				FileImpl->FinishExclusiveOperation();
 				return;
 			}
 
@@ -163,7 +159,6 @@ public:
 			FileImpl->Seek(Modio::FileOffset(Buffer.GetSize()), Modio::Detail::SeekDirection::Forward);
 
 			Self.complete(std::error_code {});
-			FileImpl->FinishExclusiveOperation();
 			return;
 		}
 	}

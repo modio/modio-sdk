@@ -45,8 +45,6 @@ namespace Modio
 			virtual Modio::ErrorCode ApplyGlobalConfigOverrides(
 				const class std::map<std::string, std::string> Overrides) = 0;
 			virtual void Shutdown() = 0;
-			virtual Modio::ErrorCode CheckExtractionPath(const Modio::filesystem::path& FilePath,
-														 const Modio::filesystem::path& RootOutputPath) const = 0;
 		};
 	} // namespace Detail
 } // namespace Modio

@@ -12,14 +12,18 @@
 
 #include "ModioGeneratedVariables.h"
 #include "common/UTF16Support.h"
-#include "common/http/HttpRequestImplementation.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/detail/FmtWrapper.h"
+#include "modio/detail/HedleyWrapper.h"
+#include "modio/detail/OptionalWrapper.h"
 #include <atomic>
 #include <memory>
 #include <queue>
+#include <shared_mutex>
 #include <unordered_map>
 #include <utility>
+#include <windows.h>
+#include <winhttp.h>
 
 // TODO: @ModioGDK probably move this back up to the parent service
 enum class HttpServiceState
@@ -38,6 +42,8 @@ enum class WinHTTPCallbackStatus : unsigned long
 	WriteComplete = WINHTTP_CALLBACK_STATUS_WRITE_COMPLETE,
 	RequestError = WINHTTP_CALLBACK_STATUS_REQUEST_ERROR
 };
+
+class HttpRequestImplementation;
 
 class HttpSharedStateBase : public std::enable_shared_from_this<HttpSharedStateBase>
 {
@@ -69,11 +75,39 @@ protected:
 	/// </summary>
 	HttpServiceState CurrentServiceState = HttpServiceState::Running;
 
+	std::shared_timed_mutex RequestStatusMutex {};
+
+	/// @brief Gets a lock on either reads or element modifications for the underlying maps.
+	/// @return Lock object, should always be assigned to a variable
+	MODIO_NODISCARD std::shared_lock<std::shared_timed_mutex> GetReadOrModifyLock()
+	{
+		return std::shared_lock<std::shared_timed_mutex>(RequestStatusMutex);
+	}
+	/// @brief Gets a lock on insertion for the underlying maps
+	/// @return lock object, should always be assigned to a variable
+	MODIO_NODISCARD std::unique_lock<std::shared_timed_mutex> GetInsertLock()
+	{
+		return std::unique_lock<std::shared_timed_mutex>(RequestStatusMutex);
+	}
+
+	/// @brief Returns a mutable reference to the callback status for a request handle
+	/// @param RequestHandle the request to search for
+	/// @return Optional mutable reference
+	MODIO_IMPL Modio::Optional<std::atomic<WinHTTPCallbackStatus>&> FindCallbackStatusForRequest(
+		HINTERNET RequestHandle);
+
+	/// @brief Returns a mutable reference to the extended status for a request handle
+	/// @param RequestHandle the request to search for
+	/// @return Optional mutable reference
+	MODIO_IMPL Modio::Optional<std::pair<std::uintptr_t, std::intmax_t>&> FindExtendedStatusForRequest(
+		HINTERNET RequestHandle);
+
 public:
 	// TODO: @ModioGDK ENSURE SESSION HANDLE IS ONLY CANCELLED AFTER ALL Connection and request handles are closed
 	HINTERNET CurrentSession;
 	MODIO_IMPL HttpSharedStateBase(HINTERNET SessionHandle);
-	HttpSharedStateBase& operator=(HttpSharedStateBase&& Other) = default;
+	MODIO_IMPL HttpSharedStateBase(HttpSharedStateBase&& Other);
+	MODIO_IMPL HttpSharedStateBase& operator=(HttpSharedStateBase&& Other);
 
 	MODIO_IMPL void InitializeRequest(std::shared_ptr<HttpRequestImplementation> Request, Modio::ErrorCode& ec);
 
@@ -82,6 +116,7 @@ public:
 
 	MODIO_IMPL WinHTTPCallbackStatus PeekHandleStatus(HINTERNET Handle);
 
+	MODIO_IMPL void EraseCabllbackStatus(HINTERNET Handle);
 	MODIO_IMPL WinHTTPCallbackStatus FetchAndClearHandleStatus(HINTERNET Handle);
 	MODIO_IMPL std::pair<std::uintptr_t, std::uintmax_t> GetExtendedStatus(HINTERNET Handle);
 	MODIO_IMPL bool IsClosing();
