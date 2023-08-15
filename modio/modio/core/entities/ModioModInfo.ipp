@@ -47,7 +47,7 @@ namespace Modio
 		Detail::ParseSafe(Json, ModInfo.ModId, "id");
 
 		{
-			Modio::FileMetadata FileInfo;
+			Modio::FileMetadata FileInfo{};
 			if (Detail ::ParseSafe(Json, FileInfo, "modfile"))
 			{
 				if (FileInfo.ModId == -1)

@@ -60,5 +60,9 @@ namespace Modio
 		/// @docpublic
 		/// @brief Optional path to a new logo image
 		Modio::Optional<std::string> LogoPath;
+
+		/// @docpublic
+		/// @brief Optional tags vector for this mod
+		Modio::Optional<std::vector<std::string>> Tags;
 	};
 } // namespace Modio

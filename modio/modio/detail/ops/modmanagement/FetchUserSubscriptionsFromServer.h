@@ -42,10 +42,8 @@ namespace Modio
 						yield Modio::Detail::PerformRequestAndGetResponseAsync(
 							SubscriptionBuffer,
 							Modio::Detail::GetUserSubscriptionsRequest.SetFilterString(
-								fmt::format("_limit=100&_offset={}&game_id={}&platform_status={}&status-in={}", CurrentResultIndex,
-								Modio::Detail::SDKSessionData::CurrentGameID(),
-								Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetPlatformStatusFilter()),
-								Modio::Detail::SDKSessionData::GetPlatformStatusFilterString())),
+								fmt::format("_limit=100&_offset={}&game_id={}&", CurrentResultIndex,
+								Modio::Detail::SDKSessionData::CurrentGameID())),
 							CachedResponse, std::move(Self));
 
 						Modio::Detail::SDKSessionData::ClearSubscriptionCacheInvalid();

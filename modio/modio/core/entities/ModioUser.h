@@ -38,12 +38,16 @@ namespace Modio
 
 		/// @brief Cached information about the user's avatar
 		Modio::Detail::Avatar Avatar;
+		
+		/// @brief The display name of the User for the given Portal that the mod search is coming from
+		/// * ie if the Portal is PSN, then this is the owning user's PSN profile name if accounts are linked.
+		std::string DisplayNamePortal = "";
 
 		/// @docnone
 		friend bool operator==(const Modio::User& A, const Modio::User& B)
 		{
 			return (A.UserId == B.UserId && A.Username == B.Username && A.DateOnline == B.DateOnline &&
-					A.ProfileUrl == B.ProfileUrl && A.Avatar == B.Avatar);
+					A.ProfileUrl == B.ProfileUrl && A.Avatar == B.Avatar) && (A.DisplayNamePortal == B.DisplayNamePortal);
 		}
 	};
 

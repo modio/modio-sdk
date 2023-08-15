@@ -59,6 +59,17 @@ namespace Modio
 					EditRequestParams = EditRequestParams.AppendPayloadValue(
 						"maturity_option", fmt::format("{}", static_cast<std::uint8_t>(Params.MaturityRating.value())));
 				}
+
+				if (Params.Tags.has_value())
+				{
+					int i = 0;
+
+					for (const std::string tag : *Params.Tags)
+					{
+						EditRequestParams = EditRequestParams.AppendPayloadValue(fmt::format("tags[{}]", i), tag);
+						i++;
+					}
+				}
 			}
 
 			template<typename CoroType>

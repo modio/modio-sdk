@@ -1963,6 +1963,11 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::ApiError::ExpiredOrRevokedAccessToken)
+					{
+						return true;
+					}
+
 
 				break;
 				case ErrorConditionTypes::SDKNotInitialized:

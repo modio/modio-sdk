@@ -59,10 +59,8 @@ namespace Modio
 						ResponseBodyBuffer,
 						Modio::Detail::GetUserModsRequest.SuppressPlatformHeader().SetGameID(GameID).SetFilterString(
 							fmt::format(
-								Filter.ToString() + "&game_id={}&platform_status-in={}&status={}",
-								std::string(ToString(GameID)),
-								Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetPlatformStatusFilter()),
-								Modio::Detail::SDKSessionData::GetPlatformStatusFilterString())),
+								Filter.ToString() + "&game_id={}",
+								std::string(ToString(GameID)))),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 
 					if (ec)

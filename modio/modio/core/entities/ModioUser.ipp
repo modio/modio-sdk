@@ -28,6 +28,8 @@ namespace Modio
 		{
 			Modio::Detail::from_json(AvatarJson, User.Avatar);
 		}
+
+		Detail::ParseSafe(Json, User.DisplayNamePortal, "display_name_portal");
 	}
 	
 	void to_json(nlohmann::json& Json, const Modio::User& User)
@@ -36,6 +38,7 @@ namespace Modio
 							   {"username", User.Username},
 							   {"date_online", User.DateOnline},
 							   {"profile_url", User.ProfileUrl},
-							   {"avatar", User.Avatar}};
+							   {"avatar", User.Avatar},
+								{"display_name_portal", User.DisplayNamePortal}};
 	}
 }

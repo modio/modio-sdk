@@ -302,6 +302,11 @@ namespace Modio
 								Modio::Detail::SDKSessionData::SetLastValidationError(
 									Error->ExtendedErrorInformation.value());
 							}
+							if (ErrRef == Modio::ApiError::ExpiredOrRevokedAccessToken) 
+							{
+								Self.complete(Modio::make_error_code(Modio::UserAuthError::StatusAuthTokenInvalid));
+								return;
+							}
 							if (ErrRef != Modio::ErrorConditionTypes::ApiErrorRefSuccess)
 							{
 								// No need to log rate-limited response out

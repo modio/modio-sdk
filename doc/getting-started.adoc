@@ -455,6 +455,8 @@ NOTE: RunPendingHandlers is not reentrant-safe. Do not call <<RunPendingHandlers
 ==== SDK Configuration and Initialization
 When you are ready to initialize the SDK for the current session, you'll need to call <<InitializeAsync>>, passing in your product's mod.io ID, your API key, the Local Profile Name, and a callback/handler so you know when the SDK is initialized correctly. Note that <<InitializeAsync>>'s callback will be invoked after calling <<RunPendingHandlers>> from your project's main loop.
 
+You should also ensure that you are targeting an appropriate Portal for mod.io to understand what storefront or app the request is originating from. This enabled additional storefront-based functionality, such as returning display name mappings for that portal.
+
 [source,cpp] 
 ----
 // represents some external state so we know that the SDK is good to go

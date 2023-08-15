@@ -63,12 +63,7 @@ namespace Modio
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ModInfoBuffer,
 						Modio::Detail::GetModRequest.SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
-							.SetModID(Mod)
-							.SetFilterString(fmt::format(
-								"&platform_status={}&status-in={}",
-								Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetPlatformStatusFilter()),
-								Modio::Detail::SDKSessionData::GetPlatformStatusFilterString()))
-						,
+							.SetModID(Mod),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 					if (ec)
 					{
@@ -115,7 +110,7 @@ namespace Modio
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
 													"Data received for mod {} contains no modfile information",
-													ModInfoData.FileInfo->Filename);
+													ModInfoData.ProfileName);
 						Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
 						Self.complete(Modio::make_error_code(Modio::GenericError::NoDataAvailable));
 						return;

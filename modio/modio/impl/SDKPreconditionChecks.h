@@ -201,7 +201,8 @@ namespace Modio
 				Params.Name.has_value() ||
 				Params.NamePath.has_value() ||
 				Params.Summary.has_value() ||
-				Params.LogoPath.has_value();
+				Params.LogoPath.has_value() ||
+				Params.Tags.has_value();
 			// clang-format on
 
 			if (!bHasValidParameter)
