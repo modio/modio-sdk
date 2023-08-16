@@ -16,7 +16,7 @@
 class HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementation
 {
 public:
-	MODIO_IMPL ~HttpRequestImplementation();
+	MODIO_IMPL virtual ~HttpRequestImplementation();
 
 	HINTERNET ConnectionHandle;
 	HINTERNET RequestHandle;
