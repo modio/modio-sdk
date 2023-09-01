@@ -40,10 +40,10 @@ namespace Modio
 						// time We're going to gather all the results together at the end of this anyways so the biggest
 						// pages give the best results because it means fewer REST calls
 						yield Modio::Detail::PerformRequestAndGetResponseAsync(
-							SubscriptionBuffer,
-							Modio::Detail::GetUserSubscriptionsRequest.SetFilterString(
-								fmt::format("_limit=100&_offset={}&game_id={}&", CurrentResultIndex,
-								Modio::Detail::SDKSessionData::CurrentGameID())),
+							SubscriptionBuffer, Modio::Detail::GetUserSubscriptionsRequest
+							.AddLimitQueryParam()
+							.AddOffsetQueryParam(CurrentResultIndex)
+							.AddCurrentGameIdQueryParam(),
 							CachedResponse, std::move(Self));
 
 						Modio::Detail::SDKSessionData::ClearSubscriptionCacheInvalid();

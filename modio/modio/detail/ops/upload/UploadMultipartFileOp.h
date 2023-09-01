@@ -252,7 +252,7 @@ namespace Modio
 								.SetModID(ModID)
 								// A "AddMultipartUploadPartRequest" needs the upload_id as part of the
 								// URL parameters
-								.SetFilterString("upload_id=" + Session->UploadID.value()),
+								.AddQueryParamRaw("upload_id", Session->UploadID.value()),
 							ArchivePath, FilePart, Session, ProgressInfo, std::move(Self));
 
 						if (ec)
@@ -269,7 +269,7 @@ namespace Modio
 
 					// #3: Finalize the "Upload Session"
 					{
-						CloseSessionRequest->Parameters().SetFilterString("upload_id=" + Session->UploadID.value());
+						CloseSessionRequest->Parameters().AddQueryParamRaw("upload_id", Session->UploadID.value());
 						yield CloseSessionRequest->SendAsync(std::move(Self));
 
 						if (ec)

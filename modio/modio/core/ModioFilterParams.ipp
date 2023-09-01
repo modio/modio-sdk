@@ -126,9 +126,9 @@ namespace Modio
 		  Count(100)
 	{}
 
-	std::string FilterParams::ToString() const
+	std::map<std::string, std::string> Modio::FilterParams::ToQueryParamaters() const
 	{
-		std::vector<std::string> FilterFields;
+		std::map<std::string, std::string> FilterFields;
 		std::string SortStr;
 
 		// The sorts listed at https://docs.mod.io/#get-mods is inverted for some reason compared to the explanation at
@@ -167,15 +167,12 @@ namespace Modio
 				break;
 		}
 
-		SortStr = fmt::format("_sort={}{}",
-							  ((Direction == SortDirection::Descending && !bInvertedSort) ||
-							   (Direction == SortDirection::Ascending && bInvertedSort))
-								  ? "-"
-								  : "",
-							  SortStr);
-		FilterFields.push_back(SortStr);
+		FilterFields.emplace("_sort", fmt::format("{}{}", ((Direction == SortDirection::Descending && !bInvertedSort) ||
+									   (Direction == SortDirection::Ascending && bInvertedSort)
+										  ? "-"
+										  : ""), SortStr));
 
-		if (SearchKeywords.size())
+		if (!SearchKeywords.empty())
 		{
 			std::string SearchStr;
 			for (std::string Keyword : SearchKeywords)
@@ -183,20 +180,20 @@ namespace Modio
 				SearchStr += Keyword + " ";
 			}
 			SearchStr.resize(SearchStr.size() - 1);
-			FilterFields.push_back(fmt::format("_q={}", SearchStr));
+			FilterFields.emplace("_q", SearchStr);
 		}
 
 		if (DateRangeBegin)
 		{
-			FilterFields.push_back(fmt::format("date_live-min={}", DateRangeBegin->time_since_epoch()));
+			FilterFields.emplace("date_live-min", fmt::format("{}",DateRangeBegin->time_since_epoch()));
 		}
 
 		if (DateRangeEnd)
 		{
-			FilterFields.push_back(fmt::format("date_live-max={}", DateRangeBegin->time_since_epoch()));
+			FilterFields.emplace("date_live-max", fmt::format("{}", DateRangeBegin->time_since_epoch()));
 		}
 
-		if (Tags.size())
+		if (!Tags.empty())
 		{
 			std::string TagStr;
 			for (std::string Tag : Tags)
@@ -204,10 +201,10 @@ namespace Modio
 				TagStr += Tag + ",";
 			}
 			TagStr.resize(TagStr.size() - 1);
-			FilterFields.push_back(fmt::format("tags={}", TagStr));
+			FilterFields.emplace("tags", TagStr);
 		}
 
-		if (ExcludedTags.size())
+		if (!ExcludedTags.empty())
 		{
 			std::string ExcludedTagStr;
 			for (std::string Tag : ExcludedTags)
@@ -215,43 +212,37 @@ namespace Modio
 				ExcludedTagStr += Tag + ",";
 			}
 			ExcludedTagStr.resize(ExcludedTagStr.size() - 1);
-			FilterFields.push_back(fmt::format("tags-not-in={}", ExcludedTagStr));
+			FilterFields.emplace("tags-not-in", ExcludedTagStr);
 		}
 
 		if (MetadataBlobSearchString)
 		{
-			FilterFields.push_back(fmt::format("metadata_blob-lk=*{}*", *MetadataBlobSearchString));
+			FilterFields.emplace("metadata_blob-lk", fmt::format("*{}*", *MetadataBlobSearchString));
 		}
 
 		std::string ResultLimitStr;
 		if (IsPaged)
 		{
-			FilterFields.push_back(fmt::format("_limit={}&_offset={}", Count, Count * Index));
+			FilterFields.emplace("_limit", std::to_string(Count));
+			FilterFields.emplace("_offset", std::to_string(Count * Index));
 		}
 		else
 		{
-			FilterFields.push_back(fmt::format("_limit={}&_offset={}", Count, Index));
+			FilterFields.emplace("_limit", std::to_string(Count));
+			FilterFields.emplace("_offset", std::to_string(Index));
 		}
 
-		if (IncludedIDs.size())
+		if (!IncludedIDs.empty())
 		{
-			FilterFields.push_back(fmt::format("id-in={}", fmt::join(IncludedIDs, ",")));
+			FilterFields.emplace("id-in", fmt::format("{}", fmt::join(IncludedIDs, ",")));
 		}
 
-		if (ExcludedIDs.size())
+		if (!ExcludedIDs.empty())
 		{
-			FilterFields.push_back(fmt::format("id-not-in={}", fmt::join(ExcludedIDs, ",")));
+			FilterFields.emplace("id-not-in", fmt::format("{}", fmt::join(ExcludedIDs, ",")));
 		}
 
-		std::string FilterString;
-
-		for (std::string Filter : FilterFields)
-		{
-			FilterString += Filter + "&";
-		}
-		FilterString.resize(FilterString.size() - 1);
-		// FilterString.pop_back();
-		return FilterString;
+		return FilterFields;
 	}
 
 	Modio::FilterParams& FilterParams::AppendValue(std::vector<std::string>& Vector, std::string Tag)

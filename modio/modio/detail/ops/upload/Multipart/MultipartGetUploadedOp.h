@@ -41,7 +41,7 @@ namespace Modio
 				GetPartsRequest = Modio::Detail::GetMultipartUploadPartsRequest
 									  .SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
 									  .SetModID(CurrentModID)
-									  .SetFilterString("upload_id=" + USession.UploadID.value());
+									  .AddQueryParamRaw("upload_id", USession.UploadID.value());
 			};
 
 			template<typename CoroType>

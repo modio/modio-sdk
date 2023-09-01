@@ -75,8 +75,6 @@ public:
 
 		reenter(Coroutine)
 		{
-			
-
 			if (Length == 0)
 			{
 				Self.complete({}, Modio::Detail::Buffer(0));

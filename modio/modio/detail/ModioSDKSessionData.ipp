@@ -466,30 +466,31 @@ namespace Modio
 			{
 				Get().PlatformStatusFilter = Modio::PlatformStatus::PendingOnly;
 			}
-			else
-			{
-				Get().PlatformStatusFilter = Modio::PlatformStatus::ApprovedOnly;
-			}
 		}
 
-		Modio::PlatformStatus SDKSessionData::GetPlatformStatusFilter()
+		Modio::Optional<Modio::PlatformStatus> SDKSessionData::GetPlatformStatusFilter()
 		{
 			return Get().PlatformStatusFilter;
 		}
 
 		std::string SDKSessionData::GetPlatformStatusFilterString()
 		{
-			switch (Get().PlatformStatusFilter)
+			if (Get().PlatformStatusFilter.has_value())
 			{
-				case PlatformStatus::ApprovedOnly:
-					return "1";
-				case PlatformStatus::LiveAndPending:
-					return "0,1";
-				case PlatformStatus::PendingOnly:
-					return "0,1";
-				default:
-					return "1";
+				switch (Get().PlatformStatusFilter.value())
+				{
+					case PlatformStatus::ApprovedOnly:
+						return "1";
+					case PlatformStatus::LiveAndPending:
+						return "0,1";
+					case PlatformStatus::PendingOnly:
+						return "0,1";
+					default:
+						return "1";
+				}	
 			}
+
+			return "";
 		}
 
 		void SDKSessionData::InvalidateSubscriptionCache()

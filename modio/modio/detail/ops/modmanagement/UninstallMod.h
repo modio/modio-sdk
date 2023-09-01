@@ -38,8 +38,9 @@ namespace Modio
 						Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MakeModPath(ModId);
 					yield Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFolderAsync(
 						InstallPath, std::move(Self));
+
 					// If the directory never existed, then don't call it a failure if we couldn't delete the files
-					if (ec && ec != std::errc::no_such_file_or_directory)
+					if (ec && (ec != std::errc::no_such_file_or_directory && ec != Modio::FilesystemError::DirectoryNotFound))
 					{
 						Modio::Detail::Logger().Log(
 							LogLevel::Error, LogCategory::File,

@@ -110,13 +110,25 @@ namespace Modio
 
 			MODIO_IMPL HttpRequestParams& SetUserID(Modio::UserID ID);
 
-			MODIO_IMPL HttpRequestParams SetFilterString(const std::string& InFilterString) const;
-
-			MODIO_IMPL HttpRequestParams& SetFilterString(const std::string& InFilterString);
-
 			MODIO_IMPL HttpRequestParams SetLocale(const Modio::Language Locale) const;
 
 			MODIO_IMPL HttpRequestParams& SetLocale(const Modio::Language Locale);
+
+			MODIO_IMPL HttpRequestParams AddQueryParamRaw(const std::string& Key, const std::string& Value) const;
+			MODIO_IMPL HttpRequestParams& AddQueryParamRaw(const std::string& Key, const std::string& Value);
+
+			MODIO_IMPL HttpRequestParams AddLimitQueryParam() const;
+
+			MODIO_IMPL HttpRequestParams AddOffsetQueryParam(int32_t offset) const;
+
+			MODIO_IMPL HttpRequestParams AddCurrentGameIdQueryParam() const;
+
+			MODIO_IMPL HttpRequestParams AddPlatformStatusFilter() const;
+
+			MODIO_IMPL HttpRequestParams AddStatusFilter() const;
+
+			MODIO_IMPL HttpRequestParams AppendQueryParameterMap(const std::map<std::string, std::string> InQueryParameterMap) const;
+
 
 			// Overload to silently drop nulled keys - doesn't have to be a template strictly, but is one so that it's
 			// lower priority than the std::string version in the overload set
@@ -297,12 +309,14 @@ namespace Modio
 
 			MODIO_IMPL const Modio::Optional<std::string> GetAuthToken() const;
 
-			/// @brief Resolves all placeholder parameters in a resource path to their actual values
+			/// @brief Resolves all placeholder in a resource path to their actual values, and build
+			///	the query string for any QueryParameters that have been passed in
 			/// @return The fully-resolved resource path
 			MODIO_IMPL std::string GetResolvedResourcePath() const;
 
 			bool bFileDownload = false;
 
+			// Whether this request should suppress the X-Modio-Platform header
 			bool bSuppressPlatformHeader = false;
 
 			std::string FileDownloadServer = "";
@@ -315,8 +329,6 @@ namespace Modio
 			std::uint64_t ModID;
 			std::uint64_t UserID;
 
-			// @todo: Investigate FilterString/Payload how we could refactor those
-			Modio::Optional<std::string> FilterString;
 			// This should most likely be a ID into a separate payload store or
 			// let it be put as a different parameter
 			Modio::Optional<std::string> Payload;
@@ -347,6 +359,8 @@ namespace Modio
 			Modio::Optional<std::tuple<Modio::FileOffset, Modio::FileOffset, Modio::FileOffset>> ContentRangeOffsets;
 			
 			Modio::Optional<std::string> UserAgentOverride;
+
+			std::map<std::string, std::string> QueryParameters;
 		};
 
 // TODO: @Modio-core implement comparison operator for HttpRequestParams and maybe IsValid()?

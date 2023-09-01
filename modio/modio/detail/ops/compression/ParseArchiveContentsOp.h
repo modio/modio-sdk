@@ -168,6 +168,14 @@ namespace Modio
 							}
 						}
 
+						// Early out if we have read some bad data, this can happen for some corrupt/truncated files
+						if (ArchiveState->CentralDirectoryOffset > ArchiveFileOnDisk->GetFileSize() ||
+							ArchiveState->CentralDirectorySize > ArchiveFileOnDisk->GetFileSize())
+						{
+							Self.complete(Modio::make_error_code(Modio::ArchiveError::InvalidHeader));
+							return;
+						}
+
 						yield ArchiveFileOnDisk->ReadSomeAtAsync(ArchiveState->CentralDirectoryOffset,
 																 ArchiveState->CentralDirectorySize, std::move(Self));
 

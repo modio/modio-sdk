@@ -19,6 +19,7 @@
 #include <asio/coroutine.hpp>
 
 #include <asio/yield.hpp>
+
 namespace Modio
 {
 	namespace Detail
@@ -43,7 +44,7 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					// In case there is no filter, it could be possible to get all cached ModInfo
-					if (Filter.ToString().length() == 0)
+					if (Filter.ToQueryParamaters().empty())
 					{
 						Modio::Optional<Modio::ModInfoList> CachedModInfo =
 							Services::GetGlobalService<CacheService>().FetchFromCache(GameID);
@@ -57,8 +58,7 @@ namespace Modio
 
 						yield Modio::Detail::PerformRequestAndGetResponseAsync(
 							ResponseBodyBuffer,
-								Modio::Detail::GetModsRequest.SetGameID(GameID).SetFilterString(
-									fmt::format("{}", Filter.ToString())),
+								Modio::Detail::GetModsRequest.SetGameID(GameID).AppendQueryParameterMap(Filter.ToQueryParamaters()),
 							Modio::Detail::CachedResponse::Allow, std::move(Self));
 					
 					if (ec)

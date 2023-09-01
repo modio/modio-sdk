@@ -60,7 +60,7 @@ nlohmann::json Modio::Detail::ToJson(const Modio::Detail::DynamicBuffer& Respons
 	Modio::Detail::Buffer LinearBuffer(ResponseBuffer.size());
 	Modio::Detail::BufferCopy(LinearBuffer, ResponseBuffer);
 	MODIO_PROFILE_SCOPE(JsonParse);
-	return nlohmann::json::parse(LinearBuffer.Data(), nullptr, false);
+	return Modio::Detail::ToJson(LinearBuffer);
 }
 
 nlohmann::json Modio::Detail::ToJson(const Modio::filesystem::path& Path)
@@ -76,5 +76,14 @@ nlohmann::json Modio::Detail::ToJson(const Modio::Detail::Buffer& InBuffer)
 	{
 		return nlohmann::json {};
 	}
+
+	// This checks that the data to parse is JSON compatible.
+	if (nlohmann::json::accept(InBuffer.Data()) == false)
+	{
+		// This negative case will return a discarded type, used by "TryMarshalResponse"
+		// to return an empty object
+        return nlohmann::json::value_t::discarded;
+	}
+
 	return nlohmann::json::parse(InBuffer.Data(), nullptr, false);
 }

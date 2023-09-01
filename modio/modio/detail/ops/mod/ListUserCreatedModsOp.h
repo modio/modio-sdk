@@ -43,7 +43,7 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					// In case there is no filter, it could be possible to get all cached ModInfo
-					if (Filter.ToString().length() == 0)
+					if (Filter.ToQueryParamaters().empty())
 					{
 						Modio::Optional<Modio::ModInfoList> CachedModInfo =
 							Services::GetGlobalService<CacheService>().FetchFromCache(GameID);
@@ -57,10 +57,7 @@ namespace Modio
 					
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer,
-						Modio::Detail::GetUserModsRequest.SuppressPlatformHeader().SetGameID(GameID).SetFilterString(
-							fmt::format(
-								Filter.ToString() + "&game_id={}",
-								std::string(ToString(GameID)))),
+						Modio::Detail::GetUserModsRequest.SuppressPlatformHeader().SetGameID(GameID).AddCurrentGameIdQueryParam(),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 
 					if (ec)

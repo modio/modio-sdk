@@ -54,10 +54,13 @@ public:
 			SharedStateHolder::Get().SharedStatePtr = SharedState;
 			SharedStateHolder::Get().CurrentSessionId.store((uint64_t) CurrentSession);
 
-			// Set Timeout to 120 seconds
-			unsigned long Timeout = 120000;
+			// Set Timeout to 19 seconds
+			unsigned long Timeout = 10000;
+			
+			// Use WinHttpSetTimeouts to set a new time-out values. In the order of placement:
+			// nResolveTimeout, nConnectTimeout, nSendTimeout, nReceiveTimeout
 			bool SetTimeoutStatus =
-				WinHttpSetOption(CurrentSession, WINHTTP_OPTION_CONNECT_TIMEOUT, &Timeout, sizeof(unsigned long));
+				WinHttpSetTimeouts(CurrentSession, Timeout, Timeout, Timeout, Timeout);
 			if (!SetTimeoutStatus)
 			{
 				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,

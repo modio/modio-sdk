@@ -139,7 +139,7 @@ namespace Modio
 			MODIO_IMPL static Modio::Optional<std::string> GetPlatformOverride();
 
 			MODIO_IMPL static void SetPlatformStatusFilter(std::string PendingOnlyResults);
-			MODIO_IMPL static Modio::PlatformStatus GetPlatformStatusFilter();
+			MODIO_IMPL static Modio::Optional<Modio::PlatformStatus> GetPlatformStatusFilter();
 			MODIO_IMPL static std::string GetPlatformStatusFilterString();
 
 			MODIO_IMPL static Modio::Optional<Modio::ModID> ResolveModCreationHandle(Modio::ModCreationHandle Handle);
@@ -182,7 +182,7 @@ namespace Modio
 			Modio::Environment Environment;
 			Modio::Optional<std::string> EnvironmentOverrideUrl;
 			Modio::Optional<std::string> PlatformOverride;
-			Modio::PlatformStatus PlatformStatusFilter;
+			Modio::Optional<Modio::PlatformStatus> PlatformStatusFilter;
 			Modio::Portal PortalInUse;
 			InitializationState CurrentInitializationState = InitializationState::NotInitialized;
 			bool bModManagementEnabled = false;

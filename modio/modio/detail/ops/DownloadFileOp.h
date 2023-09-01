@@ -43,6 +43,8 @@ namespace Modio
 			Modio::StableStorage<bool> EndOfFileReached;
 			Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo;
 
+			Modio::Optional<std::uint64_t> ExpectedFilesize;
+
 			struct DownloadFileImpl
 			{
 				Modio::Detail::OperationQueue::Ticket DownloadTicket;
@@ -60,9 +62,11 @@ namespace Modio
 			DownloadFileOp(const Modio::Detail::HttpRequestParams RequestParams,
 						   Modio::filesystem::path DestinationPath,
 						   Modio::Detail::OperationQueue::Ticket DownloadTicket,
-						   Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo)
+						   Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo,
+							Modio::Optional<std::uint64_t> Filesize)
 				: ProgressInfo(ProgressInfo)
 			{
+				ExpectedFilesize = Filesize;
 				File = std::make_shared<Modio::Detail::File>(DestinationPath += Modio::filesystem::path(".download"),
 															 Modio::Detail::FileMode::ReadWrite, false);
 				CurrentFilePosition =
@@ -253,8 +257,20 @@ namespace Modio
 							else
 							{
 								Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Http,
-															"Download of {} completed with size: {}",
-															File->GetPath().u8string(), File->GetFileSize());
+															"Download of {} completed with size: {}; expected filesize was {}",
+															File->GetPath().u8string(), File->GetFileSize(), ExpectedFilesize.has_value() ? ExpectedFilesize.value() : 0);
+
+								if (ExpectedFilesize.has_value() && (File->GetFileSize() != ExpectedFilesize))
+								{
+									Modio::Detail::Logger().Log(
+										Modio::LogLevel::Error, Modio::LogCategory::Http,
+										"Downloaded file was not the expected size; returning");
+
+									Self.complete(Modio::make_error_code(FilesystemError::WriteError));
+									File.reset();
+									return;
+								}
+
 								// Clean up
 								File.reset();
 								Self.complete(Modio::ErrorCode {});
@@ -282,13 +298,14 @@ namespace Modio
 		auto DownloadFileAsync(Modio::Detail::HttpRequestParams DownloadParameters,
 							   Modio::filesystem::path DestinationPath,
 							   Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ModProgress,
+							   Modio::Optional<std::uint64_t> Filesize,
 							   CompletionTokenType&& Token)
 		{
 			return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
 				DownloadFileOp(
 					DownloadParameters, DestinationPath,
 					Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().GetFileDownloadTicket(),
-					ModProgress),
+					ModProgress, Filesize),
 				Token, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 
@@ -296,12 +313,12 @@ namespace Modio
 		// shouldn't have to wait for mod downloads to complete.
 		template<typename CompletionTokenType>
 		auto DownloadFileAsApiRequestAsync(Modio::Detail::HttpRequestParams DownloadParameters,
-										   Modio::filesystem::path DestinationPath, CompletionTokenType&& Token)
+										   Modio::filesystem::path DestinationPath, Modio::Optional<std::uint64_t> Filesize, CompletionTokenType&& Token)
 		{
 			return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
 				DownloadFileOp(
 					DownloadParameters, DestinationPath,
-					Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().GetAPIRequestTicket(), {}),
+					Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().GetAPIRequestTicket(), {}, Filesize),
 				Token, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 

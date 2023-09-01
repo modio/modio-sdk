@@ -15,7 +15,7 @@
 #include "modio/detail/ModioDefines.h"
 
 #ifdef MODIO_PLATFORM_UNREAL
-
+	#define MODIO_WRAPPING_ASIO
 	#include MODIO_UNREAL_PLATFORM_PREAMBLE
 
 namespace asio
@@ -52,7 +52,7 @@ namespace asio
 	#pragma pop_macro("ASIO_NO_TYPEID")
 
 	#include MODIO_UNREAL_PLATFORM_EPILOGUE
-
+	#undef MODIO_WRAPPING_ASIO
 #elif defined(_WIN32)
 	// Set the proper SDK version before including asio
 	#include <SDKDDKVer.h>

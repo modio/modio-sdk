@@ -93,7 +93,7 @@ namespace Modio
 					// Download the file
 					yield Modio::Detail::DownloadFileAsApiRequestAsync(
 						OpState.DownloadRequestParams.value(),
-						OpState.DestinationTempPath, std::move(Self));
+						OpState.DestinationTempPath, {}, std::move(Self));
 
 					if (ec)
 					{

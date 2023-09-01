@@ -113,23 +113,73 @@ namespace Modio
 			return *this;
 		}
 
-		Modio::Detail::HttpRequestParams& HttpRequestParams::SetFilterString(const std::string& InFilterString)
+
+		Modio::Detail::HttpRequestParams HttpRequestParams::AddQueryParamRaw(const std::string& Key, const std::string& Value) const
 		{
-			// If there was a provided filter string, append on & to ensure that we can append on the API key
-			if (InFilterString.size())
+			auto NewParamsInstance = HttpRequestParams(*this);
+			if (QueryParameters.count(Key) == 0)
 			{
-				// @todo: Move away this & as it makes it hard to follow the logic of how the URL is built
-				FilterString = InFilterString + "&";
+				NewParamsInstance.QueryParameters.emplace(Key, Value);	
+			}
+
+			return NewParamsInstance;
+		}
+
+		Modio::Detail::HttpRequestParams& HttpRequestParams::AddQueryParamRaw(const std::string& Key,
+																			 const std::string& Value)
+		{
+			if (QueryParameters.count(Key) == 0)
+			{
+				this->QueryParameters.emplace(Key, Value);
 			}
 
 			return *this;
 		}
 
-		HttpRequestParams HttpRequestParams::SetFilterString(const std::string& InFilterString) const
+		Modio::Detail::HttpRequestParams HttpRequestParams::AppendQueryParameterMap(
+			const std::map<std::string, std::string> InQueryParameterMap) const
 		{
 			auto NewParamsInstance = HttpRequestParams(*this);
-			NewParamsInstance.SetFilterString(InFilterString);
+			NewParamsInstance.QueryParameters.insert(InQueryParameterMap.begin(), InQueryParameterMap.end());
 			return NewParamsInstance;
+		}
+
+		Modio::Detail::HttpRequestParams HttpRequestParams::AddLimitQueryParam() const
+		{
+			return AddQueryParamRaw("limit", std::to_string(100));
+		}
+
+		Modio::Detail::HttpRequestParams HttpRequestParams::AddOffsetQueryParam(int32_t offset) const
+		{
+			return AddQueryParamRaw("offset", std::to_string(offset));
+		}
+
+		Modio::Detail::HttpRequestParams HttpRequestParams::AddCurrentGameIdQueryParam() const
+		{
+			return AddQueryParamRaw("game_id", std::to_string(SDKSessionData::CurrentGameID()));
+		}
+
+		Modio::Detail::HttpRequestParams HttpRequestParams::AddPlatformStatusFilter() const
+		{
+			if (SDKSessionData::GetPlatformStatusFilter().has_value())
+			{
+				return AddQueryParamRaw(
+					"platform_status",
+					Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetPlatformStatusFilter().value()));	
+			}
+
+			return HttpRequestParams(*this);
+		}
+
+		Modio::Detail::HttpRequestParams HttpRequestParams::AddStatusFilter() const
+		{
+			if (SDKSessionData::GetPlatformStatusFilter().has_value())
+			{
+				return AddQueryParamRaw("status-in", SDKSessionData::GetPlatformStatusFilterString());
+			}
+
+			return HttpRequestParams(*this);
+
 		}
 
 		HttpRequestParams HttpRequestParams::EncodeAndAppendPayloadValue(std::string Key, Modio::Optional<std::string> Value) const
@@ -278,10 +328,6 @@ namespace Modio
 			}
 			else
 			{
-#ifdef MODIO_SERVER_SIDE_TEST
-				return MODIO_SERVER_SIDE_TEST;
-#else
-
 				auto OverrideUrl = Modio::Detail::SDKSessionData::GetEnvironmentOverrideUrl();
 
 				if (OverrideUrl.has_value())
@@ -289,7 +335,6 @@ namespace Modio
 					return OverrideUrl.value();
 				}
 
-				// @todo: Break this out so that we don't need to use this class in conjunction with the SessionData
 				switch (Modio::Detail::SDKSessionData::GetEnvironment())
 				{
 					case Environment::Live:
@@ -298,7 +343,6 @@ namespace Modio
 						return "api.test.mod.io";
 				}
 				return "";
-#endif
 			}
 		}
 
@@ -308,13 +352,14 @@ namespace Modio
 			{
 				return ResourcePath;
 			}
-			else
+
+			std::string QueryParams;
+			for (auto& QueryParam : QueryParameters)
 			{
-				// @todo: We want to clean up this, this is getting messy
-				std::string Filter = FilterString.value_or("");
-				return std::string(GetAPIVersionString() + GetResolvedResourcePath() + "?" + Filter +
-								   GetAPIKeyString());
+				QueryParams += fmt::format("{}={}&", QueryParam.first, QueryParam.second);
 			}
+
+			return fmt::format("{}{}?{}{}", GetAPIVersionString(), GetResolvedResourcePath(), QueryParams, GetAPIKeyString());
 		}
 
 		std::string HttpRequestParams::GetVerb() const

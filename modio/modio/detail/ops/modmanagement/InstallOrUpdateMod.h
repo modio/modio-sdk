@@ -159,7 +159,7 @@ namespace Modio
 						yield Modio::Detail::DownloadFileAsync(
 							Modio::Detail::HttpRequestParams::FileDownload(ModInfoData.FileInfo->DownloadBinaryURL)
 								.value(),
-							DownloadPath, ModProgress, std::move(Self));
+							DownloadPath, ModProgress, ModInfoData.FileInfo.value().Filesize, std::move(Self));
 						if (ec)
 						{
 							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
@@ -197,7 +197,6 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
-
 
 					if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CheckSpaceAvailable(
 						InstallPath, Modio::FileSize(ModInfoData.FileInfo->FilesizeUncompressed)))

@@ -141,7 +141,7 @@ namespace Modio
 		/// @docinternal
 		/// @brief Converts the filter params to a string suitable for use in the REST API
 		/// @return std::string containing the filter parameters
-		MODIO_IMPL std::string ToString() const;
+		MODIO_IMPL std::map<std::string, std::string> ToQueryParamaters() const;
 
 	private:
 		/// @docinternal
