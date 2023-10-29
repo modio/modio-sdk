@@ -18,9 +18,9 @@
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/timer/ModioTimer.h"
-#include <memory>
 
 #include <asio/yield.hpp>
+#include <memory>
 
 class ReadHttpResponseHeadersOp
 {
@@ -80,6 +80,7 @@ public:
 							WINHTTP_HEADER_NAME_BY_INDEX, &StatusCode, &BufferSize, WINHTTP_NO_HEADER_INDEX))
 					{
 						Request->ResponseCode = StatusCode;
+						ParseHeadersInResponseBuffer();
 					}
 					else
 					{
@@ -93,6 +94,50 @@ public:
 					return;
 			}
 		}
+	}
+
+	bool ParseHeadersInResponseBuffer()
+	{
+		DWORD DWSize = 0;
+		// For reference: https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpqueryheaders
+		bool Result = false;
+		WinHttpQueryHeaders(Request->RequestHandle, WINHTTP_QUERY_RAW_HEADERS_CRLF, WINHTTP_HEADER_NAME_BY_INDEX, NULL,
+							&DWSize, WINHTTP_NO_HEADER_INDEX);
+
+		// Allocate memory for the buffer.
+		if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+		{
+			Modio::Detail::Buffer LPOutBuffer(DWSize);
+
+			// Now, use WinHttpQueryHeaders to retrieve the header.
+			Result = WinHttpQueryHeaders(Request->RequestHandle, WINHTTP_QUERY_RAW_HEADERS_CRLF,
+										 WINHTTP_HEADER_NAME_BY_INDEX, (LPVOID)LPOutBuffer.begin(), &DWSize, WINHTTP_NO_HEADER_INDEX);
+
+			if (Result == false) 
+			{
+				return false;
+			}
+
+			std::string ParseBuffer = "";
+			bool SkipOther = true;
+			
+			// It is necessary to "skip" one other because the buffer returns as a "wide char" which is
+			// 16 bits unitcode, double the size of the char
+			for (auto val : LPOutBuffer) 
+			{
+				SkipOther = !SkipOther;
+					
+				if (SkipOther == true)
+				{ 
+					continue;
+				}
+				ParseBuffer += (char) val;
+			}
+				
+			Request->ResponseHeaders = Modio::Detail::String::ParseRawHeaders(ParseBuffer);
+		}
+
+		return Result;
 	}
 };
 

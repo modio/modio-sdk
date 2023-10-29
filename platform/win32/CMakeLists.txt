@@ -8,6 +8,7 @@
 # 
 
 if(MODIO_PLATFORM STREQUAL "WIN")
+	message("Initializing modio-WIN")
 	set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake;${CMAKE_MODULE_PATH}")
 	set (MODIO_PLATFORM_WIN ON INTERNAL "building windows")
 

@@ -36,7 +36,9 @@ namespace Modio
 		  LocalUserSubscriptions(Other.LocalUserSubscriptions),
 		  PathOnDisk(Other.PathOnDisk),
 		  SizeOnDisk(Other.SizeOnDisk),
-		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries) {};
+		  LastErrorCode(Other.LastErrorCode),
+		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries)
+	{};
 
 	uint8_t ModCollectionEntry::GetRetriesRemaining()
 	{
@@ -96,6 +98,11 @@ namespace Modio
 		}
 	}
 
+	Modio::ErrorCode ModCollectionEntry::GetLastError() const
+	{
+		return LastErrorCode;
+	}
+
 	void ModCollectionEntry::MarkModNoRetryThisSession()
 	{
 		ShouldNotRetry.store(true);
@@ -149,6 +156,8 @@ namespace Modio
 				MarkModNoRetryThisSession();
 			}
 		}
+
+		LastErrorCode = Reason;
 	}
 
 	void ModCollectionEntry::ClearModNoRetry()
@@ -241,6 +250,7 @@ namespace Modio
 		PathOnDisk = Other.PathOnDisk;
 		SizeOnDisk = Other.SizeOnDisk;
 		RetriesRemainingThisSession = Other.RetriesRemainingThisSession;
+		LastErrorCode = Other.LastErrorCode;
 		return *this;
 	};
 

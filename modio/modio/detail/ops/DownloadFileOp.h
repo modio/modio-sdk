@@ -144,6 +144,11 @@ namespace Modio
 							return;
 						}
 
+						if (Modio::Optional<std::uint32_t> RetryAfter = Request->GetRetryAfter())
+						{
+							Modio::Detail::SDKSessionData::MarkAsRateLimited(RetryAfter.value());
+						}
+
 						if (Request->GetResponseCode() >= 301 && Request->GetResponseCode() < 400)
 						{
 							Impl->bRequiresRedirect = true;

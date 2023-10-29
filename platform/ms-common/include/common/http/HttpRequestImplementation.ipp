@@ -50,3 +50,25 @@ Modio::Optional<std::string> HttpRequestImplementation::GetRedirectURL()
 {
 	return {};
 }
+
+Modio::Optional<std::uint32_t> HttpRequestImplementation::GetRetryAfter()
+{
+	Modio::Optional<std::string> Res = GetHeaderValue("Retry-After");
+	if (Res.has_value())
+	{
+		return Modio::Detail::String::ParseDateOrInt(Res.value());
+	}
+
+	return {};
+}
+
+Modio::Optional<std::string> HttpRequestImplementation::GetHeaderValue(std::string Key)
+{
+	auto Position = ResponseHeaders.find(Key);
+	if (Position != ResponseHeaders.end())
+	{
+		return Position->second;
+	}
+
+	return {};
+}

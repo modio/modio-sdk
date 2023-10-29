@@ -468,21 +468,21 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Simple struct to encapsulate data passed to external authentication systems
-	/// @param AuthToken String received by an authentication provider, that later is used
-	/// to verify a user on the mod.io API
-	/// @param UserEmail Optional string that associates an email with a user
-	/// @param bUserHasAcceptedTerms Boolean value that signals when a user has accepted the
-	/// mod.io Terms of Service. True when they are accepted, false otherwise.
-	/// @param bURLEncodeAuthToken Boolean value to let the SDK know if the AuthToken requires
-	/// URL encoding before sending the string to the mod.io API. By default, it would not
-	/// perform URL encoding.
-	/// @param ExtendedParameters A map to store extended parameters required by some providers.
 	struct AuthenticationParams
 	{
+		/// @brief AuthToken String received by an authentication provider, that later is used
+		/// to verify a user on the mod.io API
 		std::string AuthToken;
+		/// @brief UserEmail Optional string that associates an email with a user
 		Modio::Optional<std::string> UserEmail;
+		/// @brief bUserHasAcceptedTerms Boolean value that signals when a user has accepted the
+		/// mod.io Terms of Service. True when they are accepted, false otherwise.
 		bool bUserHasAcceptedTerms = false;
+		/// @brief bURLEncodeAuthToken Boolean value to let the SDK know if the AuthToken requires
+		/// URL encoding before sending the string to the mod.io API. By default, it would not
+		/// perform URL encoding.
 		bool bURLEncodeAuthToken = false;
+		/// @brief ExtendedParameters A map to store extended parameters required by some providers.
 		std::map<std::string, std::string> ExtendedParameters;
 	};
 
@@ -581,6 +581,15 @@ namespace Modio
 		LiveAndPending,
 		PendingOnly,
 		ApprovedOnly
+	};
+
+
+	/// @docpublic
+	/// @brief Simple struct to encapsulate portal-specific data required when consuming entitlements
+	struct EntitlementParams
+	{
+		/// @brief ExtendedParameters A map to store extended parameters required by some portals.
+		std::map<std::string, std::string> ExtendedParameters;
 	};
 
 } // namespace Modio

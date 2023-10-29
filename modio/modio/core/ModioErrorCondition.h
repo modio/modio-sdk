@@ -30,4 +30,7 @@ enum class EModioErrorCondition: uint8
 	SystemError = 18 UMETA(ToolTip="When this condition is true, the error code indicates that a low-level system error occurred outside of mod.io SDK control.") ,
 	OperationCanceled = 19 UMETA(ToolTip="When this condition is true, the error code indicates that the asynchronous operation was cancelled before it completed.") ,
 	ModManagementDisabled = 20 UMETA(ToolTip="When this condition is true, the error code indicates that Mod Management has not been enabled.") ,
+	RateLimited = 21 UMETA(ToolTip="Too many requests made to the mod.io API within the rate-limiting window. Please wait and try again.") ,
+	ModBeingProcessed = 22 UMETA(ToolTip="The specified mod's files are currently being updated by the SDK. Please try again later.") ,
+	InsufficientSpace = 23 UMETA(ToolTip="There is insufficient space to install the mod. Please free up space and try again.") ,
 };

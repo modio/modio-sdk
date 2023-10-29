@@ -65,6 +65,8 @@ namespace Modio
 
 		Modio::ErrorCode NeverRetryReason;
 
+		Modio::ErrorCode LastErrorCode;
+
 		uint8_t RetriesRemainingThisSession;
 
 		/// @docnone
@@ -179,6 +181,10 @@ namespace Modio
 		/// successful extraction/installation
 		/// @param NewSize The total size on disk of all files in the mod
 		MODIO_IMPL void UpdateSizeOnDisk(Modio::FileSize NewSize);
+
+		/// @docinternal
+		/// @return Modio::ErrorCode The last error that occurred for this mod
+		MODIO_IMPL Modio::ErrorCode GetLastError() const;
 
 		/// @docnone
 		friend MODIO_IMPL void to_json(nlohmann::json& j, const ModCollectionEntry& Entry);

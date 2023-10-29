@@ -21,7 +21,9 @@ public:
 	HINTERNET ConnectionHandle;
 	HINTERNET RequestHandle;
 	std::uint32_t ResponseCode;
+	Modio::Optional<std::uint32_t> RetryAfter;
 	Modio::Detail::HttpRequestParams Parameters;
+	std::map<std::string, std::string> ResponseHeaders;
 
 	MODIO_IMPL bool HasBeenSent();
 
@@ -29,7 +31,12 @@ public:
 	MODIO_IMPL virtual std::uint32_t GetResponseCode() override;
 
 	MODIO_IMPL virtual Modio::Detail::HttpRequestParams& GetParameters() override;
+	
 	MODIO_IMPL virtual Modio::Optional<std::string> GetRedirectURL() override;
+	
+	MODIO_IMPL virtual Modio::Optional<std::uint32_t> GetRetryAfter() override;
+
+	MODIO_IMPL virtual Modio::Optional<std::string> GetHeaderValue(std::string Key) override;
 };
 
 

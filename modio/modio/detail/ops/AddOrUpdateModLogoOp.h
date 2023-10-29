@@ -14,6 +14,7 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/ops/mod/GetModInfoOp.h"
 #include "modio/http/ModioHttpParams.h"
 
 #include <asio/yield.hpp>
@@ -43,7 +44,9 @@ namespace Modio
 				reenter(CoroState)
 				{
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
-						ResponseBodyBuffer, Modio::Detail::AddModMediaRequest.SetGameID(GameID).SetModID(ModID).AppendPayloadFile("logo", LogoPath),
+						ResponseBodyBuffer,
+						Modio::Detail::AddModMediaRequest.SetGameID(GameID).SetModID(ModID).AppendPayloadFile("logo",
+																											  LogoPath),
 						Modio::Detail::CachedResponse::Disallow, std::move(Self));
 
 					if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))
@@ -55,7 +58,28 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
+
+					// After a logo update, we need to invalidate the cache in case something exists
+					Modio::Detail::SDKSessionData::InvalidateModCache(ModID);
+
+					// Also, remove the logo file stored for that mod
+					RemoveFileIfExists(Modio::LogoSize::Original);
+					RemoveFileIfExists(Modio::LogoSize::Thumb640);
+					RemoveFileIfExists(Modio::LogoSize::Thumb1280);
+					RemoveFileIfExists(Modio::LogoSize::Thumb320);
+
 					Self.complete({});
+				}
+			}
+
+			void RemoveFileIfExists(Modio::LogoSize Logo)
+			{
+				Modio::Detail::FileService& FileService =
+					Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>();
+				Modio::Optional<Modio::filesystem::path> Path = FileService.GetLogo(ModID, Modio::LogoSize::Original);
+				if (Path.has_value() == true)
+				{
+					FileService.DeleteFile(Path.value());
 				}
 			}
 		};

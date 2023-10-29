@@ -16,10 +16,23 @@
 #include "modio/detail/JsonWrapper.h"
 #include "modio/detail/entities/ModioIcon.h"
 #include "modio/detail/entities/ModioLogo.h"
+#include "modio/core/entities/ModioGameMonetization.h"
 #include <string>
 
 namespace Modio
 {
+	/// @brief Details about a platform that this game supports
+	struct GamePlatform
+	{
+		/// @brief Platform that the game supports
+		Modio::ModfilePlatform Platform;
+
+		/// @brief Whether or not this platform is Locked from having files submitted to it
+		bool Locked;
+
+		/// @brief Whether or not files submitted for this platform are required to go through moderation
+		bool Moderated;
+	};
 	/// @brief Contains media URLs to the preview header image for the game
 	struct HeaderImage
 	{
@@ -89,8 +102,18 @@ namespace Modio
 		Modio::GameStats Stats = {};
 		/// @brief Creator defined URLs to share
 		std::vector<Modio::OtherUrl> OtherUrls = {};
+
 		/// @brief Platforms that are supported by this title
+		/// @deprecated 2023.9 Use PlatformSupport property
+		MODIO_DEPRECATED("2023.9", "std::vector<Modio::GamePlatform> PlatformSupport")
 		std::vector<Modio::ModfilePlatform> Platforms = {};
+
+		/// @brief Platforms supported by this title
+		std::vector<Modio::GamePlatform> PlatformSupport = {};
+		/// @brief Monetization options for the game
+		Modio::GameMonetization		GameMonetizationOptions;
+		/// @brief Name of the Virtual Tokens for this game
+		std::string VirtualTokenName = "";
 	};
 
 	/// @docnone

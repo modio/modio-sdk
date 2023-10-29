@@ -601,7 +601,7 @@ Modio::AuthenticateUserExternalAsync(UserParams,Provider,[Provider, Language](Mo
         if (ec == Modio::ApiError::UserNoAcceptTermsOfUse)
         {
             // We need to display the terms of use to the user
-            Modio::GetTermsOfUseAsync(Provider, Language, [](Modio::ErrorCode ec, Modio::Optional<Modio::Terms> Terms)
+            Modio::GetTermsOfUseAsync(Language, [](Modio::ErrorCode ec, Modio::Optional<Modio::Terms> Terms)
             {
                 if (ec)
                 {

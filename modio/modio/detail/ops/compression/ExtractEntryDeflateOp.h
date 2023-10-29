@@ -87,6 +87,9 @@ namespace Modio
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Compression,
 													"Zero length file in archive extracted successfully");
+
+						// Close File Handle
+						Impl.reset();
 						Self.complete({});
 						return;
 					}

@@ -55,17 +55,15 @@ namespace Modio
 			{
 				reenter(CoroState)
 				{
+					// Only check cache if no invalidation has occurred
+					if (Modio::Detail::SDKSessionData::IsModCacheInvalid(ModId) == false)
 					{
-						// This case would signal that the OpState.Logo has not been set
-						if (OpState.Logo.Filename == "")
-						{
-							Modio::Optional<Modio::ModInfo> CachedModInfo =
-								Services::GetGlobalService<CacheService>().FetchFromCache(ModId);
+						Modio::Optional<Modio::ModInfo> CachedModInfo =
+							Services::GetGlobalService<CacheService>().FetchFromCache(ModId);
 
-							if (CachedModInfo.has_value() == true)
-							{
-								OpState.Logo = CachedModInfo.value().ModLogo;
-							}
+						if (CachedModInfo.has_value() == true)
+						{
+							OpState.Logo = CachedModInfo.value().ModLogo;
 						}
 					}
 

@@ -23,6 +23,8 @@ namespace Modio
 			virtual Modio::Detail::HttpRequestParams& GetParameters() = 0;
 			virtual std::uint32_t GetResponseCode() = 0;
 			virtual Modio::Optional<std::string> GetRedirectURL() = 0;
+			virtual Modio::Optional<std::uint32_t> GetRetryAfter() = 0;
+			virtual Modio::Optional<std::string> GetHeaderValue(std::string Key) = 0;
 		};
 	} // namespace Detail
 } // namespace Modio

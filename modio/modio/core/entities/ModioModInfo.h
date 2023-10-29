@@ -136,6 +136,9 @@ namespace Modio
 		/// @brief The visibility status of the mod, default to Public
 		Modio::ObjectVisibility Visibility = Modio::ObjectVisibility::Public;
 
+		/// @brief Price of this mod
+		int Price;
+
 		/// @docnone
 		friend bool operator==(const Modio::ModInfo& A, const Modio::ModInfo& B)
 		{

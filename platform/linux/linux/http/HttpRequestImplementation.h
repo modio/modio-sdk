@@ -30,13 +30,12 @@ struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementat
 	std::size_t CurrentChunkSizeRemaining = 0;
 	Modio::Optional<std::size_t> GetContentLength()
 	{
-		for (httpparser::Response::HeaderItem& Hdr : ParsedResponseHeaders.headers)
+		Modio::Optional<std::string> Res = GetHeaderValue("Content-Length");
+		if (Res.has_value())
 		{
-			if (Modio::Detail::String::MatchesCaseInsensitive(Hdr.name, "Content-Length"))
-			{
-				return std::stoull(Hdr.value);
-			}
+			return std::stoull(Res.value());
 		}
+		
 		return {};
 	}
 
@@ -57,11 +56,28 @@ struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementat
 	{
 		return Parameters;
 	}
+
 	virtual Modio::Optional<std::string> GetRedirectURL() override
+	{
+		return GetHeaderValue("location");
+	}
+
+	virtual Modio::Optional<std::uint32_t> GetRetryAfter() override
+	{
+		Modio::Optional<std::string> Res = GetHeaderValue("Retry-After");
+		if (Res.has_value())
+		{
+			return Modio::Detail::String::ParseDateOrInt(Res.value());
+		}
+		
+		return {};
+	}
+
+	virtual Modio::Optional<std::string> GetHeaderValue(std::string HeaderKey) override
 	{
 		for (httpparser::Response::HeaderItem& Hdr : ParsedResponseHeaders.headers)
 		{
-			if (Modio::Detail::String::MatchesCaseInsensitive(Hdr.name,"location"))
+			if (Modio::Detail::String::MatchesCaseInsensitive(Hdr.name, HeaderKey))
 			{
 				return Hdr.value;
 			}

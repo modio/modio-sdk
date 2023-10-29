@@ -118,6 +118,12 @@ namespace Modio
 		return *this;
 	}
 
+	Modio::FilterParams& FilterParams::RevenueType(RevenueFilterType ByRevenue)
+	{
+		Revenue = ByRevenue;
+		return *this;
+	}
+
 	FilterParams::FilterParams()
 		: SortField(SortFieldType::ID),
 		  Direction(SortDirection::Ascending),
@@ -240,6 +246,24 @@ namespace Modio
 		if (!ExcludedIDs.empty())
 		{
 			FilterFields.emplace("id-not-in", fmt::format("{}", fmt::join(ExcludedIDs, ",")));
+		}
+
+		if (Revenue.has_value())
+		{
+			switch (Revenue.value())
+			{
+				case RevenueFilterType::Free:
+					FilterFields.emplace("revenue_type", "0");
+					break;
+				case RevenueFilterType::Paid:
+					FilterFields.emplace("revenue_type", "1");
+					break;
+				case RevenueFilterType::FreeAndPaid:
+					FilterFields.emplace("revenue_type", "2");
+					break;
+				default: ;
+			}
+			
 		}
 
 		return FilterFields;

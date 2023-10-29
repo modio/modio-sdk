@@ -21,11 +21,9 @@
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/file/ModioFileService.h"
 
-
 MODIO_DIAGNOSTIC_PUSH
 
 MODIO_ALLOW_DEPRECATED_SYMBOLS
-
 
 #include <asio/yield.hpp>
 namespace Modio
@@ -116,31 +114,48 @@ namespace Modio
 						return;
 					}
 
+					//Is there room in the installation path for the extracted files?
+					InstallPath =
+						Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MakeModPath(Mod);
+					if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CheckSpaceAvailable(
+							InstallPath, Modio::FileSize(ModInfoData.FileInfo->FilesizeUncompressed)))
+					{
+						Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
+						Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
+						return;
+					}
+
+					// Do we already have the file on disk?
+					if (Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().FileExists(
+							DownloadPath))
+					{
+						Modio::Detail::File DownloadedFile(DownloadPath, Modio::Detail::FileMode::ReadOnly);
+						// Is the downloaded file the correct size?
+						if ((int64_t) DownloadedFile.GetFileSize() == ModInfoData.FileInfo->Filesize)
+						{
+							bFileDownloadComplete = true;
+						}
+					}
+					// If we either don't have the file on disk or its size is wrong, check if we have enough space to download the file
+					if (!bFileDownloadComplete &&
+						!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CheckSpaceAvailable(
+							DownloadPath, Modio::FileSize(ModInfoData.FileInfo->Filesize)))
+					{
+						Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
+						Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
+						return;
+					}
+
 					// this check may be redundant given the above check
 					if (std::shared_ptr<Modio::ModProgressInfo> MPI = ModProgress.lock())
 					{
 						SetState(*MPI.get(), Modio::ModProgressInfo::EModProgressState::Downloading);
-						SetTotalProgress(*MPI.get(), Modio::ModProgressInfo::EModProgressState::Downloading, Modio::FileSize(ModInfoData.FileInfo->Filesize));
-
-						if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
-								 .CheckSpaceAvailable(DownloadPath, MPI->GetTotalProgress(Modio::ModProgressInfo::EModProgressState::Downloading)))
+						SetTotalProgress(*MPI.get(), Modio::ModProgressInfo::EModProgressState::Downloading,
+										 Modio::FileSize(ModInfoData.FileInfo->Filesize));
+						if (bFileDownloadComplete)
 						{
-							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
-							Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
-							return;
-						}
-						// check if a fully downloaded file exists to prevent unnecessary redownloads
-						if (Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().FileExists(
-								DownloadPath))
-						{
-							Modio::Detail::File DownloadedFile(DownloadPath, Modio::Detail::FileMode::ReadOnly);
-							if (DownloadedFile.GetFileSize() ==
-								MPI->GetTotalProgress(Modio::ModProgressInfo::EModProgressState::Downloading))
-							{
-								bFileDownloadComplete = true;
-								CompleteProgressState(*MPI.get(),
-													  Modio::ModProgressInfo::EModProgressState::Downloading);
-							}
+							CompleteProgressState(*MPI.get(),
+													Modio::ModProgressInfo::EModProgressState::Downloading);
 						}
 					}
 					else
@@ -170,8 +185,6 @@ namespace Modio
 
 					Modio::Detail::SDKSessionData::GetSystemModCollection().Entries().at(Mod)->SetModState(
 						ModState::Extracting);
-					InstallPath =
-						Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MakeModPath(Mod);
 
 					if (Modio::filesystem::exists(InstallPath, ec) && !ec)
 					{
@@ -197,15 +210,6 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
-
-					if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CheckSpaceAvailable(
-						InstallPath, Modio::FileSize(ModInfoData.FileInfo->FilesizeUncompressed)))
-					{
-						Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
-						Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
-						return;
-					}
-
 
 					yield Modio::Detail::ExtractAllFilesAsync(DownloadPath, InstallPath, ModProgress, std::move(Self));
 
@@ -262,6 +266,5 @@ namespace Modio
 	} // namespace Detail
 } // namespace Modio
 #include <asio/unyield.hpp>
-
 
 MODIO_DIAGNOSTIC_POP

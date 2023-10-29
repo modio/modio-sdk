@@ -775,6 +775,59 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
+	enum class MonetizationError
+	{
+		DisplayPriceIncorrect = 23041
+	};
+
+	/// @docnone
+	struct MonetizationErrorCategoryImpl : std::error_category
+	{
+		inline const char* name() const noexcept override { return "Modio::MonetizationError"; }
+		inline std::string message(int ErrorValue) const override
+		{
+			switch (static_cast<Modio::MonetizationError>(ErrorValue))
+			{
+				case MonetizationError::DisplayPriceIncorrect:
+						return "The display price for the mod was out-of-date or incorrect. Please retry with the correct display price.";
+					break;
+				default:
+					return "Unknown MonetizationError error";
+			}
+		}
+	};
+
+	/// @docnone
+	inline const std::error_category& MonetizationErrorCategory()
+	{
+		static MonetizationErrorCategoryImpl CategoryInstance;
+		return CategoryInstance;
+	}
+
+	/// @docnone
+	inline std::error_code make_error_code(MonetizationError e)
+	{
+		return { static_cast<int>(e), MonetizationErrorCategory() };
+	}
+
+	/// @docnone
+	inline bool operator==(std::error_code A, MonetizationError B)
+	{
+		return A.category() == MonetizationErrorCategory() && A.value() == static_cast<int>(B);
+	}
+
+	/// @docnone
+	inline bool operator!=(std::error_code A, MonetizationError B)
+	{
+		return ! (A == B);
+	}
+
+	/// @docnone
+	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, MonetizationError RawErrorValue )
+	{
+		return ec == RawErrorValue;
+	}
+
 	enum class ApiError
 	{
 		APIKeyForTestOnly = 11017,
@@ -788,6 +841,7 @@ namespace Modio
 		CannotMuteYourself = 17039,
 		CannotVerifyExternalCredentials = 11032,
 		CrossOriginForbidden = 10001,
+		DisplayPriceIncorrect = 900035,
 		ExpiredOrRevokedAccessToken = 11005,
 		FailedToCompleteTheRequest = 10002,
 		InsufficientPermission = 15019,
@@ -800,6 +854,7 @@ namespace Modio
 		MissingContentTypeHeader = 13005,
 		MissingReadPermission = 11004,
 		MissingWritePermission = 11003,
+		ModfileNoUploadPermission = 15006,
 		ModioOutage = 10000,
 		MuteUserNotFound = 17000,
 		OpenIDNotConfigured = 11086,
@@ -863,6 +918,9 @@ namespace Modio
 				case ApiError::CrossOriginForbidden:
 						return "Cross-origin request forbidden.";
 					break;
+				case ApiError::DisplayPriceIncorrect:
+						return "The given display price does not match the price of the mod.";
+					break;
 				case ApiError::ExpiredOrRevokedAccessToken:
 						return "Access token is expired, or has been revoked.";
 					break;
@@ -898,6 +956,9 @@ namespace Modio
 					break;
 				case ApiError::MissingWritePermission:
 						return "Access token is missing the write scope to perform the request.";
+					break;
+				case ApiError::ModfileNoUploadPermission:
+						return "The authenticated user does not have permission to upload modfiles for the specified mod. Ensure the user is a team manager or administrator.";
 					break;
 				case ApiError::ModioOutage:
 						return "mod.io is currently experiencing an outage. (rare)";
@@ -1037,6 +1098,9 @@ namespace Modio
 					return ModValidationErrorCategory();
 				break;
 				case 11:
+					return MonetizationErrorCategory();
+				break;
+				case 12:
 					return ApiErrorCategory();
 				break;
 				default:
@@ -1088,9 +1152,13 @@ namespace Modio
 			{
 					return 10;
 			}
-			if (Category ==  ApiErrorCategory())
+			if (Category ==  MonetizationErrorCategory())
 			{
 					return 11;
+			}
+			if (Category ==  ApiErrorCategory())
+			{
+					return 12;
 			}
 			return 0;
 		}
@@ -1141,7 +1209,13 @@ namespace Modio
 		/// @brief When this condition is true, the error code indicates that the asynchronous operation was cancelled before it completed.
 		OperationCanceled = 19,
 		/// @brief When this condition is true, the error code indicates that Mod Management has not been enabled.
-		ModManagementDisabled = 20
+		ModManagementDisabled = 20,
+		/// @brief Too many requests made to the mod.io API within the rate-limiting window. Please wait and try again.
+		RateLimited = 21,
+		/// @brief The specified mod's files are currently being updated by the SDK. Please try again later.
+		ModBeingProcessed = 22,
+		/// @brief There is insufficient space to install the mod. Please free up space and try again.
+		InsufficientSpace = 23
 	};
 
 	/// @docnone
@@ -1211,6 +1285,15 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::ModManagementDisabled:
 					return "When this condition is true, the error code indicates that Mod Management has not been enabled.";
+				break;
+				case ErrorConditionTypes::RateLimited:
+					return "Too many requests made to the mod.io API within the rate-limiting window. Please wait and try again.";
+				break;
+				case ErrorConditionTypes::ModBeingProcessed:
+					return "The specified mod's files are currently being updated by the SDK. Please try again later.";
+				break;
+				case ErrorConditionTypes::InsufficientSpace:
+					return "There is insufficient space to install the mod. Please free up space and try again.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -1909,6 +1992,11 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::ApiError::AuthenticatedAccountHasBeenDeleted)
+					{
+						return true;
+					}
+
 
 				break;
 				case ErrorConditionTypes::UserTermsOfUseError:
@@ -1968,6 +2056,11 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::ApiError::AuthenticatedAccountHasBeenDeleted)
+					{
+						return true;
+					}
+
 
 				break;
 				case ErrorConditionTypes::SDKNotInitialized:
@@ -2011,6 +2104,35 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::ModManagementDisabled:
 					if (ec == Modio::ModManagementError::ModManagementDisabled)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::RateLimited:
+					if (ec == Modio::HttpError::RateLimited)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::Ratelimited)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::ModBeingProcessed:
+					if (ec == Modio::ModManagementError::ModBeingProcessed)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::InsufficientSpace:
+					if (ec == Modio::FilesystemError::InsufficientSpace)
 					{
 						return true;
 					}

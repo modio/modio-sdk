@@ -120,11 +120,6 @@ namespace Modio
 							BytesLastRead = ReadBytes;
 							Request->ResponseBodyReceivedLength += ReadBytes;
 							ResponseBuffer.AppendBuffer(ReadChunk.CopyRange(0, BytesLastRead));
-
- #ifdef MODIO_TRACE_DUMP_RESPONSE
-							Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
-														"ReadSomeResponseBodyOp Response body: {}", std::string(ReadChunk.begin(), ReadChunk.end()));
- #endif // MODIO_TRACE_DUMP_RESPONSE
 						}
 					}
 

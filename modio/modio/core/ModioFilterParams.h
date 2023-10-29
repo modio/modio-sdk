@@ -44,6 +44,15 @@ namespace Modio
 		};
 
 		/// @docpublic
+		///	@brief Enum indicating filtering options based off revenue type
+		enum class RevenueFilterType
+		{
+			Free = 0, /** Return only free mods */
+			Paid = 1, /** Return only paid mods */
+			FreeAndPaid = 2 /** Return both free and paid mods */
+		};
+
+		/// @docpublic
 		/// @brief Indicates results should be sorted using the specified field and direction
 		/// @param ByField Field to sort with
 		/// @param ByDirection Direction to sort
@@ -130,8 +139,14 @@ namespace Modio
 		/// @brief Returns a sub-range of query results based on a specified page size and index
 		/// @param PageNumber Zero-based index of page to return
 		/// @param PageSize Number of results in a page
-		/// @return
+		/// @return *this
 		MODIO_IMPL FilterParams& PagedResults(std::size_t PageNumber, std::size_t PageSize);
+
+		/// @docpublic
+		///	@brief Indicates results should be filtered by revenue options
+		///	@param ByRevenue Revenue filter to use
+		///	@return *this
+		MODIO_IMPL FilterParams& RevenueType(RevenueFilterType ByRevenue);
 
 		/// @docpublic
 		/// @brief Default FilterParams constructor. Sorts by mod ID in ascending order and returns 100 results (the
@@ -167,6 +182,8 @@ namespace Modio
 
 		std::vector<Modio::ModID> IncludedIDs;
 		std::vector<Modio::ModID> ExcludedIDs;
+
+		Modio::Optional<RevenueFilterType> Revenue;
 
 		Modio::Optional<std::string> MetadataBlobSearchString;
 

@@ -60,6 +60,14 @@ namespace Modio
 			return get_implementation()->GetRedirectURL();
 		}
 
+		Modio::Optional<std::uint32_t> HttpRequest::GetRetryAfter()
+		{
+			return get_implementation()->GetRetryAfter();
+		}
 
+		Modio::Optional<std::string> HttpRequest::GetHeaderValue(std::string HeaderKey)
+		{
+			return get_implementation()->GetHeaderValue(HeaderKey);
+		}
 	} // namespace Detail
 } // namespace Modio

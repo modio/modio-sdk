@@ -196,6 +196,11 @@ namespace Modio
 						return;
 					}
 
+					if (Modio::Optional<std::uint32_t> RetryAfter = Request->GetRetryAfter())
+					{
+						Modio::Detail::SDKSessionData::MarkAsRateLimited(RetryAfter.value());
+					}
+
 					// According to the swagger definition:
 					// Code 400: An uploaded part with the specified start - finish byte range has already been
 					// uploaded to that session Code 403: The authenticated user does not have permission to upload
@@ -226,23 +231,16 @@ namespace Modio
 								Modio::Detail::SDKSessionData::SetLastValidationError(
 									Error->ExtendedErrorInformation.value());
 							}
-							if (ErrRef != Modio::ErrorConditionTypes::ApiErrorRefSuccess)
-							{
+							if (ErrRef != Modio::ErrorConditionTypes::ApiErrorRefSuccess &&
 								// No need to log rate-limited response out
-								if (ErrRef == Modio::ApiError::Ratelimited)
-								{
-									Modio::Detail::SDKSessionData::MarkAsRateLimited();
-								}
-								else
-								{
-									Modio::Detail::Buffer ResultBuffer(ResponseBuffer.size());
-									Modio::Detail::BufferCopy(ResultBuffer, ResponseBuffer);
+								ErrRef != Modio::ApiError::Ratelimited)
+							{
+								Modio::Detail::Buffer ResultBuffer(ResponseBuffer.size());
+								Modio::Detail::BufferCopy(ResultBuffer, ResponseBuffer);
 
-									Modio::Detail::Logger().Log(
-										Modio::LogLevel::Error, Modio::LogCategory::Http,
-										"Non 200-204 response received: {}",
-										std::string(ResultBuffer.begin(), ResultBuffer.end()));
-								}
+								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+															"Non 200-204 response received: {}",
+															std::string(ResultBuffer.begin(), ResultBuffer.end()));
 							}
 							// Return the error-ref regardless, defer upwards to Subscribe/Unsubscribe etc to handle as
 							// success

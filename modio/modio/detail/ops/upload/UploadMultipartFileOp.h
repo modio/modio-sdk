@@ -287,6 +287,11 @@ namespace Modio
 							Self.complete(ec);
 							return;
 						}
+    
+						if (Modio::Optional<std::uint32_t> RetryAfter = CloseSessionRequest->GetRetryAfter())
+						{
+							Modio::Detail::SDKSessionData::MarkAsRateLimited(RetryAfter.value());
+						}
 
 						if (CloseSessionRequest->GetResponseCode() == 415)
 						{

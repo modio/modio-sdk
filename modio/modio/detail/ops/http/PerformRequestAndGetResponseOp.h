@@ -235,6 +235,12 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
+
+					if (Modio::Optional<std::uint32_t> RetryAfter = Request->GetRetryAfter())
+					{
+						Modio::Detail::SDKSessionData::MarkAsRateLimited(RetryAfter.value());
+					}
+
 					while (!ec)
 					{
 						// Read in a chunk from the response
@@ -302,30 +308,23 @@ namespace Modio
 								Modio::Detail::SDKSessionData::SetLastValidationError(
 									Error->ExtendedErrorInformation.value());
 							}
-							if (ErrRef == Modio::ApiError::ExpiredOrRevokedAccessToken) 
+							if (ErrRef == Modio::ApiError::ExpiredOrRevokedAccessToken)
 							{
 								Self.complete(Modio::make_error_code(Modio::UserAuthError::StatusAuthTokenInvalid));
 								return;
 							}
-							if (ErrRef != Modio::ErrorConditionTypes::ApiErrorRefSuccess)
-							{
+							if (ErrRef != Modio::ErrorConditionTypes::ApiErrorRefSuccess &&
 								// No need to log rate-limited response out
-								if (ErrRef == Modio::ApiError::Ratelimited)
-								{
-									Modio::Detail::SDKSessionData::MarkAsRateLimited();
-								}
-								else
-								{
-									Modio::Detail::Buffer ResponseBuffer(ResultBuffer.size());
-									Modio::Detail::BufferCopy(ResponseBuffer, ResultBuffer);
+								ErrRef != Modio::ApiError::Ratelimited)
+							{
+								Modio::Detail::Buffer ResponseBuffer(ResultBuffer.size());
+								Modio::Detail::BufferCopy(ResponseBuffer, ResultBuffer);
 
-									// Hate doing this copy but this really should be only happening in exceptional
-									// circumstances and we want to avoid dragging in fmt string_view
-									Modio::Detail::Logger().Log(
-										Modio::LogLevel::Error, Modio::LogCategory::Http,
-										"Non 200-204 response received: {}",
-										std::string(ResponseBuffer.begin(), ResponseBuffer.end()));
-								}
+								// Hate doing this copy but this really should be only happening in exceptional
+								// circumstances and we want to avoid dragging in fmt string_view
+								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+															"Non 200-204 response received: {}",
+															std::string(ResponseBuffer.begin(), ResponseBuffer.end()));
 							}
 							// Return the error-ref regardless, defer upwards to Subscribe/Unsubscribe etc to handle as
 							// success

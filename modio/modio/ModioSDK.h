@@ -29,6 +29,7 @@
 #include "modio/core/entities/ModioModInfoList.h"
 #include "modio/core/entities/ModioModTagOptions.h"
 #include "modio/core/entities/ModioTerms.h"
+#include "modio/core/entities/ModioTransactionRecord.h"
 #include "modio/core/entities/ModioUser.h"
 #include "modio/core/entities/ModioUserList.h"
 #include "modio/detail/ModioLibraryConfigurationHelpers.h"
@@ -65,14 +66,16 @@ namespace Modio
 	/// NOTE: This should be called while xref:InitializeAsync[Modio::InitializeAsync] and
 	/// xref:ShutdownAsync[Modio::ShutdownAsync] are running, as they both utilize the internal event loop for
 	/// functionality.
-	/// NOTE: `RunPendingHandlers` should never be called inside a callback you provide to the SDK. This will result in a deadlock.
+	/// NOTE: `RunPendingHandlers` should never be called inside a callback you provide to the SDK. This will result in
+	/// a deadlock.
 	MODIOSDK_API void RunPendingHandlers();
 
 	/// @docpublic
 	/// @brief Cancels any running internal operations and invokes any pending callbacks with
 	/// Modio::GenericError::OperationCanceled. This function does not block; you should keep calling
 	/// Modio::RunPendingHandlers until the callback you provide to this function is invoked.
-	/// NOTE: `ShutdownAsync` should *never* be called inside a callback you provide to the SDK. This will result in a deadlock.
+	/// NOTE: `ShutdownAsync` should *never* be called inside a callback you provide to the SDK. This will result in a
+	/// deadlock.
 	/// @param OnShutdownComplete
 	/// @requires initialized-sdk
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
@@ -167,7 +170,8 @@ namespace Modio
 	/// @param IDToPrioritize The ID for the mod to prioritize. This mod must be pending upload, install, or update.
 	/// @return Error code indicating there is no pending upload, install, or update associated with the provided
 	/// priority mod ID.
-	/// @error GenericError::BadParameter|The supplied mod ID is invalid or not present in the list of pending operations
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid or not present in the list of pending
+	/// operations
 	MODIOSDK_API Modio::ErrorCode PrioritizeTransferForMod(Modio::ModID IDToPrioritize);
 
 	/// @docpublic
@@ -284,7 +288,21 @@ namespace Modio
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @deprecated 2023.10 Use PlatformSupport property
+	MODIO_DEPRECATED("2023.10", "Call GetTermsOfUseAsync() without a Modio::AuthenticationProvider")
 	MODIOSDK_API void GetTermsOfUseAsync(Modio::AuthenticationProvider Provider, Modio::Language Locale,
+										 std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)> Callback);
+
+	/// @docpublic
+	/// @brief This function retrieves the information required for a game to display the mod.io terms of use to a
+	/// player who wishes to create a mod.io account
+	/// @param Locale The language to display the terms of use in
+	/// @param Callback Callback invoked with the terms of use data once retrieved from the server
+	/// @requires initialized-sdk
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	MODIOSDK_API void GetTermsOfUseAsync(Modio::Language Locale,
 										 std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)> Callback);
 
 	/// @docpublic
@@ -324,7 +342,8 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory InvalidArgsError|Some of the information in the EditModParams did not pass validation
 	/// @error UserDataError::InvalidUser|No authenticated user
-	/// @error GenericError::BadParameter|No fields selected for modification in Params, or the supplied mod ID is invalid
+	/// @error GenericError::BadParameter|No fields selected for modification in Params, or the supplied mod ID is
+	/// invalid
 	MODIOSDK_API void SubmitModChangesAsync(
 		Modio::ModID Mod, Modio::EditModParams Params,
 		std::function<void(Modio::ErrorCode ec, Modio::Optional<Modio::ModInfo>)> Callback);

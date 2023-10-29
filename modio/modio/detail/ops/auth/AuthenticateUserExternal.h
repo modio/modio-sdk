@@ -96,10 +96,11 @@ namespace Modio
 						LocalState->AuthUser.UserId != Modio::Detail::SDKSessionData::GetAuthenticatedUser()->UserId)
 					{
 						yield UserDataService.ClearUserDataAsync(std::move(Self));
-						Modio::Detail::Services::GetGlobalService<Modio::Detail::CacheService>().ClearCache();
 					}
 					Modio::Detail::SDKSessionData::InitializeForUser(
 						std::move(LocalState->AuthUser), Modio::Detail::OAuthToken(LocalState->AuthResponse));
+
+					Modio::Detail::Services::GetGlobalService<Modio::Detail::CacheService>().ClearCache();
 					yield UserDataService.SaveUserDataToStorageAsync(std::move(Self));
 					Self.complete({});
 					return;

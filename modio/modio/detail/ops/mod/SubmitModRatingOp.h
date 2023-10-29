@@ -39,21 +39,30 @@ namespace Modio
 							.AppendPayloadValue(Modio::Detail::Constants::APIStrings::Rating, RawRating),
 						Modio::Detail::CachedResponse::Disallow, std::move(Self));
 
+					if (!ec)
+					{
+						Self.complete({});
+						return;
+					}
+
+					// Treat an API error indicating a no-op as a success
+					if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::ApiErrorRefSuccess))
+					{
+						Self.complete({});
+						return;
+					}
+
 					if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))
 					{
 						Modio::Detail::SDKSessionData::InvalidateOAuthToken();
-						Self.complete(ec);
+						Self.complete(Modio::make_error_code(Modio::UserDataError::InvalidUser));
 						return;
 					}
-					// Treat an API error indicating a no-op as a success
-					if (ec && Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::ApiErrorRefSuccess))
-					{
-						Self.complete({});
-					}
-					else
-					{
-						Self.complete(ec);
-					}
+
+					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http, "Error message: {}",
+												ec.message());
+					Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
+
 					return;
 				}
 			}

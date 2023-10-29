@@ -35,6 +35,10 @@ namespace Modio
 
 			MODIO_IMPL Modio::Optional<std::string> GetRedirectURL() const;
 
+			MODIO_IMPL Modio::Optional<std::uint32_t> GetRetryAfter();
+
+			MODIO_IMPL Modio::Optional<std::string> GetHeaderValue(std::string HeaderKey);
+
 			/// @brief Sends a request to the server. Assumes that any payload data is stored in its entirety on this
 			/// HttpRequest already - if you want to stream data to the server please use
 			/// BeginWriteAsync/WriteSomeAsync.
@@ -45,8 +49,7 @@ namespace Modio
 			{
 				// TODO: @Modio-core Double check if this is a pessimizing move
 				// TODO: @Modio-core prevent double-sending
-				get_service().SendRequestAsync(get_implementation(),
-											   std::forward<CompletionTokenType>(Token));
+				get_service().SendRequestAsync(get_implementation(), std::forward<CompletionTokenType>(Token));
 			}
 
 			/// @brief Begins the send operation for a request which requires a streamed upload
@@ -77,8 +80,7 @@ namespace Modio
 			{
 				// Must have sent the request first before we read headers
 
-				get_service().ReadResponseHeadersAsync(get_implementation(),
-													   std::forward<CompletionTokenType>(Token));
+				get_service().ReadResponseHeadersAsync(get_implementation(), std::forward<CompletionTokenType>(Token));
 			}
 
 			// pass in a mutable buffer to read into as well?

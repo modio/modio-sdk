@@ -26,9 +26,8 @@ namespace Modio
 		class GetTermsOfUseOp
 		{
 		public:
-			GetTermsOfUseOp(Modio::AuthenticationProvider Provider, Modio::Language Locale)
-				: Provider(Provider),
-				  Locale(Locale)
+			GetTermsOfUseOp(Modio::Language Locale)
+				: Locale(Locale)
 			{}
 
 			template<typename CoroType>
@@ -37,9 +36,7 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
-						ResponseBodyBuffer,
-						Modio::Detail::TermsRequest.SetLocale(Locale).AppendPayloadValue(
-							"service", Modio::Detail::ToString(Provider)),
+						ResponseBodyBuffer, Modio::Detail::TermsRequest.SetLocale(Locale),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 
 					if (ec)
@@ -64,7 +61,6 @@ namespace Modio
 
 		private:
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			Modio::AuthenticationProvider Provider;
 			Modio::Language Locale;
 
 			asio::coroutine CoroutineState;

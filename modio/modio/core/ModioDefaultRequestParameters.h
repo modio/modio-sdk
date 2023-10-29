@@ -54,6 +54,7 @@ namespace Modio
         static const HttpRequestParams DeleteModRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetModRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}" }; 
         static const HttpRequestParams EditModRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}" , "multipart/form-data" }; 
+        static const HttpRequestParams PurchaseRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/checkout" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetModCommentsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/comments" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AddModCommentRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/comments" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams DeleteModCommentRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}/comments/{comment-id}" , "application/x-www-form-urlencoded" }; 
@@ -104,9 +105,11 @@ namespace Modio
         static const HttpRequestParams GetUserModfilesRequest { Modio::Detail::Verb::GET, "/me/files" }; 
         static const HttpRequestParams GetUserGamesRequest { Modio::Detail::Verb::GET, "/me/games" }; 
         static const HttpRequestParams GetUserModsRequest { Modio::Detail::Verb::GET, "/me/mods" }; 
+        static const HttpRequestParams GetUserPurchasesRequest { Modio::Detail::Verb::GET, "/me/purchased" }; 
         static const HttpRequestParams GetUserRatingsRequest { Modio::Detail::Verb::GET, "/me/ratings" }; 
         static const HttpRequestParams GetUserSubscriptionsRequest { Modio::Detail::Verb::GET, "/me/subscribed" }; 
         static const HttpRequestParams GetUsersMutedRequest { Modio::Detail::Verb::GET, "/me/users/muted" }; 
+        static const HttpRequestParams GetUserWalletRequest { Modio::Detail::Verb::GET, "/me/wallets" }; 
         static const HttpRequestParams ExchangeEmailSecurityCodeRequest { Modio::Detail::Verb::POST, "/oauth/emailexchange" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams RequestEmailSecurityCodeRequest { Modio::Detail::Verb::POST, "/oauth/emailrequest" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams LogoutRequest { Modio::Detail::Verb::POST, "/oauth/logout" , "application/x-www-form-urlencoded" }; 

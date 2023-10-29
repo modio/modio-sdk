@@ -15,7 +15,8 @@
     "MODIO_UNREAL_PLATFORM_PREAMBLE=\"macos/detail/ModioUEPlatformPreamble.h\"",
     "MODIO_UNREAL_PLATFORM_EPILOGUE=\"macos/detail/ModioUEPlatformEpilogue.h\"",
     "MODIO_TARGET_PLATFORM_HEADER=\"Mac\"",
-    "FU2_WITH_NO_EMPTY_PROPAGATION"
+    "FU2_WITH_NO_EMPTY_PROPAGATION",
+    "ASIO_INITIALIZE_CALL_STACK"
   ],
   "ModuleDependencies": [
   ],

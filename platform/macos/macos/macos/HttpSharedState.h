@@ -113,6 +113,10 @@ namespace Modio
 											kCFBooleanTrue);
 				}
 
+				Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Http, "Initializing {0} request for {1} {2}",
+							Request->GetParameters().GetVerb(), Request->GetParameters().GetServerAddress(),
+							Request->GetParameters().GetFormattedResourcePath());
+
 				// Release objects created in this function
 				CFRelease(RequestMessage);
 				CFRelease(URLRef);

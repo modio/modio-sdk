@@ -59,6 +59,8 @@ namespace Modio
 				constexpr const char* RootLocalStoragePath = "RootLocalStoragePath";
 				constexpr const char* ModNeverRetryCategory = "NeverRetryCategory";
 				constexpr const char* ModNeverRetryCode = "NeverRetryCode";
+				constexpr const char* WalletBalance = "balance";
+				constexpr const char* GrossAmount = "gross_amount";
 			}
 			namespace Configuration
 			{

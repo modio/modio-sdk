@@ -32,12 +32,7 @@ namespace Modio
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer, GetAuthenticatedUserRequest, CachedResponse::Allow, std::move(Self));
 
-					if (ec && !Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::NetworkError))
-					{
-						Modio::Detail::SDKSessionData::InvalidateOAuthToken();
-						Self.complete(ec);
-						return;
-					}
+					if (!ec)
 					{
 						Modio::Optional<Modio::User> User = Detail::TryMarshalResponse<Modio::User>(ResponseBodyBuffer);
 
@@ -52,6 +47,18 @@ namespace Modio
 							return;
 						}
 					}
+
+					if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::NetworkError) ||
+						Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError) ||
+						Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::EntityNotFoundError))
+					{
+						Modio::Detail::SDKSessionData::InvalidateOAuthToken();
+					}
+
+					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+												"Error during VerifyUserAuthenticationOp with message: {}",
+												ec.message());
+					Self.complete(Modio::make_error_code(Modio::UserAuthError::StatusAuthTokenInvalid));
 				}
 			}
 

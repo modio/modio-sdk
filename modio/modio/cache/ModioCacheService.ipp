@@ -139,6 +139,12 @@ namespace Modio
 			{
 				Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Retrieving mod {} from primary cache",
 											ModIDDetail);
+
+				if (Modio::Detail::SDKSessionData::IsModCacheInvalid(ModIDDetail) == true)
+				{
+					return {};
+				}
+
 				return CacheEntryIterator->second;
 			}
 

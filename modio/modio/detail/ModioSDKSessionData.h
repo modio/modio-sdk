@@ -56,7 +56,7 @@ namespace Modio
 			MODIO_IMPL static void AllowModManagement();
 			MODIO_IMPL static void DisableModManagement();
 
-			MODIO_IMPL static void MarkAsRateLimited();
+			MODIO_IMPL static void MarkAsRateLimited(int SecondsDelay);
 			MODIO_IMPL static bool IsRateLimited();
 			MODIO_IMPL static ModCollection& GetSystemModCollection();
 
@@ -197,7 +197,7 @@ namespace Modio
 			// write into the stale log instead
 			Modio::ModEventLog EventLog;
 			bool bRateLimited = false;
-			std::chrono::system_clock::time_point RateLimitedStart;
+			std::chrono::system_clock::time_point RateLimitedStop;
 			std::map<Modio::ModCreationHandle, Modio::Optional<Modio::ModID>> CreationHandles;
 			Modio::Optional<Modio::ModID> ModIDToPrioritize;
 			std::map<Modio::ModID, Modio::CreateModFileParams> PendingModUploads;

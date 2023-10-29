@@ -84,6 +84,8 @@ namespace Modio
 			#if !defined(MODIO_NO_DEPRECATED)
 				ModInfo.bVisible = bool(ModInfo.Visibility);
 			#endif
+
+			Detail::ParseSafe(Json, ModInfo.Price, "price");
 		}
 
 		{

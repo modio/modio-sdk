@@ -12,7 +12,11 @@
 
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/HedleyWrapper.h"
+
 #include <algorithm>
+#include <iomanip>
+#include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -73,6 +77,73 @@ namespace Modio
 				}
 
 				return Result;
+			}
+
+			static inline Modio::Optional<std::uint32_t> ParseDateOrInt(std::string Value)
+			{
+				if (Value == "")
+				{
+					return {};
+				}
+
+				std::uint32_t Seconds = 0;
+				std::stringstream IntStream(Value);
+
+				// In case we need to localize it to a certain language/location
+				// IntStream.imbue(std::locale("POSIX"));
+
+				// Try to parse the number of seconds first
+				IntStream >> Seconds;
+
+				if (Seconds != 0)
+				{
+					return Seconds;
+				}
+
+				std::tm Time = {};
+				std::stringstream DateStream(Value);
+				// As an example: Fri, 1 Feb 2030 07:28:00 GMT
+				DateStream >> std::get_time(&Time, "%a, %d %b %Y %H:%M:%S %Z");
+				std::chrono::system_clock::time_point ServerTime =
+					std::chrono::system_clock::from_time_t(std::mktime(&Time));
+				std::chrono::system_clock::time_point CurrentTime = std::chrono::system_clock::now();
+				std::size_t SecondsToWait =
+					std::chrono::duration_cast<std::chrono::seconds>(ServerTime - CurrentTime).count();
+
+				// In case debugging of time is necessary
+				// std::cout << std::put_time(&Time, "%c") << '\n';
+
+				if (SecondsToWait > 0)
+				{
+					return static_cast <std::uint32_t>(SecondsToWait);
+				}
+
+				return {};
+			}
+
+			static std::map<std::string, std::string> ParseRawHeaders(const std::string RawHeaders)
+			{
+				std::map<std::string, std::string> ResponseHeaders;
+				std::string MutHeaders = RawHeaders;
+				std::string BreakDelimiter = "\r\n";
+				std::string ColonDelimiter = ": ";
+				size_t BreakPos = 0;
+				size_t ColonPos = 0;
+				std::string Line;
+				while ((BreakPos = MutHeaders.find(BreakDelimiter)) != std::string::npos)
+				{
+					Line = MutHeaders.substr(0, BreakPos);
+					if ((ColonPos = Line.find(ColonDelimiter)) != std::string::npos)
+					{
+						std::string Key = Line.substr(0, ColonPos);
+						std::string Value = Line.substr(ColonPos + ColonDelimiter.size(), Line.size());
+						ResponseHeaders.insert({Key, Value});
+					}
+
+					MutHeaders.erase(0, BreakPos + BreakDelimiter.length());
+				}
+
+				return ResponseHeaders;
 			}
 
 			// These functions create false "unused functions" warnings on certain platforms.

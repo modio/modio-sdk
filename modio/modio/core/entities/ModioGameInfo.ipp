@@ -78,6 +78,9 @@ namespace Modio
 		Detail::ParseSafe(Json, GameInfo.Stats, "stats");
 		Detail::ParseSafe(Json, GameInfo.Theme, "theme");
 		Detail::ParseSafe(Json, GameInfo.OtherUrls, "other_urls");
+		Detail::ParseSafe(Json, GameInfo.GameMonetizationOptions, "monetization_options");
+		Detail::ParseSafe(Json, GameInfo.VirtualTokenName, "token_name");
+
 
 		nlohmann::json PlatformsJson;
 		if (Detail::GetSubobjectSafe(Json, "platforms", PlatformsJson))
@@ -85,11 +88,21 @@ namespace Modio
 			Modio::ModfilePlatform Platform = Modio::ModfilePlatform::Windows;
 			for (nlohmann::json& Entry : PlatformsJson)
 			{
+#if (!defined MODIO_NO_DEPRECATED)
 				if (Detail::ParseSafe(Entry, Platform, "platform"))
 				{
 					GameInfo.Platforms.push_back(Platform);
 				}
+#endif
+
+				GamePlatform GamePlatformDetails = {};
+				Detail::ParseSafe(Entry, GamePlatformDetails.Locked, "locked");
+				Detail::ParseSafe(Entry, GamePlatformDetails.Moderated, "moderated");
+				Detail::ParseSafe(Entry, GamePlatformDetails.Platform, "platform");
+
+				GameInfo.PlatformSupport.push_back(GamePlatformDetails);
 			}
 		}
+
 	}
 } // namespace Modio

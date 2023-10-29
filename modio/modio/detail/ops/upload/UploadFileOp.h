@@ -149,8 +149,7 @@ namespace Modio
 								Impl->CurrentPayloadFileBytesRead = Modio::FileSize(0);
 
 								Impl->CurrentPayloadFile = std::make_unique<Modio::Detail::File>(
-									Impl->PayloadElement->second.PathToFile.value(),
-									Modio::Detail::FileMode::ReadOnly);
+									Impl->PayloadElement->second.PathToFile.value(), Modio::Detail::FileMode::ReadOnly);
 								{
 									// Currently no API endpoints ask for more than one file, so we only need to do this
 									// the once
@@ -199,7 +198,8 @@ namespace Modio
 										std::shared_ptr<Modio::ModProgressInfo> Progress = Impl->ProgressInfo.lock();
 										if (Progress)
 										{
-											SetCurrentProgress(*Progress.get(), Modio::FileSize(Impl->CurrentPayloadFileBytesRead));
+											SetCurrentProgress(*Progress.get(),
+															   Modio::FileSize(Impl->CurrentPayloadFileBytesRead));
 										}
 									}
 								}
@@ -243,6 +243,12 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
+
+					if (Modio::Optional<std::uint32_t> RetryAfter = Request->GetRetryAfter())
+					{
+						Modio::Detail::SDKSessionData::MarkAsRateLimited(RetryAfter.value());
+					}
+
 					while (!ec)
 					{
 						// Read in a chunk from the response
@@ -306,23 +312,16 @@ namespace Modio
 								Modio::Detail::SDKSessionData::SetLastValidationError(
 									Error->ExtendedErrorInformation.value());
 							}
-							if (ErrRef != Modio::ErrorConditionTypes::ApiErrorRefSuccess)
-							{
+							if (ErrRef != Modio::ErrorConditionTypes::ApiErrorRefSuccess &&
 								// No need to log rate-limited response out
-								if (ErrRef == Modio::ApiError::Ratelimited)
-								{
-									Modio::Detail::SDKSessionData::MarkAsRateLimited();
-								}
-								else
-								{
-									Modio::Detail::Buffer ResponseBuffer(ResultBuffer.size());
-									Modio::Detail::BufferCopy(ResponseBuffer, ResultBuffer);
+								ErrRef != Modio::ApiError::Ratelimited)
+							{
+								Modio::Detail::Buffer ResponseBuffer(ResultBuffer.size());
+								Modio::Detail::BufferCopy(ResponseBuffer, ResultBuffer);
 
-									Modio::Detail::Logger().Log(
-										Modio::LogLevel::Error, Modio::LogCategory::Http,
-										"Non 200-204 response received: {}",
-										std::string(ResponseBuffer.begin(), ResponseBuffer.end()));
-								}
+								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+															"Non 200-204 response received: {}",
+															std::string(ResponseBuffer.begin(), ResponseBuffer.end()));
 							}
 							// Return the error-ref regardless, defer upwards to Subscribe/Unsubscribe etc to handle as
 							// success
@@ -367,6 +366,5 @@ namespace Modio
 		}
 	} // namespace Detail
 } // namespace Modio
-
 
 MODIO_DIAGNOSTIC_POP

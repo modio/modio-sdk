@@ -100,16 +100,33 @@ namespace Modio
 			Get().bModManagementEnabled = false;
 		}
 
-		void SDKSessionData::MarkAsRateLimited()
+		void SDKSessionData::MarkAsRateLimited(int SecondsDelay)
 		{
+			// In case we already have set bRateLimited as true,
+			// prevent the clock from restarting
+			if (Get().bRateLimited == true)
+			{
+				return;
+			}
+
 			Get().bRateLimited = true;
-			Get().RateLimitedStart = std::chrono::system_clock::now();
+			Get().RateLimitedStop = std::chrono::system_clock::now() + std::chrono::seconds(SecondsDelay);
 		}
 
 		bool SDKSessionData::IsRateLimited()
 		{
-			// TODO: @modio-core need to compare the timestamp of start to now and work out time elapsed, reset flag if
-			// need be
+			std::chrono::system_clock::time_point Current = std::chrono::system_clock::now();
+			auto Diff = (Get().RateLimitedStop - Current);
+
+			// Compare the RateLimitedStop if it has passed more than the Current time
+			// Diff will be negative when Current has passed RateLimitedStop
+			if (Diff.count() <= 0)
+			{
+				// More than "Timeout" has happened since the last request, disable
+				// rate limiting boolean
+				Get().bRateLimited = false;
+			}
+
 			return Get().bRateLimited;
 		}
 
@@ -487,7 +504,7 @@ namespace Modio
 						return "0,1";
 					default:
 						return "1";
-				}	
+				}
 			}
 
 			return "";
