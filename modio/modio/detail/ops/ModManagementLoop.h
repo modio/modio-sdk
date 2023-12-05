@@ -11,6 +11,7 @@
 #pragma once
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/FetchExternalUpdates.h"
+#include "modio/detail/ops/PreviewExternalUpdatesOp.h"
 #include "modio/detail/ops/modmanagement/ProcessNextModInUserCollection.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/timer/ModioTimer.h"

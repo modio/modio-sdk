@@ -154,6 +154,8 @@ namespace Modio
 
 			MODIO_IMPL HttpRequestParams AppendPayloadValue(std::string Key, std::string Value) const;
 
+			MODIO_IMPL HttpRequestParams AppendEmptyPayload(std::string Key) const;
+
 			MODIO_IMPL HttpRequestParams AppendPayloadValue(std::string Key,
 															Modio::Detail::Buffer RawPayloadBuffer) const;
 

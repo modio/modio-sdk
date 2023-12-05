@@ -146,12 +146,12 @@ namespace Modio
 
 		Modio::Detail::HttpRequestParams HttpRequestParams::AddLimitQueryParam() const
 		{
-			return AddQueryParamRaw("limit", std::to_string(100));
+			return AddQueryParamRaw("_limit", std::to_string(100));
 		}
 
 		Modio::Detail::HttpRequestParams HttpRequestParams::AddOffsetQueryParam(int32_t offset) const
 		{
-			return AddQueryParamRaw("offset", std::to_string(offset));
+			return AddQueryParamRaw("_offset", std::to_string(offset));
 		}
 
 		Modio::Detail::HttpRequestParams HttpRequestParams::AddCurrentGameIdQueryParam() const
@@ -206,6 +206,21 @@ namespace Modio
             Modio::Detail::Buffer ValueBuffer(Value.length());
             std::copy(Value.begin(), Value.end(), ValueBuffer.begin());
 			return AppendPayloadValue(Key, std::move(ValueBuffer));
+		}
+
+		HttpRequestParams HttpRequestParams::AppendEmptyPayload(std::string Key) const
+		{
+			HttpRequestParams NewParamsInstance = HttpRequestParams(*this);
+
+			Modio::Detail::Buffer ValueBuffer(0);
+
+			auto KeyIterator = NewParamsInstance.PayloadMembers.find(Key);
+			if (KeyIterator != NewParamsInstance.PayloadMembers.end())
+			{
+				NewParamsInstance.PayloadMembers.erase(KeyIterator);
+			}
+			NewParamsInstance.PayloadMembers.emplace(Key, MakePayloadContent(std::move(ValueBuffer)));
+			return NewParamsInstance;
 		}
 
 		HttpRequestParams HttpRequestParams::AppendPayloadValue(std::string Key,

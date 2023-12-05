@@ -12,11 +12,11 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioModInfo.h"
+#include "modio/core/entities/ModioModInfoList.h"
 #include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/JsonWrapper.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioDefines.h"
-#include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/ModioTransactional.h"
 #include <atomic>
 #include <memory>
@@ -24,6 +24,8 @@
 
 namespace Modio
 {
+	class ModCollection;
+
 	/// @docpublic
 	/// @brief Enum representing the current state of a mod
 	enum class ModState
@@ -366,7 +368,8 @@ namespace Modio
 		enum class ChangeType
 		{
 			Added,
-			Removed
+			Removed,
+			Updated
 		};
 
 		/// @docinternal
@@ -377,6 +380,14 @@ namespace Modio
 		/// removal
 		MODIO_IMPL static std::map<Modio::ModID, ChangeType> CalculateChanges(const UserSubscriptionList& Original,
 																			  const UserSubscriptionList& Updated);
+
+		/// @docinternal
+		/// @brief Calculates updates between the ModInfoList and a ModCollection
+		/// @param Baseline List of mods comming from the mod.io service
+		/// @param Collection List of current subscriptions
+		/// @return Map containing all mod ID that have updates in their ModInfo
+		MODIO_IMPL static std::map<Modio::ModID, ChangeType> CalculateUpdates(const Modio::ModInfoList& Baseline,
+																			  const Modio::ModCollection& Collection);
 
 		/// @docnone
 		MODIO_IMPL friend void to_json(nlohmann::json& j, const UserSubscriptionList& List);
@@ -544,6 +555,7 @@ namespace Modio
 		{
 			return InternalData.size();
 		}
+
 	private:
 		std::vector<Modio::ModManagementEvent> InternalData;
 	};

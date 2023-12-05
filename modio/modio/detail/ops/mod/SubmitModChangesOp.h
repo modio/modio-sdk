@@ -64,10 +64,17 @@ namespace Modio
 				{
 					int i = 0;
 
-					for (const std::string& tag : *Params.Tags)
+					if (Params.Tags->size() != 0)
 					{
-						EditRequestParams = EditRequestParams.AppendPayloadValue(fmt::format("tags[{}]", i), tag);
-						i++;
+						for (const std::string& tag : *Params.Tags)
+						{
+							EditRequestParams = EditRequestParams.AppendPayloadValue(fmt::format("tags[{}]", i), tag);
+							i++;
+						}
+					}
+					else
+					{
+						EditRequestParams = EditRequestParams.AppendEmptyPayload("tags[]");
 					}
 				}
 			}

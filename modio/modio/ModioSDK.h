@@ -140,6 +140,21 @@ namespace Modio
 	MODIOSDK_API void FetchExternalUpdatesAsync(std::function<void(Modio::ErrorCode)> OnFetchDone);
 
 	/// @docpublic
+	/// @brief Retrieve a list of updates between the users local mod state, and the server-side state. This allows you to
+	/// identify which mods will be modified by the next call to <<FetchExternalUpdatesAsync>> in order to perform any content 
+	/// management (such as unloading files) that might be required.
+	/// @param OnPreviewDone Callback invoked when the external state has been retrieved. It contains a dictionary with ModID
+	/// as keys and changes as values. Empty when there are no differences between local and the mod.io API service
+	/// @requires initialized-sdk
+	/// @requires authenticated-user
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	MODIOSDK_API void PreviewExternalUpdatesAsync(std::function<void(Modio::ErrorCode, std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType>)> OnPreviewDone);
+
+	/// @docpublic
 	/// @brief Enables the automatic management of installed mods on the system based on the user's subscriptions.
 	/// Does nothing if mod management is currently enabled. Note: this function does not behave like other "async"
 	/// methods, given that its name does not include the word async.
@@ -271,8 +286,6 @@ namespace Modio
 	/// @errorcategory InvalidArgsError|The arguments passed to the function have failed validation
 	/// @errorcategory UserTermsOfUseError|The user has not yet accepted the mod.io Terms of Use
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
-	/// @error UserAuthError::AlreadyAuthenticated|Authenticated user already signed-in. Call ClearUserDataAsync to
-	/// de-authenticate the old user, then Shutdown() and reinitialize the SDK first.
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void AuthenticateUserExternalAsync(Modio::AuthenticationParams User,
 													Modio::AuthenticationProvider Provider,
@@ -288,7 +301,7 @@ namespace Modio
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
-	/// @deprecated 2023.10 Use PlatformSupport property
+	/// @deprecated 2023.10 Call GetTermsOfUseAsync() without a Modio::AuthenticationProvider
 	MODIO_DEPRECATED("2023.10", "Call GetTermsOfUseAsync() without a Modio::AuthenticationProvider")
 	MODIOSDK_API void GetTermsOfUseAsync(Modio::AuthenticationProvider Provider, Modio::Language Locale,
 										 std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)> Callback);
@@ -522,8 +535,8 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief De-authenticates the current mod.io user for the current session, and clears all user-specific data
-	/// stored on the current device. Any subscribed mods that are installed but do not have other local users
-	/// subscribed will be uninstalled
+	/// stored on the current device. Any subscribed mods that are installed but do not have other local users 
+	/// subscribed will be marked for uninstallation
 	/// @param Callback Callback providing a status code indicating the outcome of clearing the user data. Error codes
 	/// returned by this function are informative only - it will always succeed.
 	/// @requires initialized-sdk

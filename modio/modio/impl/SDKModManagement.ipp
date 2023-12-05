@@ -90,6 +90,18 @@ namespace Modio
 		});
 	}
 
+	void PreviewExternalUpdatesAsync(std::function<void(Modio::ErrorCode, std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType>)> OnPreviewDone)
+	{
+		Modio::Detail::SDKSessionData::EnqueueTask([OnPreviewDone = std::move(OnPreviewDone)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(OnPreviewDone) &&
+				Modio::Detail::RequireNotRateLimited(OnPreviewDone) &&
+				Modio::Detail::RequireUserIsAuthenticated(OnPreviewDone))
+			{
+				Modio::Detail::PreviewExternalUpdatesAsync(OnPreviewDone);
+			}
+		});
+	}
+
 	void SubscribeToModAsync(Modio::ModID ModToSubscribeTo, std::function<void(Modio::ErrorCode)> OnSubscribeComplete)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([ModToSubscribeTo,
@@ -289,7 +301,10 @@ namespace Modio
 			const Modio::ModCollection& AllInstalledMods = Modio::Detail::SDKSessionData::GetSystemModCollection();
 			for (auto& ModEntry : AllInstalledMods.Entries())
 			{
-				InstalledMods.emplace(std::make_pair(ModEntry.first, (*ModEntry.second)));
+				if (std::shared_ptr<Modio::ModCollectionEntry> ModEntryPtr = ModEntry.second)
+				{
+					InstalledMods.emplace(std::make_pair(ModEntry.first, (*ModEntryPtr)));
+				}
 			}
 			return InstalledMods;
 		}

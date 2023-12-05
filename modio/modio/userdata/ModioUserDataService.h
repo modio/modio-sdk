@@ -53,7 +53,12 @@ namespace Modio
 				// This may require additional testing to ensure that we don't decrement the count further than we ought
 				for (auto& Entry : FilteredModCollection.Entries())
 				{
-					Entry.second->RemoveLocalUserSubscription(Modio::Detail::SDKSessionData::GetAuthenticatedUser());
+					uint8_t Subscribers = Entry.second->RemoveLocalUserSubscription(Modio::Detail::SDKSessionData::GetAuthenticatedUser());
+					
+					if (Subscribers == 0)
+					{
+						SDKSessionData::ClearModCacheInvalid(Entry.first);
+					}
 				}
 
 				Modio::Detail::SDKSessionData::ClearUserData();

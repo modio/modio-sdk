@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -80,48 +80,72 @@ namespace Modio
 							ServerSubscriptionModIDs.AddMod(Profile);
 							ServerSubsModProfiles[Profile.ModId] = Profile;
 							Modio::Detail::SDKSessionData::GetSystemModCollection().AddOrUpdateMod(
-								Profile,
-								Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MakeModPath(
-									Profile.ModId).u8string());
+								Profile, Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+											 .MakeModPath(Profile.ModId)
+											 .u8string());
 						}
 
 						std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType> ModListDiff =
 							UserSubscriptionList::CalculateChanges(
 								Modio::Detail::SDKSessionData::GetUserSubscriptions(), ServerSubscriptionModIDs);
+
+						Modio::ModCollection RemainingMods =
+							Modio::Detail::SDKSessionData::GetSystemModCollection().FilterByUserSubscriptions(
+								ServerSubscriptionModIDs);
+						std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType> ModUpdates =
+							UserSubscriptionList::CalculateUpdates(ServerSubscriptionList.value(), RemainingMods);
+
+						// Insert the changes already calculated in ModListDiff. It gives priority to the
+						// results from CalculateChanges, ex. "Added" over "Update"
+						ModListDiff.insert(ModUpdates.begin(), ModUpdates.end());
+
 						bDirtyState = ModListDiff.size() > 0;
 						for (auto ModChange : ModListDiff)
 						{
-							if (ModChange.second == Modio::UserSubscriptionList::ChangeType::Added)
+							switch (ModChange.second)
 							{
-								Modio::Detail::SDKSessionData::GetUserSubscriptions().AddMod(
-									ServerSubsModProfiles.at(ModChange.first));
-
-								Modio::Optional<Modio::ModCollectionEntry&> ModEntry =
-									Modio::Detail::SDKSessionData::GetSystemModCollection().GetByModID(ModChange.first);
-								if (ModEntry.has_value())
+								case Modio::UserSubscriptionList::ChangeType::Added:
 								{
-									ModEntry->AddLocalUserSubscription(
-										Modio::Detail::SDKSessionData::GetAuthenticatedUser());
+									Modio::Detail::SDKSessionData::GetUserSubscriptions().AddMod(
+										ServerSubsModProfiles.at(ModChange.first));
+
+									Modio::Optional<Modio::ModCollectionEntry&> ModEntry =
+										Modio::Detail::SDKSessionData::GetSystemModCollection().GetByModID(
+											ModChange.first);
+									if (ModEntry.has_value())
+									{
+										ModEntry->AddLocalUserSubscription(
+											Modio::Detail::SDKSessionData::GetAuthenticatedUser());
+									}
+
+									Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::ModManagement,
+																"External update adding {} to local user subscriptions",
+																ModChange.first);
+									break;
 								}
-
-								Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::ModManagement,
-															"External update adding {} to local user subscriptions",
-															ModChange.first);
-							}
-							else if (ModChange.second == Modio::UserSubscriptionList::ChangeType::Removed)
-							{
-								Modio::Detail::SDKSessionData::GetUserSubscriptions().RemoveMod(ModChange.first);
-
-								Modio::Optional<Modio::ModCollectionEntry&> ModEntry =
-									Modio::Detail::SDKSessionData::GetSystemModCollection().GetByModID(ModChange.first);
-								if (ModEntry.has_value())
+								case Modio::UserSubscriptionList::ChangeType::Removed:
 								{
-									ModEntry->RemoveLocalUserSubscription(
-										Modio::Detail::SDKSessionData::GetAuthenticatedUser());
+									Modio::Detail::SDKSessionData::GetUserSubscriptions().RemoveMod(ModChange.first);
+
+									Modio::Optional<Modio::ModCollectionEntry&> ModEntry =
+										Modio::Detail::SDKSessionData::GetSystemModCollection().GetByModID(
+											ModChange.first);
+									if (ModEntry.has_value())
+									{
+										ModEntry->RemoveLocalUserSubscription(
+											Modio::Detail::SDKSessionData::GetAuthenticatedUser());
+									}
+									Modio::Detail::Logger().Log(
+										LogLevel::Info, LogCategory::ModManagement,
+										"External update removing {} from local user subscriptions", ModChange.first);
+									break;
 								}
-								Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::ModManagement,
-															"External update removing {} from local user subscriptions",
-															ModChange.first);
+								// Currently, there is no need to act on an update, given that the ModID
+								// is already stored in the UserSubscriptions. If wondering, "GetSystemModCollection"
+								// above already adds the mod to the system
+								case Modio::UserSubscriptionList::ChangeType::Updated:
+								default:
+									break;
 							}
 						}
 					}

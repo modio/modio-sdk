@@ -28,6 +28,8 @@ Welcome to the mod.io SDK repository, built using C++. It allows game developers
 |Windows (GDK)  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
 |Nintendo Switch| ✔ <<contact-us,(Contact Us)>> | Vendor-provided
 |XBox (GDK)     | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
+|Playstation 4  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
+|Playstation 5  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
 |Linux          | ✔                             | Clang 10
 |macOS          | ✔                             | Clang 10
 |===

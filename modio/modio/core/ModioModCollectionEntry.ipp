@@ -452,6 +452,34 @@ namespace Modio
 		return Diff;
 	}
 
+	std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType> UserSubscriptionList::CalculateUpdates(
+		const Modio::ModInfoList& Baseline, const Modio::ModCollection& Collection)
+	{
+		std::map<Modio ::ModID, ChangeType> Diff;
+
+		for (const Modio::ModInfo& Profile : Baseline)
+		{
+			if (Modio::Optional<Modio::ModCollectionEntry&> FoundEntry = Collection.GetByModID(Profile.ModId))
+			{
+				const Modio::ModInfo& LocalInfo = FoundEntry->GetModProfile();
+
+				// If one or the other doesnt have a file info, continue
+				if (!LocalInfo.FileInfo || !Profile.FileInfo)
+				{
+					continue;
+				}
+
+				// Check the file metadata IDs
+				if (LocalInfo.FileInfo->MetadataId != Profile.FileInfo->MetadataId)
+				{
+					Diff[Profile.ModId] = Modio::UserSubscriptionList::ChangeType::Updated;
+				}
+			}
+		}
+
+		return Diff;
+	}
+
 	void to_json(nlohmann::json& j, const UserSubscriptionList& List)
 	{
 		j = nlohmann::json {Modio::Detail::Constants::JSONKeys::UserSubscriptionList, List.InternalList};

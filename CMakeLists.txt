@@ -35,6 +35,7 @@ set(ModioGeneratedHeaderPath "${CMAKE_BINARY_DIR}/generated" CACHE INTERNAL "")
 set (MODIO_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 set (MODIO_VERSION "v2.0.0" CACHE STRING "Version number for the packaged version")
 
+
 #Global definition of the library target name so it can be referenced in platform tests, etc, and to ease renaming if it becomes necessary
 set (MODIO_TARGET_NAME modio CACHE STRING "")
 

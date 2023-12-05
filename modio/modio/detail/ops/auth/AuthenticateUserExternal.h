@@ -36,14 +36,6 @@ namespace Modio
 				auto& UserDataService = Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>();
 				reenter(LocalState->CoroutineState)
 				{
-					yield Modio::Detail::VerifyUserAuthenticationAsync(std::move(Self));
-					// No error during verification indicates the user is already authenticated
-					if (!ec)
-					{
-						Self.complete(Modio::make_error_code(Modio::UserAuthError::AlreadyAuthenticated));
-						return;
-					}
-
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						LocalState->ResponseBuffer, LocalState->AuthenticationParams, Detail::CachedResponse::Disallow,
 						std::move(Self));

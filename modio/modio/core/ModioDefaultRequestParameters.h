@@ -104,6 +104,9 @@ namespace Modio
         static const HttpRequestParams GetUserEventsRequest { Modio::Detail::Verb::GET, "/me/events" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetUserModfilesRequest { Modio::Detail::Verb::GET, "/me/files" }; 
         static const HttpRequestParams GetUserGamesRequest { Modio::Detail::Verb::GET, "/me/games" }; 
+        static const HttpRequestParams SyncPlaystationNetworkEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/psn/sync" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams SyncSteamEntitlementRequest { Modio::Detail::Verb::POST, "/me/iap/steam/sync" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams SyncXboxLiveEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/xboxlive/sync" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetUserModsRequest { Modio::Detail::Verb::GET, "/me/mods" }; 
         static const HttpRequestParams GetUserPurchasesRequest { Modio::Detail::Verb::GET, "/me/purchased" }; 
         static const HttpRequestParams GetUserRatingsRequest { Modio::Detail::Verb::GET, "/me/ratings" }; 
@@ -116,6 +119,7 @@ namespace Modio
         static const HttpRequestParams CreateOauthAccessTokenRequest { Modio::Detail::Verb::POST, "/oauth/token" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams ExchangeOauthRefreshTokenRequest { Modio::Detail::Verb::POST, "/oauth/token/refresh" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams SubmitReportRequest { Modio::Detail::Verb::POST, "/report" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams GenerateServiceTicketRequest { Modio::Detail::Verb::POST, "/s2s/ticket" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams UnmuteAUserRequest { Modio::Detail::Verb::DELETE, "/users/{user-id}/mute" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams MuteAUserRequest { Modio::Detail::Verb::POST, "/users/{user-id}/mute" , "application/x-www-form-urlencoded" }; 
     }

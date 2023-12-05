@@ -51,8 +51,8 @@ public:
 				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
 											"initialize http set option received system error code {}", GetLastError());
 			};
-			// Set Timeout to 120 seconds
-			unsigned long Timeout = 120000;
+			// Set Timeout to 15 seconds
+			unsigned long Timeout = 15000;
 			bool SetTimeoutStatus =
 				WinHttpSetOption(CurrentSession, WINHTTP_OPTION_CONNECT_TIMEOUT, &Timeout, sizeof(unsigned long));
 			if (!SetTimeoutStatus)

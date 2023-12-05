@@ -234,6 +234,8 @@ FILE HEADER VALUES
 |Windows (GDK)  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
 |Nintendo Switch| ✔ <<contact-us,(Contact Us)>> | Vendor-provided
 |XBox (GDK)     | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
+|Playstation 4  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
+|Playstation 5  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
 |Linux          | ✔                             | Clang 10
 |macOS          | ✔                             | Clang 10
 |===
@@ -355,7 +357,7 @@ An authenticated user is required to install mods and perform other operations. 
 
 To change a Local Profile's authenticated user, call <<ClearUserDataAsync>> to remove the authenticated user, and then re-authenticate as normal.
 
-NOTE: A call to <<ClearUserDataAsync>> removes the authenticated user from the local device. Any installed content is removed from local storage if no other Local Profiles contain authenticated users with active subscriptions to it.
+NOTE: A call to <<ClearUserDataAsync>> removes the authenticated user from the local device. Any installed content is marked for uninstallation from local storage if no other Local Profiles contain authenticated users with active subscriptions to it.
 
 To add a newly authenticated user or switch to one already-authenticated without removing the current one, swap to another Local Profile by calling <<ShutdownAsync>>, then re-initialize via <<InitializeAsync>> specifying a different Local Profile name in the initialization parameters you supply.
 
@@ -793,6 +795,23 @@ Modio::FetchExternalUpdatesAsync([](Modio::ErrorCode ec)
 ----
 
 NOTE: You should call <<FetchExternalUpdatesAsync>> at particular times in your application when you want to ensure that the state is up-to-date. The mod.io SDK will apply rate-limiting internally if you try to call it too often.
+
+In case you need to prepare for changes happening beforehand, call <<PreviewExternalUpdatesAsync>>. This function retrieves a list of updates between the users local mod state, and the server-side state. It allows you to identify which mods will be modified when you call <<FetchExternalUpdatesAsync>> next in order to perform any content management (such as unloading files) that might be required. Its use is very similar:
+
+[source,cpp]
+----
+Modio::PreviewExternalUpdatesAsync([](Modio::ErrorCode ec, std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType> ListOfChanges)
+{
+    if (ec)
+    {
+        // Couldn't preview external subscription data, handle error
+    }
+    else
+    {
+        // Take notice of the changes brought inside variable "ListOfChanges". It serves as acknowledgment of success
+    }
+});
+----
 
 ===== Checking the user subscription list
 

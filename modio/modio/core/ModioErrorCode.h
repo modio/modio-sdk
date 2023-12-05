@@ -214,10 +214,12 @@ namespace Modio
 	enum class UserAuthError
 	{
 		AlreadyAuthenticated = 20993,
-		NoAuthToken = 20994,
-		StatusAuthTokenInvalid = 20995,
-		StatusAuthTokenMissing = 20996,
-		UnableToInitStorage = 20997
+		EmailLoginCodeExpired = 20994,
+		EmailLoginCodeInvalid = 20995,
+		NoAuthToken = 20996,
+		StatusAuthTokenInvalid = 20997,
+		StatusAuthTokenMissing = 20998,
+		UnableToInitStorage = 20999
 	};
 
 	/// @docnone
@@ -230,6 +232,12 @@ namespace Modio
 			{
 				case UserAuthError::AlreadyAuthenticated:
 						return "User is already authenticated. To use a new user and OAuth token, call ClearUserDataAsync";
+					break;
+				case UserAuthError::EmailLoginCodeExpired:
+						return "Email login code has expired, please request a new one.";
+					break;
+				case UserAuthError::EmailLoginCodeInvalid:
+						return "Email login code is invalid";
 					break;
 				case UserAuthError::NoAuthToken:
 						return "No Auth token available";
@@ -841,9 +849,14 @@ namespace Modio
 		CannotMuteYourself = 17039,
 		CannotVerifyExternalCredentials = 11032,
 		CrossOriginForbidden = 10001,
-		DisplayPriceIncorrect = 900035,
+		EmailLoginCodeExpired = 11012,
+		EmailLoginCodeInvalid = 11014,
 		ExpiredOrRevokedAccessToken = 11005,
 		FailedToCompleteTheRequest = 10002,
+		ForbiddenDMCA = 15000,
+		ForbiddenHidden = 15001,
+		ForbiddenMissingFile = 15020,
+		ForbiddenTACNotAccepted = 15011,
 		InsufficientPermission = 15019,
 		InvalidAPIKey = 11002,
 		InvalidApiVersion = 10003,
@@ -859,6 +872,7 @@ namespace Modio
 		MuteUserNotFound = 17000,
 		OpenIDNotConfigured = 11086,
 		Ratelimited = 11008,
+		RatelimitedSameEndpoint = 11009,
 		ReportedEntityUnavailable = 15030,
 		RequestedCommentNotFound = 15026,
 		RequestedGameDeleted = 14006,
@@ -918,14 +932,29 @@ namespace Modio
 				case ApiError::CrossOriginForbidden:
 						return "Cross-origin request forbidden.";
 					break;
-				case ApiError::DisplayPriceIncorrect:
-						return "The given display price does not match the price of the mod.";
+				case ApiError::EmailLoginCodeExpired:
+						return "Email login code has expired. Please request a new login code.";
+					break;
+				case ApiError::EmailLoginCodeInvalid:
+						return "Email login code is invalid.";
 					break;
 				case ApiError::ExpiredOrRevokedAccessToken:
 						return "Access token is expired, or has been revoked.";
 					break;
 				case ApiError::FailedToCompleteTheRequest:
 						return "mod.io failed to complete the request, please try again. (rare)";
+					break;
+				case ApiError::ForbiddenDMCA:
+						return "This mod is currently under DMCA and the user cannot be subscribed to it.";
+					break;
+				case ApiError::ForbiddenHidden:
+						return "This mod is hidden and the user cannot be subscribed to it.";
+					break;
+				case ApiError::ForbiddenMissingFile:
+						return "This mod is missing a file and cannot be subscribed to.";
+					break;
+				case ApiError::ForbiddenTACNotAccepted:
+						return "The item has not been accepted and can not be purchased at this time.";
 					break;
 				case ApiError::InsufficientPermission:
 						return "The authenticated user does not have permission to delete this mod. This action is restricted to team managers and administrators only.";
@@ -971,6 +1000,9 @@ namespace Modio
 					break;
 				case ApiError::Ratelimited:
 						return "You have been ratelimited for making too many requests. See Rate Limiting.";
+					break;
+				case ApiError::RatelimitedSameEndpoint:
+						return "You have been ratelimited from calling this endpoint again, for making too many requests. See Rate Limiting.";
 					break;
 				case ApiError::ReportedEntityUnavailable:
 						return "The specified resource is not able to be reported at this time, this is potentially due to the resource in question being removed.";
@@ -1215,7 +1247,15 @@ namespace Modio
 		/// @brief The specified mod's files are currently being updated by the SDK. Please try again later.
 		ModBeingProcessed = 22,
 		/// @brief There is insufficient space to install the mod. Please free up space and try again.
-		InsufficientSpace = 23
+		InsufficientSpace = 23,
+		/// @brief When this condition is true, the error code indicates that the SDK has already been initialized.
+		SDKAlreadyInitialized = 24,
+		/// @brief When this condition is true, the error code indicates that Mod Management has already been enabled.
+		ModManagementAlreadyEnabled = 25,
+		/// @brief When this condition is true, the error code indicates that the current user does not have the required permissions for this operation.
+		InsufficientPermissions = 26,
+		/// @brief The email login code is incorrect or has expired.
+		EmailLoginCodeInvalid = 27
 	};
 
 	/// @docnone
@@ -1294,6 +1334,18 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::InsufficientSpace:
 					return "There is insufficient space to install the mod. Please free up space and try again.";
+				break;
+				case ErrorConditionTypes::SDKAlreadyInitialized:
+					return "When this condition is true, the error code indicates that the SDK has already been initialized.";
+				break;
+				case ErrorConditionTypes::ModManagementAlreadyEnabled:
+					return "When this condition is true, the error code indicates that Mod Management has already been enabled.";
+				break;
+				case ErrorConditionTypes::InsufficientPermissions:
+					return "When this condition is true, the error code indicates that the current user does not have the required permissions for this operation.";
+				break;
+				case ErrorConditionTypes::EmailLoginCodeInvalid:
+					return "The email login code is incorrect or has expired.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -2133,6 +2185,48 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::InsufficientSpace:
 					if (ec == Modio::FilesystemError::InsufficientSpace)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::SDKAlreadyInitialized:
+					if (ec == Modio::GenericError::SDKAlreadyInitialized)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::ModManagementAlreadyEnabled:
+					if (ec == Modio::ModManagementError::ModManagementAlreadyEnabled)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::InsufficientPermissions:
+					if (ec == Modio::HttpError::InsufficientPermissions)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::InsufficientPermission)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::EmailLoginCodeInvalid:
+					if (ec == Modio::UserAuthError::EmailLoginCodeExpired)
+					{
+						return true;
+					}
+
+					if (ec == Modio::UserAuthError::EmailLoginCodeInvalid)
 					{
 						return true;
 					}
