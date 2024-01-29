@@ -69,6 +69,8 @@ public:
 
 		Modio::Optional<std::string> PlatformOverride = GetExtendedParameterValue(InitParams, "PlatformOverride");
 		Modio::Optional<std::string> PendingOnlyResults = GetExtendedParameterValue(InitParams, "PendingOnlyResults");
+		Modio::Optional<std::string> InstallationDirectory =
+			GetExtendedParameterValue(InitParams, "IgnoreModInstallationDirectoryOverride");
 
 		reenter(CoroutineState)
 		{
@@ -79,12 +81,12 @@ public:
 				Self.complete(Modio::make_error_code(Modio::GenericError::SDKAlreadyInitialized));
 				return;
 			}
-			
+
 			if (PlatformOverride.has_value())
 			{
 				Modio::Detail::SDKSessionData::SetPlatformOverride(*PlatformOverride);
 			}
-			
+
 			Modio::Detail::SDKSessionData::SetPlatformStatusFilter(*PendingOnlyResults);
 
 			Modio::Detail::ExtendedInitParamHandler::PostSessionDataInit(InitParams);
@@ -107,24 +109,36 @@ public:
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::File, "Initialized File Service");
 
-			yield Modio::Detail::LoadGlobalConfigOverrideFileDataAsync(GlobalConfigFileReadBuffer, std::move(Self));
-			if (ec)
+			// Override root storage location unless extended param IgnoreModInstallationDirectoryOverride is set
+			if (!InstallationDirectory.has_value())
 			{
-				// do a warning here about not being able to load the global config ?
-				ConfigurationValues = {};
+				yield Modio::Detail::LoadGlobalConfigOverrideFileDataAsync(GlobalConfigFileReadBuffer, std::move(Self));
+
+				if (ec)
+				{
+					Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File,
+												"Failed to load global configuration overrides");
+					ConfigurationValues = {};
+				}
+				else
+				{
+					using nlohmann::from_json;
+					from_json(Modio::Detail::ToJson(GlobalConfigFileReadBuffer), ConfigurationValues);
+					ec = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+							 .ApplyGlobalConfigOverrides(ConfigurationValues);
+					if (ec)
+					{
+						Modio::Detail::SDKSessionData::Deinitialize();
+						Self.complete(ec);
+						return;
+					}
+				}
 			}
 			else
 			{
-				using nlohmann::from_json;
-				from_json(Modio::Detail::ToJson(GlobalConfigFileReadBuffer), ConfigurationValues);
-				ec = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().ApplyGlobalConfigOverrides(
-					ConfigurationValues);
-				if (ec)
-				{
-					Modio::Detail::SDKSessionData::Deinitialize();
-					Self.complete(ec);
-					return;
-				}
+				Modio::Detail::Logger().Log(
+					Modio::LogLevel::Info, Modio::LogCategory::File,
+					"Ignoring RootLocalStoragePath override. Mods will be installed to the default directory.");
 			}
 
 			yield Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().InitializeAsync(

@@ -83,6 +83,8 @@ namespace Modio
         static const HttpRequestParams DeleteModKvpMetadataRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}/metadatakvp" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetModKvpMetadataRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/metadatakvp" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AddModKvpMetadataRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/metadatakvp" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams GetUsersInModMonetizationTeamRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/monetization/team" , "multipart/form-data" }; 
+        static const HttpRequestParams CreateModMonetizationTeamRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/monetization/team" , "multipart/form-data" }; 
         static const HttpRequestParams AddModRatingRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/ratings" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetModStatsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/stats" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams UnsubscribeFromModRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}/subscribe" , "application/x-www-form-urlencoded" }; 

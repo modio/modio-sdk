@@ -109,10 +109,10 @@ namespace Modio
 									Modio::Detail::SDKSessionData::GetUserSubscriptions().AddMod(
 										ServerSubsModProfiles.at(ModChange.first));
 
-									Modio::Optional<Modio::ModCollectionEntry&> ModEntry =
-										Modio::Detail::SDKSessionData::GetSystemModCollection().GetByModID(
-											ModChange.first);
-									if (ModEntry.has_value())
+									if (Modio::Optional<Modio::ModCollectionEntry&> ModEntry =
+											Modio::Detail::SDKSessionData::GetSystemModCollection().GetByModID(
+												ModChange.first);
+										ModEntry.has_value())
 									{
 										ModEntry->AddLocalUserSubscription(
 											Modio::Detail::SDKSessionData::GetAuthenticatedUser());
@@ -127,10 +127,10 @@ namespace Modio
 								{
 									Modio::Detail::SDKSessionData::GetUserSubscriptions().RemoveMod(ModChange.first);
 
-									Modio::Optional<Modio::ModCollectionEntry&> ModEntry =
-										Modio::Detail::SDKSessionData::GetSystemModCollection().GetByModID(
-											ModChange.first);
-									if (ModEntry.has_value())
+									if (Modio::Optional<Modio::ModCollectionEntry&> ModEntry =
+											Modio::Detail::SDKSessionData::GetSystemModCollection().GetByModID(
+												ModChange.first);
+										ModEntry.has_value())
 									{
 										ModEntry->RemoveLocalUserSubscription(
 											Modio::Detail::SDKSessionData::GetAuthenticatedUser());

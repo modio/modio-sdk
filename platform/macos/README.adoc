@@ -5,7 +5,7 @@ You can then target `MACOS` to compile the mod.io SDK for MacOS SDK.
 
 == MacOS SDK Versions
 
-The mod.io SDK is built and tested against MacOS using XCode v13 & 14. Using different versions of the MacOS SDK may result in compilation issues.
+The mod.io SDK is built and tested against MacOS using XCode v14 & v15.1. Using different versions of the MacOS SDK may result in compilation issues.
 
 In MacOS, the default way to compile the mod.io SDK requires CMake, which you can install following the https://cmake.org/download/[CMake webpage] instructions or using a package manager like `brew`:
 
@@ -36,6 +36,7 @@ set (MODIO_PLATFORM MACOS)
 [source,cmake]
 ----
 add_subdirectory(<modio-sdk folder> EXCLUDE_FROM_ALL)
+target_compile_features(your_project PUBLIC cxx_std_17)
 ----
 . Link the library to your project
 +
@@ -43,14 +44,12 @@ add_subdirectory(<modio-sdk folder> EXCLUDE_FROM_ALL)
 +
 [source,cmake]
 ----
-target_compile_features(your_project PUBLIC cxx_std_17)
 target_link_libraries(your_project PUBLIC modio)
 ----
 * Or to use the static library configuration:
 +
 [source,cmake]
 ----
-target_compile_features(your_project PUBLIC cxx_std_14)
 target_link_libraries(your_project PUBLIC modioStatic)
 ----
 

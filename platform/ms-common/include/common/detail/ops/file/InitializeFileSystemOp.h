@@ -9,6 +9,7 @@
  */
 
 #pragma once
+#include "common/file/StaticDirectoriesImplementation.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioInitializeOptions.h"
 #include "modio/core/ModioStdTypes.h"
@@ -47,19 +48,8 @@ namespace Modio
 				{
 					// Get root data path in program data
 					{
-						PWSTR path = NULL;
-
-						HRESULT hr = SHGetKnownFolderPath(FOLDERID_Public, 0, NULL, &path);
-
-						if (SUCCEEDED(hr))
+						if (!Modio::Detail::GetDefaultCommonDataPath(CommonDataPath))
 						{
-							CommonDataPath = Modio::filesystem::path(std::wstring(path));
-							CommonDataPath /= fmt::format("mod.io/");
-							CoTaskMemFree(path);
-						}
-						else
-						{
-							CoTaskMemFree(path);
 							Self.complete(Modio::make_error_code(Modio::FilesystemError::UnableToCreateFolder));
 							return;
 						}

@@ -43,7 +43,11 @@ namespace Modio
 					Self.complete(ec);
 					return;
 				}
-
+				if (!GetDefaultCommonDataPath(CommonDataPath))
+				{
+					Self.complete(Modio::make_error_code(Modio::FilesystemError::UnableToCreateFolder));
+					return;
+				}
 				const char* HomeDir = std::getenv("HOME");
 				if (HomeDir == nullptr)
 				{
@@ -52,9 +56,6 @@ namespace Modio
 					Self.complete(Modio::make_error_code(Modio::FilesystemError::UnableToCreateFolder));
 					return;
 				}
-
-				CommonDataPath =
-					Modio::filesystem::path(HomeDir) / "Library/Application Support/mod.io/common/";
 				UserDataPath = Modio::filesystem::path(HomeDir) / "Library/Application Support/mod.io" /
 							   fmt::format("{}/{}/", InitParams.GameID, InitParams.User);
 				TempPath = Modio::filesystem::path("/tmp/");

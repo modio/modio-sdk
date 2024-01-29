@@ -38,15 +38,12 @@ namespace Modio
 				MODIO_PROFILE_SCOPE(GetGameInfo);
 				reenter(CoroutineState)
 				{
-					{
-						Modio::Optional<Modio::GameInfo> CachedGameInfo =
+					if (Modio::Optional<Modio::GameInfo> CachedGameInfo =
 							Services::GetGlobalService<CacheService>().FetchGameInfoFromCache(GameID);
-
-						if (CachedGameInfo.has_value())
-						{
-							Self.complete({}, CachedGameInfo);
-							return;
-						}
+						CachedGameInfo.has_value())
+					{
+						Self.complete({}, CachedGameInfo);
+						return;
 					}
 
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
@@ -59,20 +56,18 @@ namespace Modio
 						return;
 					}
 
-					{
-						Modio::Optional<Modio::GameInfo> GameInfoData =
+					if (Modio::Optional<Modio::GameInfo> GameInfoData =
 							TryMarshalResponse<Modio::GameInfo>(ResponseBodyBuffer);
-
-						if (GameInfoData.has_value())
-						{
-							Services::GetGlobalService<CacheService>().AddToCache(GameInfoData.value());
-							Self.complete(ec, GameInfoData);
-						}
-						else
-						{
-							Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse), {});
-						}
+						GameInfoData.has_value())
+					{
+						Services::GetGlobalService<CacheService>().AddToCache(GameInfoData.value());
+						Self.complete(ec, GameInfoData);
 					}
+					else
+					{
+						Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse), {});
+					}
+					
 					return;
 				}
 			}

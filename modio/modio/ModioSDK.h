@@ -140,11 +140,12 @@ namespace Modio
 	MODIOSDK_API void FetchExternalUpdatesAsync(std::function<void(Modio::ErrorCode)> OnFetchDone);
 
 	/// @docpublic
-	/// @brief Retrieve a list of updates between the users local mod state, and the server-side state. This allows you to
-	/// identify which mods will be modified by the next call to <<FetchExternalUpdatesAsync>> in order to perform any content 
-	/// management (such as unloading files) that might be required.
-	/// @param OnPreviewDone Callback invoked when the external state has been retrieved. It contains a dictionary with ModID
-	/// as keys and changes as values. Empty when there are no differences between local and the mod.io API service
+	/// @brief Retrieve a list of updates between the users local mod state, and the server-side state. This allows you
+	/// to identify which mods will be modified by the next call to <<FetchExternalUpdatesAsync>> in order to perform
+	/// any content management (such as unloading files) that might be required.
+	/// @param OnPreviewDone Callback invoked when the external state has been retrieved. It contains a dictionary with
+	/// ModID as keys and changes as values. Empty when there are no differences between local and the mod.io API
+	/// service
 	/// @requires initialized-sdk
 	/// @requires authenticated-user
 	/// @requires no-rate-limiting
@@ -152,7 +153,9 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserDataError::InvalidUser|No authenticated user
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
-	MODIOSDK_API void PreviewExternalUpdatesAsync(std::function<void(Modio::ErrorCode, std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType>)> OnPreviewDone);
+	MODIOSDK_API void PreviewExternalUpdatesAsync(
+		std::function<void(Modio::ErrorCode, std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType>)>
+			OnPreviewDone);
 
 	/// @docpublic
 	/// @brief Enables the automatic management of installed mods on the system based on the user's subscriptions.
@@ -290,21 +293,6 @@ namespace Modio
 	MODIOSDK_API void AuthenticateUserExternalAsync(Modio::AuthenticationParams User,
 													Modio::AuthenticationProvider Provider,
 													std::function<void(Modio::ErrorCode)> Callback);
-
-	/// @docpublic
-	/// @brief This function retrieves the information required for a game to display the mod.io terms of use to a
-	/// player who wishes to create a mod.io account
-	/// @param Provider The provider to use to perform the authentication
-	/// @param Locale The language to display the terms of use in
-	/// @param Callback Callback invoked with the terms of use data once retrieved from the server
-	/// @requires initialized-sdk
-	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
-	/// @error GenericError::SDKNotInitialized|SDK not initialized
-	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
-	/// @deprecated 2023.10 Call GetTermsOfUseAsync() without a Modio::AuthenticationProvider
-	MODIO_DEPRECATED("2023.10", "Call GetTermsOfUseAsync() without a Modio::AuthenticationProvider")
-	MODIOSDK_API void GetTermsOfUseAsync(Modio::AuthenticationProvider Provider, Modio::Language Locale,
-										 std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)> Callback);
 
 	/// @docpublic
 	/// @brief This function retrieves the information required for a game to display the mod.io terms of use to a
@@ -639,6 +627,13 @@ namespace Modio
 	/// @requires initialized-sdk
 	/// @return List of base mod installation directories
 	MODIOSDK_API std::vector<std::string> GetBaseModInstallationDirectories();
+
+	/// @docpublic
+	/// @brief Returns the default mod installation directory for this game and platform, ignoring overrides and without
+	/// requiring the SDK to be initialized.
+	/// @param GameID The Modio::GameID of the game we're fetching the default mod installation directory for.
+	/// @return The default mod installation directory for the specified game on the current platform
+	MODIOSDK_API std::string GetDefaultModInstallationDirectory(Modio::GameID GameID);
 
 	/// @docpublic
 	/// @brief Mute a user. This will prevent mod.io from returning mods authored by the muted user.

@@ -10,10 +10,10 @@
 
 #pragma once
 
+#include "modio/core/entities/ModioUserList.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/http/ModioHttpParams.h"
-#include "modio/core/entities/ModioUserList.h"
 
 #include <asio/yield.hpp>
 
@@ -29,8 +29,7 @@ namespace Modio
 			{
 				reenter(CoroutineState)
 				{
-					yield
-					Modio::Detail::PerformRequestAndGetResponseAsync(
+					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer, Modio::Detail::GetUsersMutedRequest,
 						Modio::Detail::CachedResponse::Disallow, std::move(Self));
 
@@ -40,9 +39,9 @@ namespace Modio
 						return;
 					}
 
-					Modio::Optional<Modio::UserList> UserList = TryMarshalResponse<Modio::UserList>(ResponseBodyBuffer);
-
-					if (UserList.has_value())
+					if (Modio::Optional<Modio::UserList> UserList =
+							TryMarshalResponse<Modio::UserList>(ResponseBodyBuffer);
+						UserList.has_value())
 					{
 						Self.complete(ec, std::move(UserList));
 						return;

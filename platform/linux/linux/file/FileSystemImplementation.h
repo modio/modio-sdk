@@ -10,6 +10,7 @@
 
 #pragma once
 #include "file/FileObjectImplementation.h"
+#include "file/StaticDirectoriesImplementation.h"
 #include "linux/FileSharedState.h"
 #include "linux/detail/ops/file/DeleteFolderOp.h"
 #include "linux/detail/ops/file/InitializeFileSystemOp.h"
@@ -413,6 +414,12 @@ namespace Modio
 				{
 					return false;
 				}
+			}
+
+			static Modio::filesystem::path GetDefaultCommonDataPath(Modio::filesystem::path& CommonDataPath)
+			{
+				Modio::Detail::GetDefaultCommonDataPath(CommonDataPath);
+				return CommonDataPath;
 			}
 		};
 	} // namespace Detail

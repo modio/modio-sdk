@@ -601,6 +601,10 @@ namespace Modio
 		{
 			return std::unique_lock<std::shared_timed_mutex>(GetShutdownMutex());
 		}
+		MODIO_NODISCARD std::unique_lock<std::shared_timed_mutex> SDKSessionData::TryGetShutdownLock()
+		{
+			return std::unique_lock<std::shared_timed_mutex>(GetShutdownMutex(), std::try_to_lock);
+		}
 
 		SDKSessionData::SDKSessionData() {}
 

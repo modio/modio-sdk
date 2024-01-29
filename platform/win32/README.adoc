@@ -36,6 +36,7 @@ set (MODIO_PLATFORM WIN)
 [source,cmake]
 ----
 add_subdirectory(<modio-sdk folder> EXCLUDE_FROM_ALL)
+target_compile_features(your_project PUBLIC cxx_std_17)
 ----
 . Link the library to your project
 +
@@ -43,14 +44,12 @@ add_subdirectory(<modio-sdk folder> EXCLUDE_FROM_ALL)
 +
 [source,cmake]
 ----
-target_compile_features(your_project PUBLIC cxx_std_17)
 target_link_libraries(your_project PUBLIC modio)
 ----
 * Or to use the static library configuration:
 +
 [source,cmake]
 ----
-target_compile_features(your_project PUBLIC cxx_std_14)
 target_link_libraries(your_project PUBLIC modioStatic)
 ----
 

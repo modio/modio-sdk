@@ -88,13 +88,6 @@ namespace Modio
 			Modio::ModfilePlatform Platform = Modio::ModfilePlatform::Windows;
 			for (nlohmann::json& Entry : PlatformsJson)
 			{
-#if (!defined MODIO_NO_DEPRECATED)
-				if (Detail::ParseSafe(Entry, Platform, "platform"))
-				{
-					GameInfo.Platforms.push_back(Platform);
-				}
-#endif
-
 				GamePlatform GamePlatformDetails = {};
 				Detail::ParseSafe(Entry, GamePlatformDetails.Locked, "locked");
 				Detail::ParseSafe(Entry, GamePlatformDetails.Moderated, "moderated");

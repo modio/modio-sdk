@@ -328,7 +328,7 @@ namespace Modio
 							}
 							// Return the error-ref regardless, defer upwards to Subscribe/Unsubscribe etc to handle as
 							// success
-							Self.complete(Modio::make_error_code(static_cast<Modio::ApiError>(Error->ErrorRef)));
+							Self.complete(ErrRef);
 							return;
 						}
 						else

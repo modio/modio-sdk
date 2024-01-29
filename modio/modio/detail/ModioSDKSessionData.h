@@ -162,6 +162,7 @@ namespace Modio
 			MODIO_IMPL MODIO_NODISCARD static std::shared_lock<std::shared_timed_mutex> GetReadLock();
 			MODIO_IMPL MODIO_NODISCARD static std::unique_lock<std::shared_timed_mutex> GetWriteLock();
 			MODIO_IMPL MODIO_NODISCARD static std::unique_lock<std::shared_timed_mutex> GetShutdownLock();
+			MODIO_IMPL MODIO_NODISCARD static std::unique_lock<std::shared_timed_mutex> TryGetShutdownLock();
 
 		private:
 			enum class InitializationState

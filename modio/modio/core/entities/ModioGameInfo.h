@@ -102,12 +102,6 @@ namespace Modio
 		Modio::GameStats Stats = {};
 		/// @brief Creator defined URLs to share
 		std::vector<Modio::OtherUrl> OtherUrls = {};
-
-		/// @brief Platforms that are supported by this title
-		/// @deprecated 2023.9 Use PlatformSupport property
-		MODIO_DEPRECATED("2023.9", "std::vector<Modio::GamePlatform> PlatformSupport")
-		std::vector<Modio::ModfilePlatform> Platforms = {};
-
 		/// @brief Platforms supported by this title
 		std::vector<Modio::GamePlatform> PlatformSupport = {};
 		/// @brief Monetization options for the game

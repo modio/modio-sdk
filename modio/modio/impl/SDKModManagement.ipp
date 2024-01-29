@@ -262,6 +262,11 @@ namespace Modio
 		return Paths;
 	}
 
+	std::string GetDefaultModInstallationDirectory(Modio::GameID GameID)
+	{
+		return Modio::Detail::FileService::GetDefaultModInstallationDirectory(GameID).string();
+	}
+
 	std::map<Modio::ModID, Modio::ModCollectionEntry> QueryUserInstallations(bool bIncludeOutdatedMods)
 	{
 		auto Lock = Modio::Detail::SDKSessionData::GetReadLock();

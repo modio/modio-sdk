@@ -47,13 +47,6 @@ namespace Modio
 		});
 	}
 
-	// Deprecated version to be removed
-	void GetTermsOfUseAsync(Modio::AuthenticationProvider Provider, Modio::Language Locale,
-							std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms> Terms)> Callback)
-	{
-		GetTermsOfUseAsync(Locale, Callback);
-	}
-
 	void GetTermsOfUseAsync(Modio::Language Locale,
 							std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms> Terms)> Callback)
 	{

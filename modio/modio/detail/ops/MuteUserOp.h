@@ -15,39 +15,34 @@
 #include "modio/http/ModioHttpParams.h"
 
 #include <asio/yield.hpp>
-namespace Modio
+namespace Modio::Detail
 {
-	namespace Detail
+	class MuteUserOp
 	{
-		class MuteUserOp
+	public:
+		MuteUserOp(Modio::UserID UserID)
 		{
+			ID = UserID;
+		}
 
-		public:
-			MuteUserOp(Modio::UserID UserID)
+		template<typename CoroType>
+		void operator()(CoroType& Self, Modio::ErrorCode ec = {})
+		{
+			reenter(CoroutineState)
 			{
-				ID = UserID;
+				yield Modio::Detail::PerformRequestAndGetResponseAsync(
+					ResponseBodyBuffer, Modio::Detail::MuteAUserRequest.SetUserID(ID),
+					Modio::Detail::CachedResponse::Disallow, std::move(Self));
+
+				Self.complete(ec);
+				return;
 			}
+		}
 
-			template<typename CoroType>
-			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
-			{
-				reenter(CoroutineState)
-				{
-					yield Modio::Detail::PerformRequestAndGetResponseAsync(
-						ResponseBodyBuffer, Modio::Detail::MuteAUserRequest.SetUserID(ID),
-						Modio::Detail::CachedResponse::Disallow,
-						std::move(Self));
-
-					Self.complete(ec);
-					return;
-				}
-			}
-
-		private:
-			Modio::UserID ID;
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			asio::coroutine CoroutineState;
-		};
-	} // namespace Detail
-} // namespace Modio
+	private:
+		Modio::UserID ID;
+		Modio::Detail::DynamicBuffer ResponseBodyBuffer;
+		asio::coroutine CoroutineState;
+	};
+} // namespace Modio::Detail
 #include <asio/unyield.hpp>

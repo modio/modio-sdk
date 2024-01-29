@@ -43,16 +43,22 @@ namespace Modio
 					Self.complete(ec);
 					return;
 				}
-				
-				const char* HomeDir = std::getenv("HOME");
-				if (HomeDir == nullptr)
+
+				if (!GetDefaultCommonDataPath(CommonDataPath))
 				{
-					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File, "Could not get home directory environment variable!");
 					Self.complete(Modio::make_error_code(Modio::FilesystemError::UnableToCreateFolder));
 					return;
 				}
-				CommonDataPath = Modio::filesystem::path(HomeDir) / "mod.io" / "common/";
-				UserDataPath = Modio::filesystem::path(HomeDir) / "mod.io" / fmt::format("{}/{}/",InitParams.GameID, InitParams.User);
+				const char* HomeDir = std::getenv("HOME");
+				if (HomeDir == nullptr)
+				{
+					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+												"Could not get home directory environment variable!");
+					Self.complete(Modio::make_error_code(Modio::FilesystemError::UnableToCreateFolder));
+					return;
+				}
+				UserDataPath = Modio::filesystem::path(HomeDir) / "mod.io" /
+							   fmt::format("{}/{}/", InitParams.GameID, InitParams.User);
 				TempPath = Modio::filesystem::path("/tmp/");
 
 				// EC should never be null at this point

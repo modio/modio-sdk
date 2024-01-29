@@ -92,6 +92,7 @@ set (MODIO_PLATFORM WIN)
 [source,cmake]
 ----
 add_subdirectory(<modio-sdk folder> EXCLUDE_FROM_ALL)
+target_compile_features(your_project PUBLIC cxx_std_17)
 ----
 .. Link the library to your project
 +
@@ -99,14 +100,12 @@ add_subdirectory(<modio-sdk folder> EXCLUDE_FROM_ALL)
 +
 [source,cmake]
 ----
-target_compile_features(your_project PUBLIC cxx_std_17)
 target_link_libraries(your_project PUBLIC modio)
 ----
 * Or to use the static library configuration:
 +
 [source,cmake]
 ----
-target_compile_features(your_project PUBLIC cxx_std_14)
 target_link_libraries(your_project PUBLIC modioStatic)
 ----
 
@@ -245,7 +244,7 @@ FILE HEADER VALUES
 |===
 |Configuration  | Version
 |Header-only    | C++17 (Windows)
-|Static Library | C++14
+|Static Library | C++17
 |===
 
 '''
@@ -386,7 +385,7 @@ However, this value can be overridden in one of two ways:
 +
 On the first run of a game using the plugin, `${FolderID_LocalAppData}/mod.io/globalsettings.json` will be created.
 +
-This JSON object contains a `RootLocalDataPath` element. A change to this string to a valid path on disk will globally redirect the mod installation directory for *ALL* games using the mod.io SDK for the current system account (it also includes the Unreal Engine 4 plugin).
+This JSON object contains a `RootLocalStoragePath` element. A change to this string to a valid path on disk will globally redirect the mod installation directory for *ALL* games using the mod.io SDK for the current system account (it also includes the Unreal Engine 4 plugin). To ignore this override and enforce use of the default directory, set the extended parameter key `IgnoreModInstallationDirectoryOverride` to any string value when initializing the SDK.
 +
 NOTE: Changing this value while the SDK is initialized is not supported and behavior is undefined.
 +

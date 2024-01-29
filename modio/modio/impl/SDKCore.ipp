@@ -52,13 +52,13 @@ namespace Modio
 
 	void RunPendingHandlers()
 	{
+		auto ShutdownLock = Modio::Detail::SDKSessionData::TryGetShutdownLock();
+		if (ShutdownLock.owns_lock())
 		{
-			auto ShutdownLock = Modio::Detail::SDKSessionData::GetShutdownLock();
-
 			MODIO_PROFILE_SCOPE(RunPendingHandlers);
 			{
 				MODIO_PROFILE_SCOPE(IOContext_Poll);
-
+        
 				// Run any pending handlers on the global io_context
 				if (Modio::Detail::Services::GetGlobalContext().stopped())
 				{
@@ -70,16 +70,16 @@ namespace Modio
 				do
 				{
 					Modio::Detail::Services::GetGlobalContext().poll_one();
-
+        
 				} while (std::chrono::steady_clock::now() - PollStartTime < std::chrono::milliseconds(1));
 			}
-
+        
 			{
 				MODIO_PROFILE_SCOPE(FlushManagementLog);
 				// invoke the mod management log callback if the user has set it
 				Modio::Detail::SDKSessionData::FlushModManagementLog();
 			}
-
+        
 			{
 				MODIO_PROFILE_SCOPE(FlushLogBuffer);
 				// invoke log callback if the user has set it

@@ -173,10 +173,12 @@ namespace Modio
 				break;
 		}
 
-		FilterFields.emplace("_sort", fmt::format("{}{}", ((Direction == SortDirection::Descending && !bInvertedSort) ||
-									   (Direction == SortDirection::Ascending && bInvertedSort)
-										  ? "-"
-										  : ""), SortStr));
+		FilterFields.emplace("_sort", fmt::format("{}{}",
+												  ((Direction == SortDirection::Descending && !bInvertedSort) ||
+														   (Direction == SortDirection::Ascending && bInvertedSort)
+													   ? "-"
+													   : ""),
+												  SortStr));
 
 		if (!SearchKeywords.empty())
 		{
@@ -191,12 +193,21 @@ namespace Modio
 
 		if (DateRangeBegin)
 		{
-			FilterFields.emplace("date_live-min", fmt::format("{}",DateRangeBegin->time_since_epoch()));
+			// The mod.io API expects an integer in seconds
+			FilterFields.emplace(
+				"date_live-min",
+				fmt::format(
+					"{}",
+					std::chrono::duration_cast<std::chrono::seconds>(DateRangeBegin->time_since_epoch()).count()));
 		}
 
 		if (DateRangeEnd)
 		{
-			FilterFields.emplace("date_live-max", fmt::format("{}", DateRangeBegin->time_since_epoch()));
+			// The mod.io API expects an integer in seconds
+			FilterFields.emplace(
+				"date_live-max",
+				fmt::format(
+					"{}", std::chrono::duration_cast<std::chrono::seconds>(DateRangeEnd->time_since_epoch()).count()));
 		}
 
 		if (!Tags.empty())
@@ -261,9 +272,8 @@ namespace Modio
 				case RevenueFilterType::FreeAndPaid:
 					FilterFields.emplace("revenue_type", "2");
 					break;
-				default: ;
+				default:;
 			}
-			
 		}
 
 		return FilterFields;

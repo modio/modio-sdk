@@ -16,8 +16,7 @@ Welcome to the mod.io SDK repository, built using C++. It allows game developers
 * Automatic downloads and updates
 * Email / Steam / EGS / Consoles / Custom SSO authentication
 * Mod Browsing / Filtering
-* Header-only support with C++17 compiler or later
-* C++14 codebases can use a static library or direct compilation
+* Header-only, direct compilation or static library support with C++17 compiler
 * Native Unreal Engine integration available via our https://github.com/modio/modio-ue[dedicated plugin]
 
 == Platform Support
@@ -39,7 +38,7 @@ Welcome to the mod.io SDK repository, built using C++. It allows game developers
 |===
 |Configuration  | Version
 |Header-only    | C++17 (Windows)
-|Static Library | C++14
+|Static Library | C++17
 |===
 
 == Download repository
@@ -112,6 +111,7 @@ set (MODIO_PLATFORM WIN)
 [source,cmake]
 ----
 add_subdirectory(<modio-sdk folder> EXCLUDE_FROM_ALL)
+target_compile_features(your_project PUBLIC cxx_std_17)
 ----
 . Link the library to your project
 +
@@ -119,14 +119,12 @@ add_subdirectory(<modio-sdk folder> EXCLUDE_FROM_ALL)
 +
 [source,cmake]
 ----
-target_compile_features(your_project PUBLIC cxx_std_17)
 target_link_libraries(your_project PUBLIC modio)
 ----
 * Or to use the static library configuration:
 +
 [source,cmake]
 ----
-target_compile_features(your_project PUBLIC cxx_std_14)
 target_link_libraries(your_project PUBLIC modioStatic)
 ----
 

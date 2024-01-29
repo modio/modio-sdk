@@ -15,6 +15,7 @@
 #include "modio/core/ModioLogEnum.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioStringHelpers.h"
 #include "modio/detail/entities/ModioAvatar.h"
@@ -129,8 +130,7 @@ namespace Modio
 			template<typename CompletionTokenType>
 			auto DeleteFolderAsync(Modio::filesystem::path FolderPath, CompletionTokenType&& Token)
 			{
-				return PlatformImplementation->DeleteFolderAsync(FolderPath,
-																 std::forward<CompletionTokenType>(Token));
+				return PlatformImplementation->DeleteFolderAsync(FolderPath, std::forward<CompletionTokenType>(Token));
 			}
 
 			Modio::ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string> Overrides)
@@ -316,6 +316,13 @@ namespace Modio
 			const Modio::filesystem::path GetModRootInstallationPath() const
 			{
 				return PlatformImplementation->GetModRootInstallationPath();
+			}
+
+			static Modio::filesystem::path GetDefaultModInstallationDirectory(Modio::GameID GameID)
+			{
+				Modio::filesystem::path CommonDataPath;
+				Modio::Detail::FileSystemImplementation::GetDefaultCommonDataPath(CommonDataPath);
+				return CommonDataPath / fmt::format("{}/mods/", GameID);
 			}
 
 			bool CheckSpaceAvailable(const Modio::filesystem::path& Destination, Modio::FileSize DesiredSize)

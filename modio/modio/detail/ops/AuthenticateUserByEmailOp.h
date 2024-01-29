@@ -35,10 +35,8 @@ namespace Modio
 			template<typename OperationState>
 			void operator()(OperationState& Self, Modio::ErrorCode ec = {})
 			{
-				using namespace Modio;
-
 				Detail::UserDataService& UserDataService =
-					Detail::Services::GetGlobalService<Detail::UserDataService>();
+					Modio::Detail::Services::GetGlobalService<Detail::UserDataService>();
 
 				reenter(CoroutineState)
 				{
@@ -54,18 +52,16 @@ namespace Modio
 						return;
 					}
 
-					{
-						Modio::Optional<Modio::Detail::AccessTokenObject> Token =
+					if (Modio::Optional<Modio::Detail::AccessTokenObject> Token =
 							Detail::TryMarshalResponse<Detail::AccessTokenObject>(Local.ResponseBodyBuffer);
-						if (Token.has_value())
-						{
-							Local.AuthResponse = Token.value();
-						}
-						else
-						{
-							Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
-							return;
-						}
+						Token.has_value())
+					{
+						Local.AuthResponse = Token.value();
+					}
+					else
+					{
+						Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
+						return;
 					}
 
 					Local.ResponseBodyBuffer.Clear();
@@ -81,19 +77,18 @@ namespace Modio
 						return;
 					}
 
-					{
-						Modio::Optional<Modio::User> User =
+					if (Modio::Optional<Modio::User> User =
 							Detail::TryMarshalResponse<Modio::User>(Local.ResponseBodyBuffer);
-						if (User.has_value())
-						{
-							Local.NewlyAuthenticatedUser = User.value();
-						}
-						else
-						{
-							Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
-							return;
-						}
+						User.has_value())
+					{
+						Local.NewlyAuthenticatedUser = User.value();
 					}
+					else
+					{
+						Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
+						return;
+					}
+					
 					Local.ResponseBodyBuffer.Clear();
 
 					Modio::Detail::SDKSessionData::InitializeForUser(std::move(Local.NewlyAuthenticatedUser),

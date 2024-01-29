@@ -40,11 +40,6 @@ namespace Modio
 				{
 					SubmitParams = SubmitParams.AppendPayloadValue("visible", fmt::format("{}", static_cast<std::uint8_t>(Params.Visibility.value())));
 				}
-				// When bVisible is removed from deprecation, remove the else if below
-				else if (Params.bVisible)
-				{
-					SubmitParams = SubmitParams.AppendPayloadValue("visible", Params.bVisible.value() ? "1" : "0");
-				}
 
 				if (Params.Stock)
 				{
