@@ -297,14 +297,12 @@ namespace Modio
 	/// @docpublic
 	/// @brief This function retrieves the information required for a game to display the mod.io terms of use to a
 	/// player who wishes to create a mod.io account
-	/// @param Locale The language to display the terms of use in
 	/// @param Callback Callback invoked with the terms of use data once retrieved from the server
 	/// @requires initialized-sdk
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
-	MODIOSDK_API void GetTermsOfUseAsync(Modio::Language Locale,
-										 std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)> Callback);
+	MODIOSDK_API void GetTermsOfUseAsync(std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)> Callback);
 
 	/// @docpublic
 	/// @brief Returns a handle for use with SubmitNewModAsync
@@ -679,6 +677,11 @@ namespace Modio
 	/// @error GenericError::BadParameter|The supplied game ID is invalid
 	MODIOSDK_API void GetGameInfoAsync(
 		Modio::GameID GameID, std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfo>)> Callback);
+
+	/// @docpublic
+	/// @brief Set language to get corresponding data from the server
+	/// @param Modio::Language to set
+	MODIOSDK_API void SetLanguage(Modio::Language Locale);
 
 } // namespace Modio
 

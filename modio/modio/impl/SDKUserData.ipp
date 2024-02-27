@@ -47,15 +47,14 @@ namespace Modio
 		});
 	}
 
-	void GetTermsOfUseAsync(Modio::Language Locale,
-							std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms> Terms)> Callback)
+	void GetTermsOfUseAsync(std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms> Terms)> Callback)
 	{
-		Modio::Detail::SDKSessionData::EnqueueTask([Locale, Callback = std::move(Callback)]() mutable {
+		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback))
 			{
 				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)>,
 									void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)>(
-					Modio::Detail::GetTermsOfUseOp(Locale), Callback,
+					Modio::Detail::GetTermsOfUseOp(), Callback,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 		});

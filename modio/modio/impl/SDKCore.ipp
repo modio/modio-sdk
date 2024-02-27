@@ -218,4 +218,30 @@ namespace Modio
 			}
 		});
 	}
+
+	void SetLanguage(Modio::Language Locale)
+	{
+		bool bLanguageChanged = false;
+		Modio::Language CurrentLanguage = Modio::Language::English;
+		{
+			auto Lock = Modio::Detail::SDKSessionData::GetReadLock();
+			CurrentLanguage = Modio::Detail::SDKSessionData::GetLocalLanguage();
+			bLanguageChanged = CurrentLanguage != Locale;
+		}
+		if (bLanguageChanged)
+		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
+			// Guard against the language being mutated while we didnt have the lock
+			if (CurrentLanguage == Modio::Detail::SDKSessionData::GetLocalLanguage())
+			{
+				// Invalidate all necessary cache
+				Modio::Detail::SDKSessionData::InvalidateTermsOfUseCache();
+				Modio::Detail::SDKSessionData::InvalidateSubscriptionCache();
+				Modio::Detail::SDKSessionData::InvalidateAllModsCache();
+				Detail::Services::GetGlobalService<Detail::CacheService>().ClearCache();
+				Modio::Detail::SDKSessionData::SetLocalLanguage(Locale);
+			}
+		}
+	}
+
 } // namespace Modio

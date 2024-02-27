@@ -114,6 +114,29 @@ namespace Modio
 			CacheInstance->ModInfoListCache.emplace(GameIDDetail, ModIDVec);
 		}
 
+		List<std::vector, Modio::ModID> CacheService::GetAllModIdsInCache()
+		{
+
+			List<std::vector, Modio::ModID> listModId;
+
+			//Get ModIds from primary cache
+			for (auto& CacheEntry : CacheInstance->ModInfoCache)
+			{
+				listModId.GetRawList().push_back(CacheEntry.second.ModId);
+			}
+
+			// Get ModIds from secondary cache
+			for (auto ModEntry : Modio::Detail::SDKSessionData::GetSystemModCollection().Entries())
+			{
+				if (std::find(listModId.GetRawList().begin(), listModId.GetRawList().end(), ModEntry.first) != listModId.GetRawList().end())
+				{
+					listModId.GetRawList().push_back(ModEntry.first);
+				}
+			}
+			
+			return listModId;
+		}
+
 		Modio::Optional<Modio::Detail::DynamicBuffer> CacheService::FetchFromCache(std::string ResourceURL) const
 		{
 			MODIO_PROFILE_SCOPE(CacheFetchURL);

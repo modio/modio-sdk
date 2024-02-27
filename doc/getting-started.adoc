@@ -595,14 +595,14 @@ UserParams.AuthToken = "AuthenticationToken";
 UserParams.UserEmail = "UserEmail";
 UserParams.bUserHasAcceptedTerms = false;
 
-Modio::AuthenticateUserExternalAsync(UserParams,Provider,[Provider, Language](Modio::ErrorCode ec)
+Modio::AuthenticateUserExternalAsync(UserParams,Provider,[Provider](Modio::ErrorCode ec)
 {
     if (ec)
     {
         if (ec == Modio::ApiError::UserNoAcceptTermsOfUse)
         {
             // We need to display the terms of use to the user
-            Modio::GetTermsOfUseAsync(Language, [](Modio::ErrorCode ec, Modio::Optional<Modio::Terms> Terms)
+            Modio::GetTermsOfUseAsync([](Modio::ErrorCode ec, Modio::Optional<Modio::Terms> Terms)
             {
                 if (ec)
                 {

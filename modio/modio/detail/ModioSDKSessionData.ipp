@@ -16,6 +16,7 @@
 #include "modio/core/ModioInitializeOptions.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/HedleyWrapper.h"
+#include "modio/cache/ModioCacheService.h"
 
 MODIO_DIAGNOSTIC_PUSH
 
@@ -510,6 +511,16 @@ namespace Modio
 			return "";
 		}
 
+		void SDKSessionData::SetLocalLanguage(Modio::Language Local)
+		{
+			Get().LocalLanguage = Local;
+		}
+
+		Modio::Language SDKSessionData::GetLocalLanguage()
+		{
+			return Get().LocalLanguage;
+		}
+
 		void SDKSessionData::InvalidateSubscriptionCache()
 		{
 			Get().bSubscriptionCacheInvalid = true;
@@ -523,6 +534,34 @@ namespace Modio
 		bool SDKSessionData::IsSubscriptionCacheInvalid()
 		{
 			return Get().bSubscriptionCacheInvalid;
+		}
+
+		void SDKSessionData::InvalidateTermsOfUseCache()
+		{
+			Get().bTermsOfUseCacheInvalid = true;
+		}
+
+		void SDKSessionData::ClearTermsOfUseCache()
+		{
+			Get().bTermsOfUseCacheInvalid = false;
+		}
+
+		bool SDKSessionData::IsTermsOfUseCacheInvalid()
+		{
+			return Get().bTermsOfUseCacheInvalid;
+		}
+
+		void SDKSessionData::InvalidateAllModsCache()
+		{
+			Get().ModCacheInvalidMap.clear();
+
+			List<std::vector, Modio::ModID> listModIds =  Detail::Services::GetGlobalService<Detail::CacheService>()
+				.GetAllModIdsInCache();
+
+			for (auto& ModId : listModIds.GetRawList())
+			{
+				Get().ModCacheInvalidMap.emplace(std::make_pair(ModId, true));
+			}
 		}
 
 		void SDKSessionData::InvalidateModCache(Modio::ModID ID)
@@ -613,6 +652,7 @@ namespace Modio
 			  APIKey(Options.APIKey),
 			  Environment(Options.GameEnvironment),
 			  PortalInUse(Options.PortalInUse),
+			  LocalLanguage(Modio::Language::English),
 			  CurrentInitializationState(InitializationState::NotInitialized)
 		{}
 	} // namespace Detail

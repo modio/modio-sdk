@@ -53,6 +53,8 @@ namespace Modio
 
 			MODIO_IMPL void AddToCache(Modio::GameID GameIDDetail, Modio::ModInfoList ModInfoDetails);
 
+			MODIO_IMPL List<std::vector, Modio::ModID>  GetAllModIdsInCache();
+
 			MODIO_IMPL Modio::Optional<Modio::Detail::DynamicBuffer> FetchFromCache(std::string ResourceURL) const;
 
 			MODIO_IMPL Modio::Optional<Modio::ModInfo> FetchFromCache(Modio::ModID ModIDDetail) const;

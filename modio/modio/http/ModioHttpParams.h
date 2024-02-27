@@ -110,10 +110,6 @@ namespace Modio
 
 			MODIO_IMPL HttpRequestParams& SetUserID(Modio::UserID ID);
 
-			MODIO_IMPL HttpRequestParams SetLocale(const Modio::Language Locale) const;
-
-			MODIO_IMPL HttpRequestParams& SetLocale(const Modio::Language Locale);
-
 			MODIO_IMPL HttpRequestParams AddQueryParamRaw(const std::string& Key, const std::string& Value) const;
 			MODIO_IMPL HttpRequestParams& AddQueryParamRaw(const std::string& Key, const std::string& Value);
 
@@ -338,9 +334,6 @@ namespace Modio
 			std::map<std::string, PayloadContent> PayloadMembers;
 
 			Modio::Optional<std::string> AuthTokenOverride;
-
-			// Temporary workaround for specifying the locale on Terms request
-			Modio::Optional<Modio::Language> OverrideLocale;
 
 			std::string APIKey;
 

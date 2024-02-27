@@ -99,21 +99,6 @@ namespace Modio
 			return *this;
 		}
 
-
-		Modio::Detail::HttpRequestParams HttpRequestParams::SetLocale(Modio::Language Locale) const
-		{
-			auto NewParamsInstance = HttpRequestParams(*this);
-			NewParamsInstance.OverrideLocale = Locale;
-			return NewParamsInstance;
-		}
-
-		Modio::Detail::HttpRequestParams& HttpRequestParams::SetLocale(Modio::Language Locale)
-		{
-			OverrideLocale = Locale;
-			return *this;
-		}
-
-
 		Modio::Detail::HttpRequestParams HttpRequestParams::AddQueryParamRaw(const std::string& Key, const std::string& Value) const
 		{
 			auto NewParamsInstance = HttpRequestParams(*this);
@@ -662,10 +647,8 @@ namespace Modio
 				Headers.push_back({"Content-Range", fmt::format("bytes {}-{}/{}", StartValue, EndValue, TotalValue)});
 			}
 
-			if (OverrideLocale)
-			{
-				Headers.push_back({"Accept-Language", Modio::Detail::ToString(*OverrideLocale)});
-			}
+			// Add Local Language Header
+			Headers.push_back({ "Accept-Language", Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetLocalLanguage()) });
 
 			// @todo: Set Content-Type: multipart/form-data for binary payload
 			return Headers;

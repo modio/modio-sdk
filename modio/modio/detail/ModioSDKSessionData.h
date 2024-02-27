@@ -142,6 +142,9 @@ namespace Modio
 			MODIO_IMPL static Modio::Optional<Modio::PlatformStatus> GetPlatformStatusFilter();
 			MODIO_IMPL static std::string GetPlatformStatusFilterString();
 
+			MODIO_IMPL static void SetLocalLanguage(Modio::Language Local);
+			MODIO_IMPL static Modio::Language GetLocalLanguage();
+
 			MODIO_IMPL static Modio::Optional<Modio::ModID> ResolveModCreationHandle(Modio::ModCreationHandle Handle);
 			MODIO_IMPL static void LinkModCreationHandle(Modio::ModCreationHandle Handle, Modio::ModID ID);
 
@@ -149,6 +152,11 @@ namespace Modio
 			MODIO_IMPL static void ClearSubscriptionCacheInvalid();
 			MODIO_IMPL static bool IsSubscriptionCacheInvalid();
 
+			MODIO_IMPL static void InvalidateTermsOfUseCache();
+			MODIO_IMPL static void ClearTermsOfUseCache();
+			MODIO_IMPL static bool IsTermsOfUseCacheInvalid();
+
+			MODIO_IMPL static void InvalidateAllModsCache();
 			MODIO_IMPL static void InvalidateModCache(Modio::ModID ID);
 			MODIO_IMPL static void ClearModCacheInvalid(Modio::ModID ID);
 			MODIO_IMPL static bool IsModCacheInvalid(Modio::ModID ID);
@@ -185,6 +193,7 @@ namespace Modio
 			Modio::Optional<std::string> PlatformOverride;
 			Modio::Optional<Modio::PlatformStatus> PlatformStatusFilter;
 			Modio::Portal PortalInUse;
+			Modio::Language LocalLanguage;
 			InitializationState CurrentInitializationState = InitializationState::NotInitialized;
 			bool bModManagementEnabled = false;
 			std::vector<struct FieldError> LastValidationError;
@@ -203,6 +212,7 @@ namespace Modio
 			Modio::Optional<Modio::ModID> ModIDToPrioritize;
 			std::map<Modio::ModID, Modio::CreateModFileParams> PendingModUploads;
 			bool bSubscriptionCacheInvalid = false;
+			bool bTermsOfUseCacheInvalid = false;
 			std::unordered_map<std::int64_t, bool> ModCacheInvalidMap;
 			moodycamel::ConcurrentQueue < fu2::unique_function < void()>> IncomingTaskQueue;
 		};

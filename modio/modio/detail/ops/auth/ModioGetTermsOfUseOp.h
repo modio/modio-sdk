@@ -26,8 +26,7 @@ namespace Modio
 		class GetTermsOfUseOp
 		{
 		public:
-			GetTermsOfUseOp(Modio::Language Locale)
-				: Locale(Locale)
+			GetTermsOfUseOp()
 			{}
 
 			template<typename CoroType>
@@ -35,9 +34,14 @@ namespace Modio
 			{
 				reenter(CoroutineState)
 				{
+					CachedResponse = Modio::Detail::SDKSessionData::IsTermsOfUseCacheInvalid()
+										 ? Modio::Detail::CachedResponse::Disallow
+										 : Modio::Detail::CachedResponse::Allow;
+
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
-						ResponseBodyBuffer, Modio::Detail::TermsRequest.SetLocale(Locale),
-						Modio::Detail::CachedResponse::Allow, std::move(Self));
+						ResponseBodyBuffer, Modio::Detail::TermsRequest, CachedResponse, std::move(Self));
+
+					Modio::Detail::SDKSessionData::ClearTermsOfUseCache();
 
 					if (ec)
 					{
@@ -61,8 +65,7 @@ namespace Modio
 
 		private:
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			Modio::Language Locale;
-
+			Modio::Detail::CachedResponse CachedResponse;
 			asio::coroutine CoroutineState;
 		};
 	} // namespace Detail
