@@ -62,14 +62,18 @@ sudo apt install ./liburing*deb
 
 NOTE: If you are using the "header_only" release mode, the mod.io SDK includes MbedTLS headers, but requires the library installed in your system, which was tested with libmbedtls-dev 2.28.0 in Ubuntu. The "static" mode includes these libraries in the same folder as the libmodioStatic.a
 
-=== macOS Dependencies
+=== macOS / iOS Dependencies
 
-The mod.io SDK for development on macOS requires Clang 10 or GCC 10, which come included in the XCode 12 installation. To install CMake 3.20 or Ninja 1.10, it is recommended to use https://brew.sh[brew] as follows:
+The mod.io SDK for development on macOS / iOS requires Clang 10 or GCC 10 or later, which come included in the XCode installation. XCode 14 or later is recommended. To install CMake 3.20 or Ninja 1.10, it is recommended to use https://brew.sh[brew] as follows:
 
 [source,bash]
 ----
 brew install cmake ninja
 ----
+
+iOS compiles by default to the simulator. If you need to deploy to a device, add variable `MODIO_IOS_DEVICE` to cmake. Check documentation in the platform link:platform/ios/README.adoc[README.adoc] for more details.
+
+The minimum deployment target is macOS 12.0. In case of mobile, it is iOS 15.0
 
 === Inside a CMake project
 
@@ -123,6 +127,9 @@ To simplify the SDK compilation, the file `CMakePresets.json` includes the most 
 |macOS    | macOS           | Release      | Ninja or XCode
 |macOS    | macOS-debug     | Debug        | Ninja or XCode
 |macOS    | macOS-dbginfo   | Pre-Release  | Ninja or XCode
+|iOS      | iOS             | Release      | Ninja or XCode
+|iOS      | iOS-debug       | Debug        | Ninja or XCode
+|iOS      | iOS-dbginfo     | Pre-Release  | Ninja or XCode
 |===
 
 Debug presets have the `-debug` suffix, and Release-with-debug-info is `-dbginfo`. For example, if you want to build the SDK in debug configuration specify `win-debug` as the preset name.
@@ -237,6 +244,8 @@ FILE HEADER VALUES
 |Playstation 5  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
 |Linux          | ✔                             | Clang 10
 |macOS          | ✔                             | Clang 10
+|iOS            | ✔                             | Clang 10
+|Android        | ✔                             | Clang
 |===
 
 ==== Compiler Feature Support
@@ -377,7 +386,7 @@ The plugin stores mods in a game-specific directory in the following path by def
 |`${FolderID_Public}/mod.io` | `${USER_HOME}/mod.io`    | `${USER_HOME}/Library/Application Support/mod.io`
 |===
 
-NOTE: In Linux and macOS, mods and data binds to a single user. Every other client would have their own instance in their home directory.
+NOTE: In Linux, macOS & iOS, mods and data binds to a single user. Every other client would have their own instance in their home directory.
 
 However, this value can be overridden in one of two ways:
 

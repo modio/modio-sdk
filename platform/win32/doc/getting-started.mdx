@@ -1,0 +1,24 @@
+---
+id: win-getting-started
+title: Getting Started
+slug: /c++sdk/win/getting-started
+sidebar_position: 0
+---
+
+
+# Getting Started
+
+The use of Windows with the mod.io SDK is ready by default. You can find the `win32` directory in the platform subdirectory of your SDK installation.
+You can then target `WIN` to compile the mod.io SDK for Windows SDK.
+
+## Windows SDK Versions
+
+The mod.io SDK is built and tested against Windows using Visual Studio 2019 & 2022. Using different versions of the Windows SDK may result in compilation issues.
+
+In case you plan to use CMake to compile the mod.io SDK build outside of Visual Studio, you can take advantage of the default "CMake Extensions" typically found here:
+
+```cmake
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin
+```
+
+This folder, or a similar with respect to your installation, contain the relevant CMake binaries to start configuring with CMake. The CMake FlagTables file is located at C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Templates\MSBuild\FlagTables` (or equivalent VS and CMake installation directory)

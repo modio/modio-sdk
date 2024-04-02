@@ -12,6 +12,7 @@
 	#include "modio/core/ModioFilterParams.h"
 #endif
 
+#include "modio/core/entities/ModioProfileMaturity.h"
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioFormatters.h"
 
@@ -121,6 +122,18 @@ namespace Modio
 	Modio::FilterParams& FilterParams::RevenueType(RevenueFilterType ByRevenue)
 	{
 		Revenue = ByRevenue;
+		return *this;
+	}
+
+	Modio::FilterParams& FilterParams::DisallowMatureContent()
+	{
+		Maturity = Modio::MaturityOption::None;
+		return *this;
+	}
+
+	Modio::FilterParams& FilterParams::WithMatureContentFlags(Modio::MaturityOption ByMaturity)
+	{
+		Maturity = ByMaturity;
 		return *this;
 	}
 
@@ -274,6 +287,12 @@ namespace Modio
 					break;
 				default:;
 			}
+		}
+
+		if (Maturity.has_value())
+		{
+			auto maturityOption = static_cast<uint8_t>(Maturity.value());
+			FilterFields.emplace("maturity_option", std::to_string(maturityOption));
 		}
 
 		return FilterFields;

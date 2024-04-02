@@ -99,7 +99,7 @@ namespace Modio
 		}
 
 		/// @docnone
-		constexpr bool ToggleFlag(const EnumType& EnumValue)
+		constexpr FlagImpl<T>& ToggleFlag(const EnumType& EnumValue)
 		{
 			Value = Value.disjunction(static_cast<StorageType>(0)).value() ^ Convert(EnumValue);
 			return *this;

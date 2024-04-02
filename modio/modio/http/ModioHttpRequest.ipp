@@ -30,8 +30,8 @@ namespace Modio
 
 		{
 			get_implementation()->Parameters = RequestParams;
-			Logger().Log(LogLevel::Trace, LogCategory::Http, "Creating Request for {}",
-						 RequestParams.GetFormattedResourcePath());
+			Logger().Log(LogLevel::Trace, LogCategory::Http, "Creating Request for {}{}",
+						 RequestParams.GetServerAddress(), RequestParams.GetFormattedResourcePath());
 		}
 
 		HttpRequest::HttpRequest(HttpRequestParams RequestParams)
@@ -39,8 +39,8 @@ namespace Modio
 			  RequestParameters(RequestParams)
 		{
 			get_implementation()->Parameters = RequestParameters;
-			Logger().Log(LogLevel::Trace, LogCategory::Http, "Creating Request for {}",
-						 RequestParams.GetFormattedResourcePath());
+			Logger().Log(LogLevel::Trace, LogCategory::Http, "Creating Request for {}{}",
+						 RequestParams.GetServerAddress(), RequestParams.GetFormattedResourcePath());
 		}
 
 		HttpRequest::~HttpRequest() {}

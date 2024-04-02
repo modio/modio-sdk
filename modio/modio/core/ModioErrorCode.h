@@ -1255,7 +1255,13 @@ namespace Modio
 		/// @brief When this condition is true, the error code indicates that the current user does not have the required permissions for this operation.
 		InsufficientPermissions = 26,
 		/// @brief The email login code is incorrect or has expired.
-		EmailLoginCodeInvalid = 27
+		EmailLoginCodeInvalid = 27,
+		/// @brief The specified mod is already subscribed to.
+		AlreadySubscribed = 28,
+		/// @brief The current mod installation or update was cancelled.
+		InstallOrUpdateCancelled = 29,
+		/// @brief The current modfile upload was cancelled.
+		UploadCancelled = 30
 	};
 
 	/// @docnone
@@ -1346,6 +1352,15 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::EmailLoginCodeInvalid:
 					return "The email login code is incorrect or has expired.";
+				break;
+				case ErrorConditionTypes::AlreadySubscribed:
+					return "The specified mod is already subscribed to.";
+				break;
+				case ErrorConditionTypes::InstallOrUpdateCancelled:
+					return "The current mod installation or update was cancelled.";
+				break;
+				case ErrorConditionTypes::UploadCancelled:
+					return "The current modfile upload was cancelled.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -2227,6 +2242,30 @@ namespace Modio
 					}
 
 					if (ec == Modio::UserAuthError::EmailLoginCodeInvalid)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::AlreadySubscribed:
+					if (ec == Modio::ModManagementError::AlreadySubscribed)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::InstallOrUpdateCancelled:
+					if (ec == Modio::ModManagementError::InstallOrUpdateCancelled)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::UploadCancelled:
+					if (ec == Modio::ModManagementError::UploadCancelled)
 					{
 						return true;
 					}

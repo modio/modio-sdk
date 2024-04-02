@@ -18,8 +18,6 @@
 #include "Mac/MacPlatformCompilerPreSetup.h"
 #include "Mac/MacPlatformAtomics.h"
 
-// NOTE!! I tried to add "-Wshadow" as a "target_compile_options" in many CMake files:
-// platform/macos/macos, asio.cmake, howeever it dit not like it.
 #pragma GCC diagnostic push
 
 // This is required by file "resolver_base.hpp" in line 69 which complains about this:

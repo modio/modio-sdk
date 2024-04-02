@@ -46,9 +46,6 @@ namespace Modio
 				{
 					if (FileOffset.value() > FileImpl->GetSize())
 					{
-						// For some reason, this error was caught during (de)compression in file.
-						// Added a comment to task
-						// "https://trello.com/c/mYK6LumZ/765-investigate-zip-file-discrepancies-win-linux-mac"
 						Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File,
 													"Offset for file {} with File Descriptor {} requested larger "
 													"offset({}) than the current size({}). Offset set to 0",

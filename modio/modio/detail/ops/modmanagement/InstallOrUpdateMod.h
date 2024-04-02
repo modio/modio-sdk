@@ -43,16 +43,19 @@ namespace Modio
 				MODIO_PROFILE_SCOPE(InstallOrUpdateMod);
 				// We dont care whether we couldn't start the download because something was blocking it or if it's
 				// since been cancelled, bail anyways. null pointer ie the busy case should never happen
-				if (ModProgress.lock() == nullptr)
-				{
-					Self.complete(Modio::make_error_code(Modio::ModManagementError::InstallOrUpdateCancelled));
-					return;
-				}
 				if (!Modio::Detail::SDKSessionData::IsModManagementEnabled())
 				{
 					Self.complete(Modio::make_error_code(Modio::ModManagementError::InstallOrUpdateCancelled));
 					return;
 				}
+				if (ModProgress.lock() == nullptr)
+				{
+					// Avoid rollback of state when ModProgress is null, should only happen when unsubing to an installing mod
+					Transaction.Commit();
+					Self.complete(Modio::make_error_code(Modio::ModManagementError::InstallOrUpdateCancelled));
+					return;
+				}
+				
 				reenter(CoroutineState)
 				{
 					Transaction =

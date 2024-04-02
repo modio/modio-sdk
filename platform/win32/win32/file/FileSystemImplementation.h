@@ -9,8 +9,12 @@
  */
 
 #pragma once
-#include "common/detail/ops/file/InitializeFileSystemOp.h"
+#include "common/FileSharedState.h"
 #include "common/file/FileSystemImplementation.h"
+
+#include "common/detail/ops/file/InitializeFileSystemOp.h"
+#include "common/detail/ops/file/StreamWriteOp.h"
+#include "common/detail/ops/file/WriteSomeToFileOp.h"
 #include "common/file/StaticDirectoriesImplementation.h"
 
 namespace Modio
@@ -26,6 +30,21 @@ namespace Modio
 										 Modio::filesystem::path& UserPath, Modio::filesystem::path& TempPath)
 			{
 				return Modio::Detail::InitializeFileSystemOp(InitParams, CommonPath, UserPath, TempPath);
+			}
+
+			auto MakeStreamWriteOp(IOObjectImplementationType PlatformIOObjectInstance, Modio::Detail::Buffer Buffer)
+			{
+				return StreamWriteOp(PlatformIOObjectInstance, SharedState, std::move(Buffer));
+			}
+
+			auto MakeWriteSomeToFileOp(IOObjectImplementationType PlatformIOObjectInstance, std::uintmax_t Offset, Modio::Detail::Buffer Buffer)
+			{
+				return WriteSomeToFileOp(PlatformIOObjectInstance, SharedState, Offset, std::move(Buffer));
+			}
+
+			auto MakeSharedState()
+			{
+				return std::make_shared<FileSharedState>();
 			}
 
 			static Modio::filesystem::path GetDefaultCommonDataPath(Modio::filesystem::path& CommonDataPath)

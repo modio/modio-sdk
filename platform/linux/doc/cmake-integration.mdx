@@ -1,0 +1,58 @@
+---
+id: linux-cmake-integration
+title: CMake Integration
+slug: /c++sdk/linux/cmake-integration
+sidebar_position: 1
+---
+
+# Inside a CMake project
+
+Unzip the archive. Confirm `your_project` uses CMake 3.20 or later.
+
+```cmake
+cmake_minimum_required(VERSION 3.20)
+```
+
+Specify the target platform with `LINUX`.
+
+```cmake
+set (MODIO_PLATFORM LINUX)
+```
+Add the SDK subdirectory to your project
+
+```cmake
+add_subdirectory(<modio-sdk folder> EXCLUDE_FROM_ALL)
+target_compile_features(your_project PUBLIC cxx_std_17)
+```
+
+Link the library to your project.
+
+To use the header-only configuration:
+```cmake
+target_link_libraries(your_project PUBLIC modio)
+```
+Or to use the static library configuration:
+```cmake
+target_link_libraries(your_project PUBLIC modioStatic)
+```
+
+To simplify the CMake configuration, the folder `cmake/` has the file `CMakePresets.json` with the basic configuration required to guide the mod.io SDK compilation using the Linux SDK. If you copy that file to the folder root, it can be used as follows:
+
+```cmake
+cmake --preset linux
+```
+
+## Backend environment
+
+If you wish to use a different mod.io backend environment than the default `LIVE` environment (possibly `TEST`), please specify this as the `MODIO_DEFAULT_SERVER` parameter during the `cmake configuration` step. Similarly, you can add this variable to your `CMakePresets.json` file as follows:
+
+```cmake
+"cacheVariables": 
+{
+    "MODIO_DEFAULT_SERVER": 
+    {
+    "type": "STRING",
+    "value": "LIVE"
+    },
+}
+```

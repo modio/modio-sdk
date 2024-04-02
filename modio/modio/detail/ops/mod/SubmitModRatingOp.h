@@ -61,6 +61,14 @@ namespace Modio
 
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http, "Error message: {}",
 												ec.message());
+
+					// Check if the error is supported by the SDK
+					if (ec.category() != std::system_category())
+					{
+						Self.complete(ec);
+						return;
+					}
+
 					Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
 
 					return;

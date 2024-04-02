@@ -29,6 +29,26 @@ namespace Modio
 		Explicit = 8
 	};
 
+	inline std::string ToString(Modio::MaturityOption option)
+	{
+		switch (option)
+		{
+			case MaturityOption::None:
+				return "None";
+			case MaturityOption::Alcohol:
+				return "Alcohol";
+			case MaturityOption::Drugs:
+				return "Drugs";
+			case MaturityOption::Violence:
+				return "Violence";
+			case MaturityOption::Explicit:
+				return "Explicit";
+		}
+
+		assert(false && "Invalid value to ToString(Modio::MaturityOption)");
+		return "Unknown";
+	}
+
 	/// @docpublic
 	/// @brief A strong type flag object to represent MaturityOption from a mod.io info.
 	/// * Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to

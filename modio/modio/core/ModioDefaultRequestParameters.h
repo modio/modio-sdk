@@ -20,6 +20,7 @@ namespace Modio
         static const HttpRequestParams GetAgreementVersionRequest { Modio::Detail::Verb::GET, "/agreements/versions/{agreement-version-id}" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams TermsRequest { Modio::Detail::Verb::GET, "/authenticate/terms" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams SignInWithModioRequest { Modio::Detail::Verb::GET, "/authorize" }; 
+        static const HttpRequestParams AuthenticateViaAppleRequest { Modio::Detail::Verb::POST, "/external/appleauth" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AuthenticateViaDiscordRequest { Modio::Detail::Verb::POST, "/external/discordauth" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AuthenticateViaEpicgamesRequest { Modio::Detail::Verb::POST, "/external/epicgamesauth" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AuthenticateViaFacebookRequest { Modio::Detail::Verb::POST, "/external/facebookauth" , "application/x-www-form-urlencoded" }; 
@@ -96,16 +97,16 @@ namespace Modio
         static const HttpRequestParams AddModTeamMemberRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/team" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams DeleteModTeamMemberRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}/team/{team-member-id}" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams UpdateModTeamMemberRequest { Modio::Detail::Verb::PUT, "/games/{game-id}/mods/{mod-id}/team/{team-member-id}" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams GetGameTokenPacksRequest { Modio::Detail::Verb::GET, "/games/{game-id}/monetization/token-packs" }; 
         static const HttpRequestParams GetGameStatsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/stats" , "application/x-www-form-urlencoded" }; 
-        static const HttpRequestParams DeleteGameTagOptionRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/tags" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetGameTagOptionsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/tags" , "application/x-www-form-urlencoded" }; 
-        static const HttpRequestParams AddGameTagOptionRequest { Modio::Detail::Verb::POST, "/games/{game-id}/tags" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams RenameGameTagOptionRequest { Modio::Detail::Verb::PUT, "/games/{game-id}/tags/rename" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetResourceOwnerRequest { Modio::Detail::Verb::POST, "/general/ownership" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetAuthenticatedUserRequest { Modio::Detail::Verb::GET, "/me" }; 
         static const HttpRequestParams GetUserEventsRequest { Modio::Detail::Verb::GET, "/me/events" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetUserModfilesRequest { Modio::Detail::Verb::GET, "/me/files" }; 
         static const HttpRequestParams GetUserGamesRequest { Modio::Detail::Verb::GET, "/me/games" }; 
+        static const HttpRequestParams SyncAppleEntitlementRequest { Modio::Detail::Verb::POST, "/me/iap/apple/sync" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams SyncPlaystationNetworkEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/psn/sync" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams SyncSteamEntitlementRequest { Modio::Detail::Verb::POST, "/me/iap/steam/sync" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams SyncXboxLiveEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/xboxlive/sync" , "application/x-www-form-urlencoded" }; 

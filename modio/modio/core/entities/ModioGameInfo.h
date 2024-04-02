@@ -16,6 +16,8 @@
 #include "modio/detail/JsonWrapper.h"
 #include "modio/detail/entities/ModioIcon.h"
 #include "modio/detail/entities/ModioLogo.h"
+#include "modio/core/entities/ModioGameCommunityOptions.h"
+#include "modio/core/entities/ModioGameMaturityOptions.h"
 #include "modio/core/entities/ModioGameMonetization.h"
 #include <string>
 
@@ -104,8 +106,12 @@ namespace Modio
 		std::vector<Modio::OtherUrl> OtherUrls = {};
 		/// @brief Platforms supported by this title
 		std::vector<Modio::GamePlatform> PlatformSupport = {};
+		/// @brief Community options for the game
+		Modio::GameCommunityOptionsFlags	CommunityOptions;
 		/// @brief Monetization options for the game
 		Modio::GameMonetization		GameMonetizationOptions;
+		/// @brief Maturity options for the game
+		Modio::GameMaturityOptionsFlags	MaturityOptions;
 		/// @brief Name of the Virtual Tokens for this game
 		std::string VirtualTokenName = "";
 	};

@@ -9,6 +9,7 @@
  */
 
 #pragma once
+#include "entities/ModioProfileMaturity.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/ModioDefines.h"
 #include <chrono>
@@ -141,12 +142,23 @@ namespace Modio
 		/// @param PageSize Number of results in a page
 		/// @return *this
 		MODIO_IMPL FilterParams& PagedResults(std::size_t PageNumber, std::size_t PageSize);
-
+		
 		/// @docpublic
 		///	@brief Indicates results should be filtered by revenue options
 		///	@param ByRevenue Revenue filter to use
 		///	@return *this
 		MODIO_IMPL FilterParams& RevenueType(RevenueFilterType ByRevenue);
+		
+		/// @docpublic
+		///	@brief Indicates results should exclude all mods which contain mature content
+		///	@return *this
+		MODIO_IMPL FilterParams& DisallowMatureContent();
+
+		/// @docpublic
+		///	@brief Indicates results should be filtered by maturity options
+		///	@param ByMaturity Maturity flags to filter by
+		///	@return *this
+		MODIO_IMPL FilterParams& WithMatureContentFlags(Modio::MaturityOption ByMaturity);
 
 		/// @docpublic
 		/// @brief Default FilterParams constructor. Sorts by mod ID in ascending order and returns 100 results (the
@@ -184,6 +196,8 @@ namespace Modio
 		std::vector<Modio::ModID> ExcludedIDs;
 
 		Modio::Optional<RevenueFilterType> Revenue;
+
+		Modio::Optional<MaturityOption> Maturity;
 
 		Modio::Optional<std::string> MetadataBlobSearchString;
 

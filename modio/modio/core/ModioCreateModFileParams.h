@@ -21,9 +21,9 @@ namespace Modio
 	{
 	public:
 		/// @docpublic
-		/// @brief Path to a directory to treat as the root of the mod. All contents of this folder will be added to the
-		/// archive, with a relative path based on this directory. This directory will not be created itself, the
-		/// contents will exist at the top level of the archive.
+		/// @brief Path to a directory to treat as the root of the mod. The SDK will compress all contents of this
+		/// folder into a .zip archive, with a relative path based on this directory. This directory will not be created
+		/// itself, the contents will exist at the top level of the archive.
 		std::string RootDirectory;
 
 		/// @docpublic
@@ -35,7 +35,7 @@ namespace Modio
 		Modio::Optional<std::string> Changelog;
 
 		/// @docpublic
-		/// @brief Should this mod be set as active/latest release? defaults to true if not set
+		/// @brief Should this mod be set as active/latest release? Defaults to true if not set.
 		Modio::Optional<bool> bSetAsActive;
 
 		/// @docpublic

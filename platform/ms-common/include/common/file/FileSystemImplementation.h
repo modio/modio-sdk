@@ -10,13 +10,10 @@
 
 // MIRRORED TO gdk/file/FileSystemImplementation.h, UPDATE THAT FILE IF THIS IS UPDATED
 #pragma once
-#include "common/FileSharedState.h"
 #include "common/detail/ops/file/DeleteFolderOp.h"
 #include "common/detail/ops/file/ReadSomeFromFileBufferedOp.h"
 #include "common/detail/ops/file/ReadSomeFromFileOp.h"
 #include "common/detail/ops/file/StreamReadOp.h"
-#include "common/detail/ops/file/StreamWriteOp.h"
-#include "common/detail/ops/file/WriteSomeToFileOp.h"
 #include "common/file/FileObjectImplementation.h"
 #include "modio/core/ModioInitializeOptions.h"
 #include "modio/detail/FmtWrapper.h"
@@ -46,6 +43,7 @@ namespace Modio
 			Modio::filesystem::path RootTempPath;
 			Modio::GameID CurrentGameID;
 
+		protected:
 			std::shared_ptr<Modio::Detail::FileSharedState> SharedState;
 
 		public:
@@ -58,7 +56,7 @@ namespace Modio
 
 			FileSystemImplementationBase(asio::io_context::service& OwningService) : OwningService(OwningService)
 			{
-				SharedState = std::make_shared<FileSharedState>();
+				SharedState = static_cast<Subplatform*>(this)->MakeSharedState();
 			}
 
 			/// <summary>
@@ -121,7 +119,7 @@ namespace Modio
 								  Modio::Detail::Buffer Buffer, CompletionTokenType&& Token)
 			{
 				return asio::async_compose<CompletionTokenType, void(std::error_code)>(
-					WriteSomeToFileOp(PlatformIOObjectInstance, Offset, std::move(Buffer)), Token,
+					static_cast<Subplatform*>(this)->MakeWriteSomeToFileOp(PlatformIOObjectInstance, Offset, std::move(Buffer)), Token,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 
@@ -161,7 +159,7 @@ namespace Modio
 							CompletionTokenType&& Token)
 			{
 				return asio::async_compose<CompletionTokenType, void(std::error_code)>(
-					StreamWriteOp(PlatformIOObjectInstance, std::move(Buffer)), Token,
+					static_cast<Subplatform*>(this)->MakeStreamWriteOp(PlatformIOObjectInstance, std::move(Buffer)), Token,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 

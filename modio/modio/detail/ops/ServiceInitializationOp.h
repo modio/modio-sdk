@@ -214,7 +214,7 @@ public:
 										"mod.io service initialization complete");
 
 			Modio::Detail::SDKSessionData::ConfirmInitialize();
-
+			
 			Self.complete({});
 		}
 	}

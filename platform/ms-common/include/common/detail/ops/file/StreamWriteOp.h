@@ -47,11 +47,14 @@ class StreamWriteOp : public Modio::Detail::BaseOperation<StreamWriteOp>
 
 	bool bMovedFrom = false;
 
+	std::weak_ptr<Modio::Detail::FileSharedState> SharedState;
+
 public:
-	StreamWriteOp(std::shared_ptr<Modio::Detail::FileObjectImplementation> IOObject, Modio::Detail::Buffer Buffer)
+	StreamWriteOp(std::shared_ptr<Modio::Detail::FileObjectImplementation> IOObject, std::weak_ptr<Modio::Detail::FileSharedState> SharedState, Modio::Detail::Buffer Buffer)
 		: Buffer(std::move(Buffer)),
 		  FileImpl(IOObject),
-		  WriteOpParams {}
+		  WriteOpParams {},
+		  SharedState(SharedState)
 	{}
 
 	StreamWriteOp(StreamWriteOp&& Other)
@@ -60,7 +63,8 @@ public:
 		  FileImpl(std::move(Other.FileImpl)),
 		  WriteOpParams(std::move(Other.WriteOpParams)),
 		  Coroutine(std::move(Other.Coroutine)),
-		  StatusTimer(std::move(Other.StatusTimer))
+		  StatusTimer(std::move(Other.StatusTimer)),
+		  SharedState(std::move(Other.SharedState))
 	{
 		Other.bMovedFrom = true;
 	};

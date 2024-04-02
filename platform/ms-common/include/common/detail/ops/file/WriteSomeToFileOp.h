@@ -47,11 +47,16 @@ class WriteSomeToFileOp
 	/// </summary>
 	Modio::Detail::Timer StatusTimer;
 
+	std::weak_ptr<Modio::Detail::FileSharedState> SharedState;
+
 public:
-	WriteSomeToFileOp(std::shared_ptr<Modio::Detail::FileObjectImplementation> IOObject, std::uintmax_t Offset,
+	WriteSomeToFileOp(std::shared_ptr<Modio::Detail::FileObjectImplementation> IOObject,
+					  std::weak_ptr<Modio::Detail::FileSharedState> SharedState, 
+					  std::uintmax_t Offset,
 					  Modio::Detail::Buffer Buffer)
 		: Buffer(std::move(Buffer)),
 		  FileImpl(IOObject),
+		  SharedState(SharedState),
 		  FileOffset(Offset),
 		  WriteOpParams {}
 	{}
@@ -59,6 +64,7 @@ public:
 	WriteSomeToFileOp(WriteSomeToFileOp&& Other)
 		: Buffer(std::move(Other.Buffer)),
 		  FileImpl(Other.FileImpl),
+		  SharedState(Other.SharedState),
 		  FileOffset(Other.FileOffset),
 		  WriteOpParams(std::move(Other.WriteOpParams)),
 		  Coroutine(std::move(Other.Coroutine)),

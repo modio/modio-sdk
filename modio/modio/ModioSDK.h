@@ -25,6 +25,7 @@
 #include "modio/core/ModioReportParams.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/core/entities/ModioGameInfo.h"
+#include "modio/core/entities/ModioGameInfoList.h"
 #include "modio/core/entities/ModioModDetails.h"
 #include "modio/core/entities/ModioModInfoList.h"
 #include "modio/core/entities/ModioModTagOptions.h"
@@ -348,9 +349,11 @@ namespace Modio
 		std::function<void(Modio::ErrorCode ec, Modio::Optional<Modio::ModInfo>)> Callback);
 
 	/// @docpublic
-	/// @brief Queues a modfile submission. The submission process creates an archive using the information specified in
-	/// the parameters, then uploads that file to the server as a new modfile release for the specified mod. When the
-	/// modfile submission completes, a Mod Management Event will be triggered.
+	/// @brief Queues the upload of a new modfile release for the specified mod using the submitted parameters. This
+	/// function takes a Modio::CreateModFileParams object specifying a path to the root folder of the new modfile. The
+	/// SDK will compress the folder's contents into a .zip archive and queue the result for upload. When the upload
+	/// completes, a Mod Management Event will be triggered. Note the SDK is also responsible for decompressing the
+	/// archive upon its installation at a later point in time.
 	/// @param Mod The mod to attach the modfile to
 	/// @param Params Descriptor containing information regarding the modfile
 	/// @requires initialized-sdk
@@ -521,7 +524,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief De-authenticates the current mod.io user for the current session, and clears all user-specific data
-	/// stored on the current device. Any subscribed mods that are installed but do not have other local users 
+	/// stored on the current device. Any subscribed mods that are installed but do not have other local users
 	/// subscribed will be marked for uninstallation
 	/// @param Callback Callback providing a status code indicating the outcome of clearing the user data. Error codes
 	/// returned by this function are informative only - it will always succeed.
@@ -674,11 +677,25 @@ namespace Modio
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @errorcategory EntityNotFoundError|Specified game does not exist
+	/// @error UserDataError::InvalidUser|No authenticated user
 	/// @error GenericError::BadParameter|The supplied game ID is invalid
 	MODIOSDK_API void GetGameInfoAsync(
 		Modio::GameID GameID, std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfo>)> Callback);
 
 	/// @docpublic
+	/// @brief Provides a list of games for the current user, that match the parameters specified in the filter
+	/// @param Filter Modio::FilterParams object containing any filters that should be applied to the query
+	/// @param Callback Callback invoked with a status code and an optional GameInfoList providing game infos
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @requires user-authenticated
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	MODIOSDK_API void ListUserGamesAsync(
+		Modio::FilterParams Filter,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)> Callback);
+
 	/// @brief Set language to get corresponding data from the server
 	/// @param Modio::Language to set
 	MODIOSDK_API void SetLanguage(Modio::Language Locale);

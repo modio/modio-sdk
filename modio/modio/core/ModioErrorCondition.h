@@ -38,4 +38,7 @@ enum class EModioErrorCondition: uint8
 	ModManagementAlreadyEnabled = 25 UMETA(ToolTip="When this condition is true, the error code indicates that Mod Management has already been enabled.") ,
 	InsufficientPermissions = 26 UMETA(ToolTip="When this condition is true, the error code indicates that the current user does not have the required permissions for this operation.") ,
 	EmailLoginCodeInvalid = 27 UMETA(ToolTip="The email login code is incorrect or has expired.") ,
+	AlreadySubscribed = 28 UMETA(ToolTip="The specified mod is already subscribed to.") ,
+	InstallOrUpdateCancelled = 29 UMETA(ToolTip="The current mod installation or update was cancelled.") ,
+	UploadCancelled = 30 UMETA(ToolTip="The current modfile upload was cancelled.") ,
 };

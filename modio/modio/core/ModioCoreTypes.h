@@ -520,7 +520,8 @@ namespace Modio
 		PSN,
 		Oculus,
 		Epic,
-		OpenID
+		OpenID,
+		Apple
 	};
 
 	/// @docpublic
@@ -692,6 +693,8 @@ namespace Modio
 					return "epic";
 				case AuthenticationProvider::OpenID:
 					return "openid";
+				case AuthenticationProvider::Apple:
+					return "apple";
 			}
 
 			assert(false && "Invalid value to ToString(Modio::Provider)");

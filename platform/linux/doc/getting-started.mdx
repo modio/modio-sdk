@@ -1,0 +1,23 @@
+---
+id: linux-getting-started
+title: Getting Started
+slug: /c++sdk/linux/getting-started
+sidebar_position: 0
+---
+
+# Getting Started
+
+## mod.io Linux SDK Integration
+
+The use of Linux with the mod.io SDK is ready by default. You can find the `linux` directory in the platform subdirectory of your SDK installation.
+You can then target `LINUX` to compile the mod.io SDK for Linux SDK.
+
+## Linux SDK Versions
+
+The mod.io SDK is built and tested against Ubuntu 21.04 using clang v10. Using different versions of the Linux SDK may result in compilation issues.
+
+In Linux, the default way to compile the mod.io SDK requires CMake with Ninja as generator, which you can install CMake Installation instructions or using a package manager like `apt`:
+
+```cmake
+sudo apt install cmake ninja
+```

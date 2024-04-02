@@ -20,8 +20,8 @@ if(MODIO_PLATFORM STREQUAL "LINUX")
 	enable_language(CXX)
 
 	add_subdirectory(linux)
-	set(ENABLE_PROGRAMS OFF)
-	set(ENABLE_TESTING OFF)
+	set(ENABLE_PROGRAMS OFF CACHE BOOL "")
+	set(ENABLE_TESTING OFF CACHE BOOL "")
 
 	execute_process(COMMAND make generated_files WORKING_DIRECTORY ${MODIO_ROOT_DIR}/ext/mbedtls)
 	add_subdirectory(${MODIO_ROOT_DIR}/ext/mbedtls mbedtls EXCLUDE_FROM_ALL)

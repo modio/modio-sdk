@@ -78,7 +78,9 @@ namespace Modio
 		Detail::ParseSafe(Json, GameInfo.Stats, "stats");
 		Detail::ParseSafe(Json, GameInfo.Theme, "theme");
 		Detail::ParseSafe(Json, GameInfo.OtherUrls, "other_urls");
+		Detail::ParseSafe(Json, GameInfo.CommunityOptions, "community_options");
 		Detail::ParseSafe(Json, GameInfo.GameMonetizationOptions, "monetization_options");
+		Detail::ParseSafe(Json, GameInfo.MaturityOptions, "maturity_options");
 		Detail::ParseSafe(Json, GameInfo.VirtualTokenName, "token_name");
 
 

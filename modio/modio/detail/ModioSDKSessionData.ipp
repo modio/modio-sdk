@@ -99,6 +99,10 @@ namespace Modio
 		void SDKSessionData::DisableModManagement()
 		{
 			Get().bModManagementEnabled = false;
+			if (Get().CurrentModInProgress != nullptr)
+			{
+				Get().CurrentModInProgress.reset();
+			}
 		}
 
 		void SDKSessionData::MarkAsRateLimited(int SecondsDelay)
