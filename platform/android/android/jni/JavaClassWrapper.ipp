@@ -1,6 +1,7 @@
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "jni/JavaClassWrapper.h"
 #endif
+#include "jni/JavaHelpers.h"
 #include "jni/AndroidContextService.h"
 #include "modio/core/ModioLogger.h"
 
@@ -68,5 +69,58 @@ namespace Modio
 			Env->DeleteGlobalRef(Object);
 			Env->DeleteGlobalRef(Class);
 		}
+
+		bool JavaClassWrapper::CallBooleanMethod(jmethodID Method, ...)
+		{
+			if (Method == NULL || Object == NULL)
+			{
+				return false;
+			}
+
+			JNIEnv* Env = Modio::Detail::AndroidContextService::Get().GetJavaEnv();
+
+			va_list Args;
+			va_start(Args, Method);
+			jboolean Return = Env->CallBooleanMethodV(Object, Method, Args);
+			va_end(Args);
+
+			return (bool) Return;
+		}
+
+		std::string JavaClassWrapper::CallStringMethod(jmethodID Method, ...)
+		{
+			if (Method == NULL || Object == NULL)
+			{
+				return NULL;
+			}
+
+			JNIEnv* Env = Modio::Detail::AndroidContextService::Get().GetJavaEnv();
+
+			va_list Args;
+			va_start(Args, Method);
+			jobject Return = Env->CallObjectMethodV(Object, Method, Args);
+			va_end(Args);
+
+			std::string Result = Modio::Detail::JavaHelpers::StringFromLocalRef(Env, (jstring) Return);
+
+			return Result;
+		}
+
+		void JavaClassWrapper::CallVoidMethod(jmethodID Method, ...)
+		{
+			if (Method == NULL || Object == NULL)
+			{
+				return;
+			}
+
+			JNIEnv* Env = Modio::Detail::AndroidContextService::Get().GetJavaEnv();
+
+			va_list Args;
+			va_start(Args, Method);
+			Env->CallVoidMethodV(Object, Method, Args);
+			va_end(Args);
+		}
+
+
 	}
 }

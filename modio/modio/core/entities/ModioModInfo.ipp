@@ -63,6 +63,7 @@ namespace Modio
 				}
 			}
 
+
 			Detail::ParseSafe(Json, ModInfo.MetadataBlob, "metadata_blob");
 			Detail::ParseSafe(Json, ModInfo.MetadataKvp, "metadata_kvp");
 			Detail::ParseSafe(Json, ModInfo.Tags, "tags");
@@ -82,6 +83,7 @@ namespace Modio
 			Detail::ParseSafe(Json, ModInfo.ModStatus, "status");
 			Detail::ParseSafe(Json, ModInfo.Visibility, "visible");
 			Detail::ParseSafe(Json, ModInfo.Price, "price");
+			Detail::ParseSafe(Json, ModInfo.Dependencies, "dependencies");
 		}
 
 		{
@@ -117,6 +119,7 @@ namespace Modio
 							   {"summary", Info.ProfileSummary},
 							   {"status", Info.ModStatus},
 							   {"visible", Info.Visibility},
+							   {"dependencies", Info.Dependencies},
 							   {"stats", Info.Stats},
 							   {"logo", Info.ModLogo},
 							   {"media", nlohmann::json::object({{"youtube", Info.YoutubeURLs.GetRawList()},

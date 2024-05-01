@@ -23,14 +23,20 @@ namespace Modio
 		class GetModDependenciesOp
 		{
 		public:
-			GetModDependenciesOp(Modio::ModID ModID, Modio::GameID GameID) : ModID(ModID), GameID(GameID) {};
+			GetModDependenciesOp(Modio::ModID ModID, Modio::GameID GameID, bool Recursive)
+				: ModID(ModID),
+				  GameID(GameID),
+				  Recursive(Recursive) {};
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
 				reenter(CoroutineState)
 				{
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
-						ResponseBodyBuffer, Modio::Detail::GetModDependenciesRequest.SetGameID(GameID).SetModID(ModID),
+						ResponseBodyBuffer,
+						Modio::Detail::GetModDependenciesRequest.SetGameID(GameID).SetModID(ModID).AddQueryParamRaw(
+							Modio::Detail::Constants::QueryParamStrings::Recursive,
+							(Recursive ? "true" : "false")),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 					if (ec)
 					{
@@ -58,6 +64,7 @@ namespace Modio
 			asio::coroutine CoroutineState;
 			Modio::ModID ModID;
 			Modio::GameID GameID;
+			bool Recursive;
 		};
 	} // namespace Detail
 } // namespace Modio

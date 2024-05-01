@@ -1,7 +1,7 @@
 ---
 id: mac-getting-started
 title: Getting Started
-slug: /mac/cpp-sdk/getting-started
+slug: /cppsdk/macos/getting-started
 sidebar_position: 0
 ---
 
@@ -23,3 +23,14 @@ brew install cmake ninja
 ```
 
 NOTE: You can use Ninja or XCode as project generators. The former works like any other C++ project. The later will create a `.xcodeproj` file in the designated output folder.
+
+
+## macOS Dependencies
+
+The mod.io SDK for development on macOS / iOS requires Clang 10 or GCC 10 or later, which come included in the XCode installation. XCode 14 or later is recommended. To install CMake 3.20 or Ninja 1.10, it is recommended to use [brew](https://brew.sh) as follows:
+
+```bash
+brew install cmake ninja
+```
+
+The minimum deployment target is macOS 12.0. 

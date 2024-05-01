@@ -164,7 +164,6 @@ namespace Modio
 				break;
 			case SortFieldType::DownloadsToday:
 				SortStr = "popular";
-				bInvertedSort = true;
 				break;
 			case SortFieldType::Rating:
 				SortStr = "rating";

@@ -1,11 +1,9 @@
 ---
 id: linux-getting-started
 title: Getting Started
-slug: /c++sdk/linux/getting-started
+slug: /cppsdk/linux/getting-started
 sidebar_position: 0
 ---
-
-# Getting Started
 
 ## mod.io Linux SDK Integration
 
@@ -21,3 +19,24 @@ In Linux, the default way to compile the mod.io SDK requires CMake with Ninja as
 ```cmake
 sudo apt install cmake ninja
 ```
+
+## Dependencies
+
+The mod.io SDK requires a Linux kernel with liburing support (v5.1 or later). The io_uring system calls provides asynchronous input/output operations. To fulfill that requirement and have the development tools ready, the following commands employ the "apt" package manager (tested on Ubuntu 20.04 Focal Fossa):
+
+```bash
+sudo apt update
+sudo apt upgrade
+sudo apt install llvm clang lldb make wget python3 ninja-build git unzip
+## Install Cmake
+wget -q -O cmake-linux.sh https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3-Linux-x86_64.sh
+sh cmake-linux.sh -- --skip-license --prefix=/usr/
+## Install liburing-dev
+wget http://mirrors.kernel.org/ubuntu/pool/main/libu/liburing/liburing-dev_0.7-3ubuntu3_amd64.deb
+wget http://mirrors.kernel.org/ubuntu/pool/main/libu/liburing/liburing1_0.7-3ubuntu3_amd64.deb
+sudo apt install ./liburing*deb
+```
+
+:::note
+If you are using the "header_only" release mode, the mod.io SDK includes MbedTLS headers, but requires the library installed in your system, which was tested with libmbedtls-dev 2.28.0 in Ubuntu. The "static" mode includes these libraries in the same folder as the libmodioStatic.a
+:::

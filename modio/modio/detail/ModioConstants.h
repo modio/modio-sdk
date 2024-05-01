@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -24,7 +24,8 @@ namespace Modio
 				constexpr const char* XboxToken = "xbox_token";
 				constexpr const char* SwitchToken = "id_token";
 				constexpr const char* OpenIDToken = "id_token";
-				constexpr const char* GoogleToken = "id_token";
+				constexpr const char* GoogleIDToken = "id_token";
+				constexpr const char* GoogleServerSideToken = "auth_code";
 				constexpr const char* DiscordToken = "discord_token";
 				constexpr const char* Appdata = "appdata";
 				constexpr const char* EmailAddress = "email";
@@ -43,6 +44,11 @@ namespace Modio
 				constexpr const char* AccessToken = "access_token";
 				constexpr const char* UploadID = "upload_id";
 			} // namespace APIStrings
+			namespace QueryParamStrings
+			{
+				constexpr const char* Recursive = "recursive";
+				constexpr const char* IncludeDependecies = "include_dependencies";
+			} // namespace QueryParamStrings
 			namespace JSONKeys
 			{
 				constexpr const char* UserSubscriptionList = "subscriptions";
@@ -62,7 +68,7 @@ namespace Modio
 				constexpr const char* ModNeverRetryCode = "NeverRetryCode";
 				constexpr const char* WalletBalance = "balance";
 				constexpr const char* GrossAmount = "gross_amount";
-			}
+			} // namespace JSONKeys
 			namespace Configuration
 			{
 				constexpr uint8_t DefaultNumberOfRetries = 3;
@@ -88,7 +94,7 @@ namespace Modio
 				constexpr const char* Switch = "switch";
 				constexpr const char* Oculus = "oculus";
 				constexpr const char* Source = "source";
-			}
-		}
-	}
-}
+			} // namespace PlatformNames
+		} // namespace Constants
+	} // namespace Detail
+} // namespace Modio

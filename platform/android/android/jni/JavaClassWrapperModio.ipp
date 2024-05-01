@@ -22,26 +22,12 @@ namespace Modio
 
 		std::string JavaClassWrapperModio::GetCertificatePath()
 		{
-			JNIEnv* Env = Modio::Detail::AndroidContextService::Get().GetJavaEnv();
-
-			auto RetVal = Env->CallObjectMethod(Object, GetCertificatePathMethodId);
-
-			auto Result = Modio::Detail::JavaHelpers::StringFromLocalRef(Env, (jstring) RetVal);
-
-			return Result;
+			return CallStringMethod(GetCertificatePathMethodId);
 		}
 
 		std::string JavaClassWrapperModio::GetStoragePath()
 		{
-			JNIEnv* Env = Modio::Detail::AndroidContextService::Get().GetJavaEnv();
-
-			auto RetVal = Env->CallObjectMethod(Object, GetStoragePathMethodId);
-
-			auto Result = Modio::Detail::JavaHelpers::StringFromLocalRef(Env, (jstring) RetVal);
-
-			return Result;
+			return CallStringMethod(GetStoragePathMethodId);
 		}
-
-
 	}
 }

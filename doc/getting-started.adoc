@@ -272,7 +272,6 @@ The mod.io SDK has a simple structure that primarily consists of a flat interfac
 * User authentication
 * Mod browsing and querying
 * Mod management: subscribe, unsubscribe
-* Two environments: Test & Live.
 
 See <<quick-start>> for basic guides for each of these categories.
 
@@ -406,20 +405,6 @@ Per-game, Local Profile-specific settings are stored in `${FolderID_LocalAppData
 +
 *Adding* a `RootLocalDataPath` element to this file will redirect the mod installation directory for this specific game only, for the current Local Profile. Removing this value will cause the game to revert back to the global value in `globalsettings.json`.
 
-=== Endpoint Environments
-
-The mod.io plugin can connect to different endpoint environments depending on the development stage your game is in. The 'test' environment is intended for use by developers while they perform initial integration of mod.io into their title.
-
-Before release, you will be able to setup a "hidden" Live environment that will allow you to perform QA against the production environment before release, without exposing your title to the public. At this stage, only selected accounts are able to see your game page, and mods that are uploaded for your title. Once you are ready, you can change the state from "hidden" to "public" to make a full release of your game's modding capabilities.
-
-In summary, here are the three steps:
-
-* Test Environment: Used for integration between your game and mod.io
-* Live Environment, Hidden: Used for quality assurance and pre-release mods
-* Live Environment, Public: It is open for everyone to see.
-
-The <<sdk-initialization, sample code>> below shows how the SDK sets the value `GameEnvironment` to denote the endpoint API to use. Also, consider that these two environments use a different API keys.If you try to connect to a Test environment with a key created from the Live environment, any endpoint API request will fail with a `401` error.
-
 '''
 == SDK quick-start [[quick-start]]
 
@@ -477,7 +462,7 @@ Options.APIKey = Modio::ApiKey(YOUR_API_KEY);
 Options.GameID = Modio::GameID(YOUR_GAME_ID);
 Options.User = "LocalProfileName";
 Options.PortalInUse = Modio::Portal::None;
-Options.GameEnvironment = Modio::Environment::Test;
+Options.GameEnvironment = Modio::Environment::Live;
 
 Modio::InitializeAsync(Options, [&SDKInitialized](Modio::ErrorCode ec) {
     if (ec)
@@ -747,16 +732,21 @@ if (!Modio::IsModManagementBusy())
 
 ==== Mod subscriptions
 
-A user indicates they want to have a mod installed by 'subscribing' to it. The mod.io servers stores subscriptions and associates them with a particular user's mod.io account. When a user 'unsubscribes' to a mod, they indicate that mod should be uninstalled from any device they're logged in on.
+A user indicates they want to have a mod installed by 'subscribing' to it. The mod.io servers stores subscriptions and associates them with a particular user's mod.io account. 
+When a user 'unsubscribes' to a mod, they indicate that mod should be uninstalled from any device they're logged in on.
 
 The API for managing subscriptions is simple and consists of a call to either <<SubscribeToModAsync>> or <<UnsubscribeFromModAsync>> with the ID of the mod in question and a callback to receive the status of the request:
 
 NOTE: To subscribe to a mod, <<EnableModManagement>> must be called beforehand.
 
+When subscribing to a mod, you can also pass in a bool to indicate if you want to subscribe to all dependencies for the given mod. If dependencies are also subscribed, the mod.io servers will also associate them with the current user.
+
+NOTE: Currently when dependencies are included during subscription, they will not automatically be downloaded. To ensure the latest content is downloaded, <<FetchExternalUpdatesAsync>> must be called after subscribing.
+
 [source,cpp]
 ----
 // Subscription
-Modio::SubscribeToModAsync(ModID, [](Modio::ErrorCode ec)
+Modio::SubscribeToModAsync(ModID, IncludeDependencies, [](Modio::ErrorCode ec)
 {
     if (ec)
     {

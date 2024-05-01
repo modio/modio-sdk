@@ -171,17 +171,27 @@ namespace Modio
 		});
 	}
 
+	#if !defined(MODIO_NO_DEPRECATED)
 	void GetModDependenciesAsync(
 		Modio::ModID ModID,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback)
 	{
-		Modio::Detail::SDKSessionData::EnqueueTask([ModID, Callback = std::move(Callback)]() mutable {
+		GetModDependenciesAsync(ModID, false, std::move(Callback));
+	}
+	#endif
+
+	void GetModDependenciesAsync(
+		Modio::ModID ModID,
+		bool Recursive,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback)
+	{
+		Modio::Detail::SDKSessionData::EnqueueTask([ModID, Recursive, Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
 				Modio::Detail::RequireValidModID(ModID, Callback))
 			{
 				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList>)>,
 									void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList>)>(
-					Modio::Detail::GetModDependenciesOp(ModID, Modio::Detail::SDKSessionData::CurrentGameID()),
+					Modio::Detail::GetModDependenciesOp(ModID, Modio::Detail::SDKSessionData::CurrentGameID(), Recursive),
 					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 		});

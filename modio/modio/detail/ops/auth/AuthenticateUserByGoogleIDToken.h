@@ -15,12 +15,12 @@ namespace Modio
 {
 	namespace Detail
 	{
-		inline void AuthenticateUserByGoogleAsync(Modio::AuthenticationParams User,
-											   std::function<void(Modio::ErrorCode)> Callback)
+		inline void AuthenticateUserByGoogleIDTokenAsync(Modio::AuthenticationParams User,
+																 std::function<void(Modio::ErrorCode)> Callback)
 		{
 			Modio::Detail::HttpRequestParams Params =
 				Modio::Detail::AuthenticateViaGoogleRequest
-					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::GoogleToken, User.AuthToken)
+					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::GoogleIDToken, User.AuthToken)
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed,
 										User.bUserHasAcceptedTerms ? "true" : "false");
 			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(

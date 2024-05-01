@@ -30,7 +30,8 @@
 #include "modio/detail/ops/auth/AuthenticateUserBySteam.h"
 #include "modio/detail/ops/auth/AuthenticateUserBySwitchID.h"
 #include "modio/detail/ops/auth/AuthenticateUserByXBoxLive.h"
-#include "modio/detail/ops/auth/AuthenticateUserByGoogle.h"
+#include "modio/detail/ops/auth/AuthenticateUserByGoogleIDToken.h"
+#include "modio/detail/ops/auth/AuthenticateUserByGoogleServerSideToken.h"
 #include "modio/detail/ops/auth/ModioGetTermsOfUseOp.h"
 #include "modio/detail/ops/user/GetUserMediaOp.h"
 #include "modio/detail/ops/userdata/RefreshUserDataOp.h"
@@ -119,6 +120,12 @@ namespace Modio
 						break;
 					case AuthenticationProvider::Apple:
 						Modio::Detail::AuthenticateUserByAppleAsync(User, Callback);
+						break;
+					case AuthenticationProvider::GoogleIDToken:
+						Modio::Detail::AuthenticateUserByGoogleIDTokenAsync(User, Callback);
+						break;
+					case AuthenticationProvider::GoogleServerSideToken:
+						Modio::Detail::AuthenticateUserByGoogleServerSideTokenAsync(User, Callback);
 						break;
 				}
 			}

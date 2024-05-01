@@ -17,6 +17,10 @@ namespace Modio
 			MODIO_IMPL JavaClassWrapper(std::string ClassName, const char* ConstructorSignature, ...);
 			MODIO_IMPL ~JavaClassWrapper();
 
+			MODIO_IMPL bool CallBooleanMethod(jmethodID Method, ...);
+			MODIO_IMPL std::string CallStringMethod(jmethodID Method, ...);
+			MODIO_IMPL void CallVoidMethod(jmethodID Method, ...);
+
 		protected:
 			jobject Object;
 			jclass Class;

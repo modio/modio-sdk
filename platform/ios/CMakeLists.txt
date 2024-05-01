@@ -37,4 +37,8 @@ if(MODIO_PLATFORM STREQUAL "IOS")
 		DESTINATION ${CMAKE_INSTALL_PREFIX}/header_only
 		COMPONENT header_only
 	)
+
+	if (MODIO_BUILD_EXAMPLES)
+		add_subdirectory(examples/modioSSO EXCLUDE_FROM_ALL)
+	endif()
 endif()

@@ -28,10 +28,11 @@ namespace Modio
 		class SubscribeToModOp
 		{
 		public:
-			SubscribeToModOp(Modio::GameID GameID, Modio::ApiKey ApiKey, Modio::ModID ModID)
+			SubscribeToModOp(Modio::GameID GameID, Modio::ApiKey ApiKey, Modio::ModID ModID, bool IncludeDependencies)
 				: GameID(GameID),
 				  ApiKey(ApiKey),
-				  ModId(ModID)
+				  ModId(ModID),
+				  IncludeDependencies(IncludeDependencies)
 			{}
 
 			template<typename CoroType>
@@ -42,7 +43,9 @@ namespace Modio
 					Modio::Detail::SDKSessionData::RemoveDeferredUnsubscription(ModId);
 
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
-						ResponseBodyBuffer, Modio::Detail::SubscribeToModRequest.SetGameID(GameID).SetModID(ModId),
+						ResponseBodyBuffer,
+						Modio::Detail::SubscribeToModRequest.SetGameID(GameID).SetModID(ModId).AddQueryParamRaw(
+							Modio::Detail::Constants::QueryParamStrings::IncludeDependecies, (IncludeDependencies ? "true" : "false")),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 
 					if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))
@@ -124,6 +127,7 @@ namespace Modio
 			Modio::GameID GameID;
 			Modio::ApiKey ApiKey;
 			Modio::ModID ModId;
+			bool IncludeDependencies;
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
 			asio::coroutine CoroutineState;
 		};

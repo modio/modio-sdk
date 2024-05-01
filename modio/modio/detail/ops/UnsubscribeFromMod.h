@@ -23,7 +23,9 @@ namespace Modio
 		class UnsubscribeFromModOp
 		{
 		public:
-			UnsubscribeFromModOp(Modio::GameID GameID, Modio::ModID ModId) : GameID(GameID), ModId(ModId) {};
+			UnsubscribeFromModOp(Modio::GameID GameID, Modio::ModID ModId)
+				: GameID(GameID),
+				  ModId(ModId) {};
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
@@ -49,7 +51,8 @@ namespace Modio
 					}
 
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
-						ResponseBodyBuffer, Modio::Detail::UnsubscribeFromModRequest.SetGameID(GameID).SetModID(ModId),
+						ResponseBodyBuffer,
+						Modio::Detail::UnsubscribeFromModRequest.SetGameID(GameID).SetModID(ModId),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 
 					if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))

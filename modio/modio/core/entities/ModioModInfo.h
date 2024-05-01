@@ -134,6 +134,9 @@ namespace Modio
 		/// @brief Price of this mod
 		int Price;
 
+		/// @brief If this mod has any direct dependencie.
+		bool Dependencies;
+
 		/// @docnone
 		friend bool operator==(const Modio::ModInfo& A, const Modio::ModInfo& B)
 		{
@@ -146,7 +149,7 @@ namespace Modio
 				(A.ProfileDateUpdated == B.ProfileDateUpdated) && (A.ProfileDateLive == B.ProfileDateLive) &&
 				(A.MetadataBlob == B.MetadataBlob) && (A.MetadataKvp == B.MetadataKvp) && (A.Tags == B.Tags) &&
 				(A.YoutubeURLs == B.YoutubeURLs) && (A.Stats == B.Stats) && (A.ModLogo == B.ModLogo) &&
-				(A.ModStatus == B.ModStatus) && (A.Visibility == B.Visibility))
+				(A.ModStatus == B.ModStatus) && (A.Visibility == B.Visibility) && (A.Dependencies == B.Dependencies))
 			{
 				if (A.FileInfo.has_value() && B.FileInfo.has_value())
 				{

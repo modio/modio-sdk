@@ -100,19 +100,20 @@ namespace Modio
         static const HttpRequestParams GetGameTokenPacksRequest { Modio::Detail::Verb::GET, "/games/{game-id}/monetization/token-packs" }; 
         static const HttpRequestParams GetGameStatsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/stats" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetGameTagOptionsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/tags" , "application/x-www-form-urlencoded" }; 
-        static const HttpRequestParams RenameGameTagOptionRequest { Modio::Detail::Verb::PUT, "/games/{game-id}/tags/rename" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetResourceOwnerRequest { Modio::Detail::Verb::POST, "/general/ownership" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetAuthenticatedUserRequest { Modio::Detail::Verb::GET, "/me" }; 
         static const HttpRequestParams GetUserEventsRequest { Modio::Detail::Verb::GET, "/me/events" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetUserModfilesRequest { Modio::Detail::Verb::GET, "/me/files" }; 
         static const HttpRequestParams GetUserGamesRequest { Modio::Detail::Verb::GET, "/me/games" }; 
         static const HttpRequestParams SyncAppleEntitlementRequest { Modio::Detail::Verb::POST, "/me/iap/apple/sync" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams SyncGoogleEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/google/sync" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams SyncPlaystationNetworkEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/psn/sync" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams SyncSteamEntitlementRequest { Modio::Detail::Verb::POST, "/me/iap/steam/sync" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams SyncXboxLiveEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/xboxlive/sync" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetUserModsRequest { Modio::Detail::Verb::GET, "/me/mods" }; 
         static const HttpRequestParams GetUserPurchasesRequest { Modio::Detail::Verb::GET, "/me/purchased" }; 
         static const HttpRequestParams GetUserRatingsRequest { Modio::Detail::Verb::GET, "/me/ratings" }; 
+        static const HttpRequestParams GenerateServiceTicketRequest { Modio::Detail::Verb::POST, "/me/s2s/modio/ticket" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetUserSubscriptionsRequest { Modio::Detail::Verb::GET, "/me/subscribed" }; 
         static const HttpRequestParams GetUsersMutedRequest { Modio::Detail::Verb::GET, "/me/users/muted" }; 
         static const HttpRequestParams GetUserWalletRequest { Modio::Detail::Verb::GET, "/me/wallets" }; 
@@ -120,9 +121,12 @@ namespace Modio
         static const HttpRequestParams RequestEmailSecurityCodeRequest { Modio::Detail::Verb::POST, "/oauth/emailrequest" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams LogoutRequest { Modio::Detail::Verb::POST, "/oauth/logout" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams CreateOauthAccessTokenRequest { Modio::Detail::Verb::POST, "/oauth/token" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams ExchangeClientCredentialTokenRequest { Modio::Detail::Verb::POST, "/oauth/token/" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams ExchangeOauthRefreshTokenRequest { Modio::Detail::Verb::POST, "/oauth/token/refresh" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams SubmitReportRequest { Modio::Detail::Verb::POST, "/report" , "application/x-www-form-urlencoded" }; 
-        static const HttpRequestParams GenerateServiceTicketRequest { Modio::Detail::Verb::POST, "/s2s/ticket" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams S2sTransactionClawbackRequest { Modio::Detail::Verb::POST, "/s2s/transactions/clawback" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams S2sTransactionCommitRequest { Modio::Detail::Verb::POST, "/s2s/transactions/commit" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams S2sTransactionIntentRequest { Modio::Detail::Verb::POST, "/s2s/transactions/intent" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams UnmuteAUserRequest { Modio::Detail::Verb::DELETE, "/users/{user-id}/mute" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams MuteAUserRequest { Modio::Detail::Verb::POST, "/users/{user-id}/mute" , "application/x-www-form-urlencoded" }; 
     }

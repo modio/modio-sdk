@@ -1,11 +1,11 @@
 ---
-id: win-cmake-integration
+id: windows-cmake-integration
 title: CMake Integration
-slug: /c++sdk/win/cmake-integration
+slug: /cppsdk/windows/cmake-integration
 sidebar_position: 1
 ---
 
-# Inside a CMake project
+## Inside a CMake project
 
 Unzip the archive. Confirm `your_project` uses CMake 3.20 or later.
 
@@ -39,20 +39,6 @@ target_link_libraries(your_project PUBLIC modioStatic)
 To simplify the CMake configuration, the folder `cmake/` has the file `CMakePresets.json` with the basic configuration required to guide the mod.io SDK compilation using the Windows SDK. If you copy that file to the folder root, it can be used as follows:
 
 ```cmake
-cmake --preset win
+cmake --preset win64
 ```
-
-## Backend environment
-
-If you wish to use a different mod.io backend environment than the default `LIVE` environment (possibly `TEST`), please specify this as the `MODIO_DEFAULT_SERVER` parameter during the `cmake configuration` step. Similarly, you can add this variable to your `CMakePresets.json` file as follows:
-
-```cmake
-"cacheVariables": 
-{
-    "MODIO_DEFAULT_SERVER": 
-    {
-    "type": "STRING",
-    "value": "LIVE"
-    },
-}
 ```

@@ -803,7 +803,6 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_users_and_local_profiles">Users and Local Profiles</a></li>
 <li><a href="#_error_handling">Error handling</a></li>
 <li><a href="#_mod_data_directories">Mod Data Directories</a></li>
-<li><a href="#_endpoint_environments">Endpoint Environments</a></li>
 </ul>
 </li>
 <li><a href="#quick-start">SDK quick-start</a>
@@ -835,7 +834,8 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_setlogcallback">SetLogCallback</a></li>
 <li><a href="#_runpendinghandlers">RunPendingHandlers</a></li>
 <li><a href="#_shutdownasync">ShutdownAsync</a></li>
-<li><a href="#_subscribetomodasync">SubscribeToModAsync</a></li>
+<li><a href="#_subscribetomodasync"><span class="line-through">SubscribeToModAsync</span></a></li>
+<li><a href="#_subscribetomodasync_2">SubscribeToModAsync</a></li>
 <li><a href="#_unsubscribefrommodasync">UnsubscribeFromModAsync</a></li>
 <li><a href="#_fetchexternalupdatesasync">FetchExternalUpdatesAsync</a></li>
 <li><a href="#_previewexternalupdatesasync">PreviewExternalUpdatesAsync</a></li>
@@ -864,7 +864,8 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_getmodmediaasync_3">GetModMediaAsync</a></li>
 <li><a href="#_submitmodratingasync">SubmitModRatingAsync</a></li>
 <li><a href="#_getmodtagoptionsasync">GetModTagOptionsAsync</a></li>
-<li><a href="#_getmoddependenciesasync">GetModDependenciesAsync</a></li>
+<li><a href="#_getmoddependenciesasync"><span class="line-through">GetModDependenciesAsync</span></a></li>
+<li><a href="#_getmoddependenciesasync_2">GetModDependenciesAsync</a></li>
 <li><a href="#_requestemailauthcodeasync">RequestEmailAuthCodeAsync</a></li>
 <li><a href="#_authenticateuseremailasync">AuthenticateUserEmailAsync</a></li>
 <li><a href="#_clearuserdataasync">ClearUserDataAsync</a></li>
@@ -1569,9 +1570,6 @@ FILE HEADER VALUES
 <li>
 <p>Mod management: subscribe, unsubscribe</p>
 </li>
-<li>
-<p>Two environments: Test &amp; Live.</p>
-</li>
 </ul>
 </div>
 <div class="paragraph">
@@ -1849,34 +1847,6 @@ Consider that the mod.io SDK configuration folder is different from that where m
 </li>
 </ul>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_endpoint_environments">Endpoint Environments</h3>
-<div class="paragraph">
-<p>The mod.io plugin can connect to different endpoint environments depending on the development stage your game is in. The 'test' environment is intended for use by developers while they perform initial integration of mod.io into their title.</p>
-</div>
-<div class="paragraph">
-<p>Before release, you will be able to setup a "hidden" Live environment that will allow you to perform QA against the production environment before release, without exposing your title to the public. At this stage, only selected accounts are able to see your game page, and mods that are uploaded for your title. Once you are ready, you can change the state from "hidden" to "public" to make a full release of your game&#8217;s modding capabilities.</p>
-</div>
-<div class="paragraph">
-<p>In summary, here are the three steps:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Test Environment: Used for integration between your game and mod.io</p>
-</li>
-<li>
-<p>Live Environment, Hidden: Used for quality assurance and pre-release mods</p>
-</li>
-<li>
-<p>Live Environment, Public: It is open for everyone to see.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>The <a href="#sdk-initialization">sample code</a> below shows how the SDK sets the value <code>GameEnvironment</code> to denote the endpoint API to use. Also, consider that these two environments use a different API keys.If you try to connect to a Test environment with a key created from the Live environment, any endpoint API request will fail with a <code>401</code> error.</p>
-</div>
 <hr>
 </div>
 </div>
@@ -1979,7 +1949,7 @@ RunPendingHandlers is not reentrant-safe. Do not call <a href="#_runpendinghandl
 <span class="n">Options</span><span class="p">.</span><span class="n">GameID</span> <span class="o">=</span> <span class="n">Modio</span><span class="o">::</span><span class="n">GameID</span><span class="p">(</span><span class="n">YOUR_GAME_ID</span><span class="p">);</span>
 <span class="n">Options</span><span class="p">.</span><span class="n">User</span> <span class="o">=</span> <span class="s">"LocalProfileName"</span><span class="p">;</span>
 <span class="n">Options</span><span class="p">.</span><span class="n">PortalInUse</span> <span class="o">=</span> <span class="n">Modio</span><span class="o">::</span><span class="n">Portal</span><span class="o">::</span><span class="n">None</span><span class="p">;</span>
-<span class="n">Options</span><span class="p">.</span><span class="n">GameEnvironment</span> <span class="o">=</span> <span class="n">Modio</span><span class="o">::</span><span class="n">Environment</span><span class="o">::</span><span class="n">Test</span><span class="p">;</span>
+<span class="n">Options</span><span class="p">.</span><span class="n">GameEnvironment</span> <span class="o">=</span> <span class="n">Modio</span><span class="o">::</span><span class="n">Environment</span><span class="o">::</span><span class="n">Live</span><span class="p">;</span>
 
 <span class="n">Modio</span><span class="o">::</span><span class="n">InitializeAsync</span><span class="p">(</span><span class="n">Options</span><span class="p">,</span> <span class="p">[</span><span class="o">&amp;</span><span class="n">SDKInitialized</span><span class="p">](</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span> <span class="n">ec</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
@@ -2358,10 +2328,11 @@ You will need to base-64 encode a Steam encrypted app ticket before submitting i
 <div class="sect3">
 <h4 id="_mod_subscriptions">Mod subscriptions</h4>
 <div class="paragraph">
-<p>A user indicates they want to have a mod installed by 'subscribing' to it. The mod.io servers stores subscriptions and associates them with a particular user&#8217;s mod.io account. When a user 'unsubscribes' to a mod, they indicate that mod should be uninstalled from any device they&#8217;re logged in on.</p>
+<p>A user indicates they want to have a mod installed by 'subscribing' to it. The mod.io servers stores subscriptions and associates them with a particular user&#8217;s mod.io account.
+When a user 'unsubscribes' to a mod, they indicate that mod should be uninstalled from any device they&#8217;re logged in on.</p>
 </div>
 <div class="paragraph">
-<p>The API for managing subscriptions is simple and consists of a call to either <a href="#_subscribetomodasync">SubscribeToModAsync</a> or <a href="#_unsubscribefrommodasync">UnsubscribeFromModAsync</a> with the ID of the mod in question and a callback to receive the status of the request:</p>
+<p>The API for managing subscriptions is simple and consists of a call to either <a href="#_subscribetomodasync_2">SubscribeToModAsync</a> or <a href="#_unsubscribefrommodasync">UnsubscribeFromModAsync</a> with the ID of the mod in question and a callback to receive the status of the request:</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -2375,10 +2346,25 @@ To subscribe to a mod, <a href="#_enablemodmanagement">EnableModManagement</a> m
 </tr>
 </table>
 </div>
+<div class="paragraph">
+<p>When subscribing to a mod, you can also pass in a bool to indicate if you want to subscribe to all dependencies for the given mod. If dependencies are also subscribed, the mod.io servers will also associate them with the current user.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Currently when dependencies are included during subscription, they will not automatically be downloaded. To ensure the latest content is downloaded, <a href="#_fetchexternalupdatesasync">FetchExternalUpdatesAsync</a> must be called after subscribing.
+</td>
+</tr>
+</table>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="cpp"><span class="c1">// Subscription</span>
-<span class="n">Modio</span><span class="o">::</span><span class="n">SubscribeToModAsync</span><span class="p">(</span><span class="n">ModID</span><span class="p">,</span> <span class="p">[](</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span> <span class="n">ec</span><span class="p">)</span>
+<span class="n">Modio</span><span class="o">::</span><span class="n">SubscribeToModAsync</span><span class="p">(</span><span class="n">ModID</span><span class="p">,</span> <span class="n">IncludeDependencies</span><span class="p">,</span> <span class="p">[](</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span> <span class="n">ec</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ec</span><span class="p">)</span>
     <span class="p">{</span>
@@ -3433,10 +3419,21 @@ If the SDK runs for the lifetime of your application and you do not call <a href
 </div>
 </div>
 <div class="sect2">
-<h3 id="_subscribetomodasync">SubscribeToModAsync</h3>
+<h3 id="_subscribetomodasync"><span class="line-through">SubscribeToModAsync</span></h3>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SubscribeToModAsync</span><span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModID</span> <span class="n">ModToSubscribeTo</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">OnSubscribeComplete</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Deprecated in 2024.4 Call SubscribeToModAsync() and specify if mod dependencies should be included.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_subscribetomodasync_2">SubscribeToModAsync</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SubscribeToModAsync</span><span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModID</span> <span class="n">ModToSubscribeTo</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">IncludeDependencies</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">OnSubscribeComplete</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3475,6 +3472,10 @@ If the SDK runs for the lifetime of your application and you do not call <a href
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">ModToSubscribeTo</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Mod ID of the mod requiring a subscription.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">IncludeDependencies</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If this mod has any dependencies, all of those will also be subscribed to.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">OnSubscribeComplete</span></p></td>
@@ -5086,10 +5087,21 @@ If the SDK runs for the lifetime of your application and you do not call <a href
 </div>
 </div>
 <div class="sect2">
-<h3 id="_getmoddependenciesasync">GetModDependenciesAsync</h3>
+<h3 id="_getmoddependenciesasync"><span class="line-through">GetModDependenciesAsync</span></h3>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">GetModDependenciesAsync</span><span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModID</span> <span class="n">ModID</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModDependencyList</span><span class="o">&gt;</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Deprecated in 2024.4 Call GetModDependenciesAsync() and specify if recursion is desired.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_getmoddependenciesasync_2">GetModDependenciesAsync</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">GetModDependenciesAsync</span><span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModID</span> <span class="n">ModID</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">Recursive</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModDependencyList</span><span class="o">&gt;</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -5131,6 +5143,10 @@ This function is part of an experimental feature and is subject to change.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">ModID</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The mod to retrieve dependencies for</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Recursive</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Include child dependencies in a recursive manner.  NOTE: Recursion supports a maximum depth of 5.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Callback</span></p></td>
@@ -6152,7 +6168,7 @@ This function is part of an experimental feature and is subject to change.
 <h2 id="_classes">Classes</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_errorcode"><a id="_1479450004224"></a> <a id="ErrorCode"></a> ErrorCode</h3>
+<h3 id="_errorcode"><a id="_2652529552144"></a> <a id="ErrorCode"></a> ErrorCode</h3>
 <div class="paragraph">
 <p>Trivial wrapper around <a href="https://en.cppreference.com/w/cpp/error/error_code">std::error_code</a>. Implemented as a class instead of a type alias to allow it to be forward-declared in wrappers, eg the UE4 plugin.</p>
 </div>
@@ -6183,7 +6199,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_flagimpl"><a id="_1479473248544"></a> <a id="FlagImpl"></a> FlagImpl</h3>
+<h3 id="_flagimpl"><a id="_2652552730784"></a> <a id="FlagImpl"></a> FlagImpl</h3>
 <div class="paragraph">
 <p>Helper class to strongly type bitfield operations</p>
 </div>
@@ -6201,7 +6217,7 @@ This function is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479473250160">Modio::Optional&lt;StorageType&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652552732400">Modio::Optional&lt;StorageType&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Value</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -6210,7 +6226,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_list"><a id="_1479473768608"></a> <a id="List"></a> List</h3>
+<h3 id="_list"><a id="_2652553250976"></a> <a id="List"></a> List</h3>
 <div class="paragraph">
 <p>Templated helper class to wrap a dynamic collection of elements</p>
 </div>
@@ -6260,7 +6276,7 @@ This function is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479473769056">ListType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652553251424">ListType</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalList</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -6269,25 +6285,25 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_youtubeurllist"><a id="_1479473790160"></a> <a id="YoutubeURLList"></a> YoutubeURLList</h3>
+<h3 id="_youtubeurllist"><a id="_2652553272528"></a> <a id="YoutubeURLList"></a> YoutubeURLList</h3>
 <div class="paragraph">
 <p>A URLList subclass to match Youtube urls</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_sketchfaburllist"><a id="_1479473801264"></a> <a id="SketchfabURLList"></a> SketchfabURLList</h3>
+<h3 id="_sketchfaburllist"><a id="_2652553283632"></a> <a id="SketchfabURLList"></a> SketchfabURLList</h3>
 <div class="paragraph">
 <p>A URLList subclass to match Sketchfab urls</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gallerylist"><a id="_1479475664144"></a> <a id="GalleryList"></a> GalleryList</h3>
+<h3 id="_gallerylist"><a id="_2652555264608"></a> <a id="GalleryList"></a> GalleryList</h3>
 <div class="paragraph">
 <p>List subclass to contain, compare and transform images</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_createmodfileparams"><a id="_1479476620512"></a> <a id="CreateModFileParams"></a> CreateModFileParams</h3>
+<h3 id="_createmodfileparams"><a id="_2652556352624"></a> <a id="CreateModFileParams"></a> CreateModFileParams</h3>
 <div class="paragraph">
 <p>Class specifying the parameters to submit when creating a mod file</p>
 </div>
@@ -6301,32 +6317,32 @@ This function is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RootDirectory</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Path to a directory to treat as the root of the mod. The SDK will compress all contents of this folder into a .zip archive, with a relative path based on this directory. This directory will not be created itself, the contents will exist at the top level of the archive.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Version</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional version string for this modfile release</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Changelog</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional changelog string for this modfile release</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479476622944">Modio::Optional&lt;_Bool&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652556355056">Modio::Optional&lt;_Bool&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bSetAsActive</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Should this mod be set as active/latest release? Defaults to true if not set.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataBlob</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional metadata blob for this mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479477140336">Modio::Optional&lt;std::vector&lt;Modio::ModfilePlatform&gt; &gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652556870080">Modio::Optional&lt;std::vector&lt;Modio::ModfilePlatform&gt; &gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Platforms</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional vector of platforms for this modfile</p></td>
 </tr>
@@ -6335,7 +6351,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_createmodparams"><a id="_1479478159968"></a> <a id="CreateModParams"></a> CreateModParams</h3>
+<h3 id="_createmodparams"><a id="_2652557619776"></a> <a id="CreateModParams"></a> CreateModParams</h3>
 <div class="paragraph">
 <p>Class specifying the parameters to submit when creating a mod</p>
 </div>
@@ -6349,57 +6365,57 @@ This function is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PathToLogoFile</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Path to the logo for the mod. Must point to a valid file on disk or the mod will not be created on the server.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Name</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The name of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Summary</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A brief summary of what the mod is</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NamePath</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional override for the name 'slug' in the mod&#8217;s URL</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479478162240">Modio::Optional&lt;Modio::ObjectVisibility&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652557622048">Modio::Optional&lt;Modio::ObjectVisibility&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Visibility</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional override for the mod&#8217;s visibility status. Defaults to Public (1)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Description</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional long description of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">HomepageURL</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional URL to the mod&#8217;s homepage. Must be a valid URL</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479478826048">Modio::Optional&lt;std::size_t&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652558251136">Modio::Optional&lt;std::size_t&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Stock</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional quantity limit on the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479479049104">Modio::Optional&lt;Modio::MaturityOption&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652558474192">Modio::Optional&lt;Modio::MaturityOption&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MaturityRating</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Bitwise mask of flags indicating mature content</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataBlob</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional metadata blob for this mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479479276704">Modio::Optional&lt;std::vector&lt;std::string&gt; &gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652558701776">Modio::Optional&lt;std::vector&lt;std::string&gt; &gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tags</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional list of mod tags. All tags must be supported by the parent game to be applied</p></td>
 </tr>
@@ -6408,7 +6424,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_editmodparams"><a id="_1479480447296"></a> <a id="EditModParams"></a> EditModParams</h3>
+<h3 id="_editmodparams"><a id="_2652559806960"></a> <a id="EditModParams"></a> EditModParams</h3>
 <div class="paragraph">
 <p>Class specifying fields to update for a mod</p>
 </div>
@@ -6422,52 +6438,52 @@ This function is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Name</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The name of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Summary</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A brief summary of what the mod is</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NamePath</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional override for the name 'slug' in the mod&#8217;s URL</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479478162240">Modio::Optional&lt;Modio::ObjectVisibility&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652557622048">Modio::Optional&lt;Modio::ObjectVisibility&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Visibility</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional override for the mod&#8217;s visibility status. Defaults to Public (1)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Description</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional long description of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">HomepageURL</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional URL to the mod&#8217;s homepage. Must be a valid URL</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479479049104">Modio::Optional&lt;Modio::MaturityOption&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652558474192">Modio::Optional&lt;Modio::MaturityOption&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MaturityRating</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Bitwise mask of flags indicating mature content</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataBlob</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional metadata blob for this mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">LogoPath</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional path to a new logo image</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479479276704">Modio::Optional&lt;std::vector&lt;std::string&gt; &gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652558701776">Modio::Optional&lt;std::vector&lt;std::string&gt; &gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tags</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional tags vector for this mod</p></td>
 </tr>
@@ -6476,14 +6492,14 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_filterparams"><a id="_1479481962576"></a> <a id="FilterParams"></a> FilterParams</h3>
+<h3 id="_filterparams"><a id="_2652561322096"></a> <a id="FilterParams"></a> FilterParams</h3>
 <div class="paragraph">
 <p>Class storing a set of filter parameters for use in <a href="#Modio::ListAllModsAsync">[Modio::ListAllModsAsync]</a></p>
 </div>
 <div class="sect3">
 <h4 id="_enums">Enums</h4>
 <div class="sect4">
-<h5 id="_sortfieldtype"><a id="_1479481963120"></a> SortFieldType</h5>
+<h5 id="_sortfieldtype"><a id="_2652561322640"></a> SortFieldType</h5>
 <div class="paragraph">
 <p>Enum indicating which field should be used to sort the results.</p>
 </div>
@@ -6528,7 +6544,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect4">
-<h5 id="_sortdirection"><a id="_1479481964320"></a> SortDirection</h5>
+<h5 id="_sortdirection"><a id="_2652561323840"></a> SortDirection</h5>
 <div class="paragraph">
 <p>Enum indicating which direction sorting should be applied</p>
 </div>
@@ -6553,7 +6569,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect4">
-<h5 id="_revenuefiltertype"><a id="_1479481964784"></a> RevenueFilterType</h5>
+<h5 id="_revenuefiltertype"><a id="_2652561324304"></a> RevenueFilterType</h5>
 <div class="paragraph">
 <p>Enum indicating filtering options based off revenue type</p>
 </div>
@@ -7151,77 +7167,77 @@ This function is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479481963120">SortFieldType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652561322640">SortFieldType</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SortField</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479481964320">SortDirection</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652561323840">SortDirection</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Direction</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479465964640">std::vector&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652545557600">std::vector&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SearchKeywords</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479481982672">Modio::Optional&lt;std::chrono::system_clock::time_point&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652561342192">Modio::Optional&lt;std::chrono::system_clock::time_point&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateRangeBegin</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479481982672">Modio::Optional&lt;std::chrono::system_clock::time_point&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652561342192">Modio::Optional&lt;std::chrono::system_clock::time_point&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateRangeEnd</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479465964640">std::vector&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652545557600">std::vector&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tags</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479465964640">std::vector&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652545557600">std::vector&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExcludedTags</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479481968992">std::vector&lt;Modio::ModID&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652561328512">std::vector&lt;Modio::ModID&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">IncludedIDs</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479481968992">std::vector&lt;Modio::ModID&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652561328512">std::vector&lt;Modio::ModID&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExcludedIDs</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479482357008">Modio::Optional&lt;RevenueFilterType&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652561716592">Modio::Optional&lt;RevenueFilterType&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Revenue</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479479049104">Modio::Optional&lt;MaturityOption&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652558474192">Modio::Optional&lt;MaturityOption&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Maturity</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataBlobSearchString</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634400">_Bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119232">_Bool</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">IsPaged</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634752">std::size_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119584">std::size_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Index</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634752">std::size_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119584">std::size_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Count</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -7230,7 +7246,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_pagedresult"><a id="_1479483288368"></a> <a id="PagedResult"></a> PagedResult</h3>
+<h3 id="_pagedresult"><a id="_2652562649696"></a> <a id="PagedResult"></a> PagedResult</h3>
 <div class="paragraph">
 <p>Base class for all types that represent a page from a set of results</p>
 </div>
@@ -7302,27 +7318,27 @@ This function is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634528">std::int32_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119360">std::int32_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PageIndex</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634528">std::int32_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119360">std::int32_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PageSize</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634528">std::int32_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119360">std::int32_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PageCount</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634528">std::int32_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119360">std::int32_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TotalResultCount</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634528">std::int32_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119360">std::int32_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ResultCount</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -7331,7 +7347,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modinfolist"><a id="_1479483294432"></a> <a id="ModInfoList"></a> ModInfoList</h3>
+<h3 id="_modinfolist"><a id="_2652562655760"></a> <a id="ModInfoList"></a> ModInfoList</h3>
 <div class="paragraph">
 <p>Class representing a list of mods that may be a page from a larger set of results</p>
 </div>
@@ -7362,7 +7378,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modcollectionentry"><a id="_1479483718880"></a> <a id="ModCollectionEntry"></a> ModCollectionEntry</h3>
+<h3 id="_modcollectionentry"><a id="_2652563081088"></a> <a id="ModCollectionEntry"></a> ModCollectionEntry</h3>
 <div class="paragraph">
 <p>Class representing a mod which is installed locally</p>
 </div>
@@ -7380,62 +7396,62 @@ This function is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472381664">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551863056">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ID</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The ID of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479483722192">std::atomic&lt;Modio::ModState&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652563084400">std::atomic&lt;Modio::ModState&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CurrentState</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The status of the mod, is it pending installation, is it installed but needing an update, etc</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479483795216">Modio::Optional&lt;Modio::ModState&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652563157424">Modio::Optional&lt;Modio::ModState&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RollbackState</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479475858192">ModInfo</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652555458608">ModInfo</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModProfile</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Mod descriptor from the REST API</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479447593168">std::atomic&lt;uint8_t&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652527030368">std::atomic&lt;uint8_t&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">LocalUserSubscriptionCount</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Reference counting to allow automatic uninstallation of unused local mods</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479484288592">std::set&lt;Modio::UserID&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652563920624">std::set&lt;Modio::UserID&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">LocalUserSubscriptions</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PathOnDisk</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472407696">Modio::FileSize</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551889088">Modio::FileSize</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SizeOnDisk</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479447591504">std::atomic&lt;_Bool&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652527028704">std::atomic&lt;_Bool&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ShouldNotRetry</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">flag if this mod should not be processed because it encountered an unrecoverable error during installation/update. This should not be saved to disk as we will more than likely want to retry next session</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479450004224">Modio::ErrorCode</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652529552144">Modio::ErrorCode</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NeverRetryReason</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479450004224">Modio::ErrorCode</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652529552144">Modio::ErrorCode</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">LastErrorCode</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634624">uint8_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119456">uint8_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RetriesRemainingThisSession</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -7444,14 +7460,14 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modprogressinfo"><a id="_1479484721264"></a> <a id="ModProgressInfo"></a> ModProgressInfo</h3>
+<h3 id="_modprogressinfo"><a id="_2652564353248"></a> <a id="ModProgressInfo"></a> ModProgressInfo</h3>
 <div class="paragraph">
 <p>Class representing the progress of a mod installation or update</p>
 </div>
 <div class="sect3">
 <h4 id="_enums_2">Enums</h4>
 <div class="sect4">
-<h5 id="_emodprogressstate"><a id="_1479484721808"></a> EModProgressState</h5>
+<h5 id="_emodprogressstate"><a id="_2652564353792"></a> EModProgressState</h5>
 <div class="paragraph">
 <p>Enum representing which state the currently processing mod is in</p>
 </div>
@@ -7582,7 +7598,7 @@ This function is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472381664">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551863056">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ID</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The mod ID of the mod being processed</p></td>
 </tr>
@@ -7591,14 +7607,14 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_usersubscriptionlist"><a id="_1479484738160"></a> <a id="UserSubscriptionList"></a> UserSubscriptionList</h3>
+<h3 id="_usersubscriptionlist"><a id="_2652564370144"></a> <a id="UserSubscriptionList"></a> UserSubscriptionList</h3>
 <div class="paragraph">
 <p>Class containing the mod IDs the current user is subscribed to</p>
 </div>
 <div class="sect3">
 <h4 id="_enums_3">Enums</h4>
 <div class="sect4">
-<h5 id="_changetype"><a id="_1479484743696"></a> ChangeType</h5>
+<h5 id="_changetype"><a id="_2652564375680"></a> ChangeType</h5>
 <div class="paragraph">
 <p>Enum indicating if a mod was added or removed when calculating the difference of two user subscription lists</p>
 </div>
@@ -7641,7 +7657,7 @@ This function is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479484742816">std::set&lt;Modio::ModID&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652564374800">std::set&lt;Modio::ModID&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalList</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -7650,7 +7666,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modeventlog"><a id="_1479485468480"></a> <a id="ModEventLog"></a> ModEventLog</h3>
+<h3 id="_modeventlog"><a id="_2652565100384"></a> <a id="ModEventLog"></a> ModEventLog</h3>
 <div class="paragraph">
 <p>Container of events directly related to a ModID, in particular any error occurred during execution</p>
 </div>
@@ -7740,7 +7756,7 @@ This function is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479485471104">std::vector&lt;Modio::ModManagementEvent&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652565103008">std::vector&lt;Modio::ModManagementEvent&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalData</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -7749,7 +7765,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_moddependencylist"><a id="_1479485886432"></a> <a id="ModDependencyList"></a> ModDependencyList</h3>
+<h3 id="_moddependencylist"><a id="_2652565649872"></a> <a id="ModDependencyList"></a> ModDependencyList</h3>
 <div class="paragraph">
 <p>Container for a collection of ModDependency objects</p>
 </div>
@@ -7767,17 +7783,17 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_reportparams"><a id="_1479486029840"></a> <a id="ReportParams"></a> ReportParams</h3>
+<h3 id="_reportparams"><a id="_2652565793280"></a> <a id="ReportParams"></a> ReportParams</h3>
 
 </div>
 <div class="sect2">
-<h3 id="_modtagoptions"><a id="_1479486057328"></a> <a id="ModTagOptions"></a> ModTagOptions</h3>
+<h3 id="_modtagoptions"><a id="_2652565820768"></a> <a id="ModTagOptions"></a> ModTagOptions</h3>
 <div class="paragraph">
 <p>Container for a collection of ModTagInfo objects</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gameinfolist"><a id="_1479487415360"></a> <a id="GameInfoList"></a> GameInfoList</h3>
+<h3 id="_gameinfolist"><a id="_2652566974256"></a> <a id="GameInfoList"></a> GameInfoList</h3>
 <div class="paragraph">
 <p>Class representing a list of games that may be a page from a larger set of results</p>
 </div>
@@ -7808,13 +7824,13 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_moddetails"><a id="_1479487607520"></a> <a id="ModDetails"></a> ModDetails</h3>
+<h3 id="_moddetails"><a id="_2652567166464"></a> <a id="ModDetails"></a> ModDetails</h3>
 <div class="paragraph">
 <p>Collection of FileMetadata objects representing mod file updates</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_userlist"><a id="_1479487890400"></a> <a id="UserList"></a> UserList</h3>
+<h3 id="_userlist"><a id="_2652567449344"></a> <a id="UserList"></a> UserList</h3>
 <div class="paragraph">
 <p>Class representing a list of users</p>
 </div>
@@ -7850,7 +7866,7 @@ This class is part of an experimental feature and is subject to change.
 <h2 id="_structs">Structs</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_stronginteger"><a id="_1479472319344"></a> <a id="StrongInteger"></a> StrongInteger</h3>
+<h3 id="_stronginteger"><a id="_2652551800736"></a> <a id="StrongInteger"></a> StrongInteger</h3>
 <div class="paragraph">
 <p>Strong integer type to prevent accidental function parameter reordering and prevent unwanted implicit conversions</p>
 </div>
@@ -7893,7 +7909,7 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400941104">UnderlyingIntegerType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479446704">UnderlyingIntegerType</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Value</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -7902,7 +7918,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_emailauthcode"><a id="_1479472332912"></a> <a id="EmailAuthCode"></a> EmailAuthCode</h3>
+<h3 id="_emailauthcode"><a id="_2652551814304"></a> <a id="EmailAuthCode"></a> EmailAuthCode</h3>
 <div class="paragraph">
 <p>Strong type representing an email authentication code sent to a user email address</p>
 </div>
@@ -7945,7 +7961,7 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalCode</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -7954,7 +7970,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_emailaddress"><a id="_1479472347552"></a> <a id="EmailAddress"></a> EmailAddress</h3>
+<h3 id="_emailaddress"><a id="_2652551828944"></a> <a id="EmailAddress"></a> EmailAddress</h3>
 <div class="paragraph">
 <p>Strong type representing an email address</p>
 </div>
@@ -7997,7 +8013,7 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalAddress</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -8006,7 +8022,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_apikey"><a id="_1479472352944"></a> <a id="ApiKey"></a> ApiKey</h3>
+<h3 id="_apikey"><a id="_2652551834336"></a> <a id="ApiKey"></a> ApiKey</h3>
 <div class="paragraph">
 <p>Strong type representing an api key</p>
 </div>
@@ -8049,7 +8065,7 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalApiKey</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -8058,7 +8074,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_userid"><a id="_1479472364752"></a> <a id="UserID"></a> UserID</h3>
+<h3 id="_userid"><a id="_2652551846144"></a> <a id="UserID"></a> UserID</h3>
 <div class="paragraph">
 <p>Strong type for User IDs</p>
 </div>
@@ -8068,7 +8084,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modid"><a id="_1479472381664"></a> <a id="ModID"></a> ModID</h3>
+<h3 id="_modid"><a id="_2652551863056"></a> <a id="ModID"></a> ModID</h3>
 <div class="paragraph">
 <p>Strong type for Mod IDs</p>
 </div>
@@ -8078,37 +8094,37 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_filemetadataid"><a id="_1479472387936"></a> <a id="FileMetadataID"></a> FileMetadataID</h3>
+<h3 id="_filemetadataid"><a id="_2652551869328"></a> <a id="FileMetadataID"></a> FileMetadataID</h3>
 <div class="paragraph">
 <p>Strong type for File Metadata IDs</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_commentid"><a id="_1479472390592"></a> <a id="CommentID"></a> CommentID</h3>
+<h3 id="_commentid"><a id="_2652551871984"></a> <a id="CommentID"></a> CommentID</h3>
 <div class="paragraph">
 <p>Strong type for Comment ID</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_mediafileid"><a id="_1479472393248"></a> <a id="MediaFileID"></a> MediaFileID</h3>
+<h3 id="_mediafileid"><a id="_2652551874640"></a> <a id="MediaFileID"></a> MediaFileID</h3>
 <div class="paragraph">
 <p>Strong type for Media File ID</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_fileoffset"><a id="_1479472395904"></a> <a id="FileOffset"></a> FileOffset</h3>
+<h3 id="_fileoffset"><a id="_2652551877296"></a> <a id="FileOffset"></a> FileOffset</h3>
 <div class="paragraph">
 <p>Strong type for file offsets</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_filesize"><a id="_1479472407696"></a> <a id="FileSize"></a> FileSize</h3>
+<h3 id="_filesize"><a id="_2652551889088"></a> <a id="FileSize"></a> FileSize</h3>
 <div class="paragraph">
 <p>Strong type for file sizes</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gameid"><a id="_1479472410352"></a> <a id="GameID"></a> GameID</h3>
+<h3 id="_gameid"><a id="_2652551891744"></a> <a id="GameID"></a> GameID</h3>
 <div class="paragraph">
 <p>Strong type for a game ID</p>
 </div>
@@ -8118,13 +8134,13 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modcreationhandle"><a id="_1479472416624"></a> <a id="ModCreationHandle"></a> ModCreationHandle</h3>
+<h3 id="_modcreationhandle"><a id="_2652551898016"></a> <a id="ModCreationHandle"></a> ModCreationHandle</h3>
 <div class="paragraph">
 <p>Strong type wrapping a handle to an as-yet-uncreated mod</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_authenticationparams"><a id="_1479472419280"></a> <a id="AuthenticationParams"></a> AuthenticationParams</h3>
+<h3 id="_authenticationparams"><a id="_2652551900672"></a> <a id="AuthenticationParams"></a> AuthenticationParams</h3>
 <div class="paragraph">
 <p>Simple struct to encapsulate data passed to external authentication systems</p>
 </div>
@@ -8138,27 +8154,27 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AuthToken</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">AuthToken String received by an authentication provider, that later is used to verify a user on the mod.io API</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472420304">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551901696">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">UserEmail</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">UserEmail Optional string that associates an email with a user</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634400">_Bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119232">_Bool</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bUserHasAcceptedTerms</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">bUserHasAcceptedTerms Boolean value that signals when a user has accepted the mod.io Terms of Service. True when they are accepted, false otherwise.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634400">_Bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119232">_Bool</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bURLEncodeAuthToken</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">bURLEncodeAuthToken Boolean value to let the SDK know if the AuthToken requires URL encoding before sending the string to the mod.io API. By default, it would not perform URL encoding.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472667584">std::map&lt;std::string, std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652552148976">std::map&lt;std::string, std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExtendedParameters</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">ExtendedParameters A map to store extended parameters required by some providers.</p></td>
 </tr>
@@ -8167,7 +8183,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_fielderror"><a id="_1479473175520"></a> <a id="FieldError"></a> FieldError</h3>
+<h3 id="_fielderror"><a id="_2652552657088"></a> <a id="FieldError"></a> FieldError</h3>
 <div class="paragraph">
 <p>Simple struct representing a validation error from the REST API</p>
 </div>
@@ -8181,12 +8197,12 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Field</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">String description of the field failing validation</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Error</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">String containing the reason for the validation failure</p></td>
 </tr>
@@ -8195,7 +8211,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_entitlementparams"><a id="_1479473182480"></a> <a id="EntitlementParams"></a> EntitlementParams</h3>
+<h3 id="_entitlementparams"><a id="_2652552664048"></a> <a id="EntitlementParams"></a> EntitlementParams</h3>
 <div class="paragraph">
 <p>Simple struct to encapsulate portal-specific data required when consuming entitlements</p>
 </div>
@@ -8209,7 +8225,7 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472667584">std::map&lt;std::string, std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652552148976">std::map&lt;std::string, std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExtendedParameters</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">ExtendedParameters A map to store extended parameters required by some portals.</p></td>
 </tr>
@@ -8218,14 +8234,14 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_filemetadata"><a id="_1479473202880"></a> <a id="FileMetadata"></a> FileMetadata</h3>
+<h3 id="_filemetadata"><a id="_2652552685120"></a> <a id="FileMetadata"></a> FileMetadata</h3>
 <div class="paragraph">
 <p>Metadata for a release archive for a mod</p>
 </div>
 <div class="sect3">
 <h4 id="_enums_4">Enums</h4>
 <div class="sect4">
-<h5 id="_virusscanstatus"><a id="_1479473203552"></a> VirusScanStatus</h5>
+<h5 id="_virusscanstatus"><a id="_2652552685792"></a> VirusScanStatus</h5>
 <div class="paragraph">
 <p>Enum related to the Virus scan status of a file</p>
 </div>
@@ -8266,7 +8282,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect4">
-<h5 id="_virusstatus"><a id="_1479473205072"></a> VirusStatus</h5>
+<h5 id="_virusstatus"><a id="_2652552687312"></a> VirusStatus</h5>
 <div class="paragraph">
 <p>Enum related to the Virus status of a file</p>
 </div>
@@ -8305,67 +8321,67 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472387936">Modio::FileMetadataID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551869328">Modio::FileMetadataID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataId</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unique modfile id.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472381664">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551863056">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModId</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unique mod id.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateAdded</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of date file was added.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479473203552">VirusScanStatus</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652552685792">VirusScanStatus</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CurrentVirusScanStatus</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Current virus scan status of the file. For newly added files that have yet to be scanned this field will change frequently until a scan is complete</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479473205072">VirusStatus</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652552687312">VirusStatus</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CurrentVirusStatus</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Was a virus detected?</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Filesize</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Size of the file in bytes.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">FilesizeUncompressed</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Size of the uncompressed file in bytes.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Filename</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Filename including extension.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Version</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Release version this file represents.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Changelog</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Changelog for the file.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataBlob</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Metadata stored by the game developer for this file.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DownloadBinaryURL</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Modfile download URL</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DownloadExpiryDate</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Modfile download expiry date</p></td>
 </tr>
@@ -8374,7 +8390,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modstats"><a id="_1479473234000"></a> <a id="ModStats"></a> ModStats</h3>
+<h3 id="_modstats"><a id="_2652552716240"></a> <a id="ModStats"></a> ModStats</h3>
 <div class="paragraph">
 <p>Contains download stats and ratings for a mod</p>
 </div>
@@ -8388,52 +8404,52 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PopularityRankPosition</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Current rank of the mod.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PopularityRankTotalMods</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of ranking spots the current rank is measured against.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DownloadsTotal</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of total mod downloads.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SubscribersTotal</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of total users who have subscribed to the mod.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingTotal</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of times this mod has been rated.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingPositive</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of positive ratings.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingNegative</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of negative ratings.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingPercentagePositive</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of positive ratings, divided by the total ratings to determine it’s percentage score.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634816">double</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119648">double</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingWeightedAggregate</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Overall rating of this item calculated using the [Wilson score confidence interval](<a href="https://www.evanmiller.org/how-not-to-sort-by-average-Ratinghtml" class="bare">https://www.evanmiller.org/how-not-to-sort-by-average-Ratinghtml</a>). This column is good to sort on, as it will order items based on number of ratings and will place items with many positive ratings above those with a higher score but fewer ratings.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingDisplayText</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Textual representation of the rating in format: Overwhelmingly Positive &#8594; Very Positive &#8594; Positive &#8594; Mostly Positive &#8594; Mixed &#8594; Negative &#8594; Mostly Negative &#8594; Very Negative &#8594; Overwhelmingly Negative &#8594; Unrated</p></td>
 </tr>
@@ -8442,7 +8458,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_profilematurity"><a id="_1479473282112"></a> <a id="ProfileMaturity"></a> ProfileMaturity</h3>
+<h3 id="_profilematurity"><a id="_2652552764352"></a> <a id="ProfileMaturity"></a> ProfileMaturity</h3>
 <div class="paragraph">
 <p>A strong type flag object to represent MaturityOption from a mod.io info. * Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to * be labeled as mature. The value of this field will default to "Maturity Option None" unless the parent * game allows to flag mature content.</p>
 </div>
@@ -8452,7 +8468,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_user"><a id="_1479473922544"></a> <a id="User"></a> User</h3>
+<h3 id="_user"><a id="_2652553404912"></a> <a id="User"></a> User</h3>
 <div class="paragraph">
 <p>Object representing a mod.io user profile</p>
 </div>
@@ -8466,37 +8482,37 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472364752">Modio::UserID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551846144">Modio::UserID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">UserId</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unique id for the user</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Username</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Username of the user</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479473923936">Modio::Optional&lt;Modio::Detail::OAuthToken&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652553406304">Modio::Optional&lt;Modio::Detail::OAuthToken&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AuthToken</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Authentification token of the user</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateOnline</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp the user was last online</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileUrl</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URL of the user&#8217;s mod.io profile</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479473890672">Modio::Detail::Avatar</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652553373040">Modio::Detail::Avatar</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Avatar</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Cached information about the user&#8217;s avatar</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DisplayNamePortal</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The display name of the User for the given Portal that the mod search is coming from * ie if the Portal is PSN, then this is the owning user&#8217;s PSN profile name if accounts are linked.</p></td>
 </tr>
@@ -8505,7 +8521,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modtag"><a id="_1479475840464"></a> <a id="ModTag"></a> ModTag</h3>
+<h3 id="_modtag"><a id="_2652555440880"></a> <a id="ModTag"></a> ModTag</h3>
 <div class="paragraph">
 <p>Strong type for a ModTag</p>
 </div>
@@ -8519,7 +8535,7 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tag</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -8528,7 +8544,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_metadata"><a id="_1479475847808"></a> <a id="Metadata"></a> Metadata</h3>
+<h3 id="_metadata"><a id="_2652555448224"></a> <a id="Metadata"></a> Metadata</h3>
 <div class="paragraph">
 <p>Key-Value pair that represents a mod metadata</p>
 </div>
@@ -8542,12 +8558,12 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Key</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Value</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -8556,7 +8572,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modinfo"><a id="_1479475858192"></a> <a id="ModInfo"></a> ModInfo</h3>
+<h3 id="_modinfo"><a id="_2652555458608"></a> <a id="ModInfo"></a> ModInfo</h3>
 <div class="paragraph">
 <p>Full mod profile including current release information, media links, and stats</p>
 </div>
@@ -8570,136 +8586,141 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472381664">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551863056">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModId</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unique Mod ID</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileName</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Name of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileSummary</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Summary of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileDescription</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Detailed description in HTML format</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileDescriptionPlaintext</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Detailed description in plaintext</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileURL</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URL to the mod profile</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479473922544">Modio::User</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652553404912">Modio::User</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileSubmittedBy</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Information on the user who submitted the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileDateAdded</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of the date the mod was registered</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileDateUpdated</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of the date the mod was updated</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileDateLive</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of the date the mod was marked live</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479473282112">Modio::ProfileMaturity</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652552764352">Modio::ProfileMaturity</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileMaturityOption</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Object representing a mod.io user profile	* Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to	* be labeled as mature. The value of this field will default to None unless the parent game allows * to flag mature content.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataBlob</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Metadata stored by the game developer.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479475862112">Modio::Optional&lt;Modio::FileMetadata&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652555462528">Modio::Optional&lt;Modio::FileMetadata&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">FileInfo</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Information about the mod&#8217;s most recent public release</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479476092400">std::vector&lt;Modio::Metadata&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652555692800">std::vector&lt;Modio::Metadata&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataKvp</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Arbitrary key-value metadata set for this mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479476225040">std::vector&lt;Modio::ModTag&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652555825440">std::vector&lt;Modio::ModTag&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tags</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Tags this mod has set</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634752">std::size_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119584">std::size_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NumGalleryImages</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of images in the mod&#8217;s media gallery</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479475664144">Modio::GalleryList</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652555264608">Modio::GalleryList</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GalleryImages</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">List of images in the mod&#8217;s media gallery</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479473790160">Modio::YoutubeURLList</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652553272528">Modio::YoutubeURLList</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">YoutubeURLs</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">List of youtube links provided by the creator of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479473801264">Modio::SketchfabURLList</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652553283632">Modio::SketchfabURLList</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SketchfabURLs</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">List of sketchfab links provided by the creator of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479473234000">Modio::ModStats</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652552716240">Modio::ModStats</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Stats</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Stats and rating information for the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479475815232">Modio::Detail::Logo</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652555415648">Modio::Detail::Logo</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModLogo</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Media data related to the mod logo</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Version</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The current ModInfo version. This property is updated when changes to the class happen.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479475857408">Modio::ModServerSideStatus</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652555457824">Modio::ModServerSideStatus</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModStatus</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The current ModStatus on the server: Accepted, NotAccepted, or Deleted.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479473181376">Modio::ObjectVisibility</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652552662944">Modio::ObjectVisibility</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Visibility</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The visibility status of the mod, default to Public</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634528">int</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119360">int</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Price</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Price of this mod</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119232">_Bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Dependencies</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If this mod has any direct dependencie.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_initializeoptions"><a id="_1479483277408"></a> <a id="InitializeOptions"></a> InitializeOptions</h3>
+<h3 id="_initializeoptions"><a id="_2652562638880"></a> <a id="InitializeOptions"></a> InitializeOptions</h3>
 <div class="paragraph">
 <p>Structure with all initialization parameters needed to start the API, all need to be filled in for the SDK to properly initialize</p>
 </div>
@@ -8769,32 +8790,32 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472410352">Modio::GameID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551891744">Modio::GameID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GameID</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The mod.io-provided ID for the game.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472352944">Modio::ApiKey</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551834336">Modio::ApiKey</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">APIKey</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The mod.io-provided API key for your application or game.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">Modio::UserHandleType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">Modio::UserHandleType</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">User</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unique identifier for the local session, which will optionally contain user data for an authenticated mod.io user (once authentication is completed).</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472292032">Modio::Portal</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551773424">Modio::Portal</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PortalInUse</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The storefront or distribution method to use. The API uses this parameter to serve platform-compliant user names. Use <code>Modio::Portal::None</code> if your title does not require this.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472288080">Modio::Environment</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551769472">Modio::Environment</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GameEnvironment</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The mod.io environment you want to run the SDK on.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472667584">std::map&lt;std::string, std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652552148976">std::map&lt;std::string, std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExtendedParameters</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Platform-specific extended initialization parameters. See <a href="#Platform-specific Notes">[Platform-specific Notes]</a> for more information regarding any special values your platform requires or supports.</p></td>
 </tr>
@@ -8803,14 +8824,14 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modmanagementevent"><a id="_1479484972320"></a> <a id="ModManagementEvent"></a> ModManagementEvent</h3>
+<h3 id="_modmanagementevent"><a id="_2652564604288"></a> <a id="ModManagementEvent"></a> ModManagementEvent</h3>
 <div class="paragraph">
 <p>Simple struct representing the outcome of a mod management operation</p>
 </div>
 <div class="sect3">
 <h4 id="_enums_5">Enums</h4>
 <div class="sect4">
-<h5 id="_eventtype"><a id="_1479484972992"></a> EventType</h5>
+<h5 id="_eventtype"><a id="_2652564604960"></a> EventType</h5>
 <div class="paragraph">
 <p>What type of event occurred</p>
 </div>
@@ -8869,17 +8890,17 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472381664">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551863056">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ID</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">ID for the mod that the event occurred on</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479484972992">EventType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652564604960">EventType</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Event</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">What type of event occurred</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479450004224">Modio::ErrorCode</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652529552144">Modio::ErrorCode</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Status</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Empty if operation completed successfully, truthy/contains error code if operation failed</p></td>
 </tr>
@@ -8888,7 +8909,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_moddependency"><a id="_1479485882560"></a> <a id="ModDependency"></a> ModDependency</h3>
+<h3 id="_moddependency"><a id="_2652565646000"></a> <a id="ModDependency"></a> ModDependency</h3>
 <div class="paragraph">
 <p>Simple struct containing simplified information about a mod which is a dependency of another mod</p>
 </div>
@@ -8914,12 +8935,12 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472381664">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551863056">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModID</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModName</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -8928,7 +8949,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gamestats"><a id="_1479486048384"></a> <a id="GameStats"></a> GameStats</h3>
+<h3 id="_gamestats"><a id="_2652565811824"></a> <a id="GameStats"></a> GameStats</h3>
 <div class="paragraph">
 <p>Contains download stats for a game</p>
 </div>
@@ -8942,37 +8963,37 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472410352">Modio::GameID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551891744">Modio::GameID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GameID</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unique game id</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModCountTotal</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Available mod count for the game</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModDownloadsToday</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Mods downloaded today for the game</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModDownloadsTotal</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Total Mods downloaded for the game</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModDownloadsDailyAverage</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Average mods downloaded on a daily basis</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModSubscribersTotal</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of total users who have subscribed to the mods for the game</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634592">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119424">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateExpires</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp until this game&#8217;s statistics are considered stale</p></td>
 </tr>
@@ -8981,7 +9002,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modtaginfo"><a id="_1479486052864"></a> <a id="ModTagInfo"></a> ModTagInfo</h3>
+<h3 id="_modtaginfo"><a id="_2652565816304"></a> <a id="ModTagInfo"></a> ModTagInfo</h3>
 <div class="paragraph">
 <p>Metadata about a group of tags that can be used for filtering mods</p>
 </div>
@@ -8995,17 +9016,17 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupName</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The display name for the tag</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479465964640">std::vector&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652545557600">std::vector&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupValues</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The valid tags the group can have</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634400">_Bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119232">_Bool</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bAllowMultipleSelection</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">True if multiple tags from the group can be used simultaneously</p></td>
 </tr>
@@ -9014,7 +9035,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gamecommunityoptionsflags"><a id="_1479486543312"></a> <a id="GameCommunityOptionsFlags"></a> GameCommunityOptionsFlags</h3>
+<h3 id="_gamecommunityoptionsflags"><a id="_2652566036528"></a> <a id="GameCommunityOptionsFlags"></a> GameCommunityOptionsFlags</h3>
 <div class="paragraph">
 <p>A strong type flag object to represent GameCommunityOptions from a mod.io info.</p>
 </div>
@@ -9024,7 +9045,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gamematurityoptionsflags"><a id="_1479487029616"></a> <a id="GameMaturityOptionsFlags"></a> GameMaturityOptionsFlags</h3>
+<h3 id="_gamematurityoptionsflags"><a id="_2652566522848"></a> <a id="GameMaturityOptionsFlags"></a> GameMaturityOptionsFlags</h3>
 <div class="paragraph">
 <p>A strong type flag object to represent GameMaturityOptions from a mod.io info.</p>
 </div>
@@ -9034,7 +9055,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gamemonetization"><a id="_1479487072800"></a> <a id="GameMonetization"></a> GameMonetization</h3>
+<h3 id="_gamemonetization"><a id="_2652566566032"></a> <a id="GameMonetization"></a> GameMonetization</h3>
 <div class="paragraph">
 <p>A strong type flag object to represent GameMonetizationOptions from a mod.io info.</p>
 </div>
@@ -9044,7 +9065,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_terms"><a id="_1479487747008"></a> <a id="Terms"></a> Terms</h3>
+<h3 id="_terms"><a id="_2652567305952"></a> <a id="Terms"></a> Terms</h3>
 <div class="paragraph">
 <p>This struct contains strings that should be displayed to a user when displaying the terms of use and offering to create a mod.io account</p>
 </div>
@@ -9058,17 +9079,17 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479487750608">struct TermsButtons</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652567309552">struct TermsButtons</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Buttons</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479487753744">struct TermsLinks</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652567312688">struct TermsLinks</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Links</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479444974224">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652524206752">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TermsText</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The plaintext version of the mod.io terms of use</p></td>
 </tr>
@@ -9077,7 +9098,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_transactionrecord"><a id="_1479487887840"></a> <a id="TransactionRecord"></a> TransactionRecord</h3>
+<h3 id="_transactionrecord"><a id="_2652567446784"></a> <a id="TransactionRecord"></a> TransactionRecord</h3>
 <div class="paragraph">
 <p>Contains information about a successful transaction for a mod</p>
 </div>
@@ -9091,17 +9112,17 @@ This class is part of an experimental feature and is subject to change.
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479472381664">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652551863056">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AssociatedMod</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The mod the purchase was for</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634752">uint64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119584">uint64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Price</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The price the mod was purchased for</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1479400634752">uint64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2652479119584">uint64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">UpdatedUserWalletBalance</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The updated balance in the user&#8217;s wallet after the transaction</p></td>
 </tr>
@@ -9115,7 +9136,7 @@ This class is part of an experimental feature and is subject to change.
 <h2 id="_enums_6">Enums</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_environment"><a id="_1479472288080"></a> Environment</h3>
+<h3 id="_environment"><a id="_2652551769472"></a> Environment</h3>
 <div class="paragraph">
 <p>Enum representing what environment your game is deployed in</p>
 </div>
@@ -9140,7 +9161,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_portal"><a id="_1479472292032"></a> Portal</h3>
+<h3 id="_portal"><a id="_2652551773424"></a> Portal</h3>
 <div class="paragraph">
 <p>Enum representing the store or service your game is being distributed through</p>
 </div>
@@ -9197,7 +9218,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modfileplatform"><a id="_1479472296640"></a> ModfilePlatform</h3>
+<h3 id="_modfileplatform"><a id="_2652551778032"></a> ModfilePlatform</h3>
 <div class="paragraph">
 <p>Enum representing the platform(s) that a modfile is enabled for</p>
 </div>
@@ -9262,7 +9283,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_logosize"><a id="_1479472301600"></a> LogoSize</h3>
+<h3 id="_logosize"><a id="_2652551782992"></a> LogoSize</h3>
 <div class="paragraph">
 <p>Enum representing mod logo sizes</p>
 </div>
@@ -9295,7 +9316,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_iconsize"><a id="_1479472306000"></a> IconSize</h3>
+<h3 id="_iconsize"><a id="_2652551787392"></a> IconSize</h3>
 <div class="paragraph">
 <p>Enum representing game icon sizes</p>
 </div>
@@ -9328,7 +9349,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_avatarsize"><a id="_1479472310400"></a> AvatarSize</h3>
+<h3 id="_avatarsize"><a id="_2652551791792"></a> AvatarSize</h3>
 <div class="paragraph">
 <p>Enum representing avatar image sizes</p>
 </div>
@@ -9357,7 +9378,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gallerysize"><a id="_1479472314672"></a> GallerySize</h3>
+<h3 id="_gallerysize"><a id="_2652551796064"></a> GallerySize</h3>
 <div class="paragraph">
 <p>Enum representing an image gallery size</p>
 </div>
@@ -9386,7 +9407,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_language"><a id="_1479473172752"></a> Language</h3>
+<h3 id="_language"><a id="_2652552654144"></a> Language</h3>
 <div class="paragraph">
 <p>Enum representing the languages mod.io support responses in</p>
 </div>
@@ -9463,7 +9484,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_authenticationprovider"><a id="_1479473174320"></a> AuthenticationProvider</h3>
+<h3 id="_authenticationprovider"><a id="_2652552655712"></a> AuthenticationProvider</h3>
 <div class="paragraph">
 <p>Simple struct to encapsulate data passed to external authentication systems</p>
 </div>
@@ -9519,12 +9540,20 @@ This class is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Apple</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GoogleIDToken</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GoogleServerSideToken</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">12</p></td>
+</tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_loglevel"><a id="_1479473178464"></a> LogLevel</h3>
+<h3 id="_loglevel"><a id="_2652552660032"></a> LogLevel</h3>
 <div class="paragraph">
 <p>Degree of severity for the log output</p>
 </div>
@@ -9557,7 +9586,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_logcategory"><a id="_1479473179488"></a> LogCategory</h3>
+<h3 id="_logcategory"><a id="_2652552661056"></a> LogCategory</h3>
 <div class="paragraph">
 <p>The category of the log message (usually the internal service the message is originating from)</p>
 </div>
@@ -9606,7 +9635,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_rating"><a id="_1479473180496"></a> Rating</h3>
+<h3 id="_rating"><a id="_2652552662064"></a> Rating</h3>
 <div class="paragraph">
 <p>A rating for a mod.</p>
 </div>
@@ -9635,7 +9664,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_objectvisibility"><a id="_1479473181376"></a> ObjectVisibility</h3>
+<h3 id="_objectvisibility"><a id="_2652552662944"></a> ObjectVisibility</h3>
 <div class="paragraph">
 <p>The visiblility of a mod.</p>
 </div>
@@ -9660,7 +9689,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_platformstatus"><a id="_1479473181984"></a> PlatformStatus</h3>
+<h3 id="_platformstatus"><a id="_2652552663552"></a> PlatformStatus</h3>
 <div class="paragraph">
 <p>File approval status to filter by. Passed in ExtendedInitializationParameters for the duration of a session.</p>
 </div>
@@ -9689,7 +9718,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_maturityoption"><a id="_1479473276960"></a> MaturityOption</h3>
+<h3 id="_maturityoption"><a id="_2652552759200"></a> MaturityOption</h3>
 <div class="paragraph">
 <p>Maturity types classification according to the mod.io API	* 0 = None set (default)	* 1 = Alcohol	* 2 = Drugs	* 4 = Violence	* 8 = Explicit</p>
 </div>
@@ -9726,7 +9755,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modserversidestatus"><a id="_1479475857408"></a> ModServerSideStatus</h3>
+<h3 id="_modserversidestatus"><a id="_2652555457824"></a> ModServerSideStatus</h3>
 <div class="paragraph">
 <p>Possible status as received from the server</p>
 </div>
@@ -9755,7 +9784,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_httperror"><a id="_1479480457472"></a> HttpError</h3>
+<h3 id="_httperror"><a id="_2652559817136"></a> HttpError</h3>
 <div class="sect3">
 <h4 id="_values_25">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -9825,7 +9854,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_filesystemerror"><a id="_1479480495680"></a> FilesystemError</h3>
+<h3 id="_filesystemerror"><a id="_2652559855344"></a> FilesystemError</h3>
 <div class="sect3">
 <h4 id="_values_26">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -9879,7 +9908,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_userautherror"><a id="_1479480526080"></a> UserAuthError</h3>
+<h3 id="_userautherror"><a id="_2652559885856"></a> UserAuthError</h3>
 <div class="sect3">
 <h4 id="_values_27">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -9921,7 +9950,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_userdataerror"><a id="_1479480555872"></a> UserDataError</h3>
+<h3 id="_userdataerror"><a id="_2652559915552"></a> UserDataError</h3>
 <div class="sect3">
 <h4 id="_values_28">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -9943,7 +9972,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_archiveerror"><a id="_1479480583584"></a> ArchiveError</h3>
+<h3 id="_archiveerror"><a id="_2652559943264"></a> ArchiveError</h3>
 <div class="sect3">
 <h4 id="_values_29">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -9965,7 +9994,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_genericerror"><a id="_1479480612064"></a> GenericError</h3>
+<h3 id="_genericerror"><a id="_2652559971744"></a> GenericError</h3>
 <div class="sect3">
 <h4 id="_values_30">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -10019,7 +10048,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_systemerror"><a id="_1479480645568"></a> SystemError</h3>
+<h3 id="_systemerror"><a id="_2652560005248"></a> SystemError</h3>
 <div class="sect3">
 <h4 id="_values_31">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -10037,7 +10066,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_zliberror"><a id="_1479480675120"></a> ZlibError</h3>
+<h3 id="_zliberror"><a id="_2652560034800"></a> ZlibError</h3>
 <div class="sect3">
 <h4 id="_values_32">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -10107,7 +10136,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modmanagementerror"><a id="_1479480711968"></a> ModManagementError</h3>
+<h3 id="_modmanagementerror"><a id="_2652560071648"></a> ModManagementError</h3>
 <div class="sect3">
 <h4 id="_values_33">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -10149,7 +10178,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modvalidationerror"><a id="_1479480746224"></a> ModValidationError</h3>
+<h3 id="_modvalidationerror"><a id="_2652560105904"></a> ModValidationError</h3>
 <div class="sect3">
 <h4 id="_values_34">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -10171,7 +10200,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_monetizationerror"><a id="_1479480778352"></a> MonetizationError</h3>
+<h3 id="_monetizationerror"><a id="_2652560138032"></a> MonetizationError</h3>
 <div class="sect3">
 <h4 id="_values_35">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -10189,7 +10218,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_apierror"><a id="_1479480810976"></a> ApiError</h3>
+<h3 id="_apierror"><a id="_2652560170672"></a> ApiError</h3>
 <div class="sect3">
 <h4 id="_values_36">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -10407,7 +10436,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_errorconditiontypes"><a id="_1479481011728"></a> ErrorConditionTypes</h3>
+<h3 id="_errorconditiontypes"><a id="_2652560371424"></a> ErrorConditionTypes</h3>
 <div class="paragraph">
 <p>Enum describing the different conditions a Modio::ErrorCode can satisfy Check if a Modio::ErrorCode meets a particular condition using <a href="#ErrorCodeMatches">[ErrorCodeMatches]</a></p>
 </div>
@@ -10544,7 +10573,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modstate"><a id="_1479483718128"></a> ModState</h3>
+<h3 id="_modstate"><a id="_2652563080336"></a> ModState</h3>
 <div class="paragraph">
 <p>Enum representing the current state of a mod</p>
 </div>
@@ -10585,7 +10614,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_reporttype"><a id="_1479486030096"></a> ReportType</h3>
+<h3 id="_reporttype"><a id="_2652565793536"></a> ReportType</h3>
 <div class="paragraph">
 <p>The type of report being made</p>
 </div>
@@ -10634,7 +10663,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gamecommunityoptions"><a id="_1479486541056"></a> GameCommunityOptions</h3>
+<h3 id="_gamecommunityoptions"><a id="_2652566034272"></a> GameCommunityOptions</h3>
 <div class="paragraph">
 <p>Community options for a game	* 0 = None set (default)	* 1 = Comments are enabled	* 2 = Guides are enabled	* 4 = Pin on homepage	* 8 = Show on homepage	* 16 = Show more on homepage	* 32 = Allow change status	* 64 = Enable Previews (Game must be hidden)	* 128 = Allow Preview Share-URL (Previews must be enabled)	* 256 = Allow negative ratings	* 512 = Allow mods to be edited on web</p>
 </div>
@@ -10695,7 +10724,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gamematurityoptions"><a id="_1479487028832"></a> GameMaturityOptions</h3>
+<h3 id="_gamematurityoptions"><a id="_2652566522064"></a> GameMaturityOptions</h3>
 <div class="paragraph">
 <p>Maturity options for a game	* 0 = Don&#8217;t allow mature content in mods (default)	* 1 = This game allows mods containing mature content	* 2 = This game is for mature audiences only</p>
 </div>
@@ -10724,7 +10753,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gamemonetizationoptions"><a id="_1479487071840"></a> GameMonetizationOptions</h3>
+<h3 id="_gamemonetizationoptions"><a id="_2652566565072"></a> GameMonetizationOptions</h3>
 <div class="paragraph">
 <p>Monetization properties of a game	* 0 = None set (default)	* 1 = Monetization is enabled	* 2 = Marketplace is enabled	* 4 = Partner Program is enabled</p>
 </div>
@@ -10761,7 +10790,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-04-02 15:01:51 +1100
+Last updated 2024-05-01 15:19:45 +1000
 </div>
 </div>
 </body>

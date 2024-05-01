@@ -1,12 +1,9 @@
 ---
-id: getting-started
+id: android-getting-started
 title: Getting Started
-sidebar_label: Getting Started
-slug: /android/cpp-sdk/getting-started
+slug: /cppsdk/android/getting-started
 sidebar_position: 1
 ---
-
-# Getting Started
 
 ## Android SDK/NDK Versions
 
@@ -25,3 +22,50 @@ Prior to initializing the mod.io SDK via `Modio::InitializeAsync`, you have to p
 2. Pass mod.io a reference to your native main Activity using `Modio::SetGlobalActivity(JavaObject);`. You can do this either in a native event from Java, or anytime in your startup process if you have a reference to the native activity cached.
 
 3. Call `Modio::InitializeAndroid();` for mod.io to initialize and setup its JNI bindings.
+
+### Authentication
+
+There are two ways that you can perform Google SSO, either via a server-side auth code which the mod.io service will exchange for an ID Token, or directly using an ID token.
+
+#### Sever Auth Code
+
+Obtain a Server Auth Code from Google Play Games Services (v1 only) or the Google Sign-In Client library, ensuring you request Email access and the Profile scope.
+
+```java
+GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+                .requestScopes(new Scope(Scopes.PROFILE))
+                .requestEmail()
+                .requestServerAuthCode(OAUTH_CLIENT_ID)
+                .build();
+```
+
+You can then show the Google Sign-In Intent to prompt users to consent to the OAuth scopes you are requesting, and obtain the server auth code in the callback.
+
+```java
+    SignInClient = GoogleSignIn.getClient(this, signInOptions);
+    startActivityForResult(SignInClient.getSignInIntent(), RC_SIGN_IN);
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(intent);
+
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                serverSideAuthCode = account.getServerAuthCode();
+            }
+        }
+    }
+```
+
+Once you receive the Server Auth Code, you can authenticate using `Modio::AuthenticateUserExternalAsync`, passing `Modio::AuthenticationProvider::GoogleServerSideToken` as the authentication provider. This indicates to mod.io that this is a server side token that should be exchanged for an ID Token by the backend.
+
+Ensure that you have configured your OAuth client ID and secret on your games authentication providers page.
+
+You can read more about Google Play Services sign-in at https://developers.google.com/games/services/common/concepts/v1/sign-in
+
+#### ID Token
+
+You can also directly request an ID Token using Google Credential Manager, and use this to authenticate.
+
+Once you receive the ID Token, you can authenticate using `Modio::AuthenticateUserExternalAsync`, passing `Modio::AuthenticationProvider::GoogleIDToken` as the authentication provider. This indicates to mod.io that this is is an ID token that can be directly used.

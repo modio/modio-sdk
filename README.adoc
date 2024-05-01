@@ -32,6 +32,7 @@ Welcome to the mod.io SDK repository, built using C++. It allows game developers
 |Linux          | ✔                             | Clang 10
 |macOS          | ✔                             | Clang 10
 |iOS            | ✔                             | Clang 10
+|Android        | ✔                             | Clang 10
 |===
 
 == Compiler Support

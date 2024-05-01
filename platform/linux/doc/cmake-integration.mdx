@@ -1,11 +1,11 @@
 ---
 id: linux-cmake-integration
 title: CMake Integration
-slug: /c++sdk/linux/cmake-integration
+slug: /cppsdk/linux/cmake-integration
 sidebar_position: 1
 ---
 
-# Inside a CMake project
+## Inside a CMake project
 
 Unzip the archive. Confirm `your_project` uses CMake 3.20 or later.
 
@@ -40,19 +40,4 @@ To simplify the CMake configuration, the folder `cmake/` has the file `CMakePres
 
 ```cmake
 cmake --preset linux
-```
-
-## Backend environment
-
-If you wish to use a different mod.io backend environment than the default `LIVE` environment (possibly `TEST`), please specify this as the `MODIO_DEFAULT_SERVER` parameter during the `cmake configuration` step. Similarly, you can add this variable to your `CMakePresets.json` file as follows:
-
-```cmake
-"cacheVariables": 
-{
-    "MODIO_DEFAULT_SERVER": 
-    {
-    "type": "STRING",
-    "value": "LIVE"
-    },
-}
 ```

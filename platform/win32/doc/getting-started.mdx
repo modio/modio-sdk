@@ -1,24 +1,35 @@
 ---
-id: win-getting-started
+id: windows-getting-started
 title: Getting Started
-slug: /c++sdk/win/getting-started
+slug: /cppsdk/windows/getting-started
 sidebar_position: 0
 ---
 
+## mod.io Windows SDK Integration
 
-# Getting Started
+The use of Windows with the mod.io SDK is ready by default. You can find the `windows` directory in the platform subdirectory of your SDK installation.
+You can then target `WIN` to compile the mod.io SDK for Windows.
 
-The use of Windows with the mod.io SDK is ready by default. You can find the `win32` directory in the platform subdirectory of your SDK installation.
-You can then target `WIN` to compile the mod.io SDK for Windows SDK.
+## Windows Terminal Compilation of x64 library
 
-## Windows SDK Versions
+When you compile the mod.io SDK and you require a x64 library in Windows, confirm the use the "x64 Native Tools Command Prompt for VS 2019", which by default employs the x64 compiler. To verify the Static or Shared library was compiled with x64 architecture, you can use the "dumpbin" command:
+```
+dumpbin out\build\win\modio\modioStatic.lib /headers
+```
+Then search for the confirmation as follows:
+```
+Dump of file out\build\win\modio\modioStatic.lib
 
-The mod.io SDK is built and tested against Windows using Visual Studio 2019 & 2022. Using different versions of the Windows SDK may result in compilation issues.
+File Type: LIBRARY
 
-In case you plan to use CMake to compile the mod.io SDK build outside of Visual Studio, you can take advantage of the default "CMake Extensions" typically found here:
-
-```cmake
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin
+FILE HEADER VALUES
+            8664 machine (x64)
+             34A number of sections
+        63336D7D time date stamp Wed Sep 28 10:39:09 2022
+           136EC file pointer to symbol table
+             AC9 number of symbols
+               0 size of optional header
+               0 characteristics
 ```
 
-This folder, or a similar with respect to your installation, contain the relevant CMake binaries to start configuring with CMake. The CMake FlagTables file is located at C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.20\Templates\MSBuild\FlagTables` (or equivalent VS and CMake installation directory)
+---

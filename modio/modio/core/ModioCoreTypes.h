@@ -521,7 +521,9 @@ namespace Modio
 		Oculus,
 		Epic,
 		OpenID,
-		Apple
+		Apple,
+		GoogleIDToken,
+		GoogleServerSideToken
 	};
 
 	/// @docpublic
@@ -695,6 +697,10 @@ namespace Modio
 					return "openid";
 				case AuthenticationProvider::Apple:
 					return "apple";
+				case AuthenticationProvider::GoogleIDToken:
+					return "googleidtoken";
+				case AuthenticationProvider::GoogleServerSideToken:
+					return "googleserversidetoken";
 			}
 
 			assert(false && "Invalid value to ToString(Modio::Provider)");

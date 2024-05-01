@@ -1,0 +1,25 @@
+= mod.io iOS SSO Example
+
+== About this Sample
+
+This sample demonstrates the interactions between "Sign in with Apple" and authentication on the mod.io service. This allows users to use Apple's authentication services to sign in with mod.io, create a profile on the server and start subscribing to user generated content.
+
+iOS has two options to run: Simulator and device. To choose either, enable/disable the variable `MODIO_IOS_DEVICE`. When it is `True``, it will load the frameworks that allow Xcode/Ninja to run on device. When `False` (default), it will load the simulator binaries offered by the Apple SDK.
+
+In case you want to run any binary on device, you need a paid Apple Developer Account, which you can get at https://developer.apple.com[Apple Developer account].
+
+If your project uses Swift, the easiest way to integrate the mod.io SDK is using Objective-C++ and the bridging header. This sample uses a Objective-C++ in its entirety.
+
+== Preparation
+
+First, you need to enable "Sign in with Apple" on the https://developer.apple.com[Apple Developer] portal. This step is dependent on your company/personal account.
+
+When you have that configured, it will create a "provisioning profile" associated to specific developer certificates that enables SSO. 
+
+On the mod.io side, you need to add the `Bundle ID` to the 3rd party authentication following this path in the mod.io SDK page: `Admin -> General settings -> Platform Authentication -> Apple`.
+
+== Running the sample
+
+Once you have built the mod.io SDK project with CMake and flag `MODIO_BUILD_EXAMPLES` enabled, you will have access to the target `modioSSO`. By default, Xcode enables the capability `Sign in with Apple` using the `resources/modioSSO.entitlements` file.
+
+After these steps, make sure to update your `GAME_ID` and `API_KEY` in the `ModioSDKHelper.mm` file.

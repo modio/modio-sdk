@@ -82,6 +82,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	MODIOSDK_API void ShutdownAsync(std::function<void(Modio::ErrorCode)> OnShutdownComplete);
 
+	#if !defined(MODIO_NO_DEPRECATED)
 	/// @docpublic
 	/// @brief Sends a request to the mod.io server to add the specified mod to the user's list of subscriptions, and
 	/// marks the mod for local installation by the SDK
@@ -100,7 +101,32 @@ namespace Modio
 	/// @error ModManagementError::ModBeingProcessed|Specified mod is pending uninstall. Wait until the uninstall
 	/// process is complete before subscribing again.
 	/// @error GenericError::BadParameter|The supplied mod ID is invalid
+	///	@deprecated 2024.4 Call SubscribeToModAsync() and specify if mod dependencies should be included.
+	MODIO_DEPRECATED("Release 2024.4", "SubscribeToModAsync")
 	MODIOSDK_API void SubscribeToModAsync(Modio::ModID ModToSubscribeTo,
+										  std::function<void(Modio::ErrorCode)> OnSubscribeComplete);
+	#endif
+
+	/// @docpublic
+	/// @brief Sends a request to the mod.io server to add the specified mod to the user's list of subscriptions, and
+	/// marks the mod for local installation by the SDK
+	/// @param ModToSubscribeTo Mod ID of the mod requiring a subscription.
+	/// @param IncludeDependencies If this mod has any dependencies, all of those will also be subscribed to.
+	/// @param OnSubscribeComplete Callback invoked when the subscription request is completed.
+	/// @requires initialized-sdk
+	/// @requires authenticated-user
+	/// @requires no-rate-limiting
+	/// @requires management-enabled
+	/// @requires mod-not-pending-uninstall
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error ModManagementError::ModBeingProcessed|Specified mod is pending uninstall. Wait until the uninstall
+	/// process is complete before subscribing again.
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
+	MODIOSDK_API void SubscribeToModAsync(Modio::ModID ModToSubscribeTo, bool IncludeDependencies,
 										  std::function<void(Modio::ErrorCode)> OnSubscribeComplete);
 
 	/// @docpublic
@@ -475,6 +501,7 @@ namespace Modio
 	MODIOSDK_API void GetModTagOptionsAsync(
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)> Callback);
 
+	#if !defined(MODIO_NO_DEPRECATED)
 	/// @docpublic
 	/// @brief For a given Mod ID, fetches a list of any mods that the creator has marked as dependencies
 	/// @param ModID The mod to retrieve dependencies for
@@ -486,8 +513,28 @@ namespace Modio
 	/// @experimental
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @error GenericError::BadParameter|The supplied mod ID is invalid
+	///	@deprecated 2024.4 Call GetModDependenciesAsync() and specify if recursion is desired.
+	MODIO_DEPRECATED("Release 2024.4", "GetModDependenciesAsync")
 	MODIOSDK_API void GetModDependenciesAsync(
 		Modio::ModID ModID,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback);
+	#endif
+
+	/// @docpublic
+	/// @brief For a given Mod ID, fetches a list of any mods that the creator has marked as dependencies
+	/// @param ModID The mod to retrieve dependencies for
+	/// @param Recursive Include child dependencies in a recursive manner. \r\n NOTE: Recursion supports a maximum depth of 5.
+	/// @param Callback Callback providing a status code and an optional xref:ModDependencyList[ModDependencyList]
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @experimental
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
+	MODIOSDK_API void GetModDependenciesAsync(
+		Modio::ModID ModID,
+		bool Recursive,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback);
 
 	/// @docpublic

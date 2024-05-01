@@ -102,9 +102,16 @@ namespace Modio
 		});
 	}
 
+	#if !defined(MODIO_NO_DEPRECATED)
 	void SubscribeToModAsync(Modio::ModID ModToSubscribeTo, std::function<void(Modio::ErrorCode)> OnSubscribeComplete)
 	{
-		Modio::Detail::SDKSessionData::EnqueueTask([ModToSubscribeTo,
+		SubscribeToModAsync(ModToSubscribeTo, false, std::move(OnSubscribeComplete));
+	}
+	#endif
+
+	void SubscribeToModAsync(Modio::ModID ModToSubscribeTo, bool IncludeDependencies, std::function<void(Modio::ErrorCode)> OnSubscribeComplete)
+	{
+		Modio::Detail::SDKSessionData::EnqueueTask([ModToSubscribeTo, IncludeDependencies,
 													OnSubscribeComplete = std::move(OnSubscribeComplete)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(OnSubscribeComplete) &&
 				Modio::Detail::RequireNotRateLimited(OnSubscribeComplete) &&
@@ -116,7 +123,8 @@ namespace Modio
 			{
 				asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
 					Modio::Detail::SubscribeToModOp(Modio::Detail::SDKSessionData::CurrentGameID(),
-													Modio::Detail::SDKSessionData::CurrentAPIKey(), ModToSubscribeTo),
+													Modio::Detail::SDKSessionData::CurrentAPIKey(), ModToSubscribeTo,
+													IncludeDependencies),
 					OnSubscribeComplete, Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 		});
@@ -126,7 +134,8 @@ namespace Modio
 								 std::function<void(Modio::ErrorCode)> OnUnsubscribeComplete)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask(
-			[ModToUnsubscribeFrom, OnUnsubscribeComplete = std::move(OnUnsubscribeComplete)]() mutable {
+			[ModToUnsubscribeFrom,
+			 OnUnsubscribeComplete = std::move(OnUnsubscribeComplete)]() mutable {
 				if (Modio::Detail::RequireSDKIsInitialized(OnUnsubscribeComplete) &&
 					Modio::Detail::RequireNotRateLimited(OnUnsubscribeComplete) &&
 					Modio::Detail::RequireUserIsAuthenticated(OnUnsubscribeComplete) &&
