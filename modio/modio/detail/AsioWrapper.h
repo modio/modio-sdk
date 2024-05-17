@@ -25,7 +25,7 @@ namespace asio
 		template<typename Exception>
 		void throw_exception(const Exception& e)
 		{
-			checkf(false, TEXT("Asio threw a exception with the message %s"), *e.what());
+			checkf(false, TEXT("Asio threw a exception with the message %hs"), e.what());
 		}
 
 	} // namespace detail
