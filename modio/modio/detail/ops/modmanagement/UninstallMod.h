@@ -23,7 +23,8 @@ namespace Modio
 		class UninstallModOp
 		{
 		public:
-			UninstallModOp(Modio::ModID ModId, bool bForce) : ModId(ModId), bForce(bForce) {};
+			UninstallModOp(Modio::ModID ModId, bool bForce, bool bIsTempMod)
+				: ModId(ModId), bForce(bForce), bIsTempMod(bIsTempMod) {};
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
@@ -35,7 +36,10 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					InstallPath =
-						Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MakeModPath(ModId);
+						bIsTempMod
+							? Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MakeTempModPath(ModId)
+							: Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MakeModPath(ModId);
+
 					yield Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFolderAsync(
 						InstallPath, std::move(Self));
 
@@ -52,7 +56,12 @@ namespace Modio
 						return;
 					}
 
-					Modio::Detail::SDKSessionData::GetSystemModCollection().RemoveMod(ModId, bForce);
+					Modio::ModCollection& Collection = 
+						bIsTempMod 
+							? Modio::Detail::SDKSessionData::GetTempModCollection() 
+							: Modio::Detail::SDKSessionData::GetSystemModCollection();
+
+					Collection.RemoveMod(ModId, bForce);
 
 					Self.complete({});
 				}
@@ -63,13 +72,15 @@ namespace Modio
 			Modio::ModID ModId;
 			asio::coroutine CoroutineState;
 			bool bForce;
+			bool bIsTempMod;
 		};
 
 		template<typename UninstallDoneCallback>
-		auto UninstallModAsync(Modio::ModID Mod, UninstallDoneCallback&& OnUninstallComplete, bool bForce = false)
+		auto UninstallModAsync(Modio::ModID Mod, UninstallDoneCallback&& OnUninstallComplete, bool bForce = false,
+							   bool bIsTempMod = false)
 		{
 			return asio::async_compose<UninstallDoneCallback, void(Modio::ErrorCode)>(
-				UninstallModOp(Mod, bForce), OnUninstallComplete,
+				UninstallModOp(Mod, bForce, bIsTempMod), OnUninstallComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	} // namespace Detail

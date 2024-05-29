@@ -62,6 +62,7 @@ namespace Modio
         static const HttpRequestParams GetModCommentRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/comments/{comment-id}" }; 
         static const HttpRequestParams UpdateModCommentRequest { Modio::Detail::Verb::PUT, "/games/{game-id}/mods/{mod-id}/comments/{comment-id}" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AddModCommentKarmaRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/comments/{comment-id}/karma" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams GetModDependantsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/dependants" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams DeleteModDependenciesRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}/dependencies" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetModDependenciesRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/dependencies" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AddModDependenciesRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/dependencies" , "application/x-www-form-urlencoded" }; 
@@ -113,7 +114,7 @@ namespace Modio
         static const HttpRequestParams GetUserModsRequest { Modio::Detail::Verb::GET, "/me/mods" }; 
         static const HttpRequestParams GetUserPurchasesRequest { Modio::Detail::Verb::GET, "/me/purchased" }; 
         static const HttpRequestParams GetUserRatingsRequest { Modio::Detail::Verb::GET, "/me/ratings" }; 
-        static const HttpRequestParams GenerateServiceTicketRequest { Modio::Detail::Verb::POST, "/me/s2s/modio/ticket" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams RequestUserDelegationTokenRequest { Modio::Detail::Verb::POST, "/me/s2s/oauth/token" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetUserSubscriptionsRequest { Modio::Detail::Verb::GET, "/me/subscribed" }; 
         static const HttpRequestParams GetUsersMutedRequest { Modio::Detail::Verb::GET, "/me/users/muted" }; 
         static const HttpRequestParams GetUserWalletRequest { Modio::Detail::Verb::GET, "/me/wallets" }; 
@@ -123,6 +124,7 @@ namespace Modio
         static const HttpRequestParams CreateOauthAccessTokenRequest { Modio::Detail::Verb::POST, "/oauth/token" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams ExchangeClientCredentialTokenRequest { Modio::Detail::Verb::POST, "/oauth/token/" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams ExchangeOauthRefreshTokenRequest { Modio::Detail::Verb::POST, "/oauth/token/refresh" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams PingRequest { Modio::Detail::Verb::GET, "/ping" }; 
         static const HttpRequestParams SubmitReportRequest { Modio::Detail::Verb::POST, "/report" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams S2sTransactionClawbackRequest { Modio::Detail::Verb::POST, "/s2s/transactions/clawback" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams S2sTransactionCommitRequest { Modio::Detail::Verb::POST, "/s2s/transactions/commit" , "application/x-www-form-urlencoded" }; 

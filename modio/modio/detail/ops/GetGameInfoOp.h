@@ -11,7 +11,8 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/core/entities/ModioGameInfo.h"
+#include "modio/detail/serialization/ModioGameInfoSerialization.h"
+
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
@@ -60,6 +61,7 @@ namespace Modio
 							TryMarshalResponse<Modio::GameInfo>(ResponseBodyBuffer);
 						GameInfoData.has_value())
 					{
+						//// TODO GameInfoData->TagOptions.Locale = Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetLocalLanguage());
 						Services::GetGlobalService<CacheService>().AddToCache(GameInfoData.value());
 						Self.complete(ec, GameInfoData);
 					}

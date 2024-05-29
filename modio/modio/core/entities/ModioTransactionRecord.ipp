@@ -22,6 +22,8 @@ namespace Modio
 		Modio::Detail::ParseSafe(Json, Transaction.Price, Modio::Detail::Constants::JSONKeys::GrossAmount);
 		Modio::Detail::ParseSafe(Json, Transaction.UpdatedUserWalletBalance,
 								 Modio::Detail::Constants::JSONKeys::WalletBalance);
+
+		Modio::Detail::ParseSafe(Json, Transaction.Mod, "mod");
 	}
 
 } // namespace Modio

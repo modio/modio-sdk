@@ -11,7 +11,7 @@
 #pragma once
 
 #include "modio/core/ModioBuffer.h"
-#include "modio/core/entities/ModioModTagOptions.h"
+#include "modio/detail/serialization/ModioModTagOptionsSerialization.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
 #include "modio/detail/ModioSDKSessionData.h"

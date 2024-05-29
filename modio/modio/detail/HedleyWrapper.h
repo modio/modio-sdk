@@ -51,3 +51,7 @@
 #ifndef MODIO_FALL_THROUGH
 	#define MODIO_FALL_THROUGH HEDLEY_FALL_THROUGH
 #endif
+
+#ifndef MODIO_PRAGMA
+	#define MODIO_PRAGMA(Value) HEDLEY_PRAGMA(Value)
+#endif

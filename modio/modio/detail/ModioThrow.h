@@ -12,6 +12,9 @@
 
 #include "modio/detail/HedleyWrapper.h"
 
+MODIO_PRAGMA(warning(push))
+MODIO_PRAGMA(warning(disable:4702))
+
 namespace Modio
 {
 	namespace Detail
@@ -28,3 +31,5 @@ namespace Modio
 
 	} // namespace Detail
 } // namespace Modio
+
+MODIO_PRAGMA(warning(pop))

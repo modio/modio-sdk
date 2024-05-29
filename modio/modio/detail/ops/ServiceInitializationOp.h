@@ -71,6 +71,7 @@ public:
 		Modio::Optional<std::string> PendingOnlyResults = GetExtendedParameterValue(InitParams, "PendingOnlyResults");
 		Modio::Optional<std::string> InstallationDirectory =
 			GetExtendedParameterValue(InitParams, "IgnoreModInstallationDirectoryOverride");
+		Modio::Optional<std::string> PlatformEnvironment = GetExtendedParameterValue(InitParams, "PlatformEnvironment");
 
 		reenter(CoroutineState)
 		{
@@ -87,6 +88,11 @@ public:
 				Modio::Detail::SDKSessionData::SetPlatformOverride(*PlatformOverride);
 			}
 
+			if (PlatformEnvironment.has_value())
+			{
+				Modio::Detail::SDKSessionData::SetPlatformEnvironment(*PlatformEnvironment);
+			}
+			
 			Modio::Detail::SDKSessionData::SetPlatformStatusFilter(*PendingOnlyResults);
 
 			Modio::Detail::ExtendedInitParamHandler::PostSessionDataInit(InitParams);
@@ -207,6 +213,11 @@ public:
 			// ModState set to InstallationPending.  Will NOT return an error code even on validation failure to prevent
 			// killing initialization.
 			yield Modio::Detail::ValidateAllInstalledModsAsync(std::move(Self));
+
+
+			yield Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFolderAsync(
+				Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().GetTempRootInstallationPath(),
+				std::move(Self));
 
 			yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 

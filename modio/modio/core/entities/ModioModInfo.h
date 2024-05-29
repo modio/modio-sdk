@@ -30,6 +30,7 @@ namespace Modio
 	struct ModTag
 	{
 		std::string Tag;
+		std::string TagLocalized;
 
 		/// @docnone
 		friend bool operator==(const Modio::ModTag& A, const Modio::ModTag& B)
@@ -132,7 +133,7 @@ namespace Modio
 		Modio::ObjectVisibility Visibility = Modio::ObjectVisibility::Public;
 
 		/// @brief Price of this mod
-		int Price;
+		int Price = 0;
 
 		/// @brief If this mod has any direct dependencie.
 		bool Dependencies;

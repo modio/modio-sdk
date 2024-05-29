@@ -15,6 +15,7 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioInitializeOptions.h"
 #include "modio/core/ModioLogger.h"
+#include "modio/core/ModioTemporaryModSet.h"
 #include "modio/detail/HedleyWrapper.h"
 #include "modio/cache/ModioCacheService.h"
 
@@ -46,6 +47,8 @@ namespace Modio
 				Get().CurrentInitializationState = InitializationState::Initializing;
 				return true;
 			}
+
+			
 		}
 
 		void SDKSessionData::Deinitialize()
@@ -140,6 +143,16 @@ namespace Modio
 			return Get().SystemModCollection;
 		}
 
+		Modio::ModCollection& SDKSessionData::GetTempModCollection()
+		{
+			return Get().TempModCollection;
+		}
+
+		std::shared_ptr<Modio::Detail::TemporaryModSet> SDKSessionData::GetTemporaryModSet()
+		{
+			return Get().TempModSet;
+		}
+
 		Modio::ModCollection SDKSessionData::FilterSystemModCollectionByUserSubscriptions()
 		{
 			MODIO_PROFILE_SCOPE(FilterSystemModsByUserSubs);
@@ -160,6 +173,11 @@ namespace Modio
 		Modio::UserSubscriptionList& SDKSessionData::GetUserSubscriptions()
 		{
 			return Get().UserData.UserSubscriptions;
+		}
+
+		std::map<Modio::ModID, Modio::ModInfo>& SDKSessionData::GetModPurchases()
+		{
+			return Get().UserModPurchaseCache;
 		}
 
 		Modio::Detail::Buffer SDKSessionData::SerializeUserData()
@@ -374,6 +392,31 @@ namespace Modio
 			return false;
 		}
 
+		std::weak_ptr<Modio::Detail::TemporaryModSet> SDKSessionData::InitTempModSet(std::vector<Modio::ModID> ModIds)
+		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
+			if (Get().TempModSet == nullptr)
+			{
+				Get().TempModSet = std::make_shared<Modio::Detail::TemporaryModSet>(ModIds);
+				return Get().TempModSet;
+			}
+			else
+			{
+				return std::weak_ptr<Modio::Detail::TemporaryModSet>();
+			}
+		}
+
+		bool SDKSessionData::CloseTempModSet()
+		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
+			if (Get().TempModSet != nullptr)
+			{
+				Get().TempModSet.reset();
+				return true;
+			}
+			return false;
+		}
+
 		std::weak_ptr<Modio::ModProgressInfo> SDKSessionData::StartModDownloadOrUpdate(Modio::ModID ID)
 		{
 			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
@@ -462,14 +505,24 @@ namespace Modio
 			Get().CreationHandles.insert({Handle, ID});
 		}
 
-		void SDKSessionData::SetPlatformOverride(std::string Platform)
+		void SDKSessionData::SetPlatformOverride(std::string Override)
 		{
-			Get().PlatformOverride = Platform;
+			Get().PlatformOverride = Override;
 		}
 
 		Modio::Optional<std::string> SDKSessionData::GetPlatformOverride()
 		{
 			return Get().PlatformOverride;
+		}
+
+		void SDKSessionData::SetPlatformEnvironment(std::string Environment)
+		{
+			Get().PlatformEnvironment = Environment;
+		}
+
+		Modio::Optional<std::string> SDKSessionData::GetPlatformEnvironment()
+		{
+			return Get().PlatformEnvironment;
 		}
 
 		void SDKSessionData::SetEnvironmentOverrideUrl(std::string OverrideUrl)
@@ -566,6 +619,21 @@ namespace Modio
 			{
 				Get().ModCacheInvalidMap.emplace(std::make_pair(ModId, true));
 			}
+		}
+
+		void SDKSessionData::InvalidatePurchaseCache()
+		{
+			Get().bPurchaseCacheInvalid = true;
+		}
+
+		void SDKSessionData::ClearPurchaseCacheInvalid()
+		{
+			Get().bPurchaseCacheInvalid = false;
+		}
+
+		bool SDKSessionData::IsPurchaseCacheInvalid()
+		{
+			return Get().bPurchaseCacheInvalid;
 		}
 
 		void SDKSessionData::InvalidateModCache(Modio::ModID ID)

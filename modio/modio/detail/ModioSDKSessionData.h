@@ -33,6 +33,7 @@ namespace Modio
 	{
 		class Buffer;
 		class DynamicBuffer;
+		class TemporaryModSet;
 
 		class SDKSessionData
 		{
@@ -59,12 +60,16 @@ namespace Modio
 			MODIO_IMPL static void MarkAsRateLimited(int SecondsDelay);
 			MODIO_IMPL static bool IsRateLimited();
 			MODIO_IMPL static ModCollection& GetSystemModCollection();
+			MODIO_IMPL static ModCollection& GetTempModCollection();
+			MODIO_IMPL static std::shared_ptr<Modio::Detail::TemporaryModSet> GetTemporaryModSet();
 
 			MODIO_IMPL static ModCollection FilterSystemModCollectionByUserSubscriptions();
 			MODIO_IMPL static void InitializeForUser(Modio::User User, Modio::Detail::OAuthToken AuthToken);
 			MODIO_IMPL static const Modio::Optional<Modio::Detail::OAuthToken> GetAuthenticationToken();
 
 			MODIO_IMPL static Modio::UserSubscriptionList& GetUserSubscriptions();
+
+			MODIO_IMPL static std::map<Modio::ModID, Modio::ModInfo>& GetModPurchases();
 
 			MODIO_IMPL static Modio::Detail::Buffer SerializeUserData();
 
@@ -112,11 +117,16 @@ namespace Modio
 				return Get().ModIDToPrioritize;
 			};
 
+			MODIO_IMPL static std::weak_ptr<Modio::Detail::TemporaryModSet> InitTempModSet(std::vector<Modio::ModID> ModIds);
+
+			MODIO_IMPL static bool CloseTempModSet();
+
 			/// @brief Initializes a ModProgressInfo for the specified mod, storing it in the global state. This method
 			/// is only intended for use by InstallOrUpdateModOp
 			/// @param ID Mod ID for the mod to begin reporting progress on
 			/// @return Weak pointer to the ModProgressInfo, or nullptr if a mod is already downloading/updating
 			MODIO_IMPL static std::weak_ptr<Modio::ModProgressInfo> StartModDownloadOrUpdate(Modio::ModID ID);
+
 
 			MODIO_IMPL static bool CancelModDownloadOrUpdate(Modio::ModID ID);
 
@@ -138,6 +148,9 @@ namespace Modio
 			MODIO_IMPL static void SetPlatformOverride(std::string Override);
 			MODIO_IMPL static Modio::Optional<std::string> GetPlatformOverride();
 
+			MODIO_IMPL static void SetPlatformEnvironment(std::string Environment);
+			MODIO_IMPL static Modio::Optional<std::string> GetPlatformEnvironment();
+
 			MODIO_IMPL static void SetPlatformStatusFilter(std::string PendingOnlyResults);
 			MODIO_IMPL static Modio::Optional<Modio::PlatformStatus> GetPlatformStatusFilter();
 			MODIO_IMPL static std::string GetPlatformStatusFilterString();
@@ -157,6 +170,11 @@ namespace Modio
 			MODIO_IMPL static bool IsTermsOfUseCacheInvalid();
 
 			MODIO_IMPL static void InvalidateAllModsCache();
+
+			MODIO_IMPL static void InvalidatePurchaseCache();
+			MODIO_IMPL static void ClearPurchaseCacheInvalid();
+			MODIO_IMPL static bool IsPurchaseCacheInvalid();
+
 			MODIO_IMPL static void InvalidateModCache(Modio::ModID ID);
 			MODIO_IMPL static void ClearModCacheInvalid(Modio::ModID ID);
 			MODIO_IMPL static bool IsModCacheInvalid(Modio::ModID ID);
@@ -191,6 +209,7 @@ namespace Modio
 			Modio::Environment Environment;
 			Modio::Optional<std::string> EnvironmentOverrideUrl;
 			Modio::Optional<std::string> PlatformOverride;
+			Modio::Optional<std::string> PlatformEnvironment;
 			Modio::Optional<Modio::PlatformStatus> PlatformStatusFilter;
 			Modio::Portal PortalInUse;
 			Modio::Language LocalLanguage;
@@ -202,6 +221,9 @@ namespace Modio
 			std::shared_ptr<Modio::ModProgressInfo> CurrentModInProgress;
 			std::function<void(Modio::ModManagementEvent)> ModManagementEventCallback;
 			Modio::ModCollection SystemModCollection;
+			Modio::ModCollection TempModCollection;
+			// Could be a vector if we need multiple TempModSet
+			std::shared_ptr <Modio::Detail::TemporaryModSet> TempModSet;
 			Modio::Detail::UserDataContainer UserData;
 			// We may need to make this a shared pointer and give a reference to operations so if we shut down they
 			// write into the stale log instead
@@ -213,8 +235,10 @@ namespace Modio
 			std::map<Modio::ModID, Modio::CreateModFileParams> PendingModUploads;
 			bool bSubscriptionCacheInvalid = false;
 			bool bTermsOfUseCacheInvalid = false;
+			bool bPurchaseCacheInvalid = false;
 			std::unordered_map<std::int64_t, bool> ModCacheInvalidMap;
 			moodycamel::ConcurrentQueue < fu2::unique_function < void()>> IncomingTaskQueue;
+			std::map<Modio::ModID, Modio::ModInfo> UserModPurchaseCache;
 		};
 	} // namespace Detail
 } // namespace Modio

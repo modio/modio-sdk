@@ -76,6 +76,18 @@ namespace Modio
 		MODIO_IMPL FilterParams& NameContains(const std::vector<std::string>& SearchString);
 
 		/// @docpublic
+		/// @brief Only include mods with the specified author User ID
+		/// @param UserId The User ID to filter on
+		/// @return *this
+		MODIO_IMPL FilterParams& MatchingAuthor(const Modio::UserID& UserId);
+
+		/// @docpublic
+		/// @brief Only include mods with the specified author User IDs
+		/// @param UserIds The list of User IDs to filter on
+		/// @return *this
+		MODIO_IMPL FilterParams& MatchingAuthors(const std::vector<Modio::UserID>& UserIds);
+
+		/// @docpublic
 		/// @brief Only include mods with the specified IDs
 		/// @param IDSet The list of Mod IDs to filter on
 		/// @return *this
@@ -185,7 +197,9 @@ namespace Modio
 		SortFieldType SortField;
 		SortDirection Direction;
 
+		std::vector<Modio::UserID> AuthorUserIds;
 		std::vector<std::string> SearchKeywords;
+
 		Modio::Optional<std::chrono::system_clock::time_point> DateRangeBegin;
 		Modio::Optional<std::chrono::system_clock::time_point> DateRangeEnd;
 

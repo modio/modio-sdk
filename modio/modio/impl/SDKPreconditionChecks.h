@@ -14,6 +14,7 @@
 #include "modio/core/ModioInitializeOptions.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioServices.h"
+#include "modio/core/entities/ModioEntitlementConsumptionStatusList.h"
 #include "modio/detail/ModioSDKSessionData.h"
 
 /// @brief These are templated helper functions - they take in the user-provided completion handler, check some
@@ -249,6 +250,52 @@ namespace Modio
 		}
 
 		template<typename... OtherArgs>
+		bool RequireValidXBoxRefreshEntitlementsExtendedParameters(
+			Modio::EntitlementParams User,
+			std::function<void(Modio::ErrorCode,
+							   Modio::Optional<Modio::EntitlementConsumptionStatusList>, OtherArgs...)>& Handler)
+		{
+			if (User.ExtendedParameters.count(Modio::Detail::Constants::APIStrings::XboxToken))
+			{
+				return true;
+			}
+			else
+			{
+				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+						   [CompletionHandler = std::forward<std::function<void(
+						 Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>, OtherArgs...)>>(
+						 Handler)]() mutable {
+							   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter), {},
+												 (OtherArgs {})...);
+						   });
+				return false;
+			}
+		}
+
+		template<typename... OtherArgs>
+		bool RequireValidPSNRefreshEntitlementsExtendedParameters(
+			Modio::EntitlementParams User,
+			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>,
+							   OtherArgs...)>& Handler)
+		{
+			if (User.ExtendedParameters.count(Modio::Detail::Constants::APIStrings::AuthCode))
+			{
+				return true;
+			}
+			else
+			{
+				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+						   [CompletionHandler = std::forward<std::function<void(
+						 Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>, OtherArgs...)>>(
+						 Handler)]() mutable {
+							   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter), {},
+												 (OtherArgs {})...);
+						   });
+				return false;
+			}
+		}
+
+		template<typename... OtherArgs>
 		bool RequireValidOculusExtendedParameters(Modio::AuthenticationParams User,
 												  std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
 		{
@@ -289,6 +336,23 @@ namespace Modio
 					   [CompletionHandler =
 							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 						   CompletionHandler(Modio::make_error_code(Modio::FilesystemError::FileNotFound),
+											 (OtherArgs {})...);
+					   });
+			return false;
+		}
+
+		template<typename... OtherArgs>
+		bool RequireModIDNotInTempModSet(const Modio::ModID& ID, std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
+		{
+			if (!Modio::Detail::SDKSessionData::GetTempModCollection().GetByModID(ID).has_value())
+			{
+				return true;
+			}
+
+			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					   [CompletionHandler =
+							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
+						   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
 											 (OtherArgs {})...);
 					   });
 			return false;

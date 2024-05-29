@@ -39,6 +39,14 @@ namespace Modio
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						LocalState->ResponseBuffer, LocalState->AuthenticationParams, Detail::CachedResponse::Disallow,
 						std::move(Self));
+
+#if MODIO_TRACE_DUMP_RESPONSE
+					for (const auto& Buffer : LocalState->ResponseBuffer)
+					{
+						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http, "{}",
+													std::string(Buffer.begin(), Buffer.end()));
+					}
+#endif // MODIO_TRACE_DUMP_RESPONSE
 					if (ec)
 					{
 						Self.complete(ec);

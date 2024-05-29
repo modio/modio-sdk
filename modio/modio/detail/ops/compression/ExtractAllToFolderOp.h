@@ -164,6 +164,8 @@ namespace Modio
 						}
 						else
 						{
+							// Clear Stack
+							yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),std::move(Self));
 							// Otherwise, begin an async operation to extract that entry to a file with the path
 							// based on the root path
 							yield Impl->ArchiveView.ExtractEntryAsync(*Impl->CurrentEntryIterator, Impl->RootOutputPath,

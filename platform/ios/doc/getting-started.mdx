@@ -16,7 +16,7 @@ You can then target `IOS` to compile the mod.io SDK for iOS SDK.
 
 The mod.io SDK is built and tested against iOS using XCode v14 & v15.1. Using different versions of the iOS SDK may result in compilation issues.
 
-In iOS, the default way to compile the mod.io SDK requires CMake, which you can install following the https://cmake.org/download/[CMake webpage] instructions or using a package manager like `brew`:
+In iOS, the default way to compile the mod.io SDK requires CMake, which you can install following the [CMake](https://cmake.org/download/) instructions or using a package manager like `brew`:
 
 ```cmake
 brew install cmake ninja
@@ -38,6 +38,6 @@ cmake -G Xcode -DMODIO_IOS_DEVICE:BOOL=true -DMODIO_PLATFORM:STRING=IOS -B out
 
 Using Xcode as a generator, will create the file `out/modio.xcodeproj` which is used to organize and compile the project. To deploy to a device, you need a developer certificate signed by Apple and a provisioning profile that includes at least one target device identified associated to it. 
 
-Check https://developer.apple.com/documentation/xcode/devices-and-simulator[Apple documentation] to retrieve those elements.
+Check [Apple documentation](https://developer.apple.com/documentation/xcode/devices-and-simulator) to retrieve those elements.
 
 When you have those, update the `Signing And Capabilities` section in Xcode with your corresponding `Bundle Identifier`, `Team` and `Provisioning Profile`.

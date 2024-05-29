@@ -68,6 +68,8 @@ namespace Modio
 				constexpr const char* ModNeverRetryCode = "NeverRetryCode";
 				constexpr const char* WalletBalance = "balance";
 				constexpr const char* GrossAmount = "gross_amount";
+				constexpr const char* TokenEntity = "entity";
+				constexpr const char* TokenValue = "token";
 			} // namespace JSONKeys
 			namespace Configuration
 			{

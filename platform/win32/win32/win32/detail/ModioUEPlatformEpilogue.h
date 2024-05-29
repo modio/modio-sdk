@@ -10,7 +10,12 @@
 
 // clang-format off
 
-#include "Windows/PostWindowsApi.h"
+#include "Misc/EngineVersionComparison.h"
+
+#if UE_VERSION_OLDER_THAN(5, 4, 0)
+	#include "Windows/PostWindowsApi.h"
+#endif
+
 #include "Windows/HideWindowsPlatformTypes.h"
 #include "Windows/HideWindowsPlatformAtomics.h"
 

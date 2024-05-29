@@ -14,7 +14,13 @@
 #include "HAL/PlatformMisc.h"
 #include "Misc/AssertionMacros.h"
 #include "Windows/AllowWindowsPlatformTypes.h"
+
+#include "Misc/EngineVersionComparison.h"
+
+#if UE_VERSION_OLDER_THAN(5, 4, 0)
 #include "Windows/PreWindowsApi.h"
+#endif
+
 #include "Windows/AllowWindowsPlatformAtomics.h"
 
 // clang-format on

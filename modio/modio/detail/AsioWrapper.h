@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2024 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io SDK.
  *
@@ -25,7 +25,7 @@ namespace asio
 		template<typename Exception>
 		void throw_exception(const Exception& e)
 		{
-			checkf(false, TEXT("Asio threw a exception with the message %s"), *e.what());
+			checkf(false, TEXT("Asio threw a exception with the message %hs"), e.what());
 		}
 
 	} // namespace detail

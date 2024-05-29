@@ -342,6 +342,9 @@ namespace Modio
 						}
 					}
 
+					Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Http,
+												"Response recieved for {}; status code was: {}", Request->Parameters().GetFormattedResourcePath(), ResponseCode);
+
 					if (ec != make_error_code(Modio::GenericError::EndOfFile))
 					{
 						Self.complete(ec);

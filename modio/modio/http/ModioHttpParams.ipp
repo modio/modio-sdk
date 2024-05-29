@@ -13,7 +13,6 @@
 #endif
 #include "ModioGeneratedVariables.h"
 #include "modio/core/ModioLogger.h"
-#include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ModioProfiling.h"
 
@@ -116,6 +115,29 @@ namespace Modio
 			if (QueryParameters.count(Key) == 0)
 			{
 				this->QueryParameters.emplace(Key, Value);
+			}
+
+			return *this;
+		}
+
+		Modio::Detail::HttpRequestParams HttpRequestParams::AddHeaderRaw(const std::string& Key,
+																			 const std::string& Value) const
+		{
+			auto NewParamsInstance = HttpRequestParams(*this);
+			if (AdditionalHeaders.count(Key) == 0)
+			{
+				NewParamsInstance.AdditionalHeaders.emplace(Key, Value);
+			}
+
+			return NewParamsInstance;
+		}
+
+		Modio::Detail::HttpRequestParams& HttpRequestParams::AddHeaderRaw(const std::string& Key,
+																			  const std::string& Value)
+		{
+			if (QueryParameters.count(Key) == 0)
+			{
+				this->AdditionalHeaders.emplace(Key, Value);
 			}
 
 			return *this;
@@ -561,7 +583,7 @@ namespace Modio
 					Headers.push_back({"x-modio-portal", "Apple"});
 					break;
 				case Portal::EpicGamesStore:
-					Headers.push_back({"x-modio-portal", "EGS"});
+					Headers.push_back({"x-modio-portal", "epicgames"});
 					break;
 				case Portal::GOG:
 					Headers.push_back({"x-modio-portal", "GOG"});
@@ -649,6 +671,12 @@ namespace Modio
 
 			// Add Local Language Header
 			Headers.push_back({ "Accept-Language", Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetLocalLanguage()) });
+
+			// Add any additional headers that this request might have added
+			for (auto& AdditionalHeader : AdditionalHeaders)
+			{
+				Headers.push_back({AdditionalHeader.first, AdditionalHeader.second});
+			}
 
 			// @todo: Set Content-Type: multipart/form-data for binary payload
 			return Headers;

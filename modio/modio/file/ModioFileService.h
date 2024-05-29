@@ -153,6 +153,11 @@ namespace Modio
 				return PlatformImplementation->MakeTempFilePath(FileName);
 			}
 
+			Modio::filesystem::path MakeTempModPath(Modio::ModID ModID) const
+			{
+				return PlatformImplementation->MakeTempModPath(ModID);
+			}
+
 			Modio::filesystem::path MakeModPath(Modio::ModID ModID) const
 			{
 				return PlatformImplementation->MakeModPath(ModID);
@@ -316,6 +321,11 @@ namespace Modio
 			const Modio::filesystem::path GetModRootInstallationPath() const
 			{
 				return PlatformImplementation->GetModRootInstallationPath();
+			}
+
+			const Modio::filesystem::path GetTempRootInstallationPath() const
+			{
+				return PlatformImplementation->GetTempRootInstallationPath();
 			}
 
 			static Modio::filesystem::path GetDefaultModInstallationDirectory(Modio::GameID GameID)

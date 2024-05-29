@@ -398,27 +398,27 @@ namespace Modio
 		}
 	}
 
-	UserSubscriptionList::UserSubscriptionList(std::vector<Modio::ModID>&& NewIDs)
+	BaseModList::BaseModList(std::vector<Modio::ModID>&& NewIDs)
 		: InternalList(std::make_move_iterator(NewIDs.begin()), std::make_move_iterator(NewIDs.end()))
 	{}
 
-	UserSubscriptionList::UserSubscriptionList(std::vector<Modio::ModID> NewIDs)
+	BaseModList::BaseModList(std::vector<Modio::ModID> NewIDs)
 		: InternalList(NewIDs.begin(), NewIDs.end())
 	{}
 
-	UserSubscriptionList::UserSubscriptionList() {}
+	BaseModList::BaseModList() {}
 
-	bool UserSubscriptionList::AddMod(Modio::ModInfo Mod)
+	bool BaseModList::AddMod(Modio::ModInfo Mod)
 	{
 		return InternalList.insert(Mod.ModId).second;
 	}
 
-	void UserSubscriptionList::RemoveMod(Modio::ModID Mod)
+	void BaseModList::RemoveMod(Modio::ModID Mod)
 	{
 		InternalList.erase(Mod);
 	}
 
-	const std::set<Modio::ModID>& UserSubscriptionList::Get() const
+	const std::set<Modio::ModID>& BaseModList::Get() const
 	{
 		return InternalList;
 	}
@@ -492,6 +492,7 @@ namespace Modio
 			from_json(j, List.InternalList);
 		}
 	}
+
 	ModCollection::ModCollection(std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> Entries)
 	{
 		for (auto& ModEntry : Entries)

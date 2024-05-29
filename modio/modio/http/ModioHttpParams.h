@@ -113,6 +113,9 @@ namespace Modio
 			MODIO_IMPL HttpRequestParams AddQueryParamRaw(const std::string& Key, const std::string& Value) const;
 			MODIO_IMPL HttpRequestParams& AddQueryParamRaw(const std::string& Key, const std::string& Value);
 
+			MODIO_IMPL HttpRequestParams AddHeaderRaw(const std::string& Key, const std::string& Value) const;
+			MODIO_IMPL HttpRequestParams& AddHeaderRaw(const std::string& Key, const std::string& Value);
+
 			MODIO_IMPL HttpRequestParams AddLimitQueryParam() const;
 
 			MODIO_IMPL HttpRequestParams AddOffsetQueryParam(int32_t offset) const;
@@ -356,6 +359,8 @@ namespace Modio
 			Modio::Optional<std::string> UserAgentOverride;
 
 			std::map<std::string, std::string> QueryParameters;
+
+			std::map<std::string, std::string> AdditionalHeaders;
 		};
 
 // TODO: @Modio-core implement comparison operator for HttpRequestParams and maybe IsValid()?

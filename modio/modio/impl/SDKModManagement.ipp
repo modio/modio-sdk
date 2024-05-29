@@ -18,6 +18,7 @@
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/ModioServices.h"
+#include "modio/core/ModioTemporaryModSet.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/FilesystemWrapper.h"
 #include "modio/detail/ModioSDKSessionData.h"
@@ -118,8 +119,8 @@ namespace Modio
 				Modio::Detail::RequireUserIsAuthenticated(OnSubscribeComplete) &&
 				Modio::Detail::RequireModManagementEnabled(OnSubscribeComplete) &&
 				Modio::Detail::RequireModIsNotUninstallPending(ModToSubscribeTo, OnSubscribeComplete) &&
-				Modio::Detail::RequireValidModID(ModToSubscribeTo, OnSubscribeComplete))
-
+				Modio::Detail::RequireValidModID(ModToSubscribeTo, OnSubscribeComplete) &&
+				Modio::Detail::RequireModIDNotInTempModSet(ModToSubscribeTo, OnSubscribeComplete))
 			{
 				asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
 					Modio::Detail::SubscribeToModOp(Modio::Detail::SDKSessionData::CurrentGameID(),
@@ -166,6 +167,24 @@ namespace Modio
 				return true;
 			}
 		}
+
+		Modio::ModCollection TempModCollection =
+			Modio::Detail::SDKSessionData::GetTempModCollection();
+		for (auto& ModEntry : TempModCollection.Entries())
+		{
+			Modio::ModState CurrentState = ModEntry.second->GetModState();
+			if (CurrentState != Modio::ModState::Installed)
+			{
+				return true;
+			}
+		}
+
+		if (Modio::Detail::SDKSessionData::GetTemporaryModSet() != nullptr &&
+			Modio::Detail::SDKSessionData::GetTemporaryModSet()->GetTempModIdsToInstall().size() != 0)
+		{
+			return true;
+		}
+
 		return false;
 	}
 
@@ -472,5 +491,153 @@ namespace Modio
 			}
 		});
 	}
+
+	Modio::ErrorCode InitTempModSet(std::vector<Modio::ModID> ModIds)
+	{
+		{
+			if (!Modio::Detail::SDKSessionData::IsInitialized())
+			{
+				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
+											"SDK is not initialized.");
+				return Modio::make_error_code(Modio::GenericError::SDKNotInitialized);
+			}
+			if (!Modio::Detail::SDKSessionData::IsModManagementEnabled())
+			{
+				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core, "Mod Management need to be enabled");
+				return Modio::make_error_code(Modio::ModManagementError::ModManagementDisabled);
+			}
+			if (Modio::Detail::SDKSessionData::GetTemporaryModSet() != nullptr)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core, "Temp Mod Set is not initialize, call InitTempModSet.");
+				return Modio::make_error_code(Modio::ModManagementError::ModManagementDisabled);
+			}
+			
+			Modio::Detail::SDKSessionData::InitTempModSet(ModIds);
+			
+		}
+		return {};
+	}
+
+	Modio::ErrorCode AddToTempModSet(std::vector<Modio::ModID> ModIds)
+	{
+		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
+
+			if (!Modio::Detail::SDKSessionData::IsInitialized())
+			{
+				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
+											"SDK is not initialized.");
+				return Modio::make_error_code(Modio::GenericError::SDKNotInitialized);
+			}
+			if (!Modio::Detail::SDKSessionData::IsModManagementEnabled())
+			{
+				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core, "Mod Management need to be enabled");
+				return Modio::make_error_code(Modio::ModManagementError::ModManagementDisabled);
+			}
+			if (Modio::Detail::SDKSessionData::GetTemporaryModSet() == nullptr)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core, "Temp Mod Set is not initialize, call InitTempModSet.");
+				return Modio::make_error_code(Modio::ModManagementError::TempModSetNotInitialized);
+			}
+
+			Modio::Detail::SDKSessionData::GetTemporaryModSet()->Add(ModIds);
+		}
+		return {};
+	}
+
+	Modio::ErrorCode RemoveFromTempModSet(std::vector<Modio::ModID> ModIds)
+	{
+		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
+
+			if (!Modio::Detail::SDKSessionData::IsInitialized())
+			{
+				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
+											"SDK is not initialized.");
+				return Modio::make_error_code(Modio::GenericError::SDKNotInitialized);
+			}
+			if (!Modio::Detail::SDKSessionData::IsModManagementEnabled())
+			{
+				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core, "Mod Management need to be enabled");
+				return Modio::make_error_code(Modio::ModManagementError::ModManagementDisabled);
+			}
+			if (Modio::Detail::SDKSessionData::GetTemporaryModSet() == nullptr)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core, "Temp Mod Set is not initialize, call InitTempModSet.");
+				return Modio::make_error_code(Modio::ModManagementError::TempModSetNotInitialized);
+			}
+
+			Modio::Detail::SDKSessionData::GetTemporaryModSet()->Remove(ModIds);
+		}
+		return {};
+	}
+
+	Modio::ErrorCode CloseTempModSet()
+	{
+		{
+			if (!Modio::Detail::SDKSessionData::IsInitialized())
+			{
+				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
+											"SDK is not initialized.");
+				return Modio::make_error_code(Modio::GenericError::SDKNotInitialized);
+			}
+			if (!Modio::Detail::SDKSessionData::IsModManagementEnabled())
+			{
+				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core, "Mod Management need to be enabled");
+				return Modio::make_error_code(Modio::ModManagementError::ModManagementDisabled);
+			}
+			if (Modio::Detail::SDKSessionData::GetTemporaryModSet() == nullptr)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core, "Temp Mod Set is not initialize, call InitTempModSet.");
+				return Modio::make_error_code(Modio::ModManagementError::TempModSetNotInitialized);
+			}
+
+			Modio::Detail::SDKSessionData::CloseTempModSet();
+		}
+		return {};
+	}
+
+	 std::map<Modio::ModID, Modio::ModCollectionEntry> QueryTempModSet()
+	{
+		{
+			auto Lock = Modio::Detail::SDKSessionData::GetReadLock();
+
+			 std::map<Modio::ModID, Modio::ModCollectionEntry> queryTempModSet =
+				std::map<Modio::ModID, Modio::ModCollectionEntry>();
+
+			if (!Modio::Detail::SDKSessionData::IsInitialized())
+			{
+				return queryTempModSet;
+			}
+			if (Modio::Detail::SDKSessionData::GetTemporaryModSet() == nullptr)
+			{
+				return queryTempModSet;
+			}
+
+			std::vector<Modio::ModID> modIdS = Modio::Detail::SDKSessionData::GetTemporaryModSet()->GetModIds();
+			const Modio::ModCollection& AllInstalledMods = Modio::Detail::SDKSessionData::GetSystemModCollection();
+			const Modio::ModCollection& AllTempdMods = Modio::Detail::SDKSessionData::GetTempModCollection();
+
+			for (Modio::ModID modId : modIdS)
+			{
+				if (Modio::Optional<Modio::ModCollectionEntry&> Entry = AllInstalledMods.GetByModID(modId))
+				{
+					queryTempModSet.emplace(std::make_pair(modId, Entry.value()));
+				}
+				else if (Modio::Optional<Modio::ModCollectionEntry&> TempEntry = AllTempdMods.GetByModID(modId))
+				{
+					queryTempModSet.emplace(std::make_pair(modId, TempEntry.value()));
+				}
+				else
+				{
+					Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
+												"ModID {} from TempModSet should in System or Temp Mod Collection", modId);
+				}
+			}
+
+			return queryTempModSet;
+		}
+	}
+
 
 } // namespace Modio

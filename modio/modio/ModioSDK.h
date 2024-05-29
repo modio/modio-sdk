@@ -34,6 +34,7 @@
 #include "modio/core/entities/ModioUser.h"
 #include "modio/core/entities/ModioUserList.h"
 #include "modio/detail/ModioLibraryConfigurationHelpers.h"
+#include "modio/core/entities/ModioEntitlementConsumptionStatusList.h"
 
 namespace Modio
 {
@@ -231,6 +232,7 @@ namespace Modio
 	/// @return std::map using Mod IDs as keys and ModCollectionEntry objects providing information about the subscribed
 	/// mods
 	MODIOSDK_API std::map<Modio::ModID, Modio::ModCollectionEntry> QueryUserSubscriptions();
+
 
 	/// @docpublic
 	/// @brief Fetches the subset of the user's subscribed mods that are installed and therefore ready for loading
@@ -744,8 +746,130 @@ namespace Modio
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)> Callback);
 
 	/// @brief Set language to get corresponding data from the server
+	/// Note: Doing this will invalidate you local cache of mods and game info,
+	///     so that the next time you fetch them you will recieve the correctly localized content.
+	///     This does not call FetchExternalUpdates for you, should you want to call it after changing locale.
 	/// @param Modio::Language to set
 	MODIOSDK_API void SetLanguage(Modio::Language Locale);
+	
+	/// @docpublic
+	/// @brief Attempts to purchase a specified mod with an expected price. Purchasing a mod will add a subscription to
+	/// it
+	/// @param ModID The ID for the mod the user is trying to purchase
+	/// @param ExpectedPrice The price that was displayed to the user.
+	/// @param Callback Callback providing a status code and optional transaction confirmation if the purchase was
+	/// successful. If the expected price that was displayed to the end user is no longer correct, for example if the
+	/// price was increased or decreased by the mod creator since the price was displayed, an error will be returned. If
+	/// this is the case you should refresh your user interface with the updated price and the user can retry the
+	/// purchase at the new value.
+	/// @requires initialized-sdk
+	/// @requires authenticated-user
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @errorcategory MonetizationError|Problems during purchase transaction
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
+	MODIOSDK_API void PurchaseModAsync(
+		Modio::ModID ModID, uint64_t ExpectedPrice,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)> Callback);
+
+	/// @docpublic
+	/// @brief Fetches the updated mod.io wallet balance for the currently logged-in user
+	/// @param Callback Callback providing an error code indicating success or failure, as well as a value indicating
+	/// the updated balance
+	/// @requires initialized-sdk
+	/// @requires authenticated-user
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @errorcategory MonetizationError|Problems during purchase transaction
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error UserDataError::InvalidUser|No authenticated user
+	MODIOSDK_API void GetUserWalletBalanceAsync(
+		std::function<void(Modio::ErrorCode, Modio::Optional<uint64_t>)> Callback);
+
+	/// @docpublic
+	/// @brief Fetches a list of all purchases that a User has made. Query the list using <<QueryUserPurchasedMods>> after a successful call.
+	/// @param OnFetchDone Callback invoked with a status code for whether the fetch was successful
+	/// @requires initialized-sdk
+	/// @requires authenticated-user
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @errorcategory MonetizationError|Problems during purchase transaction
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error UserDataError::InvalidUser|No authenticated user
+	MODIOSDK_API void FetchUserPurchasesAsync(std::function<void(Modio::ErrorCode)> OnFetchDone);
+
+	/// @docpublic
+	/// @brief Fetches the locally cached view of the user's purchased mods, populated from <<RefreshUserPurchasesAsync>>
+	/// @return std::map using Mod IDs as keys and ModInfo objects providing information about the mod that was purchased.
+	/// mods
+	MODIOSDK_API std::map<Modio::ModID, Modio::ModInfo> QueryUserPurchasedMods();
+
+	/// @docpublic
+	///	@brief Gets a UserDerivedToken that can be used by a backend serve for S2S functionality.
+	/// @requires initialized-sdk
+	/// @requires authenticated-user
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @errorcategory MonetizationError|Problems during purchase transaction
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error UserDataError::InvalidUser|No authenticated user
+	MODIOSDK_API void GetUserDerivedTokenAsync(std::function<void(Modio::ErrorCode, std::string)> Callback);
+
+	/// @docpublic
+	/// @brief Initialize a Temp Mod Set, installing every specified mod 
+	/// given in the param if they are not already subbed.
+	/// @param vector of ModID to install as temp mod
+	///
+	/// @return Modio::ErrorCode indicating if temp mod correctly started
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error ModManagementError::ModManagementDisabled|Mod Management need to be enabled
+	/// @error ModManagementError::ModManagementDisabled|Mod Management need to be enabled
+	MODIOSDK_API Modio::ErrorCode InitTempModSet(std::vector<Modio::ModID> ModIds);
+
+	/// @docpublic
+	/// @brief Add mods to an already created Temp Mod Session,  
+	/// install every temp mod given in the param if they already subbed or already in Temp Mod Set
+	/// @param vector of ModID to install as temp mod
+	///
+	/// @return Modio::ErrorCode indicating if temp mod correctly started
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error ModManagementError::ModManagementDisabled|Mod Management need to be enabled
+	/// @error ModManagementError::TempModSetNotInitialized|Temp Mod Set is not initialize, call InitTempModSet.
+	MODIOSDK_API Modio::ErrorCode AddToTempModSet(std::vector<Modio::ModID> ModIds);
+
+	/// @docpublic
+	/// @brief Delete mods to an already created Temp Mod Session,
+	/// delete every temp mods given in the param if they already subbed mod, it will not delete them.
+	/// @param vector of ModID to install as temp mod
+	///
+	/// @return Modio::ErrorCode indicating if temp mod correctly started
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error ModManagementError::ModManagementDisabled|Mod Management need to be enabled
+	/// @error ModManagementError::TempModSetNotInitialized|Temp Mod Set is not initialize, call InitTempModSet.
+	MODIOSDK_API Modio::ErrorCode RemoveFromTempModSet(std::vector<Modio::ModID> ModIds);
+
+	/// @docpublic
+	/// @brief Close a Temp Mod Session,  delete all temp mods
+	///
+	/// @return Modio::ErrorCode indicating if temp mod correctly started
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error ModManagementError::ModManagementDisabled|Mod Management need to be enabled
+	/// @error ModManagementError::TempModSetNotInitialized|Temp Mod Set is not initialize, call InitTempModSet.
+	MODIOSDK_API Modio::ErrorCode CloseTempModSet();
+
+
+	/// @docpublic
+	/// @brief Fetches the temp mod added to Temp Mod Set  
+	/// 
+	/// @return std::map using Mod IDs as keys and ModCollectionEntry objects providing information about the mods
+	/// added to temp mod set
+	MODIOSDK_API std::map<Modio::ModID, Modio::ModCollectionEntry>  QueryTempModSet();
 
 } // namespace Modio
 
@@ -756,6 +880,7 @@ namespace Modio
 	#include "modio/impl/SDKModManagement.ipp"
 	#include "modio/impl/SDKModMetadata.ipp"
 	#include "modio/impl/SDKUserData.ipp"
+	#include "modio/impl/SDKMonetization.ipp"
 #endif
 
 #include "modio/detail/ModioUndefs.h"

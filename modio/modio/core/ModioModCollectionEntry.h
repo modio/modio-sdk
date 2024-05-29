@@ -328,24 +328,22 @@ namespace Modio
 												Modio::FileSize NewTotal);
 	};
 
-	/// @docpublic
-	/// @brief Class containing the mod IDs the current user is subscribed to
-	class UserSubscriptionList
+	class BaseModList
 	{
 	public:
 		/// @docinternal
 		/// @brief Constructs an empty subscription list
-		MODIO_IMPL UserSubscriptionList();
+		MODIO_IMPL BaseModList();
 
 		/// @docinternal
 		/// @brief Constructs a User subscription list by copying Mod IDs from the provided vector
 		/// @param NewIDs The source Mod IDs to use
-		MODIO_IMPL UserSubscriptionList(std::vector<Modio::ModID> NewIDs);
+		MODIO_IMPL BaseModList(std::vector<Modio::ModID> NewIDs);
 
 		/// @docinternal
 		/// @brief Constructs a User subscription list by consuming Mod IDs from the provided vector
 		/// @param NewIDs The source Mod IDs to use
-		MODIO_IMPL UserSubscriptionList(std::vector<Modio::ModID>&& NewIDs);
+		MODIO_IMPL BaseModList(std::vector<Modio::ModID>&& NewIDs);
 
 		/// @docinternal
 		/// @brief Adds a new mod to the subscription list
@@ -362,6 +360,23 @@ namespace Modio
 		/// @brief Retrieve a set of ModID
 		MODIO_IMPL const std::set<Modio::ModID>& Get() const;
 
+		/// @docnone
+		friend bool operator==(const Modio::BaseModList& A, const Modio::BaseModList& B)
+		{
+			// Written for Test_JsonToAndFrom.cpp, re-check functionality before using in actual code. This operator
+			// enforces ordering.
+			return (A.InternalList == B.InternalList);
+		}
+
+	protected:
+		std::set<Modio::ModID> InternalList;
+	};
+
+	/// @docpublic
+	/// @brief Class containing the mod IDs the current user is subscribed to
+	class UserSubscriptionList : public BaseModList
+	{
+	public:
 		/// @docpublic
 		/// @brief Enum indicating if a mod was added or removed when calculating the difference of two user
 		/// subscription lists
@@ -395,16 +410,6 @@ namespace Modio
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& j, UserSubscriptionList& List);
 
-	private:
-		std::set<Modio::ModID> InternalList;
-
-		/// @docnone
-		friend bool operator==(const Modio::UserSubscriptionList& A, const Modio::UserSubscriptionList& B)
-		{
-			// Written for Test_JsonToAndFrom.cpp, re-check functionality before using in actual code. This operator
-			// enforces ordering.
-			return (A.InternalList == B.InternalList);
-		}
 	};
 
 	// vector of these for the log

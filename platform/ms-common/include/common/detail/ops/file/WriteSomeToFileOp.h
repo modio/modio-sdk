@@ -56,19 +56,19 @@ public:
 					  Modio::Detail::Buffer Buffer)
 		: Buffer(std::move(Buffer)),
 		  FileImpl(IOObject),
-		  SharedState(SharedState),
 		  FileOffset(Offset),
-		  WriteOpParams {}
+		  WriteOpParams {},
+		  SharedState(SharedState)
 	{}
 
 	WriteSomeToFileOp(WriteSomeToFileOp&& Other)
 		: Buffer(std::move(Other.Buffer)),
 		  FileImpl(Other.FileImpl),
-		  SharedState(Other.SharedState),
 		  FileOffset(Other.FileOffset),
 		  WriteOpParams(std::move(Other.WriteOpParams)),
 		  Coroutine(std::move(Other.Coroutine)),
-		  StatusTimer(std::move(Other.StatusTimer)) {};
+		  StatusTimer(std::move(Other.StatusTimer)),
+		  SharedState(Other.SharedState) {};
 
 	~WriteSomeToFileOp()
 	{

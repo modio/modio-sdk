@@ -657,7 +657,8 @@ namespace Modio
 		ModManagementAlreadyEnabled = 22532,
 		ModManagementDisabled = 22533,
 		NoPendingWork = 22534,
-		UploadCancelled = 22535
+		TempModSetNotInitialized = 22535,
+		UploadCancelled = 22536
 	};
 
 	/// @docnone
@@ -685,6 +686,9 @@ namespace Modio
 					break;
 				case ModManagementError::NoPendingWork:
 						return "Internal: No mods require processing for this iteration";
+					break;
+				case ModManagementError::TempModSetNotInitialized:
+						return "Temporary mod set was not initialized. Please call InitTempModSet.";
 					break;
 				case ModManagementError::UploadCancelled:
 						return "The current modfile upload was cancelled";
@@ -785,7 +789,17 @@ namespace Modio
 
 	enum class MonetizationError
 	{
-		DisplayPriceIncorrect = 23041
+		DisplayPriceIncorrect = 23041,
+		GameMonetizationNotEnabled = 23042,
+		IncorrectDisplayPrice = 23043,
+		InsufficientFunds = 23044,
+		ItemAlreadyOwned = 23045,
+		MonetizationAuthenticationFailed = 23046,
+		PaymentFailed = 23047,
+		RetryEntitlements = 23048,
+		UserMonetizationDisabled = 23049,
+		UserMonetizationNotConfigured = 23050,
+		WalletFetchFailed = 23051
 	};
 
 	/// @docnone
@@ -798,6 +812,36 @@ namespace Modio
 			{
 				case MonetizationError::DisplayPriceIncorrect:
 						return "The display price for the mod was out-of-date or incorrect. Please retry with the correct display price.";
+					break;
+				case MonetizationError::GameMonetizationNotEnabled:
+						return "The game does not have active monetization.";
+					break;
+				case MonetizationError::IncorrectDisplayPrice:
+						return "The given display price does not match the price of the mod.";
+					break;
+				case MonetizationError::InsufficientFunds:
+						return "The account has insufficent funds to make this purchase.";
+					break;
+				case MonetizationError::ItemAlreadyOwned:
+						return "The account already owns this item.";
+					break;
+				case MonetizationError::MonetizationAuthenticationFailed:
+						return "A failure has occured when trying to authenticate with the monetization system.";
+					break;
+				case MonetizationError::PaymentFailed:
+						return "The payment transaction failed. Please try again later.";
+					break;
+				case MonetizationError::RetryEntitlements:
+						return "Some entitlements could not be verified. Please try again.";
+					break;
+				case MonetizationError::UserMonetizationDisabled:
+						return "The account does not have monetization enabled.";
+					break;
+				case MonetizationError::UserMonetizationNotConfigured:
+						return "The account has not been created with monetization.";
+					break;
+				case MonetizationError::WalletFetchFailed:
+						return "Unable to fetch the account's wallet. Please confirm the account has one";
 					break;
 				default:
 					return "Unknown MonetizationError error";
@@ -869,6 +913,16 @@ namespace Modio
 		MissingWritePermission = 11003,
 		ModfileNoUploadPermission = 15006,
 		ModioOutage = 10000,
+		MonetizationAuthentication = 900002,
+		MonetizationGameMonetizationNotEnabled = 900022,
+		MonetizationInMaintenance = 900012,
+		MonetizationIncorrectDisplayPrice = 900035,
+		MonetizationInsufficientFunds = 900049,
+		MonetizationItemAlreadyOwned = 900034,
+		MonetizationPaymentFailed = 900030,
+		MonetizationUnableToCommunicate = 900001,
+		MonetizationUnexpectedError = 900000,
+		MonetizationWalletFetchFailed = 900008,
 		MuteUserNotFound = 17000,
 		OpenIDNotConfigured = 11086,
 		Ratelimited = 11008,
@@ -886,6 +940,8 @@ namespace Modio
 		SubmitReportRightsRevoked = 15029,
 		UnsupportedContentTypeHeader = 13006,
 		UserExistingModRating = 15028,
+		UserMonetizationDisabled = 900015,
+		UserMonetizationNotConfigured = 900007,
 		UserNoAcceptTermsOfUse = 11074,
 		UserNoModRating = 15043,
 		ValidationErrors = 13009
@@ -992,6 +1048,36 @@ namespace Modio
 				case ApiError::ModioOutage:
 						return "mod.io is currently experiencing an outage. (rare)";
 					break;
+				case ApiError::MonetizationAuthentication:
+						return "A failure has occured when trying to authenticate with the monetization system.";
+					break;
+				case ApiError::MonetizationGameMonetizationNotEnabled:
+						return "The game does not have active monetization.";
+					break;
+				case ApiError::MonetizationInMaintenance:
+						return "The monetization is currently in maintance mode. Please try again later.";
+					break;
+				case ApiError::MonetizationIncorrectDisplayPrice:
+						return "The given display price does not match the price of the mod.";
+					break;
+				case ApiError::MonetizationInsufficientFunds:
+						return "The account has insufficent funds to make this purchase.";
+					break;
+				case ApiError::MonetizationItemAlreadyOwned:
+						return "The account already owns this item.";
+					break;
+				case ApiError::MonetizationPaymentFailed:
+						return "The payment transaction failed. Please try again later.";
+					break;
+				case ApiError::MonetizationUnableToCommunicate:
+						return "Unable to communicate with the monetization system. Please try again later.";
+					break;
+				case ApiError::MonetizationUnexpectedError:
+						return "An un expected error during a purchase transaction has occured. Please try again later.";
+					break;
+				case ApiError::MonetizationWalletFetchFailed:
+						return "Unable to fetch the accounts' wallet. Please confirm the account has one";
+					break;
 				case ApiError::MuteUserNotFound:
 						return "The user with the supplied UserID could not be found.";
 					break;
@@ -1042,6 +1128,12 @@ namespace Modio
 					break;
 				case ApiError::UserExistingModRating:
 						return "The authenticated user has already submitted a rating for this mod.";
+					break;
+				case ApiError::UserMonetizationDisabled:
+						return "The account has been disabled from monetization.";
+					break;
+				case ApiError::UserMonetizationNotConfigured:
+						return "The account has not been created with monetization.";
 					break;
 				case ApiError::UserNoAcceptTermsOfUse:
 						return "The user has not agreed to the mod.io Terms of Use. Please see terms_agreed parameter description and the Terms endpoint for more information.";
@@ -1261,7 +1353,17 @@ namespace Modio
 		/// @brief The current mod installation or update was cancelled.
 		InstallOrUpdateCancelled = 29,
 		/// @brief The current modfile upload was cancelled.
-		UploadCancelled = 30
+		UploadCancelled = 30,
+		/// @brief TempModSet need to be initialized first, call InitTempModSet.
+		TempModSetNotInitialized = 31,
+		/// @brief An error occurred while performing a monetization operation.
+		MonetizationOperationError = 32,
+		/// @brief The transaction requires a payment but it could not be fulfilled. Please retry with funds on the wallet
+		PaymentTransactionFailed = 33,
+		/// @brief The display price for the mod is out-of-date or incorrect. Please retry with the correct display price.
+		IncorrectPrice = 34,
+		/// @brief The authenticated user already has acquired this item
+		ItemAlreadyOwned = 35
 	};
 
 	/// @docnone
@@ -1362,6 +1464,21 @@ namespace Modio
 				case ErrorConditionTypes::UploadCancelled:
 					return "The current modfile upload was cancelled.";
 				break;
+				case ErrorConditionTypes::TempModSetNotInitialized:
+					return "TempModSet need to be initialized first, call InitTempModSet.";
+				break;
+				case ErrorConditionTypes::MonetizationOperationError:
+					return "An error occurred while performing a monetization operation.";
+				break;
+				case ErrorConditionTypes::PaymentTransactionFailed:
+					return "The transaction requires a payment but it could not be fulfilled. Please retry with funds on the wallet";
+				break;
+				case ErrorConditionTypes::IncorrectPrice:
+					return "The display price for the mod is out-of-date or incorrect. Please retry with the correct display price.";
+				break;
+				case ErrorConditionTypes::ItemAlreadyOwned:
+					return "The authenticated user already has acquired this item";
+				break;
 				default:
 					return "Unknown error condition";
 			}
@@ -1383,6 +1500,26 @@ namespace Modio
 					}
 
 					if (ec == Modio::HttpError::RateLimited)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationUnexpectedError)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationUnableToCommunicate)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationAuthentication)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationInMaintenance)
 					{
 						return true;
 					}
@@ -1563,6 +1700,16 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::ApiError::MonetizationPaymentFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationIncorrectDisplayPrice)
+					{
+						return true;
+					}
+
 
 				break;
 				case ErrorConditionTypes::FilesystemError:
@@ -1674,6 +1821,11 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::ApiError::MonetizationItemAlreadyOwned)
+					{
+						return true;
+					}
+
 
 				break;
 				case ErrorConditionTypes::ModInstallRetryableError:
@@ -1683,6 +1835,21 @@ namespace Modio
 					}
 
 					if (ec == Modio::ApiError::FailedToCompleteTheRequest)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationUnexpectedError)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationUnableToCommunicate)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationInMaintenance)
 					{
 						return true;
 					}
@@ -2064,6 +2231,11 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::ApiError::UserMonetizationNotConfigured)
+					{
+						return true;
+					}
+
 
 				break;
 				case ErrorConditionTypes::UserTermsOfUseError:
@@ -2124,6 +2296,11 @@ namespace Modio
 					}
 
 					if (ec == Modio::ApiError::AuthenticatedAccountHasBeenDeleted)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationAuthentication)
 					{
 						return true;
 					}
@@ -2271,6 +2448,354 @@ namespace Modio
 					}
 
 
+				break;
+				case ErrorConditionTypes::TempModSetNotInitialized:
+					if (ec == Modio::ModManagementError::TempModSetNotInitialized)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::MonetizationOperationError:
+					if (ec == Modio::MonetizationError::UserMonetizationNotConfigured)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::UserMonetizationNotConfigured)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::UserMonetizationDisabled)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::UserMonetizationDisabled)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::PaymentFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationPaymentFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::IncorrectDisplayPrice)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationIncorrectDisplayPrice)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::ItemAlreadyOwned)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationItemAlreadyOwned)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::InsufficientFunds)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationInsufficientFunds)
+					{
+						return true;
+					}
+
+
+
+					if (ec == Modio::MonetizationError::DisplayPriceIncorrect)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::GameMonetizationNotEnabled)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::IncorrectDisplayPrice)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::InsufficientFunds)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::ItemAlreadyOwned)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::MonetizationAuthenticationFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::PaymentFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::RetryEntitlements)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::UserMonetizationDisabled)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::UserMonetizationNotConfigured)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::WalletFetchFailed)
+					{
+						return true;
+					}
+
+	
+				break;
+				case ErrorConditionTypes::PaymentTransactionFailed:
+					if (ec == Modio::MonetizationError::PaymentFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationPaymentFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::InsufficientFunds)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationInsufficientFunds)
+					{
+						return true;
+					}
+
+
+
+					if (ec == Modio::MonetizationError::DisplayPriceIncorrect)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::GameMonetizationNotEnabled)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::IncorrectDisplayPrice)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::InsufficientFunds)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::ItemAlreadyOwned)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::MonetizationAuthenticationFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::PaymentFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::RetryEntitlements)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::UserMonetizationDisabled)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::UserMonetizationNotConfigured)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::WalletFetchFailed)
+					{
+						return true;
+					}
+
+	
+				break;
+				case ErrorConditionTypes::IncorrectPrice:
+					if (ec == Modio::MonetizationError::IncorrectDisplayPrice)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationIncorrectDisplayPrice)
+					{
+						return true;
+					}
+
+
+
+					if (ec == Modio::MonetizationError::DisplayPriceIncorrect)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::GameMonetizationNotEnabled)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::IncorrectDisplayPrice)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::InsufficientFunds)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::ItemAlreadyOwned)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::MonetizationAuthenticationFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::PaymentFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::RetryEntitlements)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::UserMonetizationDisabled)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::UserMonetizationNotConfigured)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::WalletFetchFailed)
+					{
+						return true;
+					}
+
+	
+				break;
+				case ErrorConditionTypes::ItemAlreadyOwned:
+					if (ec == Modio::MonetizationError::ItemAlreadyOwned)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationItemAlreadyOwned)
+					{
+						return true;
+					}
+
+
+
+					if (ec == Modio::MonetizationError::DisplayPriceIncorrect)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::GameMonetizationNotEnabled)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::IncorrectDisplayPrice)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::InsufficientFunds)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::ItemAlreadyOwned)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::MonetizationAuthenticationFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::PaymentFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::RetryEntitlements)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::UserMonetizationDisabled)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::UserMonetizationNotConfigured)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::WalletFetchFailed)
+					{
+						return true;
+					}
+
+	
 				break;
 			}
 			return false;

@@ -19,9 +19,11 @@ namespace Modio
 		public:
 			virtual ~IFileServiceImplementation() {};
 			virtual const Modio::filesystem::path LocalMetadataFolder() const = 0;
-			virtual Modio::filesystem::path MakeTempFilePath(std::string Filename) const = 0;
 			virtual Modio::filesystem::path GetModRootInstallationPath() const = 0;
+			virtual Modio::filesystem::path GetTempRootInstallationPath() const = 0;
 			virtual Modio::filesystem::path MakeModPath(Modio::ModID ID) const = 0;
+			virtual Modio::filesystem::path MakeTempFilePath(std::string Filename) const = 0;
+			virtual Modio::filesystem::path MakeTempModPath(Modio::ModID ID) const = 0;
 			virtual Modio::filesystem::path MakeModMediaFilePath(Modio::ModID ID, Modio::LogoSize Size,
 																 const std::string& OriginalFilename) const = 0;
 			virtual Modio::filesystem::path MakeModMediaFilePath(Modio::ModID ModID, Modio::GallerySize Size,

@@ -33,6 +33,7 @@ namespace Modio
 	void from_json(const nlohmann::json& Json, Modio::ModTag& ModTag)
 	{
 		Detail::ParseSafe(Json, ModTag.Tag, "name");
+		Detail::ParseSafe(Json, ModTag.TagLocalized, "name_localized");
 	}
 
 	/// @docnone

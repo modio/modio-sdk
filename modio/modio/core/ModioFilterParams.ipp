@@ -47,6 +47,19 @@ namespace Modio
 		return *this;
 	}
 
+	Modio::FilterParams& FilterParams::MatchingAuthor(const Modio::UserID& UserId)
+	{
+		AuthorUserIds.clear();
+		AuthorUserIds.push_back(UserId);
+		return *this;
+	}
+
+	Modio::FilterParams& FilterParams::MatchingAuthors(const std::vector<Modio::UserID>& UserIds)
+	{
+		AuthorUserIds = UserIds;
+		return *this;
+	}
+
 	Modio::FilterParams& FilterParams::MatchingIDs(const std::vector<Modio::ModID>& IDSet)
 	{
 		IncludedIDs = IDSet;
@@ -201,6 +214,11 @@ namespace Modio
 			}
 			SearchStr.resize(SearchStr.size() - 1);
 			FilterFields.emplace("_q", SearchStr);
+		}
+
+		if (!AuthorUserIds.empty())
+		{
+			FilterFields.emplace("submitted_by-in", fmt::format("{}", fmt::join(AuthorUserIds, ",")));
 		}
 
 		if (DateRangeBegin)

@@ -41,6 +41,7 @@ namespace Modio
 				{
 					{
 						EntryToProcess = nullptr;
+						IsTempModSelected = false;
 
 						// Note: because we aren't `yield`ing in these loops, we're safe to use range-based for. If we
 						// needed to `yield` in the loop, we'd need to store the iterator so we can pick up where we
@@ -54,7 +55,31 @@ namespace Modio
 							{
 								if (ModEntry->ShouldRetry())
 								{
-									EntryToProcess = ModEntry;
+									//Dont uninstall mod yet if it is still in TempModSet
+									if ( (Modio::Detail::SDKSessionData::GetTemporaryModSet() != nullptr &&
+										 Modio::Detail::SDKSessionData::GetTemporaryModSet()->ContainsModId(
+											 ModEntry->GetID())) == false)
+									{
+										EntryToProcess = ModEntry;
+									}
+								}
+							}
+						}
+
+						if (!EntryToProcess)
+						{
+							for (auto ModEntry :
+								 Modio::Detail::SDKSessionData::GetTempModCollection().SortEntriesByRetryPriority())
+							{
+								if (ModEntry->GetModState() == Modio::ModState::UninstallPending ||
+									ModEntry->GetModState() == Modio::ModState::InstallationPending ||
+									ModEntry->GetModState() == Modio::ModState::UpdatePending )
+								{
+									if (ModEntry->ShouldRetry())
+									{
+										EntryToProcess = ModEntry;
+										IsTempModSelected = true;
+									}
 								}
 							}
 						}
@@ -145,7 +170,7 @@ namespace Modio
 													   {}});
 						// Does this need to be a separate operation or could we provide a parameter to specify
 						// we only want to update if it's already installed or something?
-						yield Modio::Detail::InstallOrUpdateModAsync(EntryToProcess->GetID(), std::move(Self));
+						yield Modio::Detail::InstallOrUpdateModAsync(EntryToProcess->GetID(), IsTempModSelected, std::move(Self));
 						Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(
 							Modio::ModManagementEvent {EntryToProcess->GetID(),
 													   PendingModState.value() == Modio::ModState::InstallationPending
@@ -158,13 +183,13 @@ namespace Modio
 							Self.complete(ec);
 							return;
 						}
-						else
+						else if (!IsTempModSelected)
 						{
 							yield Modio::Detail::SaveModCollectionToStorageAsync(std::move(Self));
-
-							Self.complete({});
-							return;
 						}
+
+						Self.complete({});
+						return;
 					}
 					else if (EntryToProcess->GetModState() == Modio::ModState::UninstallPending)
 					{
@@ -173,22 +198,24 @@ namespace Modio
 													   Modio::ModManagementEvent::EventType::BeginUninstall,
 													   {}});
 
-						yield Modio::Detail::UninstallModAsync(EntryToProcess->GetID(), std::move(Self));
+						yield Modio::Detail::UninstallModAsync(EntryToProcess->GetID(), std::move(Self), false,
+															   IsTempModSelected);
 						Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(Modio::ModManagementEvent {
 							EntryToProcess->GetID(), Modio::ModManagementEvent::EventType::Uninstalled, ec});
+
 						if (ec)
 						{
 							EntryToProcess->SetLastError(ec);
 							Self.complete(ec);
 							return;
 						}
-						else
+						else if (!IsTempModSelected)
 						{
 							yield Modio::Detail::SaveModCollectionToStorageAsync(std::move(Self));
-
-							Self.complete({});
-							return;
 						}
+
+						Self.complete({});
+						return;
 					}
 				}
 			}
@@ -198,6 +225,7 @@ namespace Modio
 			std::shared_ptr<Modio::ModCollectionEntry> EntryToProcess;
 			Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>> PendingUpload;
 			Modio::Optional<Modio::ModState> PendingModState;
+			bool IsTempModSelected;
 		};
 
 		template<typename ProcessNextCallback>

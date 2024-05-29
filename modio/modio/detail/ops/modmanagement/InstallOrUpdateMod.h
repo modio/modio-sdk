@@ -33,7 +33,8 @@ namespace Modio
 		class InstallOrUpdateModOp : public Modio::Detail::BaseOperation<InstallOrUpdateModOp>
 		{
 		public:
-			InstallOrUpdateModOp(Modio::ModID Mod) : Mod(Mod)
+			InstallOrUpdateModOp(Modio::ModID Mod, bool IsTempMod) : 
+				Mod(Mod), IsTempMod(IsTempMod)
 			{
 				ModProgress = Modio::Detail::SDKSessionData::StartModDownloadOrUpdate(Mod);
 			};
@@ -58,8 +59,11 @@ namespace Modio
 				
 				reenter(CoroutineState)
 				{
-					Transaction =
-						BeginTransaction(Modio::Detail::SDKSessionData::GetSystemModCollection().Entries().at(Mod));
+
+					CollectionEntry = IsTempMod
+										  ? Modio::Detail::SDKSessionData::GetTempModCollection().Entries().at(Mod)
+										  : Modio::Detail::SDKSessionData::GetSystemModCollection().Entries().at(Mod);
+					Transaction = BeginTransaction(CollectionEntry);
 
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ModInfoBuffer,
@@ -73,7 +77,7 @@ namespace Modio
 						return;
 					}
 
-					Modio::Detail::SDKSessionData::GetSystemModCollection().Entries().at(Mod)->SetModState(
+					CollectionEntry->SetModState(
 						ModState::Downloading);
 
 					// TryMarshalResponse to get ModInfo object
@@ -118,10 +122,8 @@ namespace Modio
 					}
 
 					//Is there room in the installation path for the extracted files?
-					InstallPath =
-						Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MakeModPath(Mod);
 					if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CheckSpaceAvailable(
-							InstallPath, Modio::FileSize(ModInfoData.FileInfo->FilesizeUncompressed)))
+							CollectionEntry->GetPath(), Modio::FileSize(ModInfoData.FileInfo->FilesizeUncompressed)))
 					{
 						Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
 						Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
@@ -186,19 +188,18 @@ namespace Modio
 						}
 					}
 
-					Modio::Detail::SDKSessionData::GetSystemModCollection().Entries().at(Mod)->SetModState(
-						ModState::Extracting);
+					CollectionEntry->SetModState(ModState::Extracting);
 
-					if (Modio::filesystem::exists(InstallPath, ec) && !ec)
+					if (Modio::filesystem::exists(CollectionEntry->GetPath(), ec) && !ec)
 					{
 						yield Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFolderAsync(
-							InstallPath, std::move(Self));
+							CollectionEntry->GetPath(), std::move(Self));
 						if (ec)
 						{
 							Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::File,
 														"DeleteFolderAsync during InstallOrUpdateModOp was not "
 														"successful, path: {} and error message: ",
-														InstallPath.string(), ec.message());
+														CollectionEntry->GetPath(), ec.message());
 
 							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
 							// TODO: @Modio-core handle errors when trying to delete the installed mod folder
@@ -214,8 +215,8 @@ namespace Modio
 						return;
 					}
 
-					yield Modio::Detail::ExtractAllFilesAsync(DownloadPath, InstallPath, ModProgress, std::move(Self));
-
+					yield Modio::Detail::ExtractAllFilesAsync(DownloadPath, CollectionEntry->GetPath(), ModProgress,
+															  std::move(Self));
 					if (ec)
 					{
 						Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
@@ -225,10 +226,8 @@ namespace Modio
 
 					// TODO: @modio-core perhaps resolve the file path issue by storing the mod path on the entry
 					// here rather than dynamically calculating it elsewhere?
-					Modio::Detail::SDKSessionData::GetSystemModCollection().Entries().at(Mod)->UpdateSizeOnDisk(
-						ExtractedSize);
-					Modio::Detail::SDKSessionData::GetSystemModCollection().Entries().at(Mod)->SetModState(
-						ModState::Installed);
+					CollectionEntry->UpdateSizeOnDisk(ExtractedSize);
+					CollectionEntry->SetModState(ModState::Installed);
 					// ToDO: @modio-core invoke GetFolderSizeAsync here to store the value into the modstate?
 
 					if (Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(
@@ -252,7 +251,8 @@ namespace Modio
 			asio::coroutine CoroutineState;
 			Modio::Detail::DynamicBuffer ModInfoBuffer;
 			Modio::filesystem::path DownloadPath;
-			Modio::filesystem::path InstallPath;
+			bool IsTempMod;
+			std::shared_ptr<Modio::ModCollectionEntry> CollectionEntry;
 			Modio::ModInfo ModInfoData;
 			Modio::Detail::Transaction<Modio::ModCollectionEntry> Transaction;
 			std::weak_ptr<Modio::ModProgressInfo> ModProgress;
@@ -260,10 +260,10 @@ namespace Modio
 		};
 
 		template<typename InstallDoneCallback>
-		auto InstallOrUpdateModAsync(Modio::ModID Mod, InstallDoneCallback&& OnInstallComplete)
+		auto InstallOrUpdateModAsync(Modio::ModID Mod, bool IsTempMod, InstallDoneCallback&& OnInstallComplete)
 		{
 			return asio::async_compose<InstallDoneCallback, void(Modio::ErrorCode)>(
-				InstallOrUpdateModOp(Mod), OnInstallComplete,
+				InstallOrUpdateModOp(Mod, IsTempMod), OnInstallComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	} // namespace Detail

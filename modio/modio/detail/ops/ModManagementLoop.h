@@ -13,6 +13,7 @@
 #include "modio/detail/ops/FetchExternalUpdates.h"
 #include "modio/detail/ops/PreviewExternalUpdatesOp.h"
 #include "modio/detail/ops/modmanagement/ProcessNextModInUserCollection.h"
+#include "modio/detail/ops/modmanagement/ProcessNextModInTempModSet.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/timer/ModioTimer.h"
 #include <asio/yield.hpp>
@@ -57,6 +58,8 @@ namespace Modio
 							Self.complete(ec);
 							return;
 						}
+
+						yield Modio::Detail::ProcessNextModInTempModSetAsync(std::move(Self));
 
 						// This operation gets the user subscriptions, filters the system mod list based on those, then
 						// processes the next mod in that filtered list that requires some kind of management operation

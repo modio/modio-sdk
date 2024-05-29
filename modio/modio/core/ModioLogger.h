@@ -14,6 +14,7 @@
 #include "modio/core/ModioLogService.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioFormatters.h"
 
 namespace Modio
 {

@@ -12,6 +12,7 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioStdTypes.h"
+#include "modio/core/ModioErrorCode.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/file/IFileObjectImplementation.h"
 #include <atomic>

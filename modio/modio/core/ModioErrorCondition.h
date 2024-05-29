@@ -41,4 +41,9 @@ enum class EModioErrorCondition: uint8
 	AlreadySubscribed = 28 UMETA(ToolTip="The specified mod is already subscribed to.") ,
 	InstallOrUpdateCancelled = 29 UMETA(ToolTip="The current mod installation or update was cancelled.") ,
 	UploadCancelled = 30 UMETA(ToolTip="The current modfile upload was cancelled.") ,
+	TempModSetNotInitialized = 31 UMETA(ToolTip="TempModSet need to be initialized first, call InitTempModSet.") ,
+	MonetizationOperationError = 32 UMETA(ToolTip="An error occurred while performing a monetization operation.") ,
+	PaymentTransactionFailed = 33 UMETA(ToolTip="The transaction requires a payment but it could not be fulfilled. Please retry with funds on the wallet") ,
+	IncorrectPrice = 34 UMETA(ToolTip="The display price for the mod is out-of-date or incorrect. Please retry with the correct display price.") ,
+	ItemAlreadyOwned = 35 UMETA(ToolTip="The authenticated user already has acquired this item") ,
 };

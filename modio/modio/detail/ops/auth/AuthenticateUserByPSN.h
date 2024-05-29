@@ -25,12 +25,19 @@ namespace Modio
 					.EncodeAndAppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed,
 										User.bUserHasAcceptedTerms ? "true" : "false");
-			//Allow the user to override the environment by specifying the numeric value for it
+
+			// If the env parameter is present in the extended init params, use that
 			auto ParamIterator = User.ExtendedParameters.find("env");
 			if (ParamIterator != User.ExtendedParameters.end())
 			{
 				Params = Params.AppendPayloadValue("env", ParamIterator->second);
 			}
+			// Otherwise, see if we have a platform 
+			else if (Modio::Detail::SDKSessionData::GetPlatformEnvironment().has_value())
+			{
+				Params = Params.AppendPayloadValue("env", Modio::Detail::SDKSessionData::GetPlatformEnvironment().value());
+			}
+			// Otherwise, fall back to the default env
 			else
 			{
 				Params = Params.AppendPayloadValue("env", "256");

@@ -40,20 +40,20 @@ namespace Modio
 	{
 		std::string Filename = "";
 		std::string Original = "";
-	};
 
-	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::HeaderImage& HeaderImage);
+		/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::HeaderImage& HeaderImage);
+	};
 
 	/// @brief Creator defined URLs to share
 	struct OtherUrl
 	{
 		std::string Label = "";
 		std::string Url = "";
-	};
 
-	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::OtherUrl& OtherUrl);
+		/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::OtherUrl& OtherUrl);
+	};
 
 	/// @brief Theme color values for the game
 	struct Theme
@@ -64,10 +64,10 @@ namespace Modio
 		std::string Success = "";
 		std::string Warning = "";
 		std::string Danger = "";
-	};
 
-	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::Theme& Theme);
+		/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Theme& Theme);
+	};
 
 	struct GameInfo
 	{
@@ -114,13 +114,10 @@ namespace Modio
 		Modio::GameMaturityOptionsFlags	MaturityOptions;
 		/// @brief Name of the Virtual Tokens for this game
 		std::string VirtualTokenName = "";
+		/// @brief Tags for this game
+		std::vector<Modio::ModTagInfo> TagOptions;
+
+		/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GameInfo& GameInfo);
 	};
-
-	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::GameInfo& GameInfo);
-
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "ModioGameInfo.ipp"
-#endif
