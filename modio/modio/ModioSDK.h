@@ -512,7 +512,6 @@ namespace Modio
 	/// @requires no-rate-limiting
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
-	/// @experimental
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	///	@deprecated 2024.4 Call GetModDependenciesAsync() and specify if recursion is desired.
@@ -531,7 +530,6 @@ namespace Modio
 	/// @requires no-rate-limiting
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
-	/// @experimental
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void GetModDependenciesAsync(
@@ -673,7 +671,6 @@ namespace Modio
 	/// @docpublic
 	/// @brief Returns a list of base mod installation directories. Under normal circumstances, this will return a
 	/// single directory, which is the base directory that all mods are installed to for the current user.
-	/// @experimental
 	/// @requires initialized-sdk
 	/// @return List of base mod installation directories
 	MODIOSDK_API std::vector<std::string> GetBaseModInstallationDirectories();

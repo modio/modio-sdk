@@ -33,21 +33,21 @@ namespace Modio
 								  {Modio::ModfilePlatform::Source, Modio::Detail::Constants::PlatformNames::Source}});
 
 	/// @docnone
-	void from_json(const nlohmann::json& Json, Modio::HeaderImage& HeaderImage)
+	inline void from_json(const nlohmann::json& Json, Modio::HeaderImage& HeaderImage)
 	{
 		Detail::ParseSafe(Json, HeaderImage.Filename, "filename");
 		Detail::ParseSafe(Json, HeaderImage.Original, "original");
 	}
 
 	/// @docnone
-	void from_json(const nlohmann::json& Json, Modio::OtherUrl& OtherUrl)
+	inline void from_json(const nlohmann::json& Json, Modio::OtherUrl& OtherUrl)
 	{
 		Detail::ParseSafe(Json, OtherUrl.Label, "label");
 		Detail::ParseSafe(Json, OtherUrl.Url, "url");
 	}
 
 	/// @docnone
-	void from_json(const nlohmann::json& Json, Modio::Theme& Theme)
+	inline void from_json(const nlohmann::json& Json, Modio::Theme& Theme)
 	{
 		Detail::ParseSafe(Json, Theme.Primary, "primary");
 		Detail::ParseSafe(Json, Theme.Dark, "dark");
@@ -58,7 +58,7 @@ namespace Modio
 	}
 
 	/// @docnone
-	void from_json(const nlohmann::json& Json, Modio::GameInfo& GameInfo)
+	inline void from_json(const nlohmann::json& Json, Modio::GameInfo& GameInfo)
 	{
 		Detail::ParseSafe(Json, GameInfo.GameID, "id");
 		Detail::ParseSafe(Json, GameInfo.DateAdded, "date_added");

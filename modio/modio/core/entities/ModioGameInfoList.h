@@ -39,7 +39,7 @@ namespace Modio
 		}
 
 		/// @docnone
-		friend MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::GameInfoList& OutGameInfoList);
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GameInfoList& OutGameInfoList);
 	};
 
 } // namespace Modio

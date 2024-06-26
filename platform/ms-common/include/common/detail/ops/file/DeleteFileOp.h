@@ -12,6 +12,7 @@
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/FilesystemWrapper.h"
 
 #include <asio/yield.hpp>
 class DeleteFileOp

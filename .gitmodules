@@ -11,7 +11,7 @@
 	branch = ghc_os_custom
 [submodule "ext/fmt"]
 	path = ext/fmt
-	url = https://github.com/fmtlib/fmt
+	url = https://github.com/modio/modio-integration-fmt.git
 [submodule "ext/utfcpp"]
 	path = ext/utfcpp
 	url = https://github.com/nemtrif/utfcpp

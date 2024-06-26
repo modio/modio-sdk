@@ -13,7 +13,7 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioFilterParams.h"
-#include "modio/core/entities/ModioGameInfoList.h"
+#include "modio/detail/serialization/ModioGameInfoListSerialization.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include <asio/coroutine.hpp>

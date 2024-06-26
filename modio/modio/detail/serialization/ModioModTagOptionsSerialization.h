@@ -18,13 +18,13 @@
 
 namespace Modio
 {
-	void from_json(const nlohmann::json& Json, Modio::ModTagLocalizationData& TagLocalization)
+	inline void from_json(const nlohmann::json& Json, Modio::ModTagLocalizationData& TagLocalization)
 	{
 		Modio::Detail::ParseSafe(Json, TagLocalization.Tag, "tag");
 		Modio::Detail::ParseSafe(Json, TagLocalization.Translations, "translations");
 	}
 
-	void from_json(const nlohmann::json& Json, Modio::ModTagInfo& TagInfo)
+	inline void from_json(const nlohmann::json& Json, Modio::ModTagInfo& TagInfo)
 	{
 		Modio::Detail::ParseSafe(Json, TagInfo.TagGroupValues, "tags");
 		Modio::Detail::ParseSafe(Json, TagInfo.TagGroupName, "name");
@@ -46,7 +46,7 @@ namespace Modio
 		TagInfo.Locale = Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetLocalLanguage());
 	}
 
-	void from_json(const nlohmann::json& Json, Modio::ModTagOptions& Options)
+	inline void from_json(const nlohmann::json& Json, Modio::ModTagOptions& Options)
 	{
 		from_json(Json, static_cast<Modio::PagedResult&>(Options));
 		Detail::ParseSafe(Json, Options.InternalList, "data");

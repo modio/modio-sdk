@@ -10,18 +10,39 @@
 
 #pragma once
 
+#include "modio/detail/HedleyWrapper.h"
+
+MODIO_PRAGMA(warning(push))
+MODIO_PRAGMA(warning(disable : 4702))
+
 // Stubs for Posix extensions that are not available on some platforms, used by parts of FMT we don't use anyways
 #ifdef MODIO_USE_FMT_POSIX_STUBS
-inline void flockfile(FILE*) {}
-inline void funlockfile(FILE*) {}
-inline int getc_unlocked(FILE*)
+
+#pragma push_macro("FMT_FORCE_FALLBACK_FILE")
+
+#ifndef FMT_FORCE_FALLBACK_FILE
+		#define FMT_FORCE_FALLBACK_FILE
+#endif
+
+inline void flockfile(FILE* fp)
 {
-	return -1;
+	_Lockfile(fp);
 }
-inline int putc_unlocked(int, FILE*)
+inline void funlockfile(FILE* fp)
 {
-	return -1;
+	_Unlockfile(fp);
 }
+
+inline int getc_unlocked(FILE* fp)
+{
+	return fgetc(fp);
+}
+
+inline int putc_unlocked(int i, FILE* fp)
+{
+	return fputc(i, fp);
+}
+
 #endif
 
 #ifndef MODIO_USE_CUSTOM_FMT
@@ -73,3 +94,9 @@ inline int putc_unlocked(int, FILE*)
 #ifndef MODIO_USE_CUSTOM_FMT
 	#pragma pop_macro("FMT_HEADER_ONLY")
 #endif
+
+#ifdef MODIO_USE_FMT_POSIX_STUBS
+	#pragma pop_macro("FMT_FORCE_FALLBACK_FILE")
+#endif
+
+MODIO_PRAGMA(warning(pop))

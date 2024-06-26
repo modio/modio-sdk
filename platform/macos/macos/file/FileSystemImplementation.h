@@ -9,6 +9,8 @@
  */
 
 #pragma once
+
+#include "modio/detail/FilesystemWrapper.h"
 #include "file/FileObjectImplementation.h"
 #include "file/StaticDirectoriesImplementation.h"
 #include "macos/FileSharedState.h"
@@ -183,7 +185,7 @@ namespace Modio
 				return RootLocalStoragePath / fmt::format("{}/mods/", CurrentGameID);
 			}
 
-			Modio::filesystem::path GetTempRootInstallationPath() const
+			Modio::filesystem::path GetTempRootInstallationPath() const override
 			{
 				return RootLocalStoragePath / fmt::format("{}/temp/", CurrentGameID);
 			}

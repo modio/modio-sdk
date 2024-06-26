@@ -7,6 +7,8 @@
 #   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
 # 
 
+cmake_minimum_required(VERSION 3.28)
+
 
 include(split-compilation)
 
@@ -99,6 +101,32 @@ set_target_properties(${MODIO_TARGET_NAME}Static PROPERTIES DEBUG_POSTFIX _d)
 if (MODIO_STATIC_LIB_SUFFIX)
 set_target_properties(${MODIO_TARGET_NAME}Static PROPERTIES SUFFIX ${MODIO_STATIC_LIB_SUFFIX})
 endif()
+
+# Set up a header-only target that we can build for verifying header-only functionality in a lightweight way
+file(WRITE "${CMAKE_BINARY_DIR}/header-only/main.cpp" 
+"// Automatically generated dummy file for validating header-only compilation.
+#include \"modio/ModioSDK.h\"
+int main() 
+{
+	Modio::SetLogLevel(Modio::LogLevel::Info);	
+	return 0;
+}
+")
+file(WRITE "${CMAKE_BINARY_DIR}/header-only/CMakeLists.txt" 
+"Project(modioHeaderOnly)\n
+set( CMAKE_EXPORT_COMPILE_COMMANDS ON)\n 
+add_executable(modioHeaderOnly main.cpp)\n 
+target_link_libraries(modioHeaderOnly PUBLIC ${MODIO_TARGET_NAME})\n
+")
+
+	FetchContent_Declare(
+    headerOnly
+    SOURCE_DIR "${CMAKE_BINARY_DIR}/header-only/"
+    CMAKE_GENERATOR Ninja
+	EXCLUDE_FROM_ALL 
+)
+
+FetchContent_MakeAvailable(headerOnly)
 
 install(
 	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/modio/core

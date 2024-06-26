@@ -19,7 +19,6 @@
 #include "ios/detail/ops/file/WriteSomeToFileOp.h"
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioConstants.h"
-#include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/entities/ModioAvatar.h"
 #include "modio/detail/entities/ModioImage.h"
 #include "modio/detail/entities/ModioLogo.h"

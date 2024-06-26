@@ -11,6 +11,7 @@
 #pragma once
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/ModioJsonHelpers.h"
+#include "modio/core/entities/ModioPagedResult.h"
 #include <string>
 
 namespace Modio
@@ -38,25 +39,13 @@ namespace Modio
 				return (A.UploadID == B.UploadID) && (A.PartNumber == B.PartNumber) && (A.PartSize == B.PartSize) &&
 					   (A.DateAdded == B.DateAdded);
 			}
+
+			/// @docnone
+			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::UploadSessionPart& Session);
+
+			/// @docnone
+			MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::Detail::UploadSessionPart& Session);
 		};
-
-		/// @docnone
-		inline void from_json(const nlohmann::json& Json, Modio::Detail::UploadSessionPart& Session)
-		{
-			Detail::ParseSafe(Json, Session.UploadID, "upload_id");
-			Detail::ParseSafe(Json, Session.PartNumber, "part_number");
-			Detail::ParseSafe(Json, Session.PartSize, "part_size");
-			Detail::ParseSafe(Json, Session.DateAdded, "date_added");
-		}
-
-		/// @docnone
-		inline void to_json(nlohmann::json& Json, const Modio::Detail::UploadSessionPart& Session)
-		{
-			Json = nlohmann::json {{"upload_id", Session.UploadID},
-								   {"part_number", Session.PartNumber},
-								   {"part_size", Session.PartSize},
-								   {"date_added", Session.DateAdded}};
-		}
 
 		/// @docpublic
 		/// @brief Container for a collection of UploadSessionPart objects
@@ -66,11 +55,5 @@ namespace Modio
 			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::UploadSessionPartList& List);
 		};
 
-		/// @docnone
-		void from_json(const nlohmann::json& Json, Modio::Detail::UploadSessionPartList& List)
-		{
-			from_json(Json, static_cast<Modio::PagedResult&>(List));
-			Modio::Detail::ParseSafe(Json, List.InternalList, "data");
-		}
 	} // namespace Detail
 } // namespace Modio

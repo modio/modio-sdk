@@ -133,7 +133,7 @@ namespace Modio
 		Modio::ObjectVisibility Visibility = Modio::ObjectVisibility::Public;
 
 		/// @brief Price of this mod
-		int Price = 0;
+		uint64_t Price = 0;
 
 		/// @brief If this mod has any direct dependencie.
 		bool Dependencies;

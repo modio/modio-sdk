@@ -41,18 +41,10 @@ namespace Modio
 			{
 				return (A.UploadID == B.UploadID);
 			}
+
+			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::UploadSession& Session);
+			MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::Detail::UploadSession& Session);
 		};
-
-		inline void from_json(const nlohmann::json& Json, Modio::Detail::UploadSession& Session)
-		{
-			Detail::ParseSafe(Json, Session.UploadID, "upload_id");
-			Detail::ParseSafe(Json, Session.UploadStatus, "status");
-		}
-
-		inline void to_json(nlohmann::json& Json, const Modio::Detail::UploadSession& Session)
-		{
-			Json = nlohmann::json {{"upload_id", Session.UploadID.value_or("")}, {"status", Session.UploadStatus}};
-		}
 
 		/// @docpublic
 		/// @brief Container for a collection of UploadSession objects
@@ -62,10 +54,5 @@ namespace Modio
 			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::UploadSessionList& List);
 		};
 
-		void from_json(const nlohmann::json& Json, Modio::Detail::UploadSessionList& List)
-		{
-			from_json(Json, static_cast<Modio::PagedResult&>(List));
-			Modio::Detail::ParseSafe(Json, List.InternalList, "data");
-		}
 	} // namespace Detail
 } // namespace Modio

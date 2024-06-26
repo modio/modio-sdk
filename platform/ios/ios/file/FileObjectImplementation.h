@@ -9,6 +9,8 @@
  */
 
 #pragma once
+
+#include "modio/detail/FilesystemWrapper.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioStdTypes.h"
@@ -17,6 +19,7 @@
 #include "modio/detail/file/IFileObjectImplementation.h"
 #include <atomic>
 #include <chrono>
+
 namespace Modio
 {
 	namespace Detail

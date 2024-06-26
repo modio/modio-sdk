@@ -193,6 +193,9 @@ namespace Modio
 				SortStr = "downloads";
 				bInvertedSort = true;
 				break;
+			case SortFieldType::Alphabetical:
+				SortStr = "name";
+				break;
 
 			default:
 				break;

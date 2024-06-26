@@ -75,14 +75,17 @@ namespace Modio
 							Self.complete(ec);
 							return;
 						}
-						for (Modio::ModInfo& Profile : ServerSubscriptionList.value())
 						{
-							ServerSubscriptionModIDs.AddMod(Profile);
-							ServerSubsModProfiles[Profile.ModId] = Profile;
-							Modio::Detail::SDKSessionData::GetSystemModCollection().AddOrUpdateMod(
-								Profile, Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
-											 .MakeModPath(Profile.ModId)
-											 .u8string());
+							auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
+							for (Modio::ModInfo& Profile : ServerSubscriptionList.value())
+							{
+								ServerSubscriptionModIDs.AddMod(Profile);
+								ServerSubsModProfiles[Profile.ModId] = Profile;
+								Modio::Detail::SDKSessionData::GetSystemModCollection().AddOrUpdateMod(
+									Profile, Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+												 .MakeModPath(Profile.ModId)
+												 .u8string());
+							}
 						}
 
 						std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType> ModListDiff =

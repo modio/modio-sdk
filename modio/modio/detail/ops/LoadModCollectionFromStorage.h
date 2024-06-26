@@ -55,6 +55,7 @@ namespace Modio
 						if (DataBuffer.size() > 0)
 						{
 							MODIO_PROFILE_SCOPE(ModCollectionDeserialize);
+							auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 							nlohmann::json StateJson = Modio::Detail::ToJson(DataBuffer);
 							from_json(StateJson, Modio::Detail::SDKSessionData::GetSystemModCollection());
 						}

@@ -11,7 +11,7 @@
 #pragma once
 
 #include "modio/detail/ModioConstants.h"
-#include "modio/detail/entities/ModioUploadPart.h"
+#include "modio/detail/serialization/ModioUploadPartSerialization.h"
 #include "modio/http/ModioHttpParams.h"
 
 MODIO_DIAGNOSTIC_PUSH

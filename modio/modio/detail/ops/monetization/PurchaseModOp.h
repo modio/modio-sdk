@@ -76,6 +76,8 @@ namespace Modio
 						{
 							Modio::Detail::SDKSessionData::InvalidateSubscriptionCache();
 
+							auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
+
 							Services::GetGlobalService<CacheService>().AddToCache(Record.value().Mod);
 							Modio::Detail::SDKSessionData::GetSystemModCollection().AddOrUpdateMod(
 								Record.value().Mod,

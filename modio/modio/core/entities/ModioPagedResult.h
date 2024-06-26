@@ -9,6 +9,7 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioSplitCompilation.h"
 #include "modio/detail/JsonWrapper.h"
 #include <cstdint>
@@ -63,7 +64,7 @@ namespace Modio
 		}
 
 		/// @docnone
-		friend MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::PagedResult& PagedResult);
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::PagedResult& PagedResult);
 	};
 } // namespace Modio
 

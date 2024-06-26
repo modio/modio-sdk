@@ -4,12 +4,19 @@
 
 === Prerequisites
 
-The following packages are required to build the mod.io SDK for Windows 10:
+To build on Windows, the mod.io SDK requires Visual Studio 2019 or 2022 with the "Desktop Development with C++" workload. This workload includes CMake (version 3.20 or higher), Ninja, and MSVC C++ compiler.
 
-- Visual Studio 2019 & 2022 (Community version works)
-- Visual Studio 2019 & 2022 "Desktop Development with C++" (via Visual Studio Installer)
+If you are building for other platforms, you can follow each platform's requirements below.
 
-These include the required CMake (version 3.20 or higher), Ninja, and MSVC C++ compiler.
+link:windows/getting-started.mdx[Windows Getting Started]
+
+link:macos/getting-started.mdx[Max Getting Started]
+
+link:linux/getting-started.mdx[Linux Getting Started]
+
+link:iOS/getting-started.mdx[iOS Getting Started]
+
+link:android/getting-started.mdx[Android Getting Started]
 
 === Dependencies
 
@@ -33,94 +40,60 @@ git clone --recurse-submodule https://github.com/modio/modio-sdk
 cd modio-sdk
 ----
 
-== Installation
+## Building the SDK
 
-The mod.io SDK can be installed using one of the following methods:
+The mod.io SDK can be consumed either inside a CMake project, or standalone as either header-only, in separate compilation mode, or as a static library.
 
-- Inside a CMake project
-- Standalone: <<header-only>>
-- Standalone: <<separate-compilation>>
-- Standalone: <<static-library>>
+### Standalone
 
-=== Linux Dependencies
+When building the mod.io SDK in standalone mode, `Ninja` is used as the default code generator. The following steps apply when using Ninja as a code generator. If you wish to use a different code generator, such as the Visual Studio code generator, go to the Other Build Systems section.
 
-The mod.io SDK requires a Linux kernel with liburing support (v5.1 or later). The io_uring system calls provides asynchronous input/output operations. To fulfill that requirement and have the development tools ready, the following commands employ the "apt" package manager (tested on Ubuntu 20.04 Focal Fossa):
+The included `CMakePresets.json` includes the most common configurations as presets and require `Ninja` to be in your path. For a full explanation of all platforms and targets that are part of the presets, check out the CMake Presets Targets.
 
-[source,bash]
-----
-sudo apt update
-sudo apt upgrade
-sudo apt install llvm clang lldb make wget python3 ninja-build git unzip
-## Install Cmake
-wget -q -O cmake-linux.sh https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3-Linux-x86_64.sh
-sh cmake-linux.sh -- --skip-license --prefix=/usr/
-## Install liburing-dev
-wget http://mirrors.kernel.org/ubuntu/pool/main/libu/liburing/liburing-dev_0.7-3ubuntu3_amd64.deb
-wget http://mirrors.kernel.org/ubuntu/pool/main/libu/liburing/liburing1_0.7-3ubuntu3_amd64.deb
-sudo apt install ./liburing*deb
-----
+:::note
+If you have Visual Studio installed as your development environment, you can run the following commands from the Developer Command Prompt to easily have your environment configured. Otherwise, ensure that CMake and Ninja are part of your PATH.
+:::
 
-NOTE: If you are using the "header_only" release mode, the mod.io SDK includes MbedTLS headers, but requires the library installed in your system, which was tested with libmbedtls-dev 2.28.0 in Ubuntu. The "static" mode includes these libraries in the same folder as the libmodioStatic.a
+==== Generate Source
 
-=== macOS / iOS Dependencies
+To generate build files using Ninja, run `cmake -S <modio-sdk folder> --preset=win`. This will produce a Windows build configuration using Ninja at `<modio-sdk folder>/out/build/win`. This directory can then be used to build the SDK in the way you wish to include it.
 
-The mod.io SDK for development on macOS / iOS requires Clang 10 or GCC 10 or later, which come included in the XCode installation. XCode 14 or later is recommended. To install CMake 3.20 or Ninja 1.10, it is recommended to use https://brew.sh[brew] as follows:
+==== Build the project
 
-[source,bash]
-----
-brew install cmake ninja
-----
+To build the SDK, run `cmake --build <modio-sdk folder>/out/build/win`. 
 
-iOS compiles by default to the simulator. If you need to deploy to a device, add variable `MODIO_IOS_DEVICE` to cmake. Check documentation in the platform link:platform/ios/README.adoc[README.adoc] for more details.
+==== Install the project
 
-The minimum deployment target is macOS 12.0. In case of mobile, it is iOS 15.0
+Run `cmake --install <modio-sdk folder>/out/build/win`. This will produce 3 separate folders in the `<modio-sdk folder>/out/install/win` directory.
 
-=== Inside a CMake project
+   * `header_only` - directory with the header-only version of the SDK.
+   * `source` - directory containing the implementation files of the SDK for use in 'separate compilation' mode. 
+   * `static` - directory containing the static library binaries and necessary public include headers
 
-. Clone the repository, or add it as a submodule
-. Add the following commands to a CMakeLists.txt file specific to your project
-.. Confirm `your_project` uses CMake 3.20 or later
-+
-[source,cmake]
-----
-cmake_minimum_required(VERSION 3.20)
-----
-.. Specify the target platform, with options: WIN or LINUX
-+
-[source,cmake]
-----
-set (MODIO_PLATFORM WIN)
-----
-.. Add the SDK subdirectory to your project
-+
-[source,cmake]
-----
-add_subdirectory(<modio-sdk folder> EXCLUDE_FROM_ALL)
-target_compile_features(your_project PUBLIC cxx_std_17)
-----
-.. Link the library to your project
-+
-* To use the header-only configuration:
-+
-[source,cmake]
-----
-target_link_libraries(your_project PUBLIC modio)
-----
-* Or to use the static library configuration:
-+
-[source,cmake]
-----
-target_link_libraries(your_project PUBLIC modioStatic)
-----
+==== Header-only mode
 
-=== Standalone
-To simplify the SDK compilation, the file `CMakePresets.json` includes the most common configurations as `presets` that employ Ninja by default. Therefore, confirm it is available on your `PATH` unless you want to <<override, override>> the CMake generator in use.
+Simply add each of the subdirectories in `header_only` to your include directories. Then, in `your_project` source file add `#include "modio/ModioSDK.h"`
+
+==== Separate compilation mode
+
+If you prefer to compile the source code directly, add the `cpp` files in the `source` directory, along with the `include` from the header-only mode.
+You must add `MODIO_SEPARATE_COMPILATION` to your project's compiler definitions. Then, in `your_project` source file add `#include "modio/ModioSDK.h"`
+
+==== Static library mode
+
+Add the `inc` directory inside `static` to your `include` and link against the static binary in the `lib` folder.  You must add `MODIO_SEPARATE_COMPILATION` to your project's compiler definitions. Then, in `your_project` source file add `#include "modio/ModioSDK.h"`
+
+=== Other Build Systems
+
+If you use a different build system or wish to generate project files for inclusion in an existing Visual Studio solution, you can override the default CMake generator. For example, it is possible to use an MSBuild-based Visual Studio Solution via `make -S <modio-sdk folder> --preset=win -G "Visual Studio 17 2022"`. This will produce a VS Solution file in `out\build\win`.
+
+=== CMake preset targets
 
 |===
 |Platform | Preset          | Target       | Build System
-|Windows  | win             | Release      | Visual Studio 2019
-|Windows  | win-debug       | Debug        | Visual Studio 2019
-|Windows  | win-dbginfo     | Pre-Release  | Visual Studio 2019
+|Windows  | win             | Release      | Ninja or Visual Studio 2022
+|Windows  | win-debug       | Debug        | Ninja or Visual Studio 2022
+|Windows  | win-dbginfo     | Pre-Release  | Ninja or Visual Studio 2022
 |Linux    | linux64         | Release      | Ninja
 |Linux    | linux64-debug   | Debug        | Ninja
 |Linux    | linux64-dbginfo | Pre-Release  | Ninja
@@ -132,52 +105,23 @@ To simplify the SDK compilation, the file `CMakePresets.json` includes the most 
 |iOS      | iOS-dbginfo     | Pre-Release  | Ninja or XCode
 |===
 
-Debug presets have the `-debug` suffix, and Release-with-debug-info is `-dbginfo`. For example, if you want to build the SDK in debug configuration specify `win-debug` as the preset name.
-
-To build the SDK using the default build and install directories:
-
-. `cmake -S <modio-sdk folder> --preset=win`
-+
-This will use the Ninja generator to create a Ninja build system in `<modio-sdk folder>/out/build/win`. It installs the compiled libraries/headers to `<modio-sdk folder>/out/install/win`. To build the examples, append ` -DMODIO_BUILD_EXAMPLES=true`.
-. `cmake --build <modio-sdk folder>/out/build/win`
-+
-This step compiles the SDK as a static library.
-. `cmake --install <modio-sdk folder>/out/build/win`
-+
-This produces a folder `<modio-sdk folder>/out/install/win` with the following:
-+
-* `header_only` - directory with the header-only version of the SDK
-* `source` - directory containing the implementation files of the SDK for use in 'split compilation' mode
-* `static` - directory containing the static library binaries and necessary public include headers
-
 NOTE: If you are compiling the mod.io SDK using different architectures, you can change the preset compilation folder by modifying the "CMAKE_INSTALL_PREFIX" path.
 
-==== Header-only mode [[header-only]]
+== Sample Code
 
-Simply add each of the subdirectories in `header_only` to your include directories. Then, in `your_project` source file add `#include "modio/ModioSDK.h"`
+The mod.io SDK includes sample code demonstrating all of the core functionality in the `examples` directory.  If you want to build the examples, append ` -DMODIO_BUILD_EXAMPLES=true` to your CMake generation script, ie `cmake -S <modio-sdk folder> --preset=win -DMODIO_BUILD_EXAMPLES=true`
 
-==== Separate compilation mode [[separate-compilation]]
 
-If you prefer to compile the source code directly, add the `cpp` files in the `source` directory, along with the `include` from the header-only mode.
-You must add `MODIO_SEPARATE_COMPILATION` to your project's compiler definitions. Then, in `your_project` source file add `#include "modio/ModioSDK.h"`
+=== Deprecated  [[deprecated-code]]
 
-==== Static library mode [[static-library]]
-
-Add the `inc` directory inside `static` to your `include` and link against the static binary in the `lib` folder.  You must add `MODIO_SEPARATE_COMPILATION` to your project's compiler definitions. Then, in `your_project` source file add `#include "modio/ModioSDK.h"`
-
-=== Other Build Systems [[override]]
-
-If you use a different build system or wish to generate project files for inclusion in an existing Visual Studio solution, you can override the default CMake generator. For example, it is possible to use an MSBuild-based Visual Studio Solution:
-
-```
-cmake -S <modio-sdk folder> --preset=win -G "Visual Studio 16 2019"
-cmake --build <modio-sdk folder>/out/build/win
-cmake --install <modio-sdk folder>/out/build/win
-```
-
-=== Deprecated code [[deprecated-code]]
+Some classes, methods, types etc will get deprecated over time. Generally speaking, mod.io will flag deprecated methods that will result in a warning and document all deprecations as part of release notes to assist in migration.
+Deprecated functionality will remain for a minimum of 3 releases to allow for transition to the new functionality before being removed.
 
 If you want to disable deprecated code to avoid warnings or just its usage, you can add `define MODIO_NO_DEPRECATED`, this define will avoid compilation of deprecated code.
+
+=== Experimental Functionality
+
+Some functionality in the SDK is marked as experimental. While these will generally be fully functional, the interface is subject to breaking changes that do not follow the above deprecation path.
 
 === Clang compiler in Visual Studio [[clang-win]]
 
@@ -205,28 +149,6 @@ If you have a custom version of the `fmt` library, you can modify the linking st
 The directory given to `MODIO_CUSTOM_FMT_PATH` should contain a CMakeLists.txt which exposes the `fmt` and/or `fmt-header-only` targets.
 
 By default the SDK will consume the `fmt-header-only` target. Define `MODIO_CUSTOM_FMT_STATIC` to `true` to override this and request the consumption of the `fmt` static library target instead.
-
-=== Windows Terminal Compilation of x64 library
-
-When you compile the mod.io SDK and you require a x64 library in Windows, confirm the use the "x64 Native Tools Command Prompt for VS 2019", which by default employs the x64 compiler. To verify the Static or Shared library was compiled with x64 architecture, you can use the "dumpbin" command:
-```
-dumpbin out\build\win\modio\modioStatic.lib /headers
-```
-Then search for the confirmation as follows:
-```
-Dump of file out\build\win\modio\modioStatic.lib
-
-File Type: LIBRARY
-
-FILE HEADER VALUES
-            8664 machine (x64)
-             34A number of sections
-        63336D7D time date stamp Wed Sep 28 10:39:09 2022
-           136EC file pointer to symbol table
-             AC9 number of symbols
-               0 size of optional header
-               0 characteristics
-```
 
 '''
 
@@ -264,18 +186,6 @@ The following diagram provides an overview of the mod.io SDK initialization proc
 
 image:{gitplant}modio_sdk_flow-init.puml[alt:"mod.io SDK Initialization flow"]
 
-
-=== Flat API
-The mod.io SDK has a simple structure that primarily consists of a flat interface. These broadly have the following categories:
-
-* SDK management: Initialization, teardown, event loop
-* User authentication
-* Mod browsing and querying
-* Mod management: subscribe, unsubscribe
-
-See <<quick-start>> for basic guides for each of these categories.
-
-
 === Value objects
 All data returned by the SDK uses a small set of classes, containing information such as:
 
@@ -283,7 +193,7 @@ All data returned by the SDK uses a small set of classes, containing information
 * Status information about in-progress mod management operations
 * Details and load paths for installed mods.
 
-These objects return as `pass-by-value`. In other words, if you want to hold onto them once you've shut down the SDK you can do so. In contrast to interfaces that return values via interface pointers, all SDK objects do not need to call `dispose`, `release`, or some other memory manager when their scope finishes.
+These objects return as `pass-by-value`. In other words, if you want to hold onto them once you've shut down the SDK you can do so. In contrast to interfaces that return values via interface pointers, no mod.io SDK objects require you to call `dispose`, `release`, or some other memory manager when their scope finishes.
 
 This flexibility allows you to initialize the SDK, query the installed mods, and keep that list. Then shut down the SDK and stop running the SDK's event loop.
 
@@ -323,9 +233,8 @@ NOTE: If you stop calling <<RunPendingHandlers>>, any pending asynchronous API m
 
 Given that <<RunPendingHandlers>> performs all the work of the SDK and executes the callbacks that you provide as handlers for the completion of async functions, your application needs to be calling it at regular intervals. However, you may not wish to do so on the main thread of your application, given that the function has to execute for long enough to actually 'get some work done'.
 
-The mod.io SDK now supports the execution of <<RunPendingHandlers>> on a background thread while your application invokes other SDK functions on the main thread, for example in response to user input in your application's user interface. 
-
-Whilst it is now safe to call all other SDK functions from a different thread to the one executing <<RunPendingHandlers>>, it is important to note that our existing guarantees are maintained, namely, you'll still receive exactly one callback invocation per asynchronous function you run, and **callbacks you provide to those methods will be executed on the thread running <<RunPendingHandlers>>**. 
+The mod.io SDK supports the execution of <<RunPendingHandlers>> on a background thread while your application invokes other SDK functions on the main thread, for example in response to user input in your application's user interface. 
+Whilst it is safe to call all other SDK functions from a different thread to the one executing <<RunPendingHandlers>>, it is important to note that our existing guarantees are maintained, namely, you'll still receive exactly one callback invocation per asynchronous function you run, and **callbacks you provide to those methods will be executed on the thread running <<RunPendingHandlers>>**. 
 
 NOTE: <<RunPendingHandlers>> should still only be called on a single thread - it is not safe to call <<RunPendingHandlers>> from multiple threads, either simultaneously or sequentially.
 
@@ -411,8 +320,8 @@ Per-game, Local Profile-specific settings are stored in `${FolderID_LocalAppData
 The following guides are provided to help you through the basic functions of the SDK as described in <<SDK structure and concepts>>.
 
 * <<SDK quick-start: Initialization and Teardown>>
-* <<SDK quick-start: User Authentication>>
 * <<SDK quick-start: Browsing available mods>>
+* <<SDK quick-start: User Authentication>>
 * <<SDK quick-start: Mod management and subscriptions>>
 * <<SDK quick-start: Error Handling>>
 * <<SDK quick-start: In-game mod submission>>
@@ -421,35 +330,16 @@ The following guides are provided to help you through the basic functions of the
 * <<SDK quick-start: Temporary Mod Sets>>
 * <<SDK quick-start: Multithreading>>
 * <<SDK quick-start: Monetization>>
+* <<SDK quick-start: Error Handling>>
 
 '''
 === SDK quick-start: Initialization and Teardown [[sdk-initialization]]
 
-==== Event Loop (RunPendingHandlers)
-
-As mentioned in <<Maintaining the SDK event loop>>, the SDK's internal event loop requires care and attention in the form of <<RunPendingHandlers>>.
-
-ALL SDK work is performed during executions of <<RunPendingHandlers>>, therefore calling it as often as possible will improve performance of the SDK's I/O operations.
-
-You can either call <<RunPendingHandlers>> on the main thread, or on a <<use-background-thread,dedicated background thread or existing thread of your choice>>.
-
-For optimal execution, <<RunPendingHandlers>> should be called at least once per frame. 
-
-For example, if you wish to call RunPendingHandlers on the main thread, it could be located into your project's main loop or into a `tick`-style function on an appropriate controller/manager object.
-
-[source,cpp]
-----
-while(bGameIsRunning == true)
-{
-    // other stuff
-   Modio::RunPendingHandlers();
-    // other stuff
-}
-----
-
-NOTE: RunPendingHandlers is not reentrant-safe. Do not call <<RunPendingHandlers>> inside a callback you give to the SDK, or your application will deadlock. Callbacks are run inside <<RunPendingHandlers>>, and your inner <<RunPendingHandlers>> call will block infinitely waiting for the enclosing scope to exit.
 
 ==== SDK Configuration and Initialization
+
+NOTE: This functionality is demonstrated in example 01_Initialization
+
 When you are ready to initialize the SDK for the current session, you'll need to call <<InitializeAsync>>, passing in your product's mod.io ID, your API key, the Local Profile Name, and a callback/handler so you know when the SDK is initialized correctly. Note that <<InitializeAsync>>'s callback will be invoked after calling <<RunPendingHandlers>> from your project's main loop.
 
 You should also ensure that you are targeting an appropriate Portal for mod.io to understand what storefront or app the request is originating from. This enabled additional storefront-based functionality, such as returning display name mappings for that portal.
@@ -523,9 +413,36 @@ NOTE: You will need to continue to call <<RunPendingHandlers>> while the async s
 
 '''
 
+==== Event Loop (RunPendingHandlers)
+
+As mentioned in <<Maintaining the SDK event loop>>, the SDK's internal event loop requires care and attention in the form of <<RunPendingHandlers>>.
+
+ALL SDK work is performed during executions of <<RunPendingHandlers>>, therefore calling it as often as possible will improve performance of the SDK's I/O operations.
+
+You can either call <<RunPendingHandlers>> on the main thread, or on a <<use-background-thread,dedicated background thread or existing thread of your choice>>.
+
+For optimal execution, <<RunPendingHandlers>> should be called at least once per frame. 
+
+For example, if you wish to call RunPendingHandlers on the main thread, it could be located into your project's main loop or into a `tick`-style function on an appropriate controller/manager object.
+
+[source,cpp]
+----
+while(bGameIsRunning == true)
+{
+    // other stuff
+   Modio::RunPendingHandlers();
+    // other stuff
+}
+----
+
+NOTE: RunPendingHandlers is not reentrant-safe. Do not call <<RunPendingHandlers>> inside a callback you give to the SDK, or your application will deadlock. Callbacks are run inside <<RunPendingHandlers>>, and your inner <<RunPendingHandlers>> call will block infinitely waiting for the enclosing scope to exit.
+
+
 === SDK quick-start: User Authentication
 
-mod.io provides two ways for users to create an account to use the service: email authentication and single sign on (SSO) through an external authentication partner. The flow for these is slightly different.
+NOTE: This functionality is demonstrated in example 03_Authentication
+
+When you want players to subscribe to and use content, you must authenticate them. mod.io provides two ways for users to create an account to use the service: email authentication and single sign on (SSO) through an external authentication partner. The flow for these is slightly different.
 
 ==== Email authentication
 
@@ -557,6 +474,8 @@ Modio::AuthenticateUserEmailAsync(Modio::EmailAuthCode(UserProvidedAuthCode), []
 		}
 	});
 
+NOTE: Email authentication is not recommended for production releases. We strongly recommend the use of platform SSO to provide a seamless authentication experience for your players. Additional platform functionality such as platform display names, avatars and console certification requirements are supported via SSO flows.
+
 ----
 
 ==== SSO/External authentication
@@ -570,10 +489,13 @@ mod.io features single sign on authentication from a number of external provider
     * Nintendo Switch
     * Discord
     * PlayStation&trade;Network
+    * Oculus
+    * Apple
+    * Google
     * Epic Games
     * OpenID
 
-Please note that the ability to authenticate players using OpenID is feature for advanced partners only. If you are interested in becoming an advanced partner, please contact developers@mod.io
+Please note that the ability to authenticate players using OpenID is a premium feature. If you are interested in mod.io premium features, please contact developers@mod.io
 
 To use SSO with mod.io, a user must have accepted the mod.io Terms of Use in order to create an account.
 
@@ -658,6 +580,8 @@ Modio::AuthenticateUserEmailAsync(Modio::EmailAuthCode(UserProvidedAuthCode), []
 
 === SDK quick-start: Browsing available mods
 
+NOTE: This functionality is demonstrated in example 02_ModQueries
+
 Now that you've followed the instructions in <<SDK quick-start: Initialization and Teardown>> you can begin to query the available mods for information you can display to your end users. The primary way this is done is through <<ListAllModsAsync>>.
 
 [source,cpp]
@@ -701,7 +625,10 @@ Modio::ListAllModsAsync(Modio::FilterParams.NameContains("Your Query").PagedResu
 
 === SDK quick-start: Mod management and subscriptions
 
-So you've shown the user some mods based on a query they've submitted through your UI. The user has picked one that they'd like to install. This section explains how to trigger an installation process and the files downloaded to the filesystem.
+NOTE: This functionality is demonstrated in example 04_SubscriptionManagement
+
+Now you've shown the user some mods based on a query they've submitted through your UI. The user has picked one that they'd like to install. This section explains how to trigger an installation process and the files downloaded to the filesystem.
+
 
 ==== Installation management and mod filepaths
 
@@ -855,192 +782,9 @@ for (Modio::filesystem::path& Path : ModPaths)
 
 '''
 
-=== SDK quick-start: Error Handling
-
-The majority of mod.io SDK functions return a `Modio::ErrorCode`. In particular, asynchronous callbacks execute with a `Modio::ErrorCode` as the first parameter.
-
-==== Checking for errors
-
-You can check if a `Modio::ErrorCode` represents a success or failure by checking its 'truthyness'. If an ErrorCode evaluates to true, the function failed.
-
-[source,cpp]
-----
-Modio::ErrorCode ec;
-if (ec)
-{
-    // Error code was truthy, therefore an error occurred.
-}
-else
-{
-    // Error code was false-y, therefore the operation succeeded
-}
-----
-
-==== Inspecting ErrorCodes more deeply
-
-Sometimes, this information will be all that is required, just a simple 'success/fail' that you can handle.
-
-In many cases, however, you will want to perform some degree of inspection on an ErrorCode to determine specific information about that error. If nothing else you can display a reason for the failure to the end user.
-
-===== Direct Queries
-
-It's possible to query the raw value of an ErrorCode by comparing it against a particular enum value. For example, to check if a particular ErrorCode represents a filesystem error of 'Not enough space', you could do the following:
-
-[source,cpp]
-----
-if (ec == Modio::FilesystemError::InsufficientSpace)
-{
-    // Handle insufficient space by possibly deleting some files.
-}
-else
-{
-    // Other error handling here
-}
-----
-
-Of course, this means you can chain such checks together:
-
-[source,cpp]
-----
-if (ec == Modio::FilesystemError::InsufficientSpace)
-{
-    // Handle insufficient space by possibly deleting some files.
-}
-else if (ec == Modio::FilesystemError::NoPermission)
-{
-    // Handle permissions error by asking the user to re-run as admin, or prompt for priviledge elevation.
-}
-else
-{
-    // Other error handling here
-}
-----
-
-This isn't ideal though, here are some reasons:
-
-* It's considerably verbose
-* Doesn't check for semantic equivalency, only literal equivalency. In other words, some other error that derives from similar issues would return false because the codes don't match
-* It requires you to handle each case regardless of whether you need to or not
-* Scales poorly if there are several error codes with equivalent semantics in this context.
-
-We can address these by using 'semantic queries' against the error code rather than directly comparing numerical values.
-
-===== Semantic Queries
-The SDK provides a function with several overloads that you can use to query for the semantic meaning of an ErrorCode.
-
-Firstly, you can query if an ErrorCode is equivalent to a specific raw enum value:
-
-[source,cpp]
-----
-Modio::ErrorCode ec;
-if (Modio::ErrorCodeMatches(ec, Modio::HttpError::CannotOpenConnection))
-{
-    // We couldn't connect to the mod.io server
-}
-----
-
-This can be chained together like the literal value comparison mentioned earlier:
-
-[source,cpp]
-----
-Modio::ErrorCode ec;
-if (Modio::ErrorCodeMatches(ec, Modio::HttpError::CannotOpenConnection))
-{
-    // We couldn't connect to the mod.io server
-}
-else if (Modio::ErrorCodeMatches(ec, Modio::HttpError::ServerClosedConnection))
-{
-    // Server unexpectedly closed the connection
-}
-----
-
-However, this still requires knowledge of the different types of HTTP errors. In your application you probably don't need to handle them differently. The semantics of networking errors are largely 'try the function again later'.
-
-This is where the second overload of <<ErrorCodeMatches>> comes in. It allows you to query if the error satisfies a particular condition, such as 'does this code represent some kind of networking error':
-
-[source,cpp]
-----
-Modio::ErrorCode ec;
-if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::NetworkError))
-{
-    // Error code represents some kind of network error
-}
-else
-{
-    // Error code is not a network error
-}
-----
-
-By querying if the error meets a specific condition, you can focus on handling a family of errors (in this case, network transmission errors) without needing to deal with individual errors within that group. No more manually checking against individual HttpError values, just a single query.
-
-As a second example, when you ask the SDK to retrieve information about a specific mod, that ModID might be invalid or deleted. Both of these result in an error, which you could handle like the following:
-
-[source,cpp]
-----
-// Inside a Modio::GetModInfoAsync callback
-if (Modio::ErrorCodeMatches(ec, Modio::ApiError::RequestedModNotFound))
-{
-    // The ModID wasn't valid, we couldn't find it
-}
-else if (Modio::ErrorCodeMatches(ec, Modio::ApiError::RequestedModDeleted))
-{
-    // The ModID used to be valid, but the mod was deleted
-}
-else
-{
-    // Some other error...
-}
-----
-
-However, you may not care about the reasons the mod couldn't be retrieved, just that the mod information did not return a valid object.
-
-In this case, you can query if the error code matches the `EntityNotFoundError` condition:
-
-[source,cpp]
-----
-// In Modio::GetModInfoAsync callback
-if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::EntityNotFoundError))
-{
-    // The mod couldn't be found. Handle appropriately.
-}
-----
-
-By grouping these codes into semantic checks, it helps you to potentially consolidate your error handling into a more limited set of generic error handlers rather than needing to deal with each potential outcome individually.
-
-==== Putting it all together
-
-By combining queries of categories with queries of specific values, you can handle general families of errors at a single location with special-case clauses for a particular error as necessary:
-
-[source,cpp]
-----
-Modio::GetModInfoAsync(ModID, [](Modio::ErrorCode ec, Modio::Optional<Modio::ModInfo> Info)
-{
-    if (ec)
-    {
-        if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::NetworkError)) // NetworkError group
-        {
-            // Error code represents some network error kind. Possibly ask the user to try again later.
-        }
-        else if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::EntityNotFoundError)) // Entity Not Found group
-        {
-            // An mod entity is not located with this configuration. Therefore, the list you're fetching the ModID from is probably stale. A remedy could be to fetch an updated version of the list from the server.
-        }
-        else if (Modio::ErrorCodeMatches(ec, Modio::GenericError::SDKNotInitialized)) // SDK not initialized group
-        {
-            // Your application is trying to call SDK functions without initializing the SDK first
-        }
-    }
-});
-
-----
-
-==== Parameter Validation Errors
-
-Some of the SDK functions may return errors that indicate a parameter or data validation failure. For these cases, the SDK parses the error response from the mod.io API and stores the information about which parameters failed validation until the next network request executes. If an SDK function returns an error which matches `Modio::ErrorConditionTypes::InvalidArgsError`, you can call <<GetLastValidationError>> in your callback to retrieve those errors and display appropriate feedback to the end-user.
-
-'''
-
 === SDK quick-start: In-game mod submission
+
+NOTE: This functionality is demonstrated in example 08_SubmitMod
 
 Submitting a mod from inside your game and making it visible to other players involves two steps:
 
@@ -1247,6 +991,8 @@ Note | If you add an already subscribed mod to TempModSet, it will not download 
 
 === SDK quick-start: Multithreading [[use-background-thread]]
 
+NOTE: This functionality is demonstrated in example 07_Threading
+
 As mentioned in <<sdk-initialization,the quick-start section on initialization>>, the SDK supports <<RunPendingHandlers>> being run on a secondary thread that already exists or a dedicated background thread you create specifically to peform SDK work.
 
 NOTE: Callbacks you provide to the SDK will run **on the thread running <<RunPendingHandlers>>** - if you host <<RunPendingHandlers>> on a different thread, it is your responsibility to synchronize with the main thread if you wish to pass results back to it, through callbacks you provide to the SDK.
@@ -1295,6 +1041,8 @@ If the SDK runs for the lifetime of your application and you do not call <<Shutd
 
 
 === SDK quick-start: Monetization
+
+NOTE: This functionality is demonstrated in example 09_MonetizationWalletManagement (for initialization and wallet management) and 10_MonetizationPurchase (for purchase functionality).
 
 The mod.io SDK supports all of the mod.io monetization features, allowing you sell a per-game virtual currency to your players that they can use to purchase mods, with a share of the revenue split between creators and your studio. Visit HERE (TODO) for an overview of the mod.io monetization system.
 
@@ -1379,6 +1127,187 @@ Modio::PurchaseModAsync(ModId, ModPrice, [](Modio::ErrorCode ec, Modio::Optional
 
 Even though all purchased mods are automatically subscribed, the user can still unsubscribe from them and uninstall them; however, they still remain owned and purchased by the user. They must re-subscribe to the mod in order to have it installed. This is facilitated by `<<FetchUserPurchasesAsync>>`, which will fetch a list of a users purchased mods. After a successful call, you can then display them with <<QueryUserPurchases>>, allowing re-subscription if necessary.
 
-=== Sample Code
+=== SDK quick-start: Error Handling
 
-All platforms have a Monetization sample, demonstrating this flow along with how to handle each platform's commerce and store. For configuration of the virtual currency for each platform, check out the mod.io documentation website.
+The majority of mod.io SDK functions return a `Modio::ErrorCode`. In particular, asynchronous callbacks execute with a `Modio::ErrorCode` as the first parameter.
+
+==== Checking for errors
+
+You can check if a `Modio::ErrorCode` represents a success or failure by checking its 'truthyness'. If an ErrorCode evaluates to true, the function failed.
+
+[source,cpp]
+----
+Modio::ErrorCode ec;
+if (ec)
+{
+    // Error code was truthy, therefore an error occurred.
+}
+else
+{
+    // Error code was false-y, therefore the operation succeeded
+}
+----
+
+==== Inspecting ErrorCodes more deeply
+
+Sometimes, this information will be all that is required, just a simple 'success/fail' that you can handle.
+
+In many cases, however, you will want to perform some degree of inspection on an ErrorCode to determine specific information about that error. If nothing else you can display a reason for the failure to the end user.
+
+===== Direct Queries
+
+It's possible to query the raw value of an ErrorCode by comparing it against a particular enum value. For example, to check if a particular ErrorCode represents a filesystem error of 'Not enough space', you could do the following:
+
+[source,cpp]
+----
+if (ec == Modio::FilesystemError::InsufficientSpace)
+{
+    // Handle insufficient space by possibly deleting some files.
+}
+else
+{
+    // Other error handling here
+}
+----
+
+Of course, this means you can chain such checks together:
+
+[source,cpp]
+----
+if (ec == Modio::FilesystemError::InsufficientSpace)
+{
+    // Handle insufficient space by possibly deleting some files.
+}
+else if (ec == Modio::FilesystemError::NoPermission)
+{
+    // Handle permissions error by asking the user to re-run as admin, or prompt for priviledge elevation.
+}
+else
+{
+    // Other error handling here
+}
+----
+
+This isn't ideal though, for several reasons:
+
+* It's considerably verbose
+* It doesn't check for semantic equivalency, only literal equivalency. In other words, some other error that derives from similar issues would return false because the codes don't match
+* It requires you to handle each case regardless of whether you need to or not
+* It scales poorly if there are several error codes with equivalent semantics in this context.
+
+We can address these by using 'semantic queries' against the error code rather than directly comparing numerical values.
+
+===== Semantic Queries
+The SDK provides a function with several overloads that you can use to query for the semantic meaning of an ErrorCode.
+
+Firstly, you can query if an ErrorCode is equivalent to a specific raw enum value:
+
+[source,cpp]
+----
+Modio::ErrorCode ec;
+if (Modio::ErrorCodeMatches(ec, Modio::HttpError::CannotOpenConnection))
+{
+    // We couldn't connect to the mod.io server
+}
+----
+
+This can be chained together like the literal value comparison mentioned earlier:
+
+[source,cpp]
+----
+Modio::ErrorCode ec;
+if (Modio::ErrorCodeMatches(ec, Modio::HttpError::CannotOpenConnection))
+{
+    // We couldn't connect to the mod.io server
+}
+else if (Modio::ErrorCodeMatches(ec, Modio::HttpError::ServerClosedConnection))
+{
+    // Server unexpectedly closed the connection
+}
+----
+
+However, this still requires knowledge of the different types of HTTP errors. In your application you probably don't need to handle them differently. The semantics of networking errors are largely 'try the function again later'.
+
+This is where the second overload of <<ErrorCodeMatches>> comes in. It allows you to query if the error satisfies a particular condition, such as 'does this code represent some kind of networking error':
+
+[source,cpp]
+----
+Modio::ErrorCode ec;
+if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::NetworkError))
+{
+    // Error code represents some kind of network error
+}
+else
+{
+    // Error code is not a network error
+}
+----
+
+By querying if the error meets a specific condition, you can focus on handling a family of errors (in this case, network transmission errors) without needing to deal with individual errors within that group. No more manually checking against individual HttpError values, just a single query.
+
+As a second example, when you ask the SDK to retrieve information about a specific mod, that ModID might be invalid or deleted. Both of these result in an error, which you could handle like the following:
+
+[source,cpp]
+----
+// Inside a Modio::GetModInfoAsync callback
+if (Modio::ErrorCodeMatches(ec, Modio::ApiError::RequestedModNotFound))
+{
+    // The ModID wasn't valid, we couldn't find it
+}
+else if (Modio::ErrorCodeMatches(ec, Modio::ApiError::RequestedModDeleted))
+{
+    // The ModID used to be valid, but the mod was deleted
+}
+else
+{
+    // Some other error...
+}
+----
+
+However, you may not care about the reasons the mod couldn't be retrieved, just that the mod information did not return a valid object.
+
+In this case, you can query if the error code matches the `EntityNotFoundError` condition:
+
+[source,cpp]
+----
+// In Modio::GetModInfoAsync callback
+if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::EntityNotFoundError))
+{
+    // The mod couldn't be found. Handle appropriately.
+}
+----
+
+By grouping these codes into semantic checks, it helps you to potentially consolidate your error handling into a more limited set of generic error handlers rather than needing to deal with each potential outcome individually.
+
+==== Putting it all together
+
+By combining queries of categories with queries of specific values, you can handle general families of errors at a single location with special-case clauses for a particular error as necessary:
+
+[source,cpp]
+----
+Modio::GetModInfoAsync(ModID, [](Modio::ErrorCode ec, Modio::Optional<Modio::ModInfo> Info)
+{
+    if (ec)
+    {
+        if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::NetworkError)) // NetworkError group
+        {
+            // Error code represents some network error kind. Possibly ask the user to try again later.
+        }
+        else if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::EntityNotFoundError)) // Entity Not Found group
+        {
+            // An mod entity is not located with this configuration. Therefore, the list you're fetching the ModID from is probably stale. A remedy could be to fetch an updated version of the list from the server.
+        }
+        else if (Modio::ErrorCodeMatches(ec, Modio::GenericError::SDKNotInitialized)) // SDK not initialized group
+        {
+            // Your application is trying to call SDK functions without initializing the SDK first
+        }
+    }
+});
+
+----
+
+==== Parameter Validation Errors
+
+Some of the SDK functions may return errors that indicate a parameter or data validation failure. For these cases, the SDK parses the error response from the mod.io API and stores the information about which parameters failed validation until the next network request executes. If an SDK function returns an error which matches `Modio::ErrorConditionTypes::InvalidArgsError`, you can call <<GetLastValidationError>> in your callback to retrieve those errors and display appropriate feedback to the end-user.
+
+'''

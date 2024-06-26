@@ -35,8 +35,11 @@ namespace Modio
 				{
 					{
 						MODIO_PROFILE_SCOPE(SerializeModCollection);
-						nlohmann::json ModCollectionData =
-							nlohmann::json::object({Modio::Detail::SDKSessionData::GetSystemModCollection()});
+						nlohmann::json ModCollectionData = []() {
+							auto Lock = Modio::Detail::SDKSessionData::GetReadLock();
+							return nlohmann::json::object({Modio::Detail::SDKSessionData::GetSystemModCollection()});
+						}();
+
 						ModCollectionData["version"] = 1;
 						auto teststring = ModCollectionData.dump();
 

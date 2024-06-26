@@ -51,10 +51,10 @@ namespace Modio
 		Modio::Optional<Modio::EntitlementWalletBalance> WalletBalance;
 
 		/// @docnone
-		friend MODIO_IMPL void from_json(const nlohmann::json& Json, EntitlementConsumptionStatusList& OutEntitlementConsumptionStatusList);
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, EntitlementConsumptionStatusList& OutEntitlementConsumptionStatusList);
 
 		/// @docnone
-		friend MODIO_IMPL void from_json(const nlohmann::json& Json, EntitlementWalletBalance& WalletBalance);
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, EntitlementWalletBalance& WalletBalance);
 	};
 
 } // namespace Modio

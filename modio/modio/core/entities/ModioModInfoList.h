@@ -39,9 +39,8 @@ namespace Modio
 		}
 
 		/// @docnone
-		friend MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::ModInfoList& OutModInfoList);
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModInfoList& OutModInfoList);
 	};
-
 } // namespace Modio
 
 #ifndef MODIO_SEPARATE_COMPILATION

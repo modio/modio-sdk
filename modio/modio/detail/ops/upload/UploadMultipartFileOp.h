@@ -21,7 +21,7 @@
 #include "modio/detail/ModioObjectTrack.h"
 #include "modio/detail/ModioOperationQueue.h"
 #include "modio/detail/ModioSDKSessionData.h"
-#include "modio/detail/entities/ModioUploadSession.h"
+#include "modio/detail/serialization/ModioUploadSessionSerialization.h"
 #include "modio/detail/http/PerformRequestImpl.h"
 #include "modio/detail/http/ResponseError.h"
 #include "modio/detail/ops/upload/Multipart/MultipartGetSessionOp.h"

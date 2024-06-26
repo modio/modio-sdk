@@ -18,7 +18,6 @@ namespace Modio
 {
 	/// @docpublic
 	/// @brief Simple struct containing simplified information about a mod which is a dependency of another mod
-	/// @experimental
 	struct ModDependency
 	{
 		Modio::ModID ModID;
@@ -30,7 +29,6 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Container for a collection of ModDependency objects
-	/// @experimental
 	class ModDependencyList : public PagedResult, public List<std::vector, ModDependency>
 	{
 		/// @docnone

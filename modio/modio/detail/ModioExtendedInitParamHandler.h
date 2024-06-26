@@ -20,7 +20,6 @@ namespace Modio
 	{
 		struct InternalConstants
 		{
-			static constexpr const char* ServerURL = "ServerURL";
 			static constexpr const char* OAuthToken = "OAuthToken";
 			static constexpr const char* PlatformOverride = "PlatformOverride";
 		};
@@ -47,13 +46,6 @@ namespace Modio
 			/// @param InitParams Mutable set of initialization options to process
 			static void PostSessionDataInit(Modio::InitializeOptions& InitParams)
 			{
-				Modio::Optional<std::string> ServerURLOverride =
-					GetExtendedParameterValue(InitParams, Modio::Detail::InternalConstants::ServerURL);
-				if (ServerURLOverride.has_value())
-				{
-					Modio::Detail::SDKSessionData::SetEnvironmentOverrideUrl(*ServerURLOverride);
-				}
-
 				Modio::Optional<std::string> PlatformOverride =
 					GetExtendedParameterValue(InitParams, Modio::Detail::InternalConstants::PlatformOverride);
 

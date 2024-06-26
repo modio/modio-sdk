@@ -9,9 +9,11 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioBuffer.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/serialization/ModioModDependencySerialization.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/http/ModioHttpParams.h"
 

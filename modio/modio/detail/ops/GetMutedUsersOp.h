@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "modio/core/entities/ModioUserList.h"
+#include "modio/detail/serialization/ModioUserListSerialization.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/http/ModioHttpParams.h"

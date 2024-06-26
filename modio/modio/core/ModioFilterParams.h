@@ -33,7 +33,8 @@ namespace Modio
 			Rating, /** use mod rating */
 			DateMarkedLive, /** use date mod was marked live */
 			DateUpdated, /** use date mod was last updated */
-			DownloadsTotal /** use total downloads */
+			DownloadsTotal, /** use total downloads */
+			Alphabetical /** use mod name */
 		};
 
 		/// @docpublic

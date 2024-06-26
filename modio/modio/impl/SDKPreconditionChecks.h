@@ -14,7 +14,7 @@
 #include "modio/core/ModioInitializeOptions.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioServices.h"
-#include "modio/core/entities/ModioEntitlementConsumptionStatusList.h"
+#include "modio/detail/serialization/ModioEntitlementConsumptionStatusListSerialization.h"
 #include "modio/detail/ModioSDKSessionData.h"
 
 /// @brief These are templated helper functions - they take in the user-provided completion handler, check some

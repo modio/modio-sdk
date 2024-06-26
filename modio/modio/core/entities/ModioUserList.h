@@ -41,7 +41,7 @@ namespace Modio
 		}
 
 		/// @docnone
-		friend MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::UserList& OutUserList);
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::UserList& OutUserList);
 	};
 
 } // namespace Modio

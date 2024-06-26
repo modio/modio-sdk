@@ -48,19 +48,22 @@ namespace Modio
 						// left off when we return from `yield`.
 
 						// Check for pending uninstallations regardless of user
-						for (auto ModEntry :
-							 Modio::Detail::SDKSessionData::GetSystemModCollection().SortEntriesByRetryPriority())
 						{
-							if (ModEntry->GetModState() == Modio::ModState::UninstallPending)
+							auto Lock = Modio::Detail::SDKSessionData::GetReadLock();
+							for (auto ModEntry :
+								 Modio::Detail::SDKSessionData::GetSystemModCollection().SortEntriesByRetryPriority())
 							{
-								if (ModEntry->ShouldRetry())
+								if (ModEntry->GetModState() == Modio::ModState::UninstallPending)
 								{
-									//Dont uninstall mod yet if it is still in TempModSet
-									if ( (Modio::Detail::SDKSessionData::GetTemporaryModSet() != nullptr &&
-										 Modio::Detail::SDKSessionData::GetTemporaryModSet()->ContainsModId(
-											 ModEntry->GetID())) == false)
+									if (ModEntry->ShouldRetry())
 									{
-										EntryToProcess = ModEntry;
+										// Dont uninstall mod yet if it is still in TempModSet
+										if ((Modio::Detail::SDKSessionData::GetTemporaryModSet() != nullptr &&
+											 Modio::Detail::SDKSessionData::GetTemporaryModSet()->ContainsModId(
+												 ModEntry->GetID())) == false)
+										{
+											EntryToProcess = ModEntry;
+										}
 									}
 								}
 							}
