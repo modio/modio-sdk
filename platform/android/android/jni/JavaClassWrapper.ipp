@@ -19,22 +19,28 @@ namespace Modio
 
 			jclass LocalClass;
 
-			if (ClassLoader != nullptr)
+			if (ClassLoader != NULL)
 			{
 				jmethodID FindClassMethod = Modio::Detail::AndroidContextService::Get().GetFindClassMethod();
 
 				jstring ClassNameObj = Env->NewStringUTF("com/modio/modiosdk/Modio");
 				LocalClass = static_cast<jclass>(Env->CallObjectMethod(ClassLoader, FindClassMethod, ClassNameObj));
 				Env->DeleteLocalRef(ClassNameObj);
+				if (Modio::Detail::JavaExceptionHelper::CheckJavaException(Env) || LocalClass == NULL)
+				{
+					Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core,
+												"Failed to find class: " + ClassName);
+					return;
+				}
 
-				Class = (jclass) Env->NewGlobalRef(LocalClass);
+				Class = (jclass)Env->NewGlobalRef(LocalClass);
 				Env->DeleteLocalRef(LocalClass);
 			}
 			else
 			{
 				// Get the class
 				LocalClass = Env->FindClass(ClassName.c_str());
-				if (LocalClass == NULL)
+				if (Modio::Detail::JavaExceptionHelper::CheckJavaException(Env) || LocalClass == NULL)
 				{
 					Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core,
 												"Failed to find class: " + ClassName);
@@ -42,12 +48,11 @@ namespace Modio
 				}
 				Class = (jclass) Env->NewGlobalRef(LocalClass);
 				Env->DeleteLocalRef(LocalClass);
-
 			}
 
 			// Get the constructor
 			jmethodID LocalConstructor = Env->GetMethodID(Class, "<init>", ConstructorSignature);
-			if (LocalConstructor == NULL)
+			if (Modio::Detail::JavaExceptionHelper::CheckJavaException(Env) || LocalConstructor == NULL)
 			{
 				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to find constructor for class: " + ClassName);
 				return;
@@ -58,6 +63,12 @@ namespace Modio
 			va_start(Args, ConstructorSignature);
 			auto LocalObject = Env->NewObjectV(Class, LocalConstructor, Args);
 			va_end(Args);
+
+			if (Modio::Detail::JavaExceptionHelper::CheckJavaException(Env) || LocalObject == NULL)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to create object for class: " + ClassName);
+				return;
+			}
 
 			Object = Env->NewGlobalRef(LocalObject);
 		}
@@ -101,7 +112,7 @@ namespace Modio
 			jobject Return = Env->CallObjectMethodV(Object, Method, Args);
 			va_end(Args);
 
-			std::string Result = Modio::Detail::JavaHelpers::StringFromLocalRef(Env, (jstring) Return);
+			std::string Result = Modio::Detail::JavaTypeHelper::StringFromLocalRef(Env, (jstring) Return);
 
 			return Result;
 		}
@@ -120,7 +131,5 @@ namespace Modio
 			Env->CallVoidMethodV(Object, Method, Args);
 			va_end(Args);
 		}
-
-
 	}
 }

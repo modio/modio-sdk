@@ -12,11 +12,11 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioServices.h"
-#include "modio/core/entities/ModioTransactionRecord.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioSDKSessionData.h"
-#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/ops/SaveModCollectionToStorage.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/serialization/ModioTransactionRecordSerialization.h"
 #include "modio/userdata/ModioUserDataService.h"
 
 #include <asio/yield.hpp>
@@ -30,7 +30,7 @@ namespace Modio
 			PurchaseModOp(Modio::GameID GameID, Modio::ApiKey ApiKey, Modio::ModID ModID, uint64_t PriceInTokens)
 				: GameID(GameID),
 				  ApiKey(ApiKey),
-				  ModId(ModID), 
+				  ModId(ModID),
 				  PriceInTokens(PriceInTokens)
 			{}
 
@@ -41,7 +41,9 @@ namespace Modio
 				{
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer,
-						Modio::Detail::PurchaseRequest.SetGameID(GameID).SetModID(ModId).AddQueryParamRaw("display_amount", fmt::format("{}", PriceInTokens))
+						Modio::Detail::PurchaseRequest.SetGameID(GameID)
+							.SetModID(ModId)
+							.AddQueryParamRaw("display_amount", fmt::format("{}", PriceInTokens))
 							.AddQueryParamRaw("idempotent_key", fmt::format("{}", ModId))
 							.AddHeaderRaw("X-Modio-Idempotent-Key", fmt::format("{}", ModId)),
 						Modio::Detail::CachedResponse::Disallow, std::move(Self));
@@ -62,8 +64,7 @@ namespace Modio
 					}
 
 					{
-						Record =
-							TryMarshalResponse<Modio::TransactionRecord>(ResponseBodyBuffer);
+						Record = TryMarshalResponse<Modio::TransactionRecord>(ResponseBodyBuffer);
 						if (!Record.has_value())
 						{
 							Modio::Detail::SDKSessionData::InvalidatePurchaseCache();

@@ -17,7 +17,17 @@ namespace Modio
 			JNIEnv* Env = Modio::Detail::AndroidContextService::Get().GetJavaEnv();
 			
 			GetCertificatePathMethodId = Env->GetMethodID(Class, "getCertificatePath", "()Ljava/lang/String;");
+			if (Modio::Detail::JavaExceptionHelper::CheckJavaException(Env) || GetCertificatePathMethodId == NULL)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to find method getCertificatePath in class Modio");
+				return;
+			}
 			GetStoragePathMethodId = Env->GetMethodID(Class, "getStorageDirectory", "()Ljava/lang/String;");
+			if (Modio::Detail::JavaExceptionHelper::CheckJavaException(Env) || GetStoragePathMethodId == NULL)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to find method getStorageDirectory in class Modio");
+				return;
+			}
 		} 
 
 		std::string JavaClassWrapperModio::GetCertificatePath()

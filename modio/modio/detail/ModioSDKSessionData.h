@@ -39,9 +39,7 @@ namespace Modio
 		{
 		public:
 			/// @brief Initializes the static SDK state with the provided parameters.
-			/// @param GameID
-			/// @param APIKey
-			/// @param Environment
+			/// @param Options Initialization options for the SDK
 			/// @return false if the SDK is already initialized, or already running when this is called
 			MODIO_IMPL static bool Initialize(const Modio::InitializeOptions& Options);
 
@@ -65,6 +63,7 @@ namespace Modio
 
 			MODIO_IMPL static ModCollection FilterSystemModCollectionByUserSubscriptions();
 			MODIO_IMPL static void InitializeForUser(Modio::User User, Modio::Detail::OAuthToken AuthToken);
+			MODIO_IMPL static void UpdateTokenForExistingUser(Modio::Detail::OAuthToken AuthToken);
 			MODIO_IMPL static const Modio::Optional<Modio::Detail::OAuthToken> GetAuthenticationToken();
 
 			MODIO_IMPL static Modio::UserSubscriptionList& GetUserSubscriptions();
@@ -198,7 +197,7 @@ namespace Modio
 				InitializationComplete
 			};
 
-			MODIO_IMPL SDKSessionData(const Modio::InitializeOptions& Options);
+			MODIO_IMPL SDKSessionData(const Modio::InitializeOptions& Options, Modio::Language InLocalLanguage);
 			MODIO_IMPL SDKSessionData();
 
 			// This may not need to be public, can probably just expose static accessors that call it
@@ -206,13 +205,13 @@ namespace Modio
 
 			Modio::GameID GameID;
 			Modio::ApiKey APIKey;
-			Modio::Environment Environment;
+			Modio::Environment Environment = Modio::Environment::Live;
 			Modio::Optional<std::string> EnvironmentOverrideUrl;
 			Modio::Optional<std::string> PlatformOverride;
 			Modio::Optional<std::string> PlatformEnvironment;
 			Modio::Optional<Modio::PlatformStatus> PlatformStatusFilter;
-			Modio::Portal PortalInUse;
-			Modio::Language LocalLanguage;
+			Modio::Portal PortalInUse = Modio::Portal::None;
+			Modio::Language LocalLanguage = Modio::Language::English;
 			InitializationState CurrentInitializationState = InitializationState::NotInitialized;
 			bool bModManagementEnabled = false;
 			std::vector<struct FieldError> LastValidationError;

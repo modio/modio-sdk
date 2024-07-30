@@ -36,15 +36,12 @@ namespace Modio
 			Value = Convert(GameMaturityOptions::None);
 		};
 		using Modio::FlagImpl<GameMaturityOptions>::FlagImpl;
+
+			/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GameMaturityOptionsFlags& GameMaturity);
+
+		/// @docnone
+		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::GameMaturityOptionsFlags& GameMaturity);
+
 	};
-
-	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::GameMaturityOptionsFlags& GameMaturity);
-
-	/// @docnone
-	MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::GameMaturityOptionsFlags& GameMaturity);
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "modio/core/entities/ModioGameMaturityOptions.ipp"
-#endif

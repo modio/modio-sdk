@@ -26,7 +26,3 @@ namespace Modio
 	};
 
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "ModioModDetails.ipp"
-#endif

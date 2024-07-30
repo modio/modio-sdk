@@ -541,9 +541,10 @@ namespace Modio
 	enum class LogLevel
 	{
 		Trace = 0, ///< Detailed low-level debugging output. Not intended for general use
-		Info = 1, ///< Informational output containing status messages
-		Warning = 2, ///< Warnings about incorrect SDK usage, timeouts
-		Error = 3
+		Detailed = 1, ///< Detailed but not low-level. Generally useful for some mid-level information for debugging.
+		Info = 2, ///< Informational output containing status messages
+		Warning = 3, ///< Warnings about incorrect SDK usage, timeouts
+		Error = 4
 	};
 
 	/// @docpublic

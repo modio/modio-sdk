@@ -22,7 +22,11 @@ namespace Modio
 		
 		inline void from_json(const nlohmann::json& Json, Modio::Detail::UploadSession& Session)
 		{
-			Detail::ParseSafe(Json, Session.UploadID, "upload_id");
+			std::string UploadID;
+			if (Detail::ParseSafe(Json, UploadID, "upload_id"))
+			{
+				Session.UploadID = UploadID;
+			}
 			Detail::ParseSafe(Json, Session.UploadStatus, "status");
 		}
 

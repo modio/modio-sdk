@@ -11,8 +11,8 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/core/entities/ModioModDetails.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/serialization/ModioModDetailsSerialization.h"
 #include <asio/coroutine.hpp>
 
 #include <asio/yield.hpp>
@@ -44,7 +44,10 @@ namespace Modio
 				{
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer,
-						Modio::Detail::GetModfilesRequest.SetGameID(GameID).SetModID(ModId).AddPlatformStatusFilter().AddStatusFilter(),
+						Modio::Detail::GetModfilesRequest.SetGameID(GameID)
+							.SetModID(ModId)
+							.AddPlatformStatusFilter()
+							.AddStatusFilter(),
 						Modio::Detail::CachedResponse::Disallow, std::move(Self));
 
 					if (ec)

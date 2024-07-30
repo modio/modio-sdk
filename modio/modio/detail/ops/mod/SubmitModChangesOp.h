@@ -11,10 +11,10 @@
 #pragma once
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCreateModParams.h"
-#include "modio/core/entities/ModioModInfo.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/serialization/ModioModInfoSerialization.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 
 namespace Modio
@@ -41,13 +41,13 @@ namespace Modio
 				{
 					EditRequestParams = EditRequestParams.AppendPayloadFile("logo", Params.LogoPath.value());
 				}
-				
+
 				if (Params.Visibility.has_value())
 				{
-					EditRequestParams =
-						EditRequestParams.AppendPayloadValue("visible", fmt::format("{}", static_cast<std::uint8_t>(Params.Visibility.value())));
+					EditRequestParams = EditRequestParams.AppendPayloadValue(
+						"visible", fmt::format("{}", static_cast<std::uint8_t>(Params.Visibility.value())));
 				}
-				
+
 				if (Params.MaturityRating.has_value())
 				{
 					EditRequestParams = EditRequestParams.AppendPayloadValue(

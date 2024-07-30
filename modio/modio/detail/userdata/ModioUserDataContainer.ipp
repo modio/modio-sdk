@@ -31,6 +31,11 @@ namespace Modio
 			AuthenticatedProfile = Modio::Detail::ProfileData {AuthenticatedUser, AuthToken};
 		}
 
+		void UserDataContainer::UpdateTokenForExistingUser(Modio::Detail::OAuthToken AuthToken)
+		{
+			AuthenticatedProfile = Modio::Detail::ProfileData {AuthenticatedProfile->GetUser(), AuthToken};
+		}
+
 		const Modio::Optional<Modio::User> UserDataContainer::GetAuthenticatedUser() const
 		{
 			return AuthenticatedProfile.map_or(&Modio::Detail::ProfileData::GetUser, Modio::Optional<Modio::User> {});

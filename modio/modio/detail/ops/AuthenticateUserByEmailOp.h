@@ -13,10 +13,10 @@
 #include "modio/cache/ModioCacheService.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/core/entities/ModioToken.h"
-#include "modio/core/entities/ModioUser.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/serialization/ModioTokenSerialization.h"
+#include "modio/detail/serialization/ModioUserSerialization.h"
 #include "modio/http/ModioHttpParams.h"
 #include "modio/userdata/ModioUserDataService.h"
 
@@ -88,7 +88,7 @@ namespace Modio
 						Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
 						return;
 					}
-					
+
 					Local.ResponseBodyBuffer.Clear();
 
 					Modio::Detail::SDKSessionData::InitializeForUser(std::move(Local.NewlyAuthenticatedUser),

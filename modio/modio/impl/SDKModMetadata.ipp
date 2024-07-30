@@ -29,6 +29,11 @@
 #include "modio/detail/ops/mod/ListAllModsOp.h"
 #include "modio/detail/ops/mod/ListUserCreatedModsOp.h"
 #include "modio/detail/ops/mod/SubmitModRatingOp.h"
+#include "modio/detail/serialization/ModioFileMetadataSerialization.h"
+#include "modio/detail/serialization/ModioImageSerialization.h"
+#include "modio/detail/serialization/ModioModStatsSerialization.h"
+#include "modio/detail/serialization/ModioProfileMaturitySerialization.h"
+#include "modio/detail/serialization/ModioResponseErrorSerialization.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 
 // Implementation header - do not include directly
@@ -171,18 +176,8 @@ namespace Modio
 		});
 	}
 
-	#if !defined(MODIO_NO_DEPRECATED)
 	void GetModDependenciesAsync(
-		Modio::ModID ModID,
-		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback)
-	{
-		GetModDependenciesAsync(ModID, false, std::move(Callback));
-	}
-	#endif
-
-	void GetModDependenciesAsync(
-		Modio::ModID ModID,
-		bool Recursive,
+		Modio::ModID ModID, bool Recursive,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([ModID, Recursive, Callback = std::move(Callback)]() mutable {
@@ -191,7 +186,8 @@ namespace Modio
 			{
 				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList>)>,
 									void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList>)>(
-					Modio::Detail::GetModDependenciesOp(ModID, Modio::Detail::SDKSessionData::CurrentGameID(), Recursive),
+					Modio::Detail::GetModDependenciesOp(ModID, Modio::Detail::SDKSessionData::CurrentGameID(),
+														Recursive),
 					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 		});

@@ -63,15 +63,12 @@ namespace Modio
 			Value = Convert(MaturityOption::None);
 		};
 		using Modio::FlagImpl<MaturityOption>::FlagImpl;
+
+		/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ProfileMaturity& ProfileMaturity);
+
+		/// @docnone
+		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::ProfileMaturity& ProfileMaturity);
+
 	};
-
-	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::ProfileMaturity& ProfileMaturity);
-	
-	/// @docnone
-	MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::ProfileMaturity& ProfileMaturity);
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "modio/core/entities/ModioProfileMaturity.ipp"
-#endif

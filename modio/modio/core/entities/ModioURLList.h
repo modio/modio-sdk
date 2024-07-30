@@ -25,10 +25,10 @@ namespace Modio
 	class YoutubeURLList : public URLList
 	{
 		/// @docnone
-		friend MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::YoutubeURLList& YoutubeURLList);
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::YoutubeURLList& YoutubeURLList);
 		
 		/// @docnone
-		friend MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::YoutubeURLList& YoutubeURLList);
+		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::YoutubeURLList& YoutubeURLList);
 	};
 
 	/// @docpublic
@@ -36,14 +36,10 @@ namespace Modio
 	class SketchfabURLList : public URLList
 	{
 		/// @docnone
-		friend MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::SketchfabURLList& SketchfabURLList);
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::SketchfabURLList& SketchfabURLList);
 		
 		/// @docnone
-		friend MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::SketchfabURLList& SketchfabURLList);
+		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::SketchfabURLList& SketchfabURLList);
 	};
 
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "ModioURLList.ipp"
-#endif

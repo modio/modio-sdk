@@ -20,8 +20,26 @@ namespace Modio
 	/// @brief Simple struct containing simplified information about a mod which is a dependency of another mod
 	struct ModDependency
 	{
+		/// @brief Unique mod id.
 		Modio::ModID ModID;
+		/// @brief Name of the mod
 		std::string ModName;
+		/// @brief Unix timestamp of the date the mod was registered
+		std::int64_t DateAdded = 0;
+		/// @brief Unix timestamp of the date the mod was updated
+		std::int64_t DateUpdated = 0;
+		/// @brief The level at which this dependency sits. When greater than zero (0), it means that this dependency relies on additional dependencies.
+		std::uint8_t DependencyDepth = 0;
+		/// @brief Media data related to the mod logo
+		Modio::Detail::Logo Logo;
+
+		/// @brief Information about the mod's most recent public release
+		Modio::Optional<Modio::FileMetadata> FileInfo = {};
+
+		/// @brief The current ModStatus on the server: Accepted, NotAccepted, or Deleted.
+		Modio::ModServerSideStatus Status = Modio::ModServerSideStatus::NotAccepted;
+		/// @brief The visibility status of the mod, default to Public
+		Modio::ObjectVisibility Visibility = Modio::ObjectVisibility::Public;
 		
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModDependency& Dependency);
@@ -31,6 +49,13 @@ namespace Modio
 	/// @brief Container for a collection of ModDependency objects
 	class ModDependencyList : public PagedResult, public List<std::vector, ModDependency>
 	{
+	public:
+		/// @brief Total size of all the dependency files in bytes.
+		std::int64_t TotalFilesize = 0;
+		/// @brief Total Size of the uncompressed dependency files in bytes.
+		std::int64_t TotalFilesizeUncompressed = 0;
+
+	private:
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModDependencyList& List);
 	};

@@ -35,6 +35,8 @@ namespace Modio
         static const HttpRequestParams AuthenticateViaXboxLiveRequest { Modio::Detail::Verb::POST, "/external/xboxauth" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetGamesRequest { Modio::Detail::Verb::GET, "/games" }; 
         static const HttpRequestParams GetGameRequest { Modio::Detail::Verb::GET, "/games/{game-id}" }; 
+        static const HttpRequestParams BrowseGameEmhConfigsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/emh" }; 
+        static const HttpRequestParams GetGameEmhConfigRequest { Modio::Detail::Verb::GET, "/games/{game-id}/emh/{emh-id}" }; 
         static const HttpRequestParams GetGuidesRequest { Modio::Detail::Verb::GET, "/games/{game-id}/guides" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AddGuideRequest { Modio::Detail::Verb::POST, "/games/{game-id}/guides" , "multipart/form-data" }; 
         static const HttpRequestParams GetGuidesTagsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/guides/tags" , "application/x-www-form-urlencoded" }; 
@@ -126,6 +128,7 @@ namespace Modio
         static const HttpRequestParams ExchangeOauthRefreshTokenRequest { Modio::Detail::Verb::POST, "/oauth/token/refresh" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams PingRequest { Modio::Detail::Verb::GET, "/ping" }; 
         static const HttpRequestParams SubmitReportRequest { Modio::Detail::Verb::POST, "/report" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams S2sDisconnectUserRequest { Modio::Detail::Verb::DELETE, "/s2s/connections/{portal-id}" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams S2sTransactionClawbackRequest { Modio::Detail::Verb::POST, "/s2s/transactions/clawback" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams S2sTransactionCommitRequest { Modio::Detail::Verb::POST, "/s2s/transactions/commit" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams S2sTransactionIntentRequest { Modio::Detail::Verb::POST, "/s2s/transactions/intent" , "application/x-www-form-urlencoded" }; 

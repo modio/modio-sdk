@@ -29,10 +29,6 @@
 #include <functional>
 #include <memory>
 
-#ifndef MODIO_TRACE_DUMP_RESPONSE
-	#define MODIO_TRACE_DUMP_RESPONSE 0
-#endif
-
 namespace Modio
 {
 	namespace Detail
@@ -343,7 +339,14 @@ namespace Modio
 					}
 
 					Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Http,
-												"Response recieved for {}; status code was: {}", Request->Parameters().GetFormattedResourcePath(), ResponseCode);
+												"Response received for {}; status code was: {}", Request->Parameters().GetFormattedResourcePath(), ResponseCode);
+
+					Modio::Detail::Buffer ResponseBuffer(ResultBuffer.size());
+					Modio::Detail::BufferCopy(ResponseBuffer, ResultBuffer);
+
+					Modio::Detail::Logger().Log(Modio::LogLevel::Detailed, Modio::LogCategory::Http,
+												"Response body was {}",
+												std::string(ResponseBuffer.begin(), ResponseBuffer.end()));
 
 					if (ec != make_error_code(Modio::GenericError::EndOfFile))
 					{

@@ -189,18 +189,18 @@ namespace Modio
 		MODIO_IMPL Modio::ErrorCode GetLastError() const;
 
 		/// @docnone
-		friend MODIO_IMPL void to_json(nlohmann::json& j, const ModCollectionEntry& Entry);
+		MODIO_IMPL friend void to_json(nlohmann::json& j, const ModCollectionEntry& Entry);
 
 		/// @docnone
-		friend MODIO_IMPL void from_json(const nlohmann::json& j, ModCollectionEntry& Entry);
+		MODIO_IMPL friend void from_json(const nlohmann::json& j, ModCollectionEntry& Entry);
 
 		/// @docinternal
 		/// @brief If the conditions are met, it starts a transaction over the ModCollectionEntry
-		friend MODIO_IMPL void BeginTransactionImpl(ModCollectionEntry& Entry);
+		MODIO_IMPL friend void BeginTransactionImpl(ModCollectionEntry& Entry);
 
 		/// @docinternal
 		/// @brief Set the CurrentState to the RollbackState status
-		friend MODIO_IMPL void RollbackTransactionImpl(ModCollectionEntry& Entry);
+		MODIO_IMPL friend void RollbackTransactionImpl(ModCollectionEntry& Entry);
 	};
 
 	// TODO: @modio-core refactor ModProgressInfo to expose Total, Current, and State (hiding internal members)
@@ -433,9 +433,36 @@ namespace Modio
 		};
 
 		/// @docnone
+		constexpr static const char* ModManagementEventToString(EventType Event)
+		{
+			switch (Event)
+			{
+				case EventType::BeginInstall:
+					return "BeginInstall";
+				case EventType::Installed:
+					return "Installed";
+				case EventType::BeginUninstall:
+					return "BeginUninstall";
+				case EventType::Uninstalled:
+					return "Uninstalled";
+				case EventType::BeginUpdate:
+					return "BeginUpdate";
+				case EventType::Updated:
+					return "Updated";
+				case EventType::BeginUpload:
+					return "BeginUpload";
+				case EventType::Uploaded:
+					return "Uploaded";
+				default:
+					return "UNKNOWN";
+			}
+		}
+
+		/// @docnone
 		friend auto format_as(Modio::ModManagementEvent::EventType EnumValue)
 		{
-			return static_cast<std::underlying_type_t<Modio::ModManagementEvent::EventType>>(EnumValue);
+			//return static_cast<std::underlying_type_t<Modio::ModManagementEvent::EventType>>(EnumValue);
+			return ModManagementEventToString(EnumValue);
 		}
 
 		/// @brief ID for the mod that the event occurred on

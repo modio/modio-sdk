@@ -93,7 +93,7 @@ namespace Modio
 		/// @return Pointer to the element if index was valid, or nullptr if not
 		const ValueType* At(int Index) const
 		{
-			if (Index < 0 && Index >= InternalList.size())
+			if (Index >= 0 && Index < InternalList.size())
 			{
 				return &InternalList[Index];
 			}
@@ -106,7 +106,7 @@ namespace Modio
 		/// @return Pointer to the element if index was valid, or nullptr if not
 		ValueType* At(int Index)
 		{
-			if (Index < 0 && Index >= InternalList.size())
+			if (Index >= 0 && Index < InternalList.size())
 			{
 				return &InternalList[Index];
 			}

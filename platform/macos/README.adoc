@@ -60,22 +60,5 @@ To simplify the CMake configuration, the folder `cmake/` has the file `CMakePres
 cmake --preset win
 ----
 
-== Backend environment
-
-If you wish to use a different mod.io backend environment than the default `LIVE` environment (possibly `TEST`), please specify this as the `MODIO_DEFAULT_SERVER` parameter during the `cmake configuration` step. Similarly, you can add this variable to your `CMakePresets.json` file as follows:
-
-[source,json]
-----
-...
-"cacheVariables": 
-{
-    "MODIO_DEFAULT_SERVER": 
-    {
-    "type": "STRING",
-    "value": "LIVE"
-    }
-}
-...
-----
 
 For more details, follow the general details described in the https://github.com/modio/modio-sdk[mod.io repository]

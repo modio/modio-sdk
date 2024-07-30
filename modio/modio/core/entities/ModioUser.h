@@ -49,16 +49,11 @@ namespace Modio
 			return (A.UserId == B.UserId && A.Username == B.Username && A.DateOnline == B.DateOnline &&
 					A.ProfileUrl == B.ProfileUrl && A.Avatar == B.Avatar) && (A.DisplayNamePortal == B.DisplayNamePortal);
 		}
+
+			/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::User& User);
+
+		/// @docnone
+		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::User& User);
 	};
-
-	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::User& User);
-	
-	/// @docnone
-	MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::User& User);
-
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "modio/core/entities/ModioUser.ipp"
-#endif

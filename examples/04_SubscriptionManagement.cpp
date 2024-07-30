@@ -453,7 +453,7 @@ int main()
 			// ID The mod to subscribe too
 			// Callback The callback to be invoked with the results of the request. Will contain an error code if the
 			// request was not successful.
-			Modio::SubscribeToModAsync(Modio::ModID(UserModID), ModioExample::OnSubscriptionComplete);
+			Modio::SubscribeToModAsync(Modio::ModID(UserModID), false, ModioExample::OnSubscriptionComplete);
 
 			while (!ModioExample::HasAsyncOperationCompleted())
 			{

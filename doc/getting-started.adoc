@@ -162,8 +162,8 @@ By default the SDK will consume the `fmt-header-only` target. Define `MODIO_CUST
 |Windows (GDK)  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
 |Nintendo Switch| ✔ <<contact-us,(Contact Us)>> | Vendor-provided
 |XBox (GDK)     | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
-|PlayStation&reg;4  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
-|PlayStation&reg;5  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
+|PlayStation®4  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
+|PlayStation®5  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
 |Linux          | ✔                             | Clang 10
 |macOS          | ✔                             | Clang 10
 |iOS            | ✔                             | Clang 10
@@ -482,20 +482,20 @@ NOTE: Email authentication is not recommended for production releases. We strong
 
 mod.io features single sign on authentication from a number of external providers. This currently includes:
 
-    * Xbox Live
-    * Steam
+    * Apple
+    * Discord
+    * Epic Games Store
     * GoG
+    * Google
     * itch.io
     * Nintendo Switch
-    * Discord
-    * PlayStation&trade;Network
+    * PlayStation™Network
+    * Steam
+    * Xbox Live
     * Oculus
-    * Apple
-    * Google
-    * Epic Games
     * OpenID
 
-Please note that the ability to authenticate players using OpenID is a premium feature. If you are interested in mod.io premium features, please contact developers@mod.io
+Please note that the ability to authenticate players using OpenID is a premium feature. If you are interested in mod.io premium features, please contact developers@mod.io.
 
 To use SSO with mod.io, a user must have accepted the mod.io Terms of Use in order to create an account.
 
@@ -950,6 +950,8 @@ Modio::GetMutedUsersAsync([](Modio::ErrorCode ec, Modio::Optional<Modio::UserLis
 
 === SDK quick-start: Temporary Mod Sets
 
+NOTE: This functionality is demonstrated in example 11_TempModSets
+
 In some situations, you may want mods to only exist on a temporary basis - for instance, in Multiplayer environments where you don't want to subscribe a user to a piece of content. Temporary Mod Sets allow management of these more transient pieces of content separately from subscriptions. Temp Mod Sets do not require authentication to be used, however Mod Management must still be enabled to use Temp Mods.
 
 Temp Mods are downloaded in a folder separately from subscriptions, and are not updated or handled when you call `FetchExternalUpdatesAsync`. That means you can prioritize download and installation of Temp Mods outside of the regular subscription flow.
@@ -1044,7 +1046,7 @@ If the SDK runs for the lifetime of your application and you do not call <<Shutd
 
 NOTE: This functionality is demonstrated in example 09_MonetizationWalletManagement (for initialization and wallet management) and 10_MonetizationPurchase (for purchase functionality).
 
-The mod.io SDK supports all of the mod.io monetization features, allowing you sell a per-game virtual currency to your players that they can use to purchase mods, with a share of the revenue split between creators and your studio. Visit HERE (TODO) for an overview of the mod.io monetization system.
+The mod.io SDK supports all of the mod.io monetization features, allowing you to sell a per-game virtual currency to your players that they can use to purchase mods, with a share of the revenue split between creators and your studio. Visit https://docs.mod.io/monetization/ for an overview of the mod.io monetization system.
 
 Every platform requires specific setup for monetization features to work, with regards to the virtual currency configuration and API calls, however the following documentation is generically applicable, with only small differences per-platform that are documented within the platform-specific monetization documentation.
 
@@ -1125,7 +1127,11 @@ Modio::PurchaseModAsync(ModId, ModPrice, [](Modio::ErrorCode ec, Modio::Optional
 
 ==== Showing user purchases
 
-Even though all purchased mods are automatically subscribed, the user can still unsubscribe from them and uninstall them; however, they still remain owned and purchased by the user. They must re-subscribe to the mod in order to have it installed. This is facilitated by `<<FetchUserPurchasesAsync>>`, which will fetch a list of a users purchased mods. After a successful call, you can then display them with <<QueryUserPurchases>>, allowing re-subscription if necessary.
+Even though all purchased mods are automatically subscribed, the user can still unsubscribe from them and uninstall them; however, they still remain owned and purchased by the user. They must re-subscribe to the mod in order to have it installed. This is facilitated by <<FetchUserPurchasesAsync>>, which will fetch a list of a user's purchased mods. After a successful call, you can then display them with <<QueryUserPurchases>>, allowing re-subscription if necessary.
+
+==== Getting a User Delegation Token
+
+User Delegation Tokens can be used by a backend server for S2S (Server to Server) transactions/functionality. You can get one for the current user by calling <<GetUserDelegationTokenAsync>>, the callback for which contains the Token as a `std::string`.
 
 === SDK quick-start: Error Handling
 

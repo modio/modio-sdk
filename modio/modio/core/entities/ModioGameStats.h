@@ -35,10 +35,6 @@ namespace Modio
 		std::int64_t DateExpires = 0;
 
 		/// @docnone
-		friend MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::GameStats& GameStats);
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GameStats& GameStats);
 	};
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "ModioGameStats.ipp"
-#endif

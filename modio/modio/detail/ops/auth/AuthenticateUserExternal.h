@@ -40,13 +40,6 @@ namespace Modio
 						LocalState->ResponseBuffer, LocalState->AuthenticationParams, Detail::CachedResponse::Disallow,
 						std::move(Self));
 
-#if MODIO_TRACE_DUMP_RESPONSE
-					for (const auto& Buffer : LocalState->ResponseBuffer)
-					{
-						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http, "{}",
-													std::string(Buffer.begin(), Buffer.end()));
-					}
-#endif // MODIO_TRACE_DUMP_RESPONSE
 					if (ec)
 					{
 						Self.complete(ec);
@@ -96,9 +89,14 @@ namespace Modio
 						LocalState->AuthUser.UserId != Modio::Detail::SDKSessionData::GetAuthenticatedUser()->UserId)
 					{
 						yield UserDataService.ClearUserDataAsync(std::move(Self));
+						Modio::Detail::SDKSessionData::InitializeForUser(
+							std::move(LocalState->AuthUser), Modio::Detail::OAuthToken(LocalState->AuthResponse));
 					}
-					Modio::Detail::SDKSessionData::InitializeForUser(
-						std::move(LocalState->AuthUser), Modio::Detail::OAuthToken(LocalState->AuthResponse));
+					else 
+					{
+						Modio::Detail::SDKSessionData::UpdateTokenForExistingUser(Modio::Detail::OAuthToken(LocalState->AuthResponse));
+					}
+					
 
 					Modio::Detail::Services::GetGlobalService<Modio::Detail::CacheService>().ClearCache();
 					yield UserDataService.SaveUserDataToStorageAsync(std::move(Self));

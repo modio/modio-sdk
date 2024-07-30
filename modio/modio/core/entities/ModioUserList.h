@@ -45,7 +45,3 @@ namespace Modio
 	};
 
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "modio/core/entities/ModioUserList.ipp"
-#endif

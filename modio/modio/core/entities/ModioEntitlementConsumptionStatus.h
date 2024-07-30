@@ -39,6 +39,14 @@ namespace Modio
 	{
 		/// @brief Amount of tokens that were issued for this specific entitlement consumption
 		int TokensAllocated = 0;
+
+		/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json,
+										 EntitlementConsumptionVirtualCurrencyDetails& Details);
+
+		/// @docnone
+		MODIO_IMPL friend void to_json(nlohmann::json& Json,
+									   const EntitlementConsumptionVirtualCurrencyDetails& Details);
 	};
 
 	/// @docpublic
@@ -62,21 +70,13 @@ namespace Modio
 
 		/// @brief Details about 
 		Modio::EntitlementConsumptionVirtualCurrencyDetails VirtualCurrencyDetails;
+
+		/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json,
+										 Modio::EntitlementConsumptionStatus& EntitlementTransaction);
+
+		/// @docnone
+		MODIO_IMPL friend void to_json(nlohmann::json& Json,
+									   const Modio::EntitlementConsumptionStatus& EntitlementTransaction);
 	};
-
-	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::EntitlementConsumptionStatus& EntitlementTransaction);
-
-	/// @docnone
-	MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::EntitlementConsumptionStatus& EntitlementTransaction);
-
-	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, EntitlementConsumptionVirtualCurrencyDetails& Details);
-
-	/// @docnone
-	MODIO_IMPL void to_json(nlohmann::json& Json, const EntitlementConsumptionVirtualCurrencyDetails& Details);
 }
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "ModioEntitlementConsumptionStatus.ipp"
-#endif

@@ -11,7 +11,7 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/entities/ModioGalleryList.h"
+#include "modio/detail/serialization/ModioGalleryListSerialization.h"
 #include "modio/file/ModioFileService.h"
 
 namespace Modio::Detail

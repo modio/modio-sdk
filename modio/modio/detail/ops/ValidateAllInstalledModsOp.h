@@ -11,10 +11,10 @@
 #pragma once
 
 #include "modio/core/ModioLogger.h"
-#include "modio/core/ModioModCollectionEntry.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/ValidateModInstallationOp.h"
+#include "modio/detail/serialization/ModioModCollectionEntrySerialization.h"
 #include <asio/yield.hpp>
 #include <iterator>
 #include <memory>

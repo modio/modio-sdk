@@ -27,40 +27,8 @@ namespace Modio
 			std::int32_t ErrorRef;
 			std::string Error;
 			Modio::Optional<std::vector<Modio::FieldError>> ExtendedErrorInformation;
+
+			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::ResponseError& Error);
 		};
-
-		/// @docnone
-		static void from_json(const nlohmann::json& Json, Modio::Detail::ResponseError& Error)
-		{
-			if (Json.contains("error"))
-			{
-				const nlohmann::json& ErrorJson = Json.at("error");
-				if (ErrorJson.is_object())
-				{
-					// Parse usual ResponseError variables
-					Detail::ParseSafe(ErrorJson, Error.Code, "code");
-					Detail::ParseSafe(ErrorJson, Error.ErrorRef, "error_ref");
-					Detail::ParseSafe(ErrorJson, Error.Error, "message");
-
-					// Check for optional ExtendedErrorInformation
-					if (ErrorJson.contains("errors"))
-					{
-						const nlohmann::json& ExtendedErrors = ErrorJson.at("errors");
-						if (ExtendedErrors.is_object())
-						{
-							std::vector<Modio::FieldError> FieldErrors;
-							Modio::FieldError FieldError;
-							for (auto& Item : ExtendedErrors.items())
-							{
-								FieldError.Field = Item.key();
-								FieldError.Error = std::string(Item.value());
-								FieldErrors.push_back(FieldError);
-							}
-							Error.ExtendedErrorInformation = FieldErrors;
-						}
-					}
-				}
-			}
-		}
 	} // namespace Detail
 } // namespace Modio

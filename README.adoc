@@ -27,8 +27,8 @@ Welcome to the mod.io SDK repository, built using C++. It allows game developers
 |Windows (GDK)  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
 |Nintendo Switch| ✔ <<contact-us,(Contact Us)>> | Vendor-provided
 |XBox (GDK)     | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
-|PlayStation&reg;4  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
-|PlayStation&reg;5  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
+|PlayStation®4  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
+|PlayStation®5  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided
 |Linux          | ✔                             | Clang 10
 |macOS          | ✔                             | Clang 10
 |iOS            | ✔                             | Clang 10
@@ -45,7 +45,7 @@ Welcome to the mod.io SDK repository, built using C++. It allows game developers
 
 == Download repository
 
-Pre-requisites to compile this SDK are listed in https://go.mod.io/sdk-docs[Getting Started documentation]
+Pre-requisites to compile this SDK are listed in https://docs.mod.io/cppsdk/[Getting Started documentation]
 
 It is possible to download the source code as a zip file from this webpage. However, a recursive clone downloads all dependencies. Therefore, the suggestion is to perform the following:
 
@@ -203,7 +203,7 @@ Note that when using the Visual Studio code generator, you have to pass in the t
 cmake -S <modio-sdk folder> --preset=win -G "Visual Studio 16 2019" --Config=Release
 ```
 
-If you are using the `clang` compiler with Visual studio, check section https://go.mod.io/sdk-docs#clang-win[Clang compiler in Visual Studio] for further details
+If you are using the `clang` compiler with Visual studio, check section https://docs.mod.io/cppsdkref/#clang-win[Clang compiler in Visual Studio] for further details
 
 ==== Custom FMT library
 If you have a custom version of the FMT library, you can modify the linking stage defining `MODIO_USE_CUSTOM_FMT`. This define signals the CMake build system to use a custom version of the library. Also, it requires that you define `MODIO_CUSTOM_FMT_PATH` to the system path that contains the FMT library to use.
@@ -236,12 +236,12 @@ FILE HEADER VALUES
 
 == Usage
 
-Please see the https://go.mod.io/sdk-docs[Getting Started documentation] for a breakdown of the mod.io SDK's concepts and usage, including:
+Please see the https://docs.mod.io/cppsdk/[Getting Started documentation] for a breakdown of the mod.io SDK's concepts and usage, including:
 
-* https://go.mod.io/sdk-docs#_sdk_quick_start_initialization_and_teardown[SDK initialization and event loop]
-* https://go.mod.io/sdk-docs#_sdk_quick_start_user_authentication[Authentication]
-* https://go.mod.io/sdk-docs#_sdk_quick_start_browsing_available_mods[Mod Browsing]
-* https://go.mod.io/sdk-docs#_sdk_quick_start_mod_management_and_subscriptions[Mod Subscription Management]
+* https://docs.mod.io/cppsdk/getting-started/#sdk-quick-start-initialization-and-teardown[SDK initialization and event loop]
+* https://docs.mod.io/cppsdk/getting-started/#sdk-quick-start-user-authentication[Authentication]
+* https://docs.mod.io/cppsdk/getting-started/#sdk-quick-start-browsing-available-mods[Mod Browsing]
+* https://docs.mod.io/cppsdk/getting-started/#sdk-quick-start-mod-management-and-subscriptions[Mod Subscription Management]
 
 == Game studios and Publishers [[contact-us]]
 If you need assistance with 1st party approvals, or require a private, white-label UGC solution. mailto:developers@mod.io[Contact us] to discuss.

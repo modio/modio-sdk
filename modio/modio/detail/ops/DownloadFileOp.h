@@ -172,7 +172,7 @@ namespace Modio
 								if (!RedirectedParams)
 								{
 									Modio::Detail::Logger().Log(
-										Modio::LogLevel::Trace, Modio::LogCategory::Http,
+										Modio::LogLevel::Error, Modio::LogCategory::Http,
 										"download of file {} redirected to URL outside whitelist to: {}",
 										File->GetPath().u8string(), RedirectedURL.value());
 									Self.complete(Modio::make_error_code(Modio::HttpError::ResourceNotAvailable));
@@ -192,7 +192,7 @@ namespace Modio
 						}
 						else if (Request->GetResponseCode() != 200 && Request->GetResponseCode() != 206)
 						{
-							Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
 														"download of file {} got response {}",
 														File->GetPath().u8string(), Request->GetResponseCode());
 							Self.complete(Modio::make_error_code(Modio::HttpError::ResourceNotAvailable));

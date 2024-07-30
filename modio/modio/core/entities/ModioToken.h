@@ -24,10 +24,10 @@ namespace Modio
 			std::int32_t HttpResponseCode;
 			std::string AccessToken;
 			Modio::Timestamp DateExpires;
-		};
 
-		/// @docnone
-		MODIO_IMPL void from_json(const nlohmann::json& Json, AccessTokenObject& AccessToken);
+			/// @docnone
+			MODIO_IMPL friend void from_json(const nlohmann::json& Json, AccessTokenObject& AccessToken);
+		};
 
 		enum class OAuthTokenState : std::uint8_t
 		{
@@ -79,10 +79,10 @@ namespace Modio
 			static MODIO_IMPL Modio::Optional<std::string> NoToken;
 
 			/// @docnone
-			friend MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::Detail::OAuthToken& InToken);
+			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::OAuthToken& InToken);
 
 			/// @docnone
-			friend MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::Detail::OAuthToken& InToken);
+			MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::Detail::OAuthToken& InToken);
 
 		private:
 			// Optional here so that the accessors can return references to avoid memcpy, will always be set
@@ -101,7 +101,3 @@ namespace Modio
 		};	
 	} // namespace Detail
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "modio/core/entities/ModioToken.ipp"
-#endif

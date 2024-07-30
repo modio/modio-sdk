@@ -47,10 +47,10 @@ namespace Modio
 		std::string RatingDisplayText = "";
 
 		/// @docnone
-		friend MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::ModStats& ModStats);
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModStats& ModStats);
 		
 		/// @docnone
-		friend MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::ModStats Stats);
+		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::ModStats Stats);
 
 		/// @docnone
 		friend bool operator==(const Modio::ModStats& A, const Modio::ModStats& B)
@@ -72,7 +72,3 @@ namespace Modio
 		}
 	};
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "ModioModStats.ipp"
-#endif

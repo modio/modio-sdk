@@ -47,18 +47,9 @@ namespace Modio
 					return false;
 				}
 			}
+
+			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::Icon& Icon);
 		};
-
-		// These functions create false "unused functions" warnings on certain platforms.
-		// Suppressing those warnings here.
-		MODIO_DIAGNOSTIC_PUSH
-		MODIO_ALLOW_UNUSED_FUNCTIONS
-
-		/// @docnone
-		MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::Detail::Icon& Icon);
-
-		// Re-allow "unused function" warnings
-		MODIO_DIAGNOSTIC_POP
 
 		/// @docpublic
 		/// @brief Retrieve the corresponding string according to a icon size
@@ -103,7 +94,3 @@ namespace Modio
 		}
 	} // namespace Detail
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "modio/detail/entities/ModioIcon.ipp"
-#endif

@@ -19,10 +19,10 @@ namespace Modio
 	class GalleryList : public Modio::List<std::vector, Modio::Detail::Image>
 	{
 		/// @docnone
-		friend MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::GalleryList& GalleryList);
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GalleryList& GalleryList);
 		
 		/// @docnone
-		friend MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::GalleryList& GalleryList);
+		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::GalleryList& GalleryList);
 		
 		/// @docublic
 		/// @brief Comparator operator between GalleryLists, to first compare their internal list size,
@@ -51,7 +51,3 @@ namespace Modio
 		}
 	};
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "modio/detail/entities/ModioGalleryList.ipp"
-#endif

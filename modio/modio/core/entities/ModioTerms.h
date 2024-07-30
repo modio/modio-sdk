@@ -31,6 +31,9 @@ namespace Modio
 			std::string URL;
 			/// @brief Is displaying this link mandatory?
 			bool bRequired;
+
+			/// @docnone
+			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Terms::Link& OutLink);
 		};
 
 		/// @docpublic
@@ -79,16 +82,8 @@ namespace Modio
 				return false;
 			}
 		}
+
+		/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Terms& OutTerms);
 	};
-
-	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::Terms& OutTerms);
-
-	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::Terms::Link& OutLink);
-
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "modio/core/entities/ModioTerms.ipp"
-#endif

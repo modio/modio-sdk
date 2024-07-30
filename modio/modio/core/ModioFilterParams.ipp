@@ -163,8 +163,8 @@ namespace Modio
 		std::map<std::string, std::string> FilterFields;
 		std::string SortStr;
 
-		// The sorts listed at https://docs.mod.io/#get-mods is inverted for some reason compared to the explanation at
-		// https://docs.mod.io/#sorting
+		// The sorts listed at https://docs.mod.io/restapiref/#get-mods is inverted for some reason compared to the explanation at
+		// https://docs.mod.io/restapiref/#sorting
 		bool bInvertedSort = false;
 
 		switch (SortField)

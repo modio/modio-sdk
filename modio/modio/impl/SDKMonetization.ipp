@@ -18,12 +18,14 @@
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioSDKSessionData.h"
-#include "modio/detail/ops/monetization/GetUserWalletBalanceOp.h"
 #include "modio/detail/ops/monetization/FetchUserPurchasesOp.h"
+#include "modio/detail/ops/monetization/GetUserDelegationTokenOp.h"
+#include "modio/detail/ops/monetization/GetUserWalletBalanceOp.h"
 #include "modio/detail/ops/monetization/PurchaseModOp.h"
-#include "modio/detail/ops/monetization/GetUserDerivedTokenOp.h"
+#include "modio/detail/serialization/ModioResponseErrorSerialization.h"
+#include "modio/detail/serialization/ModioTransactionRecordSerialization.h"
+#include "modio/detail/serialization/ModioUserDelegationTokenSerialization.h"
 #include "modio/impl/SDKPreconditionChecks.h"
-
 
 // Implementation header - do not include directly
 
@@ -81,13 +83,13 @@ namespace Modio
 
 			return UserModPuchases;
 		}
-		else 
+		else
 		{
 			return {};
 		}
 	}
 
-	void GetUserDerivedTokenAsync(std::function<void(Modio::ErrorCode, std::string)> Callback)
+	void GetUserDelegationTokenAsync(std::function<void(Modio::ErrorCode, std::string)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) &&
@@ -95,8 +97,8 @@ namespace Modio
 			{
 				asio::async_compose<std::function<void(Modio::ErrorCode, std::string)>,
 									void(Modio::ErrorCode, std::string)>(
-					Modio::Detail::GetUserDerivedTokenOp(Modio::Detail::SDKSessionData::CurrentGameID(),
-														  Modio::Detail::SDKSessionData::CurrentAPIKey()),
+					Modio::Detail::GetUserDelegationTokenOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+															Modio::Detail::SDKSessionData::CurrentAPIKey()),
 					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 		});

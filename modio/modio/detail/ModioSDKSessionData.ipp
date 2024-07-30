@@ -12,12 +12,14 @@
 	#include "modio/detail/ModioSDKSessionData.h"
 #endif
 
+#include "modio/cache/ModioCacheService.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioInitializeOptions.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioTemporaryModSet.h"
 #include "modio/detail/HedleyWrapper.h"
-#include "modio/cache/ModioCacheService.h"
+#include "modio/detail/serialization/ModioTokenSerialization.h"
+#include "modio/detail/serialization/ModioUserDataContainerSerialization.h"
 
 MODIO_DIAGNOSTIC_PUSH
 
@@ -43,12 +45,10 @@ namespace Modio
 			}
 			else
 			{
-				Get() = SDKSessionData(Options);
+				Get() = SDKSessionData(Options, Get().LocalLanguage);
 				Get().CurrentInitializationState = InitializationState::Initializing;
 				return true;
 			}
-
-			
 		}
 
 		void SDKSessionData::Deinitialize()
@@ -163,6 +163,12 @@ namespace Modio
 		{
 			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 			Get().UserData.InitializeForUser(std::move(AuthenticatedUser), std::move(AuthToken));
+		}
+
+		void SDKSessionData::UpdateTokenForExistingUser(Modio::Detail::OAuthToken AuthToken)
+		{
+			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
+			Get().UserData.UpdateTokenForExistingUser(std::move(AuthToken));
 		}
 
 		const Modio::Optional<Modio::Detail::OAuthToken> SDKSessionData::GetAuthenticationToken()
@@ -612,8 +618,8 @@ namespace Modio
 		{
 			Get().ModCacheInvalidMap.clear();
 
-			List<std::vector, Modio::ModID> listModIds =  Detail::Services::GetGlobalService<Detail::CacheService>()
-				.GetAllModIdsInCache();
+			List<std::vector, Modio::ModID> listModIds =
+				Detail::Services::GetGlobalService<Detail::CacheService>().GetAllModIdsInCache();
 
 			for (auto& ModId : listModIds.GetRawList())
 			{
@@ -719,12 +725,12 @@ namespace Modio
 
 		SDKSessionData::SDKSessionData() {}
 
-		SDKSessionData::SDKSessionData(const Modio::InitializeOptions& Options)
+		SDKSessionData::SDKSessionData(const Modio::InitializeOptions& Options, Modio::Language InLocalLanguage)
 			: GameID(Options.GameID),
 			  APIKey(Options.APIKey),
 			  Environment(Options.GameEnvironment),
 			  PortalInUse(Options.PortalInUse),
-			  LocalLanguage(Modio::Language::English),
+			  LocalLanguage(InLocalLanguage),
 			  CurrentInitializationState(InitializationState::NotInitialized)
 		{}
 	} // namespace Detail

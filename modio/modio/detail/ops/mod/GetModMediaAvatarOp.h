@@ -12,10 +12,10 @@
 
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/core/entities/ModioUser.h"
 #include "modio/detail/ops/ModioAvatarImageType.h"
 #include "modio/detail/ops/ModioDownloadImage.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/serialization/ModioUserSerialization.h"
 #include <asio/yield.hpp>
 
 namespace Modio

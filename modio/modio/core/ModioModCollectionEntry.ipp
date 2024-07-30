@@ -16,6 +16,16 @@
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/serialization/ModioFileMetadataSerialization.h"
+#include "modio/detail/serialization/ModioGalleryListSerialization.h"
+#include "modio/detail/serialization/ModioImageSerialization.h"
+#include "modio/detail/serialization/ModioLogoSerialization.h"
+#include "modio/detail/serialization/ModioModCollectionEntrySerialization.h"
+#include "modio/detail/serialization/ModioModInfoSerialization.h"
+#include "modio/detail/serialization/ModioModStatsSerialization.h"
+#include "modio/detail/serialization/ModioProfileMaturitySerialization.h"
+#include "modio/detail/serialization/ModioTokenSerialization.h"
+#include "modio/detail/serialization/ModioUserSerialization.h"
 #include <algorithm>
 
 namespace Modio
@@ -37,8 +47,7 @@ namespace Modio
 		  PathOnDisk(Other.PathOnDisk),
 		  SizeOnDisk(Other.SizeOnDisk),
 		  LastErrorCode(Other.LastErrorCode),
-		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries)
-	{};
+		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries) {};
 
 	uint8_t ModCollectionEntry::GetRetriesRemaining()
 	{
@@ -254,60 +263,6 @@ namespace Modio
 		return *this;
 	};
 
-	void to_json(nlohmann::json& j, const ModCollectionEntry& Entry)
-	{
-		Modio::ModState EntryState = Entry.CurrentState.load();
-		// If the current state is in progress, then we store the previous state. As when loading, the user might
-		// not want to start the download/installation during SDK initialization. Instead the progress will be
-		// resumed when the mod management loop is enabled
-		if (Entry.CurrentState == Modio::ModState::Downloading || Entry.CurrentState == Modio::ModState::Extracting)
-		{
-			if (Entry.RollbackState.has_value())
-			{
-				EntryState = *Entry.RollbackState;
-			}
-			else
-			{
-				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
-											"Mod {0} is in state Downloading or Extracting without a transaction in "
-											"progress. Saving state as InstallationPending",
-											Entry.ID);
-				EntryState = Modio::ModState::InstallationPending;
-			}
-		}
-
-		j = nlohmann::json::object(
-			{{Modio::Detail::Constants::JSONKeys::ModEntryID, Entry.ID},
-			 {Modio::Detail::Constants::JSONKeys::ModEntryProfile, Entry.ModProfile},
-			 {Modio::Detail::Constants::JSONKeys::ModEntrySubCount, Entry.LocalUserSubscriptions},
-			 {Modio::Detail::Constants::JSONKeys::ModEntryState, EntryState},
-			 {Modio::Detail::Constants::JSONKeys::ModSizeOnDisk, Entry.SizeOnDisk},
-			 {Modio::Detail::Constants::JSONKeys::ModPathOnDisk, Entry.PathOnDisk},
-			 {Modio::Detail::Constants::JSONKeys::ModNeverRetryCode, Entry.NeverRetryReason.value()},
-			 {Modio::Detail::Constants::JSONKeys::ModNeverRetryCategory,
-			  Modio::Detail::ModioErrorCategoryID(Entry.NeverRetryReason.category())}});
-	}
-
-	void from_json(const nlohmann::json& j, ModCollectionEntry& Entry)
-	{
-		Modio::Detail::ParseSafe(j, Entry.ID, Modio::Detail::Constants::JSONKeys::ModEntryID);
-		Modio::Detail::ParseSafe(j, Entry.ModProfile, Modio::Detail::Constants::JSONKeys::ModEntryProfile);
-		Modio::Detail::ParseSafe(j, Entry.LocalUserSubscriptions, Modio::Detail::Constants::JSONKeys::ModEntrySubCount);
-		Modio::Detail::ParseSafe(j, Entry.SizeOnDisk, Modio::Detail::Constants::JSONKeys::ModSizeOnDisk);
-		Modio::ModState StateTmp = ModState::InstallationPending;
-		Modio::Detail::ParseSafe(j, StateTmp, Modio::Detail::Constants::JSONKeys::ModEntryState);
-		Entry.CurrentState.store(StateTmp);
-		Modio::Detail::ParseSafe(j, Entry.PathOnDisk, Modio::Detail::Constants::JSONKeys::ModPathOnDisk);
-		if (j.contains(Modio::Detail::Constants::JSONKeys::ModNeverRetryCode) &&
-			j.contains(Modio::Detail::Constants::JSONKeys::ModNeverRetryCategory))
-		{
-			Entry.NeverRetryReason =
-				std::error_code(j.at(Modio::Detail::Constants::JSONKeys::ModNeverRetryCode).get<uint32_t>(),
-								Modio::Detail::GetModioErrorCategoryByID(
-									j.at(Modio::Detail::Constants::JSONKeys::ModNeverRetryCategory).get<uint64_t>()));
-		}
-	}
-
 	void SetState(Modio::ModProgressInfo& Info, Modio::ModProgressInfo::EModProgressState State)
 	{
 		Info.CurrentState = State;
@@ -402,9 +357,7 @@ namespace Modio
 		: InternalList(std::make_move_iterator(NewIDs.begin()), std::make_move_iterator(NewIDs.end()))
 	{}
 
-	BaseModList::BaseModList(std::vector<Modio::ModID> NewIDs)
-		: InternalList(NewIDs.begin(), NewIDs.end())
-	{}
+	BaseModList::BaseModList(std::vector<Modio::ModID> NewIDs) : InternalList(NewIDs.begin(), NewIDs.end()) {}
 
 	BaseModList::BaseModList() {}
 
@@ -497,7 +450,8 @@ namespace Modio
 	{
 		for (auto& ModEntry : Entries)
 		{
-			ModEntries.emplace(std::make_pair(ModEntry.first, std::make_shared<Modio::ModCollectionEntry>(*ModEntry.second)));
+			ModEntries.emplace(
+				std::make_pair(ModEntry.first, std::make_shared<Modio::ModCollectionEntry>(*ModEntry.second)));
 		}
 	}
 	const Modio::ModCollection ModCollection::FilterByUserSubscriptions(
@@ -616,7 +570,8 @@ namespace Modio
 	{
 		Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::ModManagement,
 									"Adding ModManagementEvent {} with status {} to ModEventLog for ModID {}",
-									static_cast<std::uint8_t>(Entry.Event), Entry.Status.value(), Entry.ID);
+									ModManagementEvent::ModManagementEventToString(Entry.Event), Entry.Status.value(), Entry.ID);
+		//									static_cast<std::uint8_t>(Entry.Event), Entry.Status.value(), Entry.ID);
 		InternalData.push_back(std::move(Entry));
 	}
 

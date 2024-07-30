@@ -101,7 +101,8 @@ namespace Modio
 
 						if (ec)
 						{
-							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(ArchivePath);
+							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(
+								ArchivePath);
 
 							Self.complete(ec);
 							return;
@@ -131,7 +132,8 @@ namespace Modio
 								Modio::ModManagementEvent {CurrentModID, Modio::ModManagementEvent::EventType::Uploaded,
 														   ec});
 
-							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(ArchivePath);
+							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(
+								ArchivePath);
 							Self.complete(ec);
 							return;
 						}
@@ -146,7 +148,8 @@ namespace Modio
 								Modio::ModManagementEvent {CurrentModID, Modio::ModManagementEvent::EventType::Uploaded,
 														   ec});
 
-							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(ArchivePath);
+							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(
+								ArchivePath);
 							Self.complete(ec);
 							return;
 						}
@@ -168,10 +171,11 @@ namespace Modio
 					}
 
 					// Delete zip file when the upload is done
-					if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(ArchivePath))
+					if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(
+							ArchivePath))
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::ModManagement,
-							"Failed to delete temp archive {}", ArchivePath.string());
+													"Failed to delete temp archive {}", ArchivePath.string());
 					}
 
 					if (ec)
@@ -269,7 +273,7 @@ namespace Modio
 									fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::Oculus);
 								break;
 							case (Modio::ModfilePlatform::Source):
-								RequestParams = RequestParams.AppendPayloadValue( 
+								RequestParams = RequestParams.AppendPayloadValue(
 									fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::Source);
 								break;
 							default:

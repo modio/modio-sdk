@@ -62,10 +62,31 @@ namespace Modio
 
 		/// @docinternal
 		///	@brief Helper class for converting between Java and C++ types, including cleanup
-		class JavaHelpers
+		class JavaTypeHelper
 		{
 		public:
+			/// @docinternal
+			/// @brief Converts a Java string to a C++ string
+			/// @param Env The JNI environment
+			/// @param JavaString The Java string to convert
+			/// @return The converted C++ string
 			MODIO_IMPL static std::string StringFromLocalRef(JNIEnv* Env, jstring JavaString);
+		};
+
+		/// @docinternal
+		///	@brief Class for handling Java exceptions
+		class JavaExceptionHelper
+		{
+		public:
+			/// @docinternal
+			/// @brief Checks if a Java exception has occurred and logs it if it has
+			/// @return true if an exception has occurred
+			MODIO_IMPL static bool CheckJavaException(JNIEnv* Env);
+
+			/// @docinternal
+			/// @brief Gets the details of the current Java exception
+			/// @return A string containing the exception details
+			MODIO_IMPL static std::string GetJavaExceptionDetails(JNIEnv* Env);
 		};
 	}
 }

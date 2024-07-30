@@ -43,7 +43,3 @@ namespace Modio
 	};
 
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "modio/core/entities/ModioGameInfoList.ipp"
-#endif

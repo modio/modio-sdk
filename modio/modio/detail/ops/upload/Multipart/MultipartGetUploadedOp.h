@@ -18,9 +18,6 @@ MODIO_DIAGNOSTIC_PUSH
 
 MODIO_ALLOW_DEPRECATED_SYMBOLS
 
-#ifndef MODIO_TRACE_DUMP_RESPONSE
-	#define MODIO_TRACE_DUMP_RESPONSE 0
-#endif
 #include <asio/yield.hpp>
 namespace Modio
 {

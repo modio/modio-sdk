@@ -276,14 +276,6 @@ namespace Modio
 						"UploadFilePartOp sent a part with upload_id: {}, response code {} of size {}:",
 						Session->UploadID.value(), Request->GetResponseCode(), ResponseBuffer.size());
 
-#if MODIO_TRACE_DUMP_RESPONSE
-					for (const auto& Buffer : ResponseBuffer)
-					{
-						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http, "{}",
-													std::string(Buffer.begin(), Buffer.end()));
-					}
-#endif // MODIO_TRACE_DUMP_RESPONSE
-
 					// All parts of the file were uploaded as expected
 					Self.complete({});
 				}

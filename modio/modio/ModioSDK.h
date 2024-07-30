@@ -83,31 +83,6 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	MODIOSDK_API void ShutdownAsync(std::function<void(Modio::ErrorCode)> OnShutdownComplete);
 
-	#if !defined(MODIO_NO_DEPRECATED)
-	/// @docpublic
-	/// @brief Sends a request to the mod.io server to add the specified mod to the user's list of subscriptions, and
-	/// marks the mod for local installation by the SDK
-	/// @param ModToSubscribeTo Mod ID of the mod requiring a subscription.
-	/// @param OnSubscribeComplete Callback invoked when the subscription request is completed.
-	/// @requires initialized-sdk
-	/// @requires authenticated-user
-	/// @requires no-rate-limiting
-	/// @requires management-enabled
-	/// @requires mod-not-pending-uninstall
-	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
-	/// @error GenericError::SDKNotInitialized|SDK not initialized
-	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
-	/// @error UserDataError::InvalidUser|No authenticated user
-	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
-	/// @error ModManagementError::ModBeingProcessed|Specified mod is pending uninstall. Wait until the uninstall
-	/// process is complete before subscribing again.
-	/// @error GenericError::BadParameter|The supplied mod ID is invalid
-	///	@deprecated 2024.4 Call SubscribeToModAsync() and specify if mod dependencies should be included.
-	MODIO_DEPRECATED("Release 2024.4", "SubscribeToModAsync")
-	MODIOSDK_API void SubscribeToModAsync(Modio::ModID ModToSubscribeTo,
-										  std::function<void(Modio::ErrorCode)> OnSubscribeComplete);
-	#endif
-
 	/// @docpublic
 	/// @brief Sends a request to the mod.io server to add the specified mod to the user's list of subscriptions, and
 	/// marks the mod for local installation by the SDK
@@ -503,24 +478,6 @@ namespace Modio
 	MODIOSDK_API void GetModTagOptionsAsync(
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)> Callback);
 
-	#if !defined(MODIO_NO_DEPRECATED)
-	/// @docpublic
-	/// @brief For a given Mod ID, fetches a list of any mods that the creator has marked as dependencies
-	/// @param ModID The mod to retrieve dependencies for
-	/// @param Callback Callback providing a status code and an optional xref:ModDependencyList[ModDependencyList]
-	/// @requires initialized-sdk
-	/// @requires no-rate-limiting
-	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
-	/// @error GenericError::SDKNotInitialized|SDK not initialized
-	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
-	/// @error GenericError::BadParameter|The supplied mod ID is invalid
-	///	@deprecated 2024.4 Call GetModDependenciesAsync() and specify if recursion is desired.
-	MODIO_DEPRECATED("Release 2024.4", "GetModDependenciesAsync")
-	MODIOSDK_API void GetModDependenciesAsync(
-		Modio::ModID ModID,
-		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback);
-	#endif
-
 	/// @docpublic
 	/// @brief For a given Mod ID, fetches a list of any mods that the creator has marked as dependencies
 	/// @param ModID The mod to retrieve dependencies for
@@ -576,7 +533,6 @@ namespace Modio
 	/// @param Callback Callback providing a status code indicating the outcome of clearing the user data. Error codes
 	/// returned by this function are informative only - it will always succeed.
 	/// @requires initialized-sdk
-	/// @requires no-rate-limiting
 	/// @requires authenticated-user
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserDataError::InvalidUser|No authenticated user
@@ -748,6 +704,10 @@ namespace Modio
 	///     This does not call FetchExternalUpdates for you, should you want to call it after changing locale.
 	/// @param Modio::Language to set
 	MODIOSDK_API void SetLanguage(Modio::Language Locale);
+
+	/// @brief Get the currently applied language
+	/// @return Modio::Language currently set
+	MODIOSDK_API Modio::Language GetLanguage();
 	
 	/// @docpublic
 	/// @brief Attempts to purchase a specified mod with an expected price. Purchasing a mod will add a subscription to
@@ -807,7 +767,7 @@ namespace Modio
 	MODIOSDK_API std::map<Modio::ModID, Modio::ModInfo> QueryUserPurchasedMods();
 
 	/// @docpublic
-	///	@brief Gets a UserDerivedToken that can be used by a backend serve for S2S functionality.
+	///	@brief Gets a UserDelegationToken that can be used by a backend serve for S2S functionality.
 	/// @requires initialized-sdk
 	/// @requires authenticated-user
 	/// @requires no-rate-limiting
@@ -816,7 +776,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @error UserDataError::InvalidUser|No authenticated user
-	MODIOSDK_API void GetUserDerivedTokenAsync(std::function<void(Modio::ErrorCode, std::string)> Callback);
+	MODIOSDK_API void GetUserDelegationTokenAsync(std::function<void(Modio::ErrorCode, std::string)> Callback);
 
 	/// @docpublic
 	/// @brief Initialize a Temp Mod Set, installing every specified mod 
@@ -825,7 +785,6 @@ namespace Modio
 	///
 	/// @return Modio::ErrorCode indicating if temp mod correctly started
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
-	/// @error ModManagementError::ModManagementDisabled|Mod Management need to be enabled
 	/// @error ModManagementError::ModManagementDisabled|Mod Management need to be enabled
 	MODIOSDK_API Modio::ErrorCode InitTempModSet(std::vector<Modio::ModID> ModIds);
 

@@ -354,7 +354,7 @@ namespace Modio
 					}
 				}
 
-				Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::File, "Replacing file {} with {}",
+				Modio::Detail::Logger().Log(LogLevel::Detailed, LogCategory::File, "Replacing file {} with {}",
 											DestinationFilePath.u8string(), SourceFilePath.u8string());
 
 				// Ignore merge and ACL errors because we're only concerned about the data itself, not security and

@@ -79,8 +79,8 @@ namespace Modio
 
 				reenter(CoroutineState)
 				{
-					Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Compression,
-												"Extracting entry in Deflate {}",
+					Modio::Detail::Logger().Log(Modio::LogLevel::Detailed, Modio::LogCategory::Compression,
+												"Extracting file {}",
 												Impl->EntryToExtract.FilePath.u8string());
 
 					if (Impl->EntryToExtract.UncompressedSize == 0)

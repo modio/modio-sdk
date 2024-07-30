@@ -841,8 +841,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_setlogcallback">SetLogCallback</a></li>
 <li><a href="#_runpendinghandlers">RunPendingHandlers</a></li>
 <li><a href="#_shutdownasync">ShutdownAsync</a></li>
-<li><a href="#_subscribetomodasync"><span class="line-through">SubscribeToModAsync</span></a></li>
-<li><a href="#_subscribetomodasync_2">SubscribeToModAsync</a></li>
+<li><a href="#_subscribetomodasync">SubscribeToModAsync</a></li>
 <li><a href="#_unsubscribefrommodasync">UnsubscribeFromModAsync</a></li>
 <li><a href="#_fetchexternalupdatesasync">FetchExternalUpdatesAsync</a></li>
 <li><a href="#_previewexternalupdatesasync">PreviewExternalUpdatesAsync</a></li>
@@ -871,8 +870,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_getmodmediaasync_3">GetModMediaAsync</a></li>
 <li><a href="#_submitmodratingasync">SubmitModRatingAsync</a></li>
 <li><a href="#_getmodtagoptionsasync">GetModTagOptionsAsync</a></li>
-<li><a href="#_getmoddependenciesasync"><span class="line-through">GetModDependenciesAsync</span></a></li>
-<li><a href="#_getmoddependenciesasync_2">GetModDependenciesAsync</a></li>
+<li><a href="#_getmoddependenciesasync">GetModDependenciesAsync</a></li>
 <li><a href="#_requestemailauthcodeasync">RequestEmailAuthCodeAsync</a></li>
 <li><a href="#_authenticateuseremailasync">AuthenticateUserEmailAsync</a></li>
 <li><a href="#_clearuserdataasync">ClearUserDataAsync</a></li>
@@ -893,7 +891,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_getuserwalletbalanceasync">GetUserWalletBalanceAsync</a></li>
 <li><a href="#_fetchuserpurchasesasync">FetchUserPurchasesAsync</a></li>
 <li><a href="#_queryuserpurchasedmods">QueryUserPurchasedMods</a></li>
-<li><a href="#_getuserderivedtokenasync">GetUserDerivedTokenAsync</a></li>
+<li><a href="#_getuserdelegationtokenasync">GetUserDelegationTokenAsync</a></li>
 <li><a href="#_inittempmodset">InitTempModSet</a></li>
 <li><a href="#_addtotempmodset">AddToTempModSet</a></li>
 <li><a href="#_removefromtempmodset">RemoveFromTempModSet</a></li>
@@ -1363,12 +1361,12 @@ Deprecated functionality will remain for a minimum of 3 releases to allow for tr
 <td class="tableblock halign-left valign-top"><p class="tableblock">Vendor-provided</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">PlayStation&reg;4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PlayStation®4</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">✔ <a href="#contact-us">(Contact Us)</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Vendor-provided</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">PlayStation&reg;5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PlayStation®5</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">✔ <a href="#contact-us">(Contact Us)</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Vendor-provided</p></td>
 </tr>
@@ -1986,13 +1984,19 @@ This functionality is demonstrated in example 03_Authentication
 <div class="ulist">
 <ul>
 <li>
-<p>Xbox Live</p>
+<p>Apple</p>
 </li>
 <li>
-<p>Steam</p>
+<p>Discord</p>
+</li>
+<li>
+<p>Epic Games Store</p>
 </li>
 <li>
 <p>GoG</p>
+</li>
+<li>
+<p>Google</p>
 </li>
 <li>
 <p>itch.io</p>
@@ -2001,22 +2005,16 @@ This functionality is demonstrated in example 03_Authentication
 <p>Nintendo Switch</p>
 </li>
 <li>
-<p>Discord</p>
+<p>PlayStation™Network</p>
 </li>
 <li>
-<p>PlayStation&trade;Network</p>
+<p>Steam</p>
+</li>
+<li>
+<p>Xbox Live</p>
 </li>
 <li>
 <p>Oculus</p>
-</li>
-<li>
-<p>Apple</p>
-</li>
-<li>
-<p>Google</p>
-</li>
-<li>
-<p>Epic Games</p>
 </li>
 <li>
 <p>OpenID</p>
@@ -2024,7 +2022,7 @@ This functionality is demonstrated in example 03_Authentication
 </ul>
 </div>
 <div class="paragraph">
-<p>Please note that the ability to authenticate players using OpenID is a premium feature. If you are interested in mod.io premium features, please contact <a href="mailto:developers@mod.io">developers@mod.io</a></p>
+<p>Please note that the ability to authenticate players using OpenID is a premium feature. If you are interested in mod.io premium features, please contact <a href="mailto:developers@mod.io">developers@mod.io</a>.</p>
 </div>
 <div class="paragraph">
 <p>To use SSO with mod.io, a user must have accepted the mod.io Terms of Use in order to create an account.</p>
@@ -2253,7 +2251,7 @@ This functionality is demonstrated in example 04_SubscriptionManagement
 When a user 'unsubscribes' to a mod, they indicate that mod should be uninstalled from any device they&#8217;re logged in on.</p>
 </div>
 <div class="paragraph">
-<p>The API for managing subscriptions is simple and consists of a call to either <a href="#_subscribetomodasync_2">SubscribeToModAsync</a> or <a href="#_unsubscribefrommodasync">UnsubscribeFromModAsync</a> with the ID of the mod in question and a callback to receive the status of the request:</p>
+<p>The API for managing subscriptions is simple and consists of a call to either <a href="#_subscribetomodasync">SubscribeToModAsync</a> or <a href="#_unsubscribefrommodasync">UnsubscribeFromModAsync</a> with the ID of the mod in question and a callback to receive the status of the request:</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -2637,6 +2635,18 @@ To perform any of these actions, the muting user must be authenticated.
 </div>
 <div class="sect2">
 <h3 id="_sdk_quick_start_temporary_mod_sets">SDK quick-start: Temporary Mod Sets</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+This functionality is demonstrated in example 11_TempModSets
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>In some situations, you may want mods to only exist on a temporary basis - for instance, in Multiplayer environments where you don&#8217;t want to subscribe a user to a piece of content. Temporary Mod Sets allow management of these more transient pieces of content separately from subscriptions. Temp Mod Sets do not require authentication to be used, however Mod Management must still be enabled to use Temp Mods.</p>
 </div>
@@ -2786,7 +2796,7 @@ This functionality is demonstrated in example 09_MonetizationWalletManagement (f
 </table>
 </div>
 <div class="paragraph">
-<p>The mod.io SDK supports all of the mod.io monetization features, allowing you sell a per-game virtual currency to your players that they can use to purchase mods, with a share of the revenue split between creators and your studio. Visit HERE (TODO) for an overview of the mod.io monetization system.</p>
+<p>The mod.io SDK supports all of the mod.io monetization features, allowing you to sell a per-game virtual currency to your players that they can use to purchase mods, with a share of the revenue split between creators and your studio. Visit <a href="https://docs.mod.io/monetization/" class="bare">https://docs.mod.io/monetization/</a> for an overview of the mod.io monetization system.</p>
 </div>
 <div class="paragraph">
 <p>Every platform requires specific setup for monetization features to work, with regards to the virtual currency configuration and API calls, however the following documentation is generically applicable, with only small differences per-platform that are documented within the platform-specific monetization documentation.</p>
@@ -2881,7 +2891,13 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 <div class="sect3">
 <h4 id="_showing_user_purchases">Showing user purchases</h4>
 <div class="paragraph">
-<p>Even though all purchased mods are automatically subscribed, the user can still unsubscribe from them and uninstall them; however, they still remain owned and purchased by the user. They must re-subscribe to the mod in order to have it installed. This is facilitated by <code><a href="#_fetchuserpurchasesasync">FetchUserPurchasesAsync</a></code>, which will fetch a list of a users purchased mods. After a successful call, you can then display them with <a href="#QueryUserPurchases">[QueryUserPurchases]</a>, allowing re-subscription if necessary.</p>
+<p>Even though all purchased mods are automatically subscribed, the user can still unsubscribe from them and uninstall them; however, they still remain owned and purchased by the user. They must re-subscribe to the mod in order to have it installed. This is facilitated by <a href="#_fetchuserpurchasesasync">FetchUserPurchasesAsync</a>, which will fetch a list of a user&#8217;s purchased mods. After a successful call, you can then display them with <a href="#QueryUserPurchases">[QueryUserPurchases]</a>, allowing re-subscription if necessary.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_getting_a_user_delegation_token">Getting a User Delegation Token</h4>
+<div class="paragraph">
+<p>User Delegation Tokens can be used by a backend server for S2S (Server to Server) transactions/functionality. You can get one for the current user by calling <a href="#_getuserdelegationtokenasync">GetUserDelegationTokenAsync</a>, the callback for which contains the Token as a <code>std::string</code>.</p>
 </div>
 </div>
 </div>
@@ -3590,18 +3606,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_subscribetomodasync"><span class="line-through">SubscribeToModAsync</span></h3>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SubscribeToModAsync</span><span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModID</span> <span class="n">ModToSubscribeTo</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">OnSubscribeComplete</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Deprecated in 2024.4 Call SubscribeToModAsync() and specify if mod dependencies should be included.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_subscribetomodasync_2">SubscribeToModAsync</h3>
+<h3 id="_subscribetomodasync">SubscribeToModAsync</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SubscribeToModAsync</span><span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModID</span> <span class="n">ModToSubscribeTo</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">IncludeDependencies</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">OnSubscribeComplete</span><span class="p">)</span></code></pre>
@@ -5258,18 +5263,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_getmoddependenciesasync"><span class="line-through">GetModDependenciesAsync</span></h3>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">GetModDependenciesAsync</span><span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModID</span> <span class="n">ModID</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModDependencyList</span><span class="o">&gt;</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Deprecated in 2024.4 Call GetModDependenciesAsync() and specify if recursion is desired.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_getmoddependenciesasync_2">GetModDependenciesAsync</h3>
+<h3 id="_getmoddependenciesasync">GetModDependenciesAsync</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">GetModDependenciesAsync</span><span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModID</span> <span class="n">ModID</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">Recursive</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span><span class="p">,</span> <span class="n">Modio</span><span class="o">::</span><span class="n">Optional</span><span class="o">&lt;</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModDependencyList</span><span class="o">&gt;</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
@@ -5504,9 +5498,6 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 <ul>
 <li>
 <p><em>initialized-sdk</em></p>
-</li>
-<li>
-<p><em>no-rate-limiting</em></p>
 </li>
 <li>
 <p><em>authenticated-user</em></p>
@@ -6558,14 +6549,14 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_getuserderivedtokenasync">GetUserDerivedTokenAsync</h3>
+<h3 id="_getuserdelegationtokenasync">GetUserDelegationTokenAsync</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">GetUserDerivedTokenAsync</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">GetUserDelegationTokenAsync</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">function</span><span class="o">&lt;</span><span class="kt">void</span> <span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">ErrorCode</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Gets a UserDerivedToken that can be used by a backend serve for S2S functionality.</p>
+<p>Gets a UserDelegationToken that can be used by a backend serve for S2S functionality.</p>
 </div>
 <div class="sect3">
 <h4 id="_requirements_40">Requirements</h4>
@@ -6657,10 +6648,6 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">GenericError::SDKNotInitialized</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">SDK not initialized</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ModManagementError::ModManagementDisabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Mod Management need to be enabled</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">ModManagementError::ModManagementDisabled</p></td>
@@ -6843,7 +6830,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 <h2 id="_classes">Classes</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_errorcode"><a id="_1298691309664"></a> <a id="ErrorCode"></a> ErrorCode</h3>
+<h3 id="_errorcode"><a id="_2674762443520"></a> <a id="ErrorCode"></a> ErrorCode</h3>
 <div class="paragraph">
 <p>Trivial wrapper around <a href="https://en.cppreference.com/w/cpp/error/error_code">std::error_code</a>. Implemented as a class instead of a type alias to allow it to be forward-declared in wrappers, eg the UE4 plugin.</p>
 </div>
@@ -6874,7 +6861,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_flagimpl"><a id="_1298715439728"></a> <a id="FlagImpl"></a> FlagImpl</h3>
+<h3 id="_flagimpl"><a id="_2674785718000"></a> <a id="FlagImpl"></a> FlagImpl</h3>
 <div class="paragraph">
 <p>Helper class to strongly type bitfield operations</p>
 </div>
@@ -6892,7 +6879,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298715441344">Modio::Optional&lt;StorageType&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674785719616">Modio::Optional&lt;StorageType&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Value</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -6901,7 +6888,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_list"><a id="_1298716921184"></a> <a id="List"></a> List</h3>
+<h3 id="_list"><a id="_2674786508464"></a> <a id="List"></a> List</h3>
 <div class="paragraph">
 <p>Templated helper class to wrap a dynamic collection of elements</p>
 </div>
@@ -6951,7 +6938,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298716921632">ListType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674786508912">ListType</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalList</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -6960,25 +6947,25 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_youtubeurllist"><a id="_1298716942736"></a> <a id="YoutubeURLList"></a> YoutubeURLList</h3>
+<h3 id="_youtubeurllist"><a id="_2674786530160"></a> <a id="YoutubeURLList"></a> YoutubeURLList</h3>
 <div class="paragraph">
 <p>A URLList subclass to match Youtube urls</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_sketchfaburllist"><a id="_1298716953840"></a> <a id="SketchfabURLList"></a> SketchfabURLList</h3>
+<h3 id="_sketchfaburllist"><a id="_2674786541264"></a> <a id="SketchfabURLList"></a> SketchfabURLList</h3>
 <div class="paragraph">
 <p>A URLList subclass to match Sketchfab urls</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gallerylist"><a id="_1298717825216"></a> <a id="GalleryList"></a> GalleryList</h3>
+<h3 id="_gallerylist"><a id="_2674788416736"></a> <a id="GalleryList"></a> GalleryList</h3>
 <div class="paragraph">
 <p>List subclass to contain, compare and transform images</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_createmodfileparams"><a id="_1298719186928"></a> <a id="CreateModFileParams"></a> CreateModFileParams</h3>
+<h3 id="_createmodfileparams"><a id="_2674789644656"></a> <a id="CreateModFileParams"></a> CreateModFileParams</h3>
 <div class="paragraph">
 <p>Class specifying the parameters to submit when creating a mod file</p>
 </div>
@@ -6992,32 +6979,32 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RootDirectory</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Path to a directory to treat as the root of the mod. The SDK will compress all contents of this folder into a .zip archive, with a relative path based on this directory. This directory will not be created itself, the contents will exist at the top level of the archive.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Version</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional version string for this modfile release</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Changelog</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional changelog string for this modfile release</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298719189360">Modio::Optional&lt;_Bool&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674789647088">Modio::Optional&lt;_Bool&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bSetAsActive</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Should this mod be set as active/latest release? Defaults to true if not set.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataBlob</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional metadata blob for this mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298719682592">Modio::Optional&lt;std::vector&lt;Modio::ModfilePlatform&gt; &gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674789870256">Modio::Optional&lt;std::vector&lt;Modio::ModfilePlatform&gt; &gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Platforms</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional vector of platforms for this modfile</p></td>
 </tr>
@@ -7026,7 +7013,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_createmodparams"><a id="_1298720703456"></a> <a id="CreateModParams"></a> CreateModParams</h3>
+<h3 id="_createmodparams"><a id="_2674790889760"></a> <a id="CreateModParams"></a> CreateModParams</h3>
 <div class="paragraph">
 <p>Class specifying the parameters to submit when creating a mod</p>
 </div>
@@ -7040,57 +7027,57 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PathToLogoFile</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Path to the logo for the mod. Must point to a valid file on disk or the mod will not be created on the server.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Name</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The name of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Summary</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A brief summary of what the mod is</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NamePath</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional override for the name 'slug' in the mod&#8217;s URL</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298720705728">Modio::Optional&lt;Modio::ObjectVisibility&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674790892032">Modio::Optional&lt;Modio::ObjectVisibility&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Visibility</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional override for the mod&#8217;s visibility status. Defaults to Public (1)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Description</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional long description of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">HomepageURL</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional URL to the mod&#8217;s homepage. Must be a valid URL</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298720933760">Modio::Optional&lt;std::size_t&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674791120080">Modio::Optional&lt;std::size_t&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Stock</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional quantity limit on the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298721156928">Modio::Optional&lt;Modio::MaturityOption&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674791343136">Modio::Optional&lt;Modio::MaturityOption&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MaturityRating</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Bitwise mask of flags indicating mature content</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataBlob</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional metadata blob for this mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298721384480">Modio::Optional&lt;std::vector&lt;std::string&gt; &gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674791570736">Modio::Optional&lt;std::vector&lt;std::string&gt; &gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tags</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional list of mod tags. All tags must be supported by the parent game to be applied</p></td>
 </tr>
@@ -7099,7 +7086,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_editmodparams"><a id="_1298722555168"></a> <a id="EditModParams"></a> EditModParams</h3>
+<h3 id="_editmodparams"><a id="_2674792610192"></a> <a id="EditModParams"></a> EditModParams</h3>
 <div class="paragraph">
 <p>Class specifying fields to update for a mod</p>
 </div>
@@ -7113,52 +7100,52 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Name</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The name of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Summary</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A brief summary of what the mod is</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NamePath</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional override for the name 'slug' in the mod&#8217;s URL</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298720705728">Modio::Optional&lt;Modio::ObjectVisibility&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674790892032">Modio::Optional&lt;Modio::ObjectVisibility&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Visibility</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional override for the mod&#8217;s visibility status. Defaults to Public (1)</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Description</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional long description of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">HomepageURL</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional URL to the mod&#8217;s homepage. Must be a valid URL</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298721156928">Modio::Optional&lt;Modio::MaturityOption&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674791343136">Modio::Optional&lt;Modio::MaturityOption&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MaturityRating</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Bitwise mask of flags indicating mature content</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataBlob</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional metadata blob for this mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">LogoPath</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional path to a new logo image</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298721384480">Modio::Optional&lt;std::vector&lt;std::string&gt; &gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674791570736">Modio::Optional&lt;std::vector&lt;std::string&gt; &gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tags</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Optional tags vector for this mod</p></td>
 </tr>
@@ -7167,14 +7154,14 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_filterparams"><a id="_1298724527568"></a> <a id="FilterParams"></a> FilterParams</h3>
+<h3 id="_filterparams"><a id="_2674794464112"></a> <a id="FilterParams"></a> FilterParams</h3>
 <div class="paragraph">
 <p>Class storing a set of filter parameters for use in <a href="#Modio::ListAllModsAsync">[Modio::ListAllModsAsync]</a></p>
 </div>
 <div class="sect3">
 <h4 id="_enums">Enums</h4>
 <div class="sect4">
-<h5 id="_sortfieldtype"><a id="_1298724528112"></a> SortFieldType</h5>
+<h5 id="_sortfieldtype"><a id="_2674794464656"></a> SortFieldType</h5>
 <div class="paragraph">
 <p>Enum indicating which field should be used to sort the results.</p>
 </div>
@@ -7223,7 +7210,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_sortdirection"><a id="_1298724529440"></a> SortDirection</h5>
+<h5 id="_sortdirection"><a id="_2674794465984"></a> SortDirection</h5>
 <div class="paragraph">
 <p>Enum indicating which direction sorting should be applied</p>
 </div>
@@ -7248,7 +7235,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_revenuefiltertype"><a id="_1298724529904"></a> RevenueFilterType</h5>
+<h5 id="_revenuefiltertype"><a id="_2674794466448"></a> RevenueFilterType</h5>
 <div class="paragraph">
 <p>Enum indicating filtering options based off revenue type</p>
 </div>
@@ -7910,82 +7897,82 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298724528112">SortFieldType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674794464656">SortFieldType</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SortField</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298724529440">SortDirection</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674794465984">SortDirection</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Direction</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298724534720">std::vector&lt;Modio::UserID&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674794471264">std::vector&lt;Modio::UserID&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AuthorUserIds</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298708137472">std::vector&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674778902928">std::vector&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SearchKeywords</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298724683376">Modio::Optional&lt;std::chrono::system_clock::time_point&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674794887536">Modio::Optional&lt;std::chrono::system_clock::time_point&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateRangeBegin</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298724683376">Modio::Optional&lt;std::chrono::system_clock::time_point&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674794887536">Modio::Optional&lt;std::chrono::system_clock::time_point&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateRangeEnd</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298708137472">std::vector&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674778902928">std::vector&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tags</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298708137472">std::vector&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674778902928">std::vector&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExcludedTags</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298724536400">std::vector&lt;Modio::ModID&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674794472944">std::vector&lt;Modio::ModID&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">IncludedIDs</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298724536400">std::vector&lt;Modio::ModID&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674794472944">std::vector&lt;Modio::ModID&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExcludedIDs</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298725327696">Modio::Optional&lt;RevenueFilterType&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674795261920">Modio::Optional&lt;RevenueFilterType&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Revenue</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298721156928">Modio::Optional&lt;MaturityOption&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674791343136">Modio::Optional&lt;MaturityOption&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Maturity</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataBlobSearchString</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187248">_Bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711621968">_Bool</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">IsPaged</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187600">std::size_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622320">std::size_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Index</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187600">std::size_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622320">std::size_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Count</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -7994,7 +7981,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_pagedresult"><a id="_1298725991792"></a> <a id="PagedResult"></a> PagedResult</h3>
+<h3 id="_pagedresult"><a id="_2674795925936"></a> <a id="PagedResult"></a> PagedResult</h3>
 <div class="paragraph">
 <p>Base class for all types that represent a page from a set of results</p>
 </div>
@@ -8066,27 +8053,27 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187376">std::int32_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622096">std::int32_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PageIndex</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187376">std::int32_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622096">std::int32_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PageSize</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187376">std::int32_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622096">std::int32_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PageCount</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187376">std::int32_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622096">std::int32_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TotalResultCount</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187376">std::int32_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622096">std::int32_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ResultCount</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -8095,7 +8082,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modinfolist"><a id="_1298725997856"></a> <a id="ModInfoList"></a> ModInfoList</h3>
+<h3 id="_modinfolist"><a id="_2674795932000"></a> <a id="ModInfoList"></a> ModInfoList</h3>
 <div class="paragraph">
 <p>Class representing a list of mods that may be a page from a larger set of results</p>
 </div>
@@ -8126,7 +8113,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modcollectionentry"><a id="_1298726425088"></a> <a id="ModCollectionEntry"></a> ModCollectionEntry</h3>
+<h3 id="_modcollectionentry"><a id="_2674796758768"></a> <a id="ModCollectionEntry"></a> ModCollectionEntry</h3>
 <div class="paragraph">
 <p>Class representing a mod which is installed locally</p>
 </div>
@@ -8144,62 +8131,62 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714572032">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784850064">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ID</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The ID of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298726428400">std::atomic&lt;Modio::ModState&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674796762080">std::atomic&lt;Modio::ModState&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CurrentState</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The status of the mod, is it pending installation, is it installed but needing an update, etc</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298726501424">Modio::Optional&lt;Modio::ModState&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674796835248">Modio::Optional&lt;Modio::ModState&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RollbackState</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298718020480">ModInfo</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674788611440">ModInfo</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModProfile</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Mod descriptor from the REST API</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298688833584">std::atomic&lt;uint8_t&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674760192192">std::atomic&lt;uint8_t&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">LocalUserSubscriptionCount</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Reference counting to allow automatic uninstallation of unused local mods</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298727067440">std::set&lt;Modio::UserID&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674797328304">std::set&lt;Modio::UserID&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">LocalUserSubscriptions</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PathOnDisk</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714598064">Modio::FileSize</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784876096">Modio::FileSize</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SizeOnDisk</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298688831920">std::atomic&lt;_Bool&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674760190528">std::atomic&lt;_Bool&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ShouldNotRetry</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">flag if this mod should not be processed because it encountered an unrecoverable error during installation/update. This should not be saved to disk as we will more than likely want to retry next session</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298691309664">Modio::ErrorCode</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674762443520">Modio::ErrorCode</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NeverRetryReason</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298691309664">Modio::ErrorCode</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674762443520">Modio::ErrorCode</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">LastErrorCode</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187472">uint8_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622192">uint8_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RetriesRemainingThisSession</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -8208,14 +8195,14 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modprogressinfo"><a id="_1298727654672"></a> <a id="ModProgressInfo"></a> ModProgressInfo</h3>
+<h3 id="_modprogressinfo"><a id="_2674797988848"></a> <a id="ModProgressInfo"></a> ModProgressInfo</h3>
 <div class="paragraph">
 <p>Class representing the progress of a mod installation or update</p>
 </div>
 <div class="sect3">
 <h4 id="_enums_2">Enums</h4>
 <div class="sect4">
-<h5 id="_emodprogressstate"><a id="_1298727655216"></a> EModProgressState</h5>
+<h5 id="_emodprogressstate"><a id="_2674797989392"></a> EModProgressState</h5>
 <div class="paragraph">
 <p>Enum representing which state the currently processing mod is in</p>
 </div>
@@ -8346,7 +8333,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714572032">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784850064">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ID</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The mod ID of the mod being processed</p></td>
 </tr>
@@ -8355,14 +8342,14 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_usersubscriptionlist"><a id="_1298727898912"></a> <a id="UserSubscriptionList"></a> UserSubscriptionList</h3>
+<h3 id="_usersubscriptionlist"><a id="_2674798233088"></a> <a id="UserSubscriptionList"></a> UserSubscriptionList</h3>
 <div class="paragraph">
 <p>Class containing the mod IDs the current user is subscribed to</p>
 </div>
 <div class="sect3">
 <h4 id="_enums_3">Enums</h4>
 <div class="sect4">
-<h5 id="_changetype"><a id="_1298727899568"></a> ChangeType</h5>
+<h5 id="_changetype"><a id="_2674798233744"></a> ChangeType</h5>
 <div class="paragraph">
 <p>Enum indicating if a mod was added or removed when calculating the difference of two user subscription lists</p>
 </div>
@@ -8397,7 +8384,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modeventlog"><a id="_1298728402608"></a> <a id="ModEventLog"></a> ModEventLog</h3>
+<h3 id="_modeventlog"><a id="_2674798737264"></a> <a id="ModEventLog"></a> ModEventLog</h3>
 <div class="paragraph">
 <p>Container of events directly related to a ModID, in particular any error occurred during execution</p>
 </div>
@@ -8487,7 +8474,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298728405232">std::vector&lt;Modio::ModManagementEvent&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674798739888">std::vector&lt;Modio::ModManagementEvent&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalData</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -8496,23 +8483,45 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_moddependencylist"><a id="_1298728822288"></a> <a id="ModDependencyList"></a> ModDependencyList</h3>
+<h3 id="_moddependencylist"><a id="_2674798889280"></a> <a id="ModDependencyList"></a> ModDependencyList</h3>
 <div class="paragraph">
 <p>Container for a collection of ModDependency objects</p>
 </div>
+<div class="sect3">
+<h4 id="_variables_11">Variables</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TotalFilesize</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Total size of all the dependency files in bytes.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TotalFilesizeUncompressed</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Total Size of the uncompressed dependency files in bytes.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_reportparams"><a id="_1298728966928"></a> <a id="ReportParams"></a> ReportParams</h3>
+<h3 id="_reportparams"><a id="_2674799033552"></a> <a id="ReportParams"></a> ReportParams</h3>
 
 </div>
 <div class="sect2">
-<h3 id="_modtagoptions"><a id="_1298729312064"></a> <a id="ModTagOptions"></a> ModTagOptions</h3>
+<h3 id="_modtagoptions"><a id="_2674799377376"></a> <a id="ModTagOptions"></a> ModTagOptions</h3>
 <div class="paragraph">
 <p>Container for a collection of ModTagInfo objects</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gameinfolist"><a id="_1298730806784"></a> <a id="GameInfoList"></a> GameInfoList</h3>
+<h3 id="_gameinfolist"><a id="_2674800867536"></a> <a id="GameInfoList"></a> GameInfoList</h3>
 <div class="paragraph">
 <p>Class representing a list of games that may be a page from a larger set of results</p>
 </div>
@@ -8543,13 +8552,13 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_moddetails"><a id="_1298731009328"></a> <a id="ModDetails"></a> ModDetails</h3>
+<h3 id="_moddetails"><a id="_2674801060480"></a> <a id="ModDetails"></a> ModDetails</h3>
 <div class="paragraph">
 <p>Collection of FileMetadata objects representing mod file updates</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_userlist"><a id="_1298731571120"></a> <a id="UserList"></a> UserList</h3>
+<h3 id="_userlist"><a id="_2674801622464"></a> <a id="UserList"></a> UserList</h3>
 <div class="paragraph">
 <p>Class representing a list of users</p>
 </div>
@@ -8580,7 +8589,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_entitlementconsumptionstatuslist"><a id="_1298794104736"></a> <a id="EntitlementConsumptionStatusList"></a> EntitlementConsumptionStatusList</h3>
+<h3 id="_entitlementconsumptionstatuslist"><a id="_2674863332688"></a> <a id="EntitlementConsumptionStatusList"></a> EntitlementConsumptionStatusList</h3>
 <div class="paragraph">
 <p>Class representing a list of mods that may be a page from a larger set of results</p>
 </div>
@@ -8610,7 +8619,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_variables_11">Variables</h4>
+<h4 id="_variables_12">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -8619,7 +8628,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298794520032">Modio::Optional&lt;Modio::EntitlementWalletBalance&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674863476272">Modio::Optional&lt;Modio::EntitlementWalletBalance&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">WalletBalance</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Updated wallet balance from syncing entitlements</p></td>
 </tr>
@@ -8633,7 +8642,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 <h2 id="_structs">Structs</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_stronginteger"><a id="_1298714509808"></a> <a id="StrongInteger"></a> StrongInteger</h3>
+<h3 id="_stronginteger"><a id="_2674784787744"></a> <a id="StrongInteger"></a> StrongInteger</h3>
 <div class="paragraph">
 <p>Strong integer type to prevent accidental function parameter reordering and prevent unwanted implicit conversions</p>
 </div>
@@ -8667,7 +8676,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_variables_12">Variables</h4>
+<h4 id="_variables_13">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -8676,7 +8685,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642507056">UnderlyingIntegerType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674712817760">UnderlyingIntegerType</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Value</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -8685,7 +8694,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_emailauthcode"><a id="_1298714523376"></a> <a id="EmailAuthCode"></a> EmailAuthCode</h3>
+<h3 id="_emailauthcode"><a id="_2674784801312"></a> <a id="EmailAuthCode"></a> EmailAuthCode</h3>
 <div class="paragraph">
 <p>Strong type representing an email authentication code sent to a user email address</p>
 </div>
@@ -8719,7 +8728,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_variables_13">Variables</h4>
+<h4 id="_variables_14">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -8728,7 +8737,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalCode</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -8737,7 +8746,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_emailaddress"><a id="_1298714538016"></a> <a id="EmailAddress"></a> EmailAddress</h3>
+<h3 id="_emailaddress"><a id="_2674784815952"></a> <a id="EmailAddress"></a> EmailAddress</h3>
 <div class="paragraph">
 <p>Strong type representing an email address</p>
 </div>
@@ -8771,7 +8780,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_variables_14">Variables</h4>
+<h4 id="_variables_15">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -8780,7 +8789,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalAddress</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -8789,7 +8798,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_apikey"><a id="_1298714543408"></a> <a id="ApiKey"></a> ApiKey</h3>
+<h3 id="_apikey"><a id="_2674784821344"></a> <a id="ApiKey"></a> ApiKey</h3>
 <div class="paragraph">
 <p>Strong type representing an api key</p>
 </div>
@@ -8823,95 +8832,6 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_variables_15">Variables</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalApiKey</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_userid"><a id="_1298714555216"></a> <a id="UserID"></a> UserID</h3>
-<div class="paragraph">
-<p>Strong type for User IDs</p>
-</div>
-<div class="sect3">
-<h4 id="_functions_19">Functions</h4>
-
-</div>
-</div>
-<div class="sect2">
-<h3 id="_modid"><a id="_1298714572032"></a> <a id="ModID"></a> ModID</h3>
-<div class="paragraph">
-<p>Strong type for Mod IDs</p>
-</div>
-<div class="sect3">
-<h4 id="_functions_20">Functions</h4>
-
-</div>
-</div>
-<div class="sect2">
-<h3 id="_filemetadataid"><a id="_1298714578304"></a> <a id="FileMetadataID"></a> FileMetadataID</h3>
-<div class="paragraph">
-<p>Strong type for File Metadata IDs</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_commentid"><a id="_1298714580960"></a> <a id="CommentID"></a> CommentID</h3>
-<div class="paragraph">
-<p>Strong type for Comment ID</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_mediafileid"><a id="_1298714583616"></a> <a id="MediaFileID"></a> MediaFileID</h3>
-<div class="paragraph">
-<p>Strong type for Media File ID</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_fileoffset"><a id="_1298714586272"></a> <a id="FileOffset"></a> FileOffset</h3>
-<div class="paragraph">
-<p>Strong type for file offsets</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_filesize"><a id="_1298714598064"></a> <a id="FileSize"></a> FileSize</h3>
-<div class="paragraph">
-<p>Strong type for file sizes</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_gameid"><a id="_1298714600720"></a> <a id="GameID"></a> GameID</h3>
-<div class="paragraph">
-<p>Strong type for a game ID</p>
-</div>
-<div class="sect3">
-<h4 id="_functions_21">Functions</h4>
-
-</div>
-</div>
-<div class="sect2">
-<h3 id="_modcreationhandle"><a id="_1298714606992"></a> <a id="ModCreationHandle"></a> ModCreationHandle</h3>
-<div class="paragraph">
-<p>Strong type wrapping a handle to an as-yet-uncreated mod</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_authenticationparams"><a id="_1298714609648"></a> <a id="AuthenticationParams"></a> AuthenticationParams</h3>
-<div class="paragraph">
-<p>Simple struct to encapsulate data passed to external authentication systems</p>
-</div>
-<div class="sect3">
 <h4 id="_variables_16">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
@@ -8921,38 +8841,84 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AuthToken</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AuthToken String received by an authentication provider, that later is used to verify a user on the mod.io API</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714610672">Modio::Optional&lt;std::string&gt;</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">UserEmail</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">UserEmail Optional string that associates an email with a user</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187248">_Bool</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bUserHasAcceptedTerms</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">bUserHasAcceptedTerms Boolean value that signals when a user has accepted the mod.io Terms of Service. True when they are accepted, false otherwise.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187248">_Bool</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bURLEncodeAuthToken</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">bURLEncodeAuthToken Boolean value to let the SDK know if the AuthToken requires URL encoding before sending the string to the mod.io API. By default, it would not perform URL encoding.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714857936">std::map&lt;std::string, std::string&gt;</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExtendedParameters</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ExtendedParameters A map to store extended parameters required by some providers.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalApiKey</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_fielderror"><a id="_1298715366080"></a> <a id="FieldError"></a> FieldError</h3>
+<h3 id="_userid"><a id="_2674784833152"></a> <a id="UserID"></a> UserID</h3>
 <div class="paragraph">
-<p>Simple struct representing a validation error from the REST API</p>
+<p>Strong type for User IDs</p>
+</div>
+<div class="sect3">
+<h4 id="_functions_19">Functions</h4>
+
+</div>
+</div>
+<div class="sect2">
+<h3 id="_modid"><a id="_2674784850064"></a> <a id="ModID"></a> ModID</h3>
+<div class="paragraph">
+<p>Strong type for Mod IDs</p>
+</div>
+<div class="sect3">
+<h4 id="_functions_20">Functions</h4>
+
+</div>
+</div>
+<div class="sect2">
+<h3 id="_filemetadataid"><a id="_2674784856336"></a> <a id="FileMetadataID"></a> FileMetadataID</h3>
+<div class="paragraph">
+<p>Strong type for File Metadata IDs</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_commentid"><a id="_2674784858992"></a> <a id="CommentID"></a> CommentID</h3>
+<div class="paragraph">
+<p>Strong type for Comment ID</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mediafileid"><a id="_2674784861648"></a> <a id="MediaFileID"></a> MediaFileID</h3>
+<div class="paragraph">
+<p>Strong type for Media File ID</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fileoffset"><a id="_2674784864304"></a> <a id="FileOffset"></a> FileOffset</h3>
+<div class="paragraph">
+<p>Strong type for file offsets</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_filesize"><a id="_2674784876096"></a> <a id="FileSize"></a> FileSize</h3>
+<div class="paragraph">
+<p>Strong type for file sizes</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_gameid"><a id="_2674784878752"></a> <a id="GameID"></a> GameID</h3>
+<div class="paragraph">
+<p>Strong type for a game ID</p>
+</div>
+<div class="sect3">
+<h4 id="_functions_21">Functions</h4>
+
+</div>
+</div>
+<div class="sect2">
+<h3 id="_modcreationhandle"><a id="_2674784885024"></a> <a id="ModCreationHandle"></a> ModCreationHandle</h3>
+<div class="paragraph">
+<p>Strong type wrapping a handle to an as-yet-uncreated mod</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_authenticationparams"><a id="_2674784887680"></a> <a id="AuthenticationParams"></a> AuthenticationParams</h3>
+<div class="paragraph">
+<p>Simple struct to encapsulate data passed to external authentication systems</p>
 </div>
 <div class="sect3">
 <h4 id="_variables_17">Variables</h4>
@@ -8964,23 +8930,38 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Field</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">String description of the field failing validation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AuthToken</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AuthToken String received by an authentication provider, that later is used to verify a user on the mod.io API</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Error</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">String containing the reason for the validation failure</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784888704">Modio::Optional&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">UserEmail</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UserEmail Optional string that associates an email with a user</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711621968">_Bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bUserHasAcceptedTerms</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bUserHasAcceptedTerms Boolean value that signals when a user has accepted the mod.io Terms of Service. True when they are accepted, false otherwise.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711621968">_Bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bURLEncodeAuthToken</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">bURLEncodeAuthToken Boolean value to let the SDK know if the AuthToken requires URL encoding before sending the string to the mod.io API. By default, it would not perform URL encoding.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674785135984">std::map&lt;std::string, std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExtendedParameters</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ExtendedParameters A map to store extended parameters required by some providers.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_entitlementparams"><a id="_1298715372992"></a> <a id="EntitlementParams"></a> EntitlementParams</h3>
+<h3 id="_fielderror"><a id="_2674785644096"></a> <a id="FieldError"></a> FieldError</h3>
 <div class="paragraph">
-<p>Simple struct to encapsulate portal-specific data required when consuming entitlements</p>
+<p>Simple struct representing a validation error from the REST API</p>
 </div>
 <div class="sect3">
 <h4 id="_variables_18">Variables</h4>
@@ -8992,7 +8973,35 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714857936">std::map&lt;std::string, std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Field</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String description of the field failing validation</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Error</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">String containing the reason for the validation failure</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_entitlementparams"><a id="_2674785651264"></a> <a id="EntitlementParams"></a> EntitlementParams</h3>
+<div class="paragraph">
+<p>Simple struct to encapsulate portal-specific data required when consuming entitlements</p>
+</div>
+<div class="sect3">
+<h4 id="_variables_19">Variables</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674785135984">std::map&lt;std::string, std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExtendedParameters</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">ExtendedParameters A map to store extended parameters required by some portals.</p></td>
 </tr>
@@ -9001,14 +9010,14 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_filemetadata"><a id="_1298715394064"></a> <a id="FileMetadata"></a> FileMetadata</h3>
+<h3 id="_filemetadata"><a id="_2674785672336"></a> <a id="FileMetadata"></a> FileMetadata</h3>
 <div class="paragraph">
 <p>Metadata for a release archive for a mod</p>
 </div>
 <div class="sect3">
 <h4 id="_enums_4">Enums</h4>
 <div class="sect4">
-<h5 id="_virusscanstatus"><a id="_1298715394736"></a> VirusScanStatus</h5>
+<h5 id="_virusscanstatus"><a id="_2674785673008"></a> VirusScanStatus</h5>
 <div class="paragraph">
 <p>Enum related to the Virus scan status of a file</p>
 </div>
@@ -9049,7 +9058,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_virusstatus"><a id="_1298715396256"></a> VirusStatus</h5>
+<h5 id="_virusstatus"><a id="_2674785674528"></a> VirusStatus</h5>
 <div class="paragraph">
 <p>Enum related to the Virus status of a file</p>
 </div>
@@ -9079,89 +9088,6 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_variables_19">Variables</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714578304">Modio::FileMetadataID</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataId</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Unique modfile id.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714572032">Modio::ModID</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModId</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Unique mod id.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateAdded</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of date file was added.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298715394736">VirusScanStatus</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CurrentVirusScanStatus</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Current virus scan status of the file. For newly added files that have yet to be scanned this field will change frequently until a scan is complete</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298715396256">VirusStatus</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CurrentVirusStatus</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Was a virus detected?</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Filesize</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Size of the file in bytes.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">FilesizeUncompressed</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Size of the uncompressed file in bytes.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Filename</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Filename including extension.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Version</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Release version this file represents.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Changelog</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Changelog for the file.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataBlob</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Metadata stored by the game developer for this file.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DownloadBinaryURL</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Modfile download URL</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DownloadExpiryDate</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Modfile download expiry date</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_modstats"><a id="_1298715425184"></a> <a id="ModStats"></a> ModStats</h3>
-<div class="paragraph">
-<p>Contains download stats and ratings for a mod</p>
-</div>
-<div class="sect3">
 <h4 id="_variables_20">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
@@ -9171,73 +9097,78 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PopularityRankPosition</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Current rank of the mod.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784856336">Modio::FileMetadataID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataId</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unique modfile id.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PopularityRankTotalMods</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of ranking spots the current rank is measured against.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784850064">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModId</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unique mod id.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DownloadsTotal</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of total mod downloads.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateAdded</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of date file was added.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SubscribersTotal</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of total users who have subscribed to the mod.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674785673008">VirusScanStatus</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CurrentVirusScanStatus</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Current virus scan status of the file. For newly added files that have yet to be scanned this field will change frequently until a scan is complete</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingTotal</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of times this mod has been rated.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674785674528">VirusStatus</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CurrentVirusStatus</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Was a virus detected?</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingPositive</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of positive ratings.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Filesize</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Size of the file in bytes.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingNegative</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of negative ratings.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">FilesizeUncompressed</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Size of the uncompressed file in bytes.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingPercentagePositive</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of positive ratings, divided by the total ratings to determine it’s percentage score.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Filename</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Filename including extension.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187664">double</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingWeightedAggregate</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Overall rating of this item calculated using the [Wilson score confidence interval](<a href="https://www.evanmiller.org/how-not-to-sort-by-average-Ratinghtml" class="bare">https://www.evanmiller.org/how-not-to-sort-by-average-Ratinghtml</a>). This column is good to sort on, as it will order items based on number of ratings and will place items with many positive ratings above those with a higher score but fewer ratings.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Version</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Release version this file represents.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingDisplayText</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Textual representation of the rating in format: Overwhelmingly Positive &#8594; Very Positive &#8594; Positive &#8594; Mostly Positive &#8594; Mixed &#8594; Negative &#8594; Mostly Negative &#8594; Very Negative &#8594; Overwhelmingly Negative &#8594; Unrated</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Changelog</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Changelog for the file.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataBlob</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metadata stored by the game developer for this file.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DownloadBinaryURL</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modfile download URL</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DownloadExpiryDate</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modfile download expiry date</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_profilematurity"><a id="_1298715473296"></a> <a id="ProfileMaturity"></a> ProfileMaturity</h3>
+<h3 id="_modstats"><a id="_2674785703456"></a> <a id="ModStats"></a> ModStats</h3>
 <div class="paragraph">
-<p>A strong type flag object to represent MaturityOption from a mod.io info. * Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to * be labeled as mature. The value of this field will default to "Maturity Option None" unless the parent * game allows to flag mature content.</p>
-</div>
-<div class="sect3">
-<h4 id="_functions_22">Functions</h4>
-
-</div>
-</div>
-<div class="sect2">
-<h3 id="_user"><a id="_1298717345248"></a> <a id="User"></a> User</h3>
-<div class="paragraph">
-<p>Object representing a mod.io user profile</p>
+<p>Contains download stats and ratings for a mod</p>
 </div>
 <div class="sect3">
 <h4 id="_variables_21">Variables</h4>
@@ -9249,48 +9180,73 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714555216">Modio::UserID</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">UserId</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Unique id for the user</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PopularityRankPosition</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Current rank of the mod.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Username</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Username of the user</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PopularityRankTotalMods</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of ranking spots the current rank is measured against.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298717346640">Modio::Optional&lt;Modio::Detail::OAuthToken&gt;</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AuthToken</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Authentification token of the user</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DownloadsTotal</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of total mod downloads.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateOnline</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp the user was last online</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SubscribersTotal</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of total users who have subscribed to the mod.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileUrl</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">URL of the user&#8217;s mod.io profile</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingTotal</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of times this mod has been rated.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298717313376">Modio::Detail::Avatar</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Avatar</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Cached information about the user&#8217;s avatar</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingPositive</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of positive ratings.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DisplayNamePortal</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The display name of the User for the given Portal that the mod search is coming from * ie if the Portal is PSN, then this is the owning user&#8217;s PSN profile name if accounts are linked.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingNegative</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of negative ratings.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingPercentagePositive</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of positive ratings, divided by the total ratings to determine it’s percentage score.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622384">double</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingWeightedAggregate</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Overall rating of this item calculated using the [Wilson score confidence interval](<a href="https://www.evanmiller.org/how-not-to-sort-by-average-Ratinghtml" class="bare">https://www.evanmiller.org/how-not-to-sort-by-average-Ratinghtml</a>). This column is good to sort on, as it will order items based on number of ratings and will place items with many positive ratings above those with a higher score but fewer ratings.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RatingDisplayText</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Textual representation of the rating in format: Overwhelmingly Positive &#8594; Very Positive &#8594; Positive &#8594; Mostly Positive &#8594; Mixed &#8594; Negative &#8594; Mostly Negative &#8594; Very Negative &#8594; Overwhelmingly Negative &#8594; Unrated</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modtag"><a id="_1298718002592"></a> <a id="ModTag"></a> ModTag</h3>
+<h3 id="_profilematurity"><a id="_2674785751568"></a> <a id="ProfileMaturity"></a> ProfileMaturity</h3>
 <div class="paragraph">
-<p>Strong type for a ModTag</p>
+<p>A strong type flag object to represent MaturityOption from a mod.io info. * Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to * be labeled as mature. The value of this field will default to "Maturity Option None" unless the parent * game allows to flag mature content.</p>
+</div>
+<div class="sect3">
+<h4 id="_functions_22">Functions</h4>
+
+</div>
+</div>
+<div class="sect2">
+<h3 id="_user"><a id="_2674786662784"></a> <a id="User"></a> User</h3>
+<div class="paragraph">
+<p>Object representing a mod.io user profile</p>
 </div>
 <div class="sect3">
 <h4 id="_variables_22">Variables</h4>
@@ -9302,23 +9258,48 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tag</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784833152">Modio::UserID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">UserId</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unique id for the user</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagLocalized</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Username</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Username of the user</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674786664176">Modio::Optional&lt;Modio::Detail::OAuthToken&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AuthToken</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Authentification token of the user</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateOnline</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp the user was last online</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileUrl</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">URL of the user&#8217;s mod.io profile</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674786630752">Modio::Detail::Avatar</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Avatar</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cached information about the user&#8217;s avatar</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DisplayNamePortal</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The display name of the User for the given Portal that the mod search is coming from * ie if the Portal is PSN, then this is the owning user&#8217;s PSN profile name if accounts are linked.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_metadata"><a id="_1298718010096"></a> <a id="Metadata"></a> Metadata</h3>
+<h3 id="_modtag"><a id="_2674788593232"></a> <a id="ModTag"></a> ModTag</h3>
 <div class="paragraph">
-<p>Key-Value pair that represents a mod metadata</p>
+<p>Strong type for a ModTag</p>
 </div>
 <div class="sect3">
 <h4 id="_variables_23">Variables</h4>
@@ -9330,13 +9311,13 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Key</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tag</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagLocalized</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 </tbody>
@@ -9344,9 +9325,9 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modinfo"><a id="_1298718020480"></a> <a id="ModInfo"></a> ModInfo</h3>
+<h3 id="_metadata"><a id="_2674788600896"></a> <a id="Metadata"></a> Metadata</h3>
 <div class="paragraph">
-<p>Full mod profile including current release information, media links, and stats</p>
+<p>Key-Value pair that represents a mod metadata</p>
 </div>
 <div class="sect3">
 <h4 id="_variables_24">Variables</h4>
@@ -9358,132 +9339,160 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714572032">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Key</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Value</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_modinfo"><a id="_2674788611440"></a> <a id="ModInfo"></a> ModInfo</h3>
+<div class="paragraph">
+<p>Full mod profile including current release information, media links, and stats</p>
+</div>
+<div class="sect3">
+<h4 id="_variables_25">Variables</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784850064">Modio::ModID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModId</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unique Mod ID</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileName</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Name of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileSummary</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Summary of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileDescription</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Detailed description in HTML format</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileDescriptionPlaintext</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Detailed description in plaintext</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileURL</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">URL to the mod profile</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298717345248">Modio::User</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674786662784">Modio::User</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileSubmittedBy</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Information on the user who submitted the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileDateAdded</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of the date the mod was registered</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileDateUpdated</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of the date the mod was updated</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileDateLive</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of the date the mod was marked live</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298715473296">Modio::ProfileMaturity</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674785751568">Modio::ProfileMaturity</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileMaturityOption</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Object representing a mod.io user profile	* Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to	* be labeled as mature. The value of this field will default to None unless the parent game allows * to flag mature content.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataBlob</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Metadata stored by the game developer.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298718024400">Modio::Optional&lt;Modio::FileMetadata&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674788615360">Modio::Optional&lt;Modio::FileMetadata&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">FileInfo</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Information about the mod&#8217;s most recent public release</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298718524736">std::vector&lt;Modio::Metadata&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674789115792">std::vector&lt;Modio::Metadata&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetadataKvp</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Arbitrary key-value metadata set for this mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298718658720">std::vector&lt;Modio::ModTag&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674789248432">std::vector&lt;Modio::ModTag&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tags</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Tags this mod has set</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187600">std::size_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622320">std::size_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NumGalleryImages</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of images in the mod&#8217;s media gallery</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298717825216">Modio::GalleryList</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674788416736">Modio::GalleryList</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GalleryImages</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">List of images in the mod&#8217;s media gallery</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298716942736">Modio::YoutubeURLList</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674786530160">Modio::YoutubeURLList</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">YoutubeURLs</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">List of youtube links provided by the creator of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298716953840">Modio::SketchfabURLList</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674786541264">Modio::SketchfabURLList</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SketchfabURLs</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">List of sketchfab links provided by the creator of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298715425184">Modio::ModStats</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674785703456">Modio::ModStats</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Stats</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Stats and rating information for the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298717977360">Modio::Detail::Logo</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674788567808">Modio::Detail::Logo</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModLogo</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Media data related to the mod logo</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Version</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The current ModInfo version. This property is updated when changes to the class happen.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298718019696">Modio::ModServerSideStatus</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674788610656">Modio::ModServerSideStatus</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModStatus</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The current ModStatus on the server: Accepted, NotAccepted, or Deleted.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298715371888">Modio::ObjectVisibility</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674785650160">Modio::ObjectVisibility</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Visibility</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The visibility status of the mod, default to Public</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187600">uint64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622320">uint64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Price</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Price of this mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187248">_Bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711621968">_Bool</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Dependencies</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If this mod has any direct dependencie.</p></td>
 </tr>
@@ -9492,7 +9501,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_initializeoptions"><a id="_1298725980976"></a> <a id="InitializeOptions"></a> InitializeOptions</h3>
+<h3 id="_initializeoptions"><a id="_2674795915120"></a> <a id="InitializeOptions"></a> InitializeOptions</h3>
 <div class="paragraph">
 <p>Structure with all initialization parameters needed to start the API, all need to be filled in for the SDK to properly initialize</p>
 </div>
@@ -9553,7 +9562,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_variables_25">Variables</h4>
+<h4 id="_variables_26">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -9562,32 +9571,32 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714600720">Modio::GameID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784878752">Modio::GameID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GameID</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The mod.io-provided ID for the game.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714543408">Modio::ApiKey</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784821344">Modio::ApiKey</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">APIKey</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The mod.io-provided API key for your application or game.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">Modio::UserHandleType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">Modio::UserHandleType</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">User</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unique identifier for the local session, which will optionally contain user data for an authenticated mod.io user (once authentication is completed).</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714482496">Modio::Portal</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784760432">Modio::Portal</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PortalInUse</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The storefront or distribution method to use. The API uses this parameter to serve platform-compliant user names. Use <code>Modio::Portal::None</code> if your title does not require this.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714412816">Modio::Environment</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784756480">Modio::Environment</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GameEnvironment</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The mod.io environment you want to run the SDK on.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714857936">std::map&lt;std::string, std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674785135984">std::map&lt;std::string, std::string&gt;</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExtendedParameters</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Platform-specific extended initialization parameters. See <a href="#Platform-specific Notes">[Platform-specific Notes]</a> for more information regarding any special values your platform requires or supports.</p></td>
 </tr>
@@ -9596,14 +9605,14 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modmanagementevent"><a id="_1298727906496"></a> <a id="ModManagementEvent"></a> ModManagementEvent</h3>
+<h3 id="_modmanagementevent"><a id="_2674798240672"></a> <a id="ModManagementEvent"></a> ModManagementEvent</h3>
 <div class="paragraph">
 <p>Simple struct representing the outcome of a mod management operation</p>
 </div>
 <div class="sect3">
 <h4 id="_enums_5">Enums</h4>
 <div class="sect4">
-<h5 id="_eventtype"><a id="_1298727907168"></a> EventType</h5>
+<h5 id="_eventtype"><a id="_2674798241344"></a> EventType</h5>
 <div class="paragraph">
 <p>What type of event occurred</p>
 </div>
@@ -9653,37 +9662,8 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_variables_26">Variables</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714572032">Modio::ModID</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ID</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ID for the mod that the event occurred on</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298727907168">EventType</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Event</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">What type of event occurred</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298691309664">Modio::ErrorCode</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Status</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Empty if operation completed successfully, truthy/contains error code if operation failed</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_moddependency"><a id="_1298728818416"></a> <a id="ModDependency"></a> ModDependency</h3>
-<div class="paragraph">
-<p>Simple struct containing simplified information about a mod which is a dependency of another mod</p>
+<h4 id="_functions_24">Functions</h4>
+
 </div>
 <div class="sect3">
 <h4 id="_variables_27">Variables</h4>
@@ -9695,23 +9675,28 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714572032">Modio::ModID</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModID</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784850064">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ID</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID for the mod that the event occurred on</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModName</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674798241344">EventType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Event</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">What type of event occurred</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674762443520">Modio::ErrorCode</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Status</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Empty if operation completed successfully, truthy/contains error code if operation failed</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gamestats"><a id="_1298728985472"></a> <a id="GameStats"></a> GameStats</h3>
+<h3 id="_moddependency"><a id="_2674798882064"></a> <a id="ModDependency"></a> ModDependency</h3>
 <div class="paragraph">
-<p>Contains download stats for a game</p>
+<p>Simple struct containing simplified information about a mod which is a dependency of another mod</p>
 </div>
 <div class="sect3">
 <h4 id="_variables_28">Variables</h4>
@@ -9723,52 +9708,58 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714600720">Modio::GameID</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GameID</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Unique game id</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784850064">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModID</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unique mod id.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModCountTotal</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Available mod count for the game</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModName</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModDownloadsToday</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Mods downloaded today for the game</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateAdded</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of the date the mod was registered</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModDownloadsTotal</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Total Mods downloaded for the game</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateUpdated</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of the date the mod was updated</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModDownloadsDailyAverage</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Average mods downloaded on a daily basis</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622192">std::uint8_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DependencyDepth</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The level at which this dependency sits. When greater than zero (0), it means that this dependency relies on additional dependencies.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModSubscribersTotal</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of total users who have subscribed to the mods for the game</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674788567808">Modio::Detail::Logo</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Logo</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Media data related to the mod logo</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187440">std::int64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateExpires</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp until this game&#8217;s statistics are considered stale</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674788615360">Modio::Optional&lt;Modio::FileMetadata&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">FileInfo</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Information about the mod&#8217;s most recent public release</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674788610656">Modio::ModServerSideStatus</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Status</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The current ModStatus on the server: Accepted, NotAccepted, or Deleted.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674785650160">Modio::ObjectVisibility</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Visibility</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The visibility status of the mod, default to Public</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modtaginfo"><a id="_1298728998176"></a> <a id="ModTagInfo"></a> ModTagInfo</h3>
+<h3 id="_gamestats"><a id="_2674799052096"></a> <a id="GameStats"></a> GameStats</h3>
 <div class="paragraph">
-<p>Metadata about a group of tags that can be used for filtering mods</p>
-</div>
-<div class="sect3">
-<h4 id="_functions_24">Functions</h4>
-
+<p>Contains download stats for a game</p>
 </div>
 <div class="sect3">
 <h4 id="_variables_29">Variables</h4>
@@ -9780,73 +9771,52 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupName</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Raw unlocalized tag group name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784878752">Modio::GameID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GameID</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unique game id</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298708137472">std::vector&lt;std::string&gt;</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupValues</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Valid raw unlocalized tag values this group contains</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModCountTotal</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Available mod count for the game</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714857936">std::map&lt;std::string, std::string&gt;</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupNameLocData</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Culture code &#8594; localized tag category name mapping for all configured languages</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModDownloadsToday</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mods downloaded today for the game</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298729001216">std::vector&lt;ModTagLocalizationData&gt;</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupValueLocData</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Localization data for this tag category&#8217;s values in all configured languages</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModDownloadsTotal</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Total Mods downloaded for the game</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187248">_Bool</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bAllowMultipleSelection</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">True if multiple tags from the group can be used simultaneously</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModDownloadsDailyAverage</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Average mods downloaded on a daily basis</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Locale</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">the culture code for the mod.io locale at the time the mod.io API returned this data</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModSubscribersTotal</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of total users who have subscribed to the mods for the game</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622160">std::int64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DateExpires</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp until this game&#8217;s statistics are considered stale</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gamecommunityoptionsflags"><a id="_1298729528896"></a> <a id="GameCommunityOptionsFlags"></a> GameCommunityOptionsFlags</h3>
+<h3 id="_modtaginfo"><a id="_2674799064672"></a> <a id="ModTagInfo"></a> ModTagInfo</h3>
 <div class="paragraph">
-<p>A strong type flag object to represent GameCommunityOptions from a mod.io info.</p>
+<p>Metadata about a group of tags that can be used for filtering mods</p>
 </div>
 <div class="sect3">
 <h4 id="_functions_25">Functions</h4>
 
-</div>
-</div>
-<div class="sect2">
-<h3 id="_gamematurityoptionsflags"><a id="_1298730284992"></a> <a id="GameMaturityOptionsFlags"></a> GameMaturityOptionsFlags</h3>
-<div class="paragraph">
-<p>A strong type flag object to represent GameMaturityOptions from a mod.io info.</p>
-</div>
-<div class="sect3">
-<h4 id="_functions_26">Functions</h4>
-
-</div>
-</div>
-<div class="sect2">
-<h3 id="_gamemonetization"><a id="_1298730460784"></a> <a id="GameMonetization"></a> GameMonetization</h3>
-<div class="paragraph">
-<p>A strong type flag object to represent GameMonetizationOptions from a mod.io info.</p>
-</div>
-<div class="sect3">
-<h4 id="_functions_27">Functions</h4>
-
-</div>
-</div>
-<div class="sect2">
-<h3 id="_terms"><a id="_1298731149936"></a> <a id="Terms"></a> Terms</h3>
-<div class="paragraph">
-<p>This struct contains strings that should be displayed to a user when displaying the terms of use and offering to create a mod.io account</p>
 </div>
 <div class="sect3">
 <h4 id="_variables_30">Variables</h4>
@@ -9858,28 +9828,73 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298731153536">struct TermsButtons</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Buttons</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupName</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Raw unlocalized tag group name</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298731156672">struct TermsLinks</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Links</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674778902928">std::vector&lt;std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupValues</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Valid raw unlocalized tag values this group contains</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TermsText</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The plaintext version of the mod.io terms of use</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674785135984">std::map&lt;std::string, std::string&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupNameLocData</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Culture code &#8594; localized tag category name mapping for all configured languages</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674799067712">std::vector&lt;ModTagLocalizationData&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupValueLocData</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Localization data for this tag category&#8217;s values in all configured languages</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711621968">_Bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bAllowMultipleSelection</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">True if multiple tags from the group can be used simultaneously</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Locale</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">the culture code for the mod.io locale at the time the mod.io API returned this data</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_transactionrecord"><a id="_1298731559376"></a> <a id="TransactionRecord"></a> TransactionRecord</h3>
+<h3 id="_gamecommunityoptionsflags"><a id="_2674799862752"></a> <a id="GameCommunityOptionsFlags"></a> GameCommunityOptionsFlags</h3>
 <div class="paragraph">
-<p>Contains information about a successful transaction for a mod</p>
+<p>A strong type flag object to represent GameCommunityOptions from a mod.io info.</p>
+</div>
+<div class="sect3">
+<h4 id="_functions_26">Functions</h4>
+
+</div>
+</div>
+<div class="sect2">
+<h3 id="_gamematurityoptionsflags"><a id="_2674800349184"></a> <a id="GameMaturityOptionsFlags"></a> GameMaturityOptionsFlags</h3>
+<div class="paragraph">
+<p>A strong type flag object to represent GameMaturityOptions from a mod.io info.</p>
+</div>
+<div class="sect3">
+<h4 id="_functions_27">Functions</h4>
+
+</div>
+</div>
+<div class="sect2">
+<h3 id="_gamemonetization"><a id="_2674800392528"></a> <a id="GameMonetization"></a> GameMonetization</h3>
+<div class="paragraph">
+<p>A strong type flag object to represent GameMonetizationOptions from a mod.io info.</p>
+</div>
+<div class="sect3">
+<h4 id="_functions_28">Functions</h4>
+
+</div>
+</div>
+<div class="sect2">
+<h3 id="_terms"><a id="_2674801469728"></a> <a id="Terms"></a> Terms</h3>
+<div class="paragraph">
+<p>This struct contains strings that should be displayed to a user when displaying the terms of use and offering to create a mod.io account</p>
 </div>
 <div class="sect3">
 <h4 id="_variables_31">Variables</h4>
@@ -9891,33 +9906,28 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298714572032">Modio::ModID</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AssociatedModID</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The mod the purchase was for</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674801474384">struct TermsButtons</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Buttons</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187600">uint64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Price</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The price the mod was purchased for</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674801477520">struct TermsLinks</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Links</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187600">uint64_t</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">UpdatedUserWalletBalance</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The updated balance in the user&#8217;s wallet after the transaction</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298718020480">Modio::ModInfo</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Mod</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ModInfo of the mod that was purchase and subscribed to</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TermsText</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The plaintext version of the mod.io terms of use</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_entitlementconsumptionvirtualcurrencydetails"><a id="_1298794093328"></a> <a id="EntitlementConsumptionVirtualCurrencyDetails"></a> EntitlementConsumptionVirtualCurrencyDetails</h3>
+<h3 id="_transactionrecord"><a id="_2674801610720"></a> <a id="TransactionRecord"></a> TransactionRecord</h3>
 <div class="paragraph">
-<p>Further details about a Virtual Currency entitlement that was consumed</p>
+<p>Contains information about a successful transaction for a mod</p>
 </div>
 <div class="sect3">
 <h4 id="_variables_32">Variables</h4>
@@ -9929,18 +9939,33 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187376">int</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TokensAllocated</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Amount of tokens that were issued for this specific entitlement consumption</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674784850064">Modio::ModID</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AssociatedModID</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The mod the purchase was for</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622320">uint64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Price</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The price the mod was purchased for</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622320">uint64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">UpdatedUserWalletBalance</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The updated balance in the user&#8217;s wallet after the transaction</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674788611440">Modio::ModInfo</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Mod</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ModInfo of the mod that was purchase and subscribed to</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_entitlementconsumptionstatus"><a id="_1298794094064"></a> <a id="EntitlementConsumptionStatus"></a> EntitlementConsumptionStatus</h3>
+<h3 id="_entitlementconsumptionvirtualcurrencydetails"><a id="_2674863320736"></a> <a id="EntitlementConsumptionVirtualCurrencyDetails"></a> EntitlementConsumptionVirtualCurrencyDetails</h3>
 <div class="paragraph">
-<p>The result of an entitlement&#8217;s consumption</p>
+<p>Further details about a Virtual Currency entitlement that was consumed</p>
 </div>
 <div class="sect3">
 <h4 id="_variables_33">Variables</h4>
@@ -9952,43 +9977,18 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TransactionId</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the transaction to redeem this entitlement</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298794092064">Modio::EntitlementConsumptionState</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TransactionState</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">State of the transaction</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298686280320">std::string</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SkuId</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the SKU that we attempted to consume</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187248">_Bool</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">EntitlementConsumed</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether this entitlement was consumed or not</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298794092944">Modio::EntitlementType</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">EntitlementType</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Type of Entitlement that was consumed</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298794093328">Modio::EntitlementConsumptionVirtualCurrencyDetails</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">VirtualCurrencyDetails</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Details about</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622096">int</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TokensAllocated</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amount of tokens that were issued for this specific entitlement consumption</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_entitlementwalletbalance"><a id="_1298794104016"></a> <a id="EntitlementWalletBalance"></a> EntitlementWalletBalance</h3>
+<h3 id="_entitlementconsumptionstatus"><a id="_2674863323552"></a> <a id="EntitlementConsumptionStatus"></a> EntitlementConsumptionStatus</h3>
 <div class="paragraph">
-<p>Updated wallet balance from the sync entitlements call</p>
+<p>The result of an entitlement&#8217;s consumption</p>
 </div>
 <div class="sect3">
 <h4 id="_variables_34">Variables</h4>
@@ -10000,7 +10000,55 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_1298642187600">uint64_t</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TransactionId</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the transaction to redeem this entitlement</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674863319472">Modio::EntitlementConsumptionState</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TransactionState</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">State of the transaction</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674756130160">std::string</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SkuId</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the SKU that we attempted to consume</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711621968">_Bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">EntitlementConsumed</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether this entitlement was consumed or not</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674863320352">Modio::EntitlementType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">EntitlementType</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Type of Entitlement that was consumed</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674863320736">Modio::EntitlementConsumptionVirtualCurrencyDetails</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">VirtualCurrencyDetails</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Details about</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_entitlementwalletbalance"><a id="_2674863331968"></a> <a id="EntitlementWalletBalance"></a> EntitlementWalletBalance</h3>
+<div class="paragraph">
+<p>Updated wallet balance from the sync entitlements call</p>
+</div>
+<div class="sect3">
+<h4 id="_variables_35">Variables</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#_2674711622320">uint64_t</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Balance</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
@@ -10014,7 +10062,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 <h2 id="_enums_6">Enums</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_environment"><a id="_1298714412816"></a> Environment</h3>
+<h3 id="_environment"><a id="_2674784756480"></a> Environment</h3>
 <div class="paragraph">
 <p>Enum representing what environment your game is deployed in</p>
 </div>
@@ -10039,7 +10087,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_portal"><a id="_1298714482496"></a> Portal</h3>
+<h3 id="_portal"><a id="_2674784760432"></a> Portal</h3>
 <div class="paragraph">
 <p>Enum representing the store or service your game is being distributed through</p>
 </div>
@@ -10096,7 +10144,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modfileplatform"><a id="_1298714487104"></a> ModfilePlatform</h3>
+<h3 id="_modfileplatform"><a id="_2674784765040"></a> ModfilePlatform</h3>
 <div class="paragraph">
 <p>Enum representing the platform(s) that a modfile is enabled for</p>
 </div>
@@ -10161,7 +10209,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_logosize"><a id="_1298714492064"></a> LogoSize</h3>
+<h3 id="_logosize"><a id="_2674784770000"></a> LogoSize</h3>
 <div class="paragraph">
 <p>Enum representing mod logo sizes</p>
 </div>
@@ -10194,7 +10242,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_iconsize"><a id="_1298714496464"></a> IconSize</h3>
+<h3 id="_iconsize"><a id="_2674784774400"></a> IconSize</h3>
 <div class="paragraph">
 <p>Enum representing game icon sizes</p>
 </div>
@@ -10227,7 +10275,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_avatarsize"><a id="_1298714500864"></a> AvatarSize</h3>
+<h3 id="_avatarsize"><a id="_2674784778800"></a> AvatarSize</h3>
 <div class="paragraph">
 <p>Enum representing avatar image sizes</p>
 </div>
@@ -10256,7 +10304,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gallerysize"><a id="_1298714505136"></a> GallerySize</h3>
+<h3 id="_gallerysize"><a id="_2674784783072"></a> GallerySize</h3>
 <div class="paragraph">
 <p>Enum representing an image gallery size</p>
 </div>
@@ -10285,7 +10333,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_language"><a id="_1298715363136"></a> Language</h3>
+<h3 id="_language"><a id="_2674785641152"></a> Language</h3>
 <div class="paragraph">
 <p>Enum representing the languages mod.io support responses in</p>
 </div>
@@ -10362,7 +10410,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_authenticationprovider"><a id="_1298715364704"></a> AuthenticationProvider</h3>
+<h3 id="_authenticationprovider"><a id="_2674785642720"></a> AuthenticationProvider</h3>
 <div class="paragraph">
 <p>Simple struct to encapsulate data passed to external authentication systems</p>
 </div>
@@ -10431,7 +10479,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_loglevel"><a id="_1298715369024"></a> LogLevel</h3>
+<h3 id="_loglevel"><a id="_2674785647040"></a> LogLevel</h3>
 <div class="paragraph">
 <p>Degree of severity for the log output</p>
 </div>
@@ -10448,23 +10496,27 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Info</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Detailed</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Warning</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Info</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Error</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Warning</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Error</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_logcategory"><a id="_1298715370048"></a> LogCategory</h3>
+<h3 id="_logcategory"><a id="_2674785648272"></a> LogCategory</h3>
 <div class="paragraph">
 <p>The category of the log message (usually the internal service the message is originating from)</p>
 </div>
@@ -10513,7 +10565,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_rating"><a id="_1298715371008"></a> Rating</h3>
+<h3 id="_rating"><a id="_2674785649280"></a> Rating</h3>
 <div class="paragraph">
 <p>A rating for a mod.</p>
 </div>
@@ -10542,7 +10594,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_objectvisibility"><a id="_1298715371888"></a> ObjectVisibility</h3>
+<h3 id="_objectvisibility"><a id="_2674785650160"></a> ObjectVisibility</h3>
 <div class="paragraph">
 <p>The visiblility of a mod.</p>
 </div>
@@ -10567,7 +10619,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_platformstatus"><a id="_1298715372496"></a> PlatformStatus</h3>
+<h3 id="_platformstatus"><a id="_2674785650768"></a> PlatformStatus</h3>
 <div class="paragraph">
 <p>File approval status to filter by. Passed in ExtendedInitializationParameters for the duration of a session.</p>
 </div>
@@ -10596,7 +10648,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_maturityoption"><a id="_1298715468144"></a> MaturityOption</h3>
+<h3 id="_maturityoption"><a id="_2674785746416"></a> MaturityOption</h3>
 <div class="paragraph">
 <p>Maturity types classification according to the mod.io API	* 0 = None set (default)	* 1 = Alcohol	* 2 = Drugs	* 4 = Violence	* 8 = Explicit</p>
 </div>
@@ -10633,7 +10685,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modserversidestatus"><a id="_1298718019696"></a> ModServerSideStatus</h3>
+<h3 id="_modserversidestatus"><a id="_2674788610656"></a> ModServerSideStatus</h3>
 <div class="paragraph">
 <p>Possible status as received from the server</p>
 </div>
@@ -10662,7 +10714,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_httperror"><a id="_1298722565344"></a> HttpError</h3>
+<h3 id="_httperror"><a id="_2674792620368"></a> HttpError</h3>
 <div class="sect3">
 <h4 id="_values_25">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -10732,7 +10784,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_filesystemerror"><a id="_1298722603552"></a> FilesystemError</h3>
+<h3 id="_filesystemerror"><a id="_2674792658576"></a> FilesystemError</h3>
 <div class="sect3">
 <h4 id="_values_26">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -10786,7 +10838,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_userautherror"><a id="_1298722633952"></a> UserAuthError</h3>
+<h3 id="_userautherror"><a id="_2674792754656"></a> UserAuthError</h3>
 <div class="sect3">
 <h4 id="_values_27">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -10828,7 +10880,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_userdataerror"><a id="_1298722663648"></a> UserDataError</h3>
+<h3 id="_userdataerror"><a id="_2674792784352"></a> UserDataError</h3>
 <div class="sect3">
 <h4 id="_values_28">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -10850,7 +10902,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_archiveerror"><a id="_1298722691360"></a> ArchiveError</h3>
+<h3 id="_archiveerror"><a id="_2674792812064"></a> ArchiveError</h3>
 <div class="sect3">
 <h4 id="_values_29">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -10872,7 +10924,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_genericerror"><a id="_1298722719840"></a> GenericError</h3>
+<h3 id="_genericerror"><a id="_2674792840544"></a> GenericError</h3>
 <div class="sect3">
 <h4 id="_values_30">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -10926,7 +10978,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_systemerror"><a id="_1298722753344"></a> SystemError</h3>
+<h3 id="_systemerror"><a id="_2674792874048"></a> SystemError</h3>
 <div class="sect3">
 <h4 id="_values_31">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -10944,7 +10996,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_zliberror"><a id="_1298722782896"></a> ZlibError</h3>
+<h3 id="_zliberror"><a id="_2674792903600"></a> ZlibError</h3>
 <div class="sect3">
 <h4 id="_values_32">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -11014,7 +11066,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modmanagementerror"><a id="_1298722819840"></a> ModManagementError</h3>
+<h3 id="_modmanagementerror"><a id="_2674792940448"></a> ModManagementError</h3>
 <div class="sect3">
 <h4 id="_values_33">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -11060,7 +11112,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modvalidationerror"><a id="_1298722854784"></a> ModValidationError</h3>
+<h3 id="_modvalidationerror"><a id="_2674792975392"></a> ModValidationError</h3>
 <div class="sect3">
 <h4 id="_values_34">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -11082,7 +11134,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_monetizationerror"><a id="_1298722886912"></a> MonetizationError</h3>
+<h3 id="_monetizationerror"><a id="_2674793007520"></a> MonetizationError</h3>
 <div class="sect3">
 <h4 id="_values_35">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -11140,7 +11192,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_apierror"><a id="_1298722925104"></a> ApiError</h3>
+<h3 id="_apierror"><a id="_2674793045840"></a> ApiError</h3>
 <div class="sect3">
 <h4 id="_values_36">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -11406,7 +11458,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_errorconditiontypes"><a id="_1298723132432"></a> ErrorConditionTypes</h3>
+<h3 id="_errorconditiontypes"><a id="_2674793253312"></a> ErrorConditionTypes</h3>
 <div class="paragraph">
 <p>Enum describing the different conditions a Modio::ErrorCode can satisfy Check if a Modio::ErrorCode meets a particular condition using <a href="#ErrorCodeMatches">[ErrorCodeMatches]</a></p>
 </div>
@@ -11563,7 +11615,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modstate"><a id="_1298726424336"></a> ModState</h3>
+<h3 id="_modstate"><a id="_2674796758016"></a> ModState</h3>
 <div class="paragraph">
 <p>Enum representing the current state of a mod</p>
 </div>
@@ -11604,7 +11656,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_reporttype"><a id="_1298728967184"></a> ReportType</h3>
+<h3 id="_reporttype"><a id="_2674799033808"></a> ReportType</h3>
 <div class="paragraph">
 <p>The type of report being made</p>
 </div>
@@ -11653,7 +11705,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gamecommunityoptions"><a id="_1298729526640"></a> GameCommunityOptions</h3>
+<h3 id="_gamecommunityoptions"><a id="_2674799860496"></a> GameCommunityOptions</h3>
 <div class="paragraph">
 <p>Community options for a game	* 0 = None set (default)	* 1 = Comments are enabled	* 2 = Guides are enabled	* 4 = Pin on homepage	* 8 = Show on homepage	* 16 = Show more on homepage	* 32 = Allow change status	* 64 = Enable Previews (Game must be hidden)	* 128 = Allow Preview Share-URL (Previews must be enabled)	* 256 = Allow negative ratings	* 512 = Allow mods to be edited on web</p>
 </div>
@@ -11714,7 +11766,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gamematurityoptions"><a id="_1298730284208"></a> GameMaturityOptions</h3>
+<h3 id="_gamematurityoptions"><a id="_2674800348400"></a> GameMaturityOptions</h3>
 <div class="paragraph">
 <p>Maturity options for a game	* 0 = Don&#8217;t allow mature content in mods (default)	* 1 = This game allows mods containing mature content	* 2 = This game is for mature audiences only</p>
 </div>
@@ -11743,7 +11795,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_gamemonetizationoptions"><a id="_1298730459824"></a> GameMonetizationOptions</h3>
+<h3 id="_gamemonetizationoptions"><a id="_2674800391568"></a> GameMonetizationOptions</h3>
 <div class="paragraph">
 <p>Monetization properties of a game	* 0 = None set (default)	* 1 = Monetization is enabled	* 2 = Marketplace is enabled	* 4 = Partner Program is enabled</p>
 </div>
@@ -11776,7 +11828,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_entitlementconsumptionstate"><a id="_1298794092064"></a> EntitlementConsumptionState</h3>
+<h3 id="_entitlementconsumptionstate"><a id="_2674863319472"></a> EntitlementConsumptionState</h3>
 <div class="paragraph">
 <p>State of an entitlement consumption transaction</p>
 </div>
@@ -11809,7 +11861,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_entitlementtype"><a id="_1298794092944"></a> EntitlementType</h3>
+<h3 id="_entitlementtype"><a id="_2674863320352"></a> EntitlementType</h3>
 <div class="paragraph">
 <p>Type of entitlement that was consumed</p>
 </div>
@@ -11834,7 +11886,7 @@ Once a mod is purchased, it is automatically subscribed to for the user.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-06-26 15:26:54 +1000
+Last updated 2024-07-30 13:25:15 +1000
 </div>
 </div>
 </body>

@@ -23,6 +23,8 @@ namespace Modio
 		{
 			case LogLevel::Trace:
 				return "Trace";
+			case LogLevel::Detailed:
+				return "Detailed";
 			case LogLevel::Info:
 				return "Info";
 			case LogLevel::Warning:

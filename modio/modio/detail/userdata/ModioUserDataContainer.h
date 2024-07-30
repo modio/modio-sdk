@@ -35,6 +35,8 @@ namespace Modio
 			MODIO_IMPL void ResetUserData();
 
 			MODIO_IMPL void InitializeForUser(Modio::User AuthenticatedUser, Modio::Detail::OAuthToken AuthToken);
+			
+			MODIO_IMPL void UpdateTokenForExistingUser(Modio::Detail::OAuthToken AuthToken);
 
 			// @todo: Making copy of user object
 			MODIO_IMPL const Modio::Optional<Modio::User> GetAuthenticatedUser() const;
@@ -55,50 +57,11 @@ namespace Modio
 			Modio::Optional<Modio::filesystem::path> UserModDirectoryOverride;
 
 			/// @docnone
-			friend void to_json(nlohmann::json& Json, const Modio::Detail::UserDataContainer& UserData)
-			{
-				Json = nlohmann::json::object(
-					{UserData.UserSubscriptions,
-					 {Modio::Detail::Constants::JSONKeys::DeferredUnsubscribes, UserData.DeferredUnsubscriptions}});
-				if (UserData.AuthenticatedProfile)
-				{
-					Json[Modio::Detail::Constants::JSONKeys::OAuth] = UserData.AuthenticatedProfile->GetToken();
-					Json[Modio::Detail::Constants::JSONKeys::UserProfile] = UserData.AuthenticatedProfile->GetUser();
-					Json[Modio::Detail::Constants::JSONKeys::Avatar] = UserData.AuthenticatedProfile->GetAvatar();
-				}
-				if (UserData.UserModDirectoryOverride)
-				{
-					Json[Modio::Detail::Constants::JSONKeys::RootLocalStoragePath] =
-						UserData.UserModDirectoryOverride.value().u8string();
-				}
-			}
+			MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::Detail::UserDataContainer& UserData);
 
 			/// @docnone
-			friend void from_json(const nlohmann::json& Json, Modio::Detail::UserDataContainer& UserData)
-			{
-				Modio::User AuthenticatedUser;
-				bool ParseStatus =
-					Modio::Detail::ParseSafe(Json, AuthenticatedUser, Modio::Detail::Constants::JSONKeys::UserProfile);
-				ParseStatus &= Modio::Detail::ParseSafe(Json, AuthenticatedUser.Avatar,
-														Modio::Detail::Constants::JSONKeys::Avatar);
-				Modio::Detail::OAuthToken Token;
-				ParseStatus &= Modio::Detail::ParseSafe(Json, Token, Modio::Detail::Constants::JSONKeys::OAuth);
-				if (ParseStatus)
-				{
-					UserData.InitializeForUser(AuthenticatedUser, Token);
-				}
-
-				Modio::Detail::ParseSafe(Json, UserData.UserSubscriptions,
-										 Modio::Detail::Constants::JSONKeys::UserSubscriptionList);
-				Modio::Detail::ParseSafe(Json, UserData.DeferredUnsubscriptions,
-										 Modio::Detail::Constants::JSONKeys::DeferredUnsubscribes);
-				std::string TmpPath;
-				Modio::Detail::ParseSafe(Json, TmpPath, Modio::Detail::Constants::JSONKeys::RootLocalStoragePath);
-				if (!TmpPath.empty())
-				{
-					UserData.UserModDirectoryOverride = Modio::filesystem::path(TmpPath);
-				}
-			}
+			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::UserDataContainer& UserData);
+			
 		};
 	} // namespace Detail
 } // namespace Modio

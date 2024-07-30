@@ -70,10 +70,10 @@ namespace Modio
 		std::int64_t DownloadExpiryDate = 0;
 
 		/// @docnone
-		friend MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::FileMetadata& FileMetadata);
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::FileMetadata& FileMetadata);
 		
 		/// @docnone
-		friend MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::FileMetadata& FileMetadata);
+		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::FileMetadata& FileMetadata);
 
 		/// @docnone
 		friend bool operator==(const Modio::FileMetadata& A, const Modio::FileMetadata& B)
@@ -94,7 +94,3 @@ namespace Modio
 		}
 	};
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "ModioFileMetadata.ipp"
-#endif

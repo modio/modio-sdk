@@ -37,13 +37,13 @@ namespace Modio
 			{
 				return (A.Filename == B.Filename && A.Original == B.Original && A.Thumb320x180 == B.Thumb320x180);
 			}
-		};
 
-		/// @docnone
-		MODIO_IMPL void from_json(const nlohmann::json& Json, Image& Image);
-		
-		/// @docnone
-		MODIO_IMPL void to_json(nlohmann::json& Json, const Image& Image);
+			/// @docnone
+			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Image& Image);
+
+			/// @docnone
+			MODIO_IMPL friend void to_json(nlohmann::json& Json, const Image& Image);
+		};
 
 		// GetImmageURL() creates false "unused functions" warnings on certain platforms.
 		// Suppressing those warnings here.
@@ -92,7 +92,3 @@ namespace Modio
 		}
 	} // namespace Detail
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "modio/detail/entities/ModioImage.ipp"
-#endif

@@ -173,7 +173,7 @@ namespace Modio
 					if (!bFileDownloadComplete)
 					{
 						Modio::Detail::Logger().Log(
-							LogLevel::Info, LogCategory::Http, "Starting download of modfile {} for mod {} \"{}\"",
+							LogLevel::Detailed, LogCategory::Http, "Starting download of modfile {} for mod {} \"{}\"",
 							ModInfoData.FileInfo->Filename, ModInfoData.ModId, ModInfoData.ProfileName);
 
 						yield Modio::Detail::DownloadFileAsync(

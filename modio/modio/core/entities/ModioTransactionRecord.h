@@ -31,12 +31,7 @@ namespace Modio
 		Modio::ModInfo Mod = {};
 
 		/// @docnone
-		friend MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::TransactionRecord& Transaction);
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::TransactionRecord& Transaction);
 
 	};
 }
-
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "ModioTransactionRecord.ipp"
-#endif

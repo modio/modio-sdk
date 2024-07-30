@@ -11,10 +11,10 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/entities/ModioLogo.h"
 #include "modio/detail/ops/ModioDownloadImage.h"
 #include "modio/detail/ops/ModioLogoImageType.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/serialization/ModioLogoSerialization.h"
 #include <asio/coroutine.hpp>
 #include <asio/yield.hpp>
 

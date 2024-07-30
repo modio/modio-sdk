@@ -8,7 +8,6 @@
  *
  */
 
-
 #pragma once
 
 #include "modio/core/entities/ModioModTagOptions.h"

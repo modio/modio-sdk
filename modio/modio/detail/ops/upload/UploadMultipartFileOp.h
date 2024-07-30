@@ -36,9 +36,6 @@ MODIO_DIAGNOSTIC_PUSH
 
 MODIO_ALLOW_DEPRECATED_SYMBOLS
 
-#ifndef MODIO_TRACE_DUMP_RESPONSE
-	#define MODIO_TRACE_DUMP_RESPONSE 0
-#endif
 #include <asio/yield.hpp>
 namespace Modio
 {
@@ -316,13 +313,6 @@ namespace Modio
 													Session->UploadID.value(), CloseSessionRequest->GetResponseCode(),
 													ResponseBuffer.size());
 
-#if MODIO_TRACE_DUMP_RESPONSE
-						for (const auto& Buffer : ResponseBuffer)
-						{
-							Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http, "{}",
-														std::string(Buffer.begin(), Buffer.end()));
-						}
-#endif // MODIO_TRACE_DUMP_RESPONSE
 					}
 
 					// #4: Send a normal UploadFileOp with the "upload_id" obtained by this operation.

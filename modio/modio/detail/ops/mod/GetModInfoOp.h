@@ -11,10 +11,10 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/core/entities/ModioModInfo.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/serialization/ModioModInfoSerialization.h"
 
 #include <asio/yield.hpp>
 namespace Modio

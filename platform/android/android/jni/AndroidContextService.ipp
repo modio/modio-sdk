@@ -16,6 +16,7 @@
 #include <inttypes.h>
 #include <jni.h>
 #include "jni/JavaHelpers.h"
+#include "modio/core/ModioLogger.h"
 
 #define JNI_CURRENT_VERSION JNI_VERSION_1_6
 
@@ -38,11 +39,25 @@ namespace Modio
 			ClassLoader = InClassLoader;
 
 			auto EnvClass = Modio::Detail::NewScopedJavaObject(Env, Env->FindClass("android/os/Environment"));
+			if (Modio::Detail::JavaExceptionHelper::CheckJavaException(Env))
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to find Environment class");
+				return;
+			}
 
 			// Find the ClassLoader.findClass method
 			jclass classLoaderClass = Env->FindClass("java/lang/ClassLoader");
+			if (Modio::Detail::JavaExceptionHelper::CheckJavaException(Env) || classLoaderClass == NULL)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to find ClassLoader class");
+				return;
+			}
 			FindClassMethod = Env->GetMethodID(classLoaderClass, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;");
-
+			if (Modio::Detail::JavaExceptionHelper::CheckJavaException(Env) || FindClassMethod == NULL)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to find ClassLoader.findClass method");
+				return;
+			}
 		}
 
 		void AndroidContextService::InitializeJNI(JavaVM* InJavaVM, jobject InClassLoader)

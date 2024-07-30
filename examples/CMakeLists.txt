@@ -7,10 +7,6 @@
 #   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
 # 
 
-set (MODIO_EXAMPLES_API_KEY "ca842a1f60c40bc8fb2044bc9932d763" CACHE STRING "API Key to use in examples")
-set (MODIO_EXAMPLES_GAME_ID "3609" CACHE STRING "Game ID to use in examples")
-set (MODIO_EXAMPLES_SERVER "LIVE" CACHE STRING "Server to use in examples")
-
 set (CMAKE_CXX_STANDARD 17)
 
 function(add_example FileName)
@@ -36,4 +32,5 @@ if (MODIO_BUILD_EXAMPLES)
 	add_example(08_SubmitMod)
 	add_example(09_MonetizationWalletManagement)
 	add_example(10_MonetizationPurchase)
+	add_example(11_TempModSets)
 endif()

@@ -24,6 +24,11 @@
 #include "modio/detail/ops/ServiceInitializationOp.h"
 #include "modio/detail/ops/Shutdown.h"
 #include "modio/detail/ops/UnmuteUserOp.h"
+#include "modio/detail/serialization/ModioGameCommunityOptionsSerialization.h"
+#include "modio/detail/serialization/ModioGameMaturityOptionsSerialization.h"
+#include "modio/detail/serialization/ModioGameMonetizationSerialization.h"
+#include "modio/detail/serialization/ModioGameStatsSerialization.h"
+#include "modio/detail/serialization/ModioIconSerialization.h"
 #include "modio/file/ModioFileService.h"
 #include "modio/http/ModioHttpService.h"
 #include "modio/impl/SDKPostAsync.h"
@@ -58,7 +63,7 @@ namespace Modio
 			MODIO_PROFILE_SCOPE(RunPendingHandlers);
 			{
 				MODIO_PROFILE_SCOPE(IOContext_Poll);
-        
+
 				// Run any pending handlers on the global io_context
 				if (Modio::Detail::Services::GetGlobalContext().stopped())
 				{
@@ -70,16 +75,16 @@ namespace Modio
 				do
 				{
 					Modio::Detail::Services::GetGlobalContext().poll_one();
-        
+
 				} while (std::chrono::steady_clock::now() - PollStartTime < std::chrono::milliseconds(1));
 			}
-        
+
 			{
 				MODIO_PROFILE_SCOPE(FlushManagementLog);
 				// invoke the mod management log callback if the user has set it
 				Modio::Detail::SDKSessionData::FlushModManagementLog();
 			}
-        
+
 			{
 				MODIO_PROFILE_SCOPE(FlushLogBuffer);
 				// invoke log callback if the user has set it
@@ -152,7 +157,7 @@ namespace Modio
 		Modio::Detail::SDKSessionData::EnqueueTask(
 			[Report = std::move(Report), Callback = std::move(Callback)]() mutable {
 				if (Modio::Detail::RequireSDKIsInitialized(Callback) &&
-				Modio::Detail::RequireValidReportParams(Report, Callback))
+					Modio::Detail::RequireValidReportParams(Report, Callback))
 				{
 					asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
 						Modio::Detail::ReportContentOp(Report), Callback,
@@ -242,6 +247,12 @@ namespace Modio
 				Modio::Detail::SDKSessionData::SetLocalLanguage(Locale);
 			}
 		}
+	}
+
+	Modio::Language GetLanguage()
+	{
+		auto Lock = Modio::Detail::SDKSessionData::GetReadLock();
+		return Modio::Detail::SDKSessionData::GetLocalLanguage();
 	}
 
 } // namespace Modio

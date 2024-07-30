@@ -19,10 +19,12 @@
 #include "modio/detail/ModioStringHelpers.h"
 #include "modio/detail/ops/AuthenticateUserByEmailOp.h"
 #include "modio/detail/ops/RequestEmailAuthCodeOp.h"
+#include "modio/detail/ops/auth/AuthenticateUserByApple.h"
 #include "modio/detail/ops/auth/AuthenticateUserByDiscord.h"
 #include "modio/detail/ops/auth/AuthenticateUserByEpic.h"
-#include "modio/detail/ops/auth/AuthenticateUserByApple.h"
 #include "modio/detail/ops/auth/AuthenticateUserByGog.h"
+#include "modio/detail/ops/auth/AuthenticateUserByGoogleIDToken.h"
+#include "modio/detail/ops/auth/AuthenticateUserByGoogleServerSideToken.h"
 #include "modio/detail/ops/auth/AuthenticateUserByItch.h"
 #include "modio/detail/ops/auth/AuthenticateUserByOculus.h"
 #include "modio/detail/ops/auth/AuthenticateUserByOpenID.h"
@@ -30,13 +32,14 @@
 #include "modio/detail/ops/auth/AuthenticateUserBySteam.h"
 #include "modio/detail/ops/auth/AuthenticateUserBySwitchID.h"
 #include "modio/detail/ops/auth/AuthenticateUserByXBoxLive.h"
-#include "modio/detail/ops/auth/AuthenticateUserByGoogleIDToken.h"
-#include "modio/detail/ops/auth/AuthenticateUserByGoogleServerSideToken.h"
 #include "modio/detail/ops/auth/ModioGetTermsOfUseOp.h"
 #include "modio/detail/ops/user/GetUserMediaOp.h"
+#include "modio/detail/ops/userdata/ListUserGamesOp.h"
 #include "modio/detail/ops/userdata/RefreshUserDataOp.h"
 #include "modio/detail/ops/userdata/VerifyUserAuthenticationOp.h"
-#include "modio/detail/ops/userdata/ListUserGamesOp.h"
+#include "modio/detail/serialization/ModioResponseErrorSerialization.h"
+#include "modio/detail/serialization/ModioTermsSerialization.h"
+#include "modio/detail/serialization/ModioTokenSerialization.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 #include "modio/userdata/ModioUserDataService.h"
 
@@ -71,8 +74,7 @@ namespace Modio
 									   std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([User, Provider, Callback = std::move(Callback)]() mutable {
-			if (Modio::Detail::RequireSDKIsInitialized(Callback) &&
-				Modio::Detail::RequireNotRateLimited(Callback))
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
 			{
 				// Check if the User's AuthToken needs URL encoding
 				if (User.bURLEncodeAuthToken == true)
@@ -129,7 +131,7 @@ namespace Modio
 						break;
 				}
 			}
-			});
+		});
 
 		// Return immediately if the SDK is not initialized or the API rate limit is reached
 	}
@@ -150,7 +152,7 @@ namespace Modio
 	void ClearUserDataAsync(std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
-			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) &&
 				Modio::Detail::RequireUserIsAuthenticated(Callback))
 			{
 				return Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>().ClearUserDataAsync(
@@ -210,17 +212,17 @@ namespace Modio
 	void ListUserGamesAsync(Modio::FilterParams Filter,
 							std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)> Callback)
 	{
-		Modio::Detail::SDKSessionData::EnqueueTask(
-			[Filter = std::move(Filter), Callback = std::move(Callback)]() mutable {
-				if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
-					Modio::Detail::RequireUserIsAuthenticated(Callback))
-				{
-					asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)>,
-										void(Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)>(
-						Modio::Detail::ListUserGamesOp(std::move(Filter)),
-						Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
-				}
-			});
+		Modio::Detail::SDKSessionData::EnqueueTask([Filter = std::move(Filter),
+													Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireUserIsAuthenticated(Callback))
+			{
+				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)>,
+									void(Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)>(
+					Modio::Detail::ListUserGamesOp(std::move(Filter)), Callback,
+					Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
+		});
 	}
 
 } // namespace Modio

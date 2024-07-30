@@ -12,10 +12,10 @@
 
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
-#include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/ModioServices.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/serialization/ModioModCollectionEntrySerialization.h"
 #include <asio/yield.hpp>
 
 namespace Modio

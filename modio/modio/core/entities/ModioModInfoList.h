@@ -42,7 +42,3 @@ namespace Modio
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModInfoList& OutModInfoList);
 	};
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "modio/core/entities/ModioModInfoList.ipp"
-#endif

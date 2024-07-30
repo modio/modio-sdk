@@ -37,13 +37,13 @@ namespace Modio
 		{
 			return (A.Tag == B.Tag);
 		}
-	};
 
-	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::ModTag& ModTag);
-	
-	/// @docnone
-	MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::ModTag& Tag);
+			/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModTag& ModTag);
+
+		/// @docnone
+		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::ModTag& Tag);
+	};
 
 	// Migrate: std::vector<Modio::ModTag> Tags to a custom class that encapsulates std::map helpers to fetch Values as
 	// something like this: Metadata.Get<int32>( "OptimizedFor" );
@@ -59,13 +59,13 @@ namespace Modio
 		{
 			return (A.Key == B.Key && A.Value == B.Value);
 		}
-	};
 
-	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::Metadata& Metadata);
-	
-	/// @docnone
-	MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::Metadata& Metadata);
+		/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Metadata& Metadata);
+
+		/// @docnone
+		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::Metadata& Metadata);
+	};
 
 	/// @docpublic
 	/// @brief Possible status as received from the server
@@ -178,15 +178,11 @@ namespace Modio
 				return false;
 			}
 		}
+
+		/// @docnone
+		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModInfo& ModInfo);
+
+		/// @docnone
+		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::ModInfo& Info);
 	};
-
-	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::ModInfo& ModInfo);
-	
-	/// @docnone
-	MODIO_IMPL void to_json(nlohmann::json& Json, const Modio::ModInfo& Info);
 } // namespace Modio
-
-#ifndef MODIO_SEPARATE_COMPILATION
-	#include "ModioModInfo.ipp"
-#endif
