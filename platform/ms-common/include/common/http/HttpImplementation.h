@@ -61,7 +61,7 @@ namespace Modio
 			}
 
 			HttpImplementationBase(asio::io_context::service& OwningService) : OwningService(OwningService) {}
-			virtual ~HttpImplementationBase() {}
+			~HttpImplementationBase() override {}
 
 			template<typename CompletionToken>
 			auto InitializeHTTPAsync(CompletionToken&& Token)
@@ -101,8 +101,9 @@ namespace Modio
 			}
 
 			template<typename CompletionToken>
-			auto BeginWriteAsync(IOObjectImplementationType PlatformIOObjectInstance, Modio::FileSize TotalLength,
-								 CompletionToken&& Token)
+			auto BeginWriteAsync(IOObjectImplementationType MODIO_UNUSED_ARGUMENT(PlatformIOObjectInstance),
+								 Modio::FileSize MODIO_UNUSED_ARGUMENT(TotalLength),
+								 CompletionToken&& MODIO_UNUSED_ARGUMENT(Token))
 			{
 			}
 
@@ -115,7 +116,7 @@ namespace Modio
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 
-			void Shutdown()
+			void Shutdown() override
 			{
 				HttpState->Close();
 			}

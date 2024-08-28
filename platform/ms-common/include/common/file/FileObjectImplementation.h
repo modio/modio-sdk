@@ -54,7 +54,7 @@ namespace Modio
 					std::make_shared<Modio::Detail::OperationQueue>(ParentContext, BasePath.u8string().c_str());
 			}
 
-			~FileObjectImplementation()
+			~FileObjectImplementation() override
 			{
 				Destroy();
 			}
@@ -108,8 +108,8 @@ namespace Modio
 			virtual Modio::ErrorCode Truncate(Modio::FileOffset Offset) override
 			{
 				LARGE_INTEGER Length;
-				Length.QuadPart = Offset;
-				bool Result = SetFilePointerEx(FileHandle, Length, NULL, FILE_BEGIN);
+				Length.QuadPart = LONGLONG(Offset);
+				bool Result = SetFilePointerEx(FileHandle, Length, nullptr, FILE_BEGIN);
 				if (Result == true)
 				{
 					SetEndOfFile(FileHandle);
@@ -131,7 +131,7 @@ namespace Modio
 				{
 					LARGE_INTEGER FileSize;
 					GetFileSizeEx(FileHandle, &FileSize);
-					return FileSize.QuadPart;
+					return std::uint64_t(FileSize.QuadPart);
 				}
 				return INVALID_FILE_SIZE;
 			}
@@ -214,8 +214,8 @@ namespace Modio
 				}
 
 				FileHandle =
-					::CreateFileW(this->FilePath.generic_wstring().c_str(), Access, FILE_SHARE_READ | FILE_SHARE_WRITE,
-								  NULL, bOverwrite ? CREATE_ALWAYS : OPEN_ALWAYS, FILE_FLAG_OVERLAPPED, NULL);
+					::CreateFileW(this->FilePath.generic_wstring().c_str(), Access, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+					DWORD(bOverwrite ? CREATE_ALWAYS : OPEN_ALWAYS), FILE_FLAG_OVERLAPPED, nullptr);
 				if (FileHandle != INVALID_HANDLE_VALUE)
 				{
 					return std::error_code {};

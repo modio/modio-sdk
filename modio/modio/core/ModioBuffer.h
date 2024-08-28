@@ -41,7 +41,7 @@ namespace Modio
 				: InternalData(std::move(Source.InternalData)),
 				  Alignment(std::move(Source.Alignment)),
 				  AlignmentOffset(Source.AlignmentOffset),
-				  Size(Source.Size) {};
+				  Size(Source.Size) {}
 			MODIO_IMPL Buffer& operator=(Buffer&& Source) noexcept;
 
 			Buffer(const Buffer&) = delete;
@@ -52,9 +52,9 @@ namespace Modio
 			MODIO_IMPL Buffer Clone() const;
 			MODIO_IMPL Buffer Clone(std::size_t DiffAlignment) const;
 
-			MODIO_IMPL unsigned char* const Data() const;
-			MODIO_IMPL unsigned char* const begin() const;
-			MODIO_IMPL unsigned char* const end() const;
+			MODIO_IMPL unsigned char* Data() const;
+			MODIO_IMPL unsigned char* begin() const;
+			MODIO_IMPL unsigned char* end() const;
 			MODIO_IMPL unsigned char& operator[](size_t Index) const;
 			MODIO_IMPL std::size_t GetSize() const;
 		};
@@ -88,6 +88,7 @@ namespace Modio
 		public:
 			MODIO_IMPL DynamicBuffer(std::size_t Alignment = 1);
 			MODIO_IMPL DynamicBuffer(const DynamicBuffer& Other);
+			DynamicBuffer& operator = (const DynamicBuffer& Other) = default;
 
 			MODIO_IMPL DynamicBuffer Clone() const;
 
@@ -147,7 +148,7 @@ namespace Modio
 			Modio::MutableBufferView MBV(&Destination, sizeof(Destination));
 			asio::buffer_copy(MBV, DesiredDataRange);
 			return Destination;
-		};
+		}
 
 		template<typename DestinationType>
 		DestinationType TypedBufferRead(Modio::Detail::Buffer& BufferToRead, std::uintmax_t Offset)

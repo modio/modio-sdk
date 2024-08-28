@@ -19,7 +19,6 @@ namespace Modio
         static const HttpRequestParams GetCurrentAgreementRequest { Modio::Detail::Verb::GET, "/agreements/types/{agreement-type-id}/current" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetAgreementVersionRequest { Modio::Detail::Verb::GET, "/agreements/versions/{agreement-version-id}" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams TermsRequest { Modio::Detail::Verb::GET, "/authenticate/terms" , "application/x-www-form-urlencoded" }; 
-        static const HttpRequestParams SignInWithModioRequest { Modio::Detail::Verb::GET, "/authorize" }; 
         static const HttpRequestParams AuthenticateViaAppleRequest { Modio::Detail::Verb::POST, "/external/appleauth" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AuthenticateViaDiscordRequest { Modio::Detail::Verb::POST, "/external/discordauth" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AuthenticateViaEpicgamesRequest { Modio::Detail::Verb::POST, "/external/epicgamesauth" , "application/x-www-form-urlencoded" }; 
@@ -35,8 +34,6 @@ namespace Modio
         static const HttpRequestParams AuthenticateViaXboxLiveRequest { Modio::Detail::Verb::POST, "/external/xboxauth" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams GetGamesRequest { Modio::Detail::Verb::GET, "/games" }; 
         static const HttpRequestParams GetGameRequest { Modio::Detail::Verb::GET, "/games/{game-id}" }; 
-        static const HttpRequestParams BrowseGameEmhConfigsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/emh" }; 
-        static const HttpRequestParams GetGameEmhConfigRequest { Modio::Detail::Verb::GET, "/games/{game-id}/emh/{emh-id}" }; 
         static const HttpRequestParams GetGuidesRequest { Modio::Detail::Verb::GET, "/games/{game-id}/guides" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams AddGuideRequest { Modio::Detail::Verb::POST, "/games/{game-id}/guides" , "multipart/form-data" }; 
         static const HttpRequestParams GetGuidesTagsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/guides/tags" , "application/x-www-form-urlencoded" }; 
@@ -120,12 +117,12 @@ namespace Modio
         static const HttpRequestParams GetUserSubscriptionsRequest { Modio::Detail::Verb::GET, "/me/subscribed" }; 
         static const HttpRequestParams GetUsersMutedRequest { Modio::Detail::Verb::GET, "/me/users/muted" }; 
         static const HttpRequestParams GetUserWalletRequest { Modio::Detail::Verb::GET, "/me/wallets" }; 
+        static const HttpRequestParams MetricsSessionEndRequest { Modio::Detail::Verb::POST, "/metrics/sessions/end" , "application/json" }; 
+        static const HttpRequestParams MetricsSessionHeartbeatRequest { Modio::Detail::Verb::POST, "/metrics/sessions/heartbeat" , "application/json" }; 
+        static const HttpRequestParams MetricsSessionStartRequest { Modio::Detail::Verb::POST, "/metrics/sessions/start" , "application/json" }; 
         static const HttpRequestParams ExchangeEmailSecurityCodeRequest { Modio::Detail::Verb::POST, "/oauth/emailexchange" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams RequestEmailSecurityCodeRequest { Modio::Detail::Verb::POST, "/oauth/emailrequest" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams LogoutRequest { Modio::Detail::Verb::POST, "/oauth/logout" , "application/x-www-form-urlencoded" }; 
-        static const HttpRequestParams CreateOauthAccessTokenRequest { Modio::Detail::Verb::POST, "/oauth/token" , "application/x-www-form-urlencoded" }; 
-        static const HttpRequestParams ExchangeClientCredentialTokenRequest { Modio::Detail::Verb::POST, "/oauth/token/" , "application/x-www-form-urlencoded" }; 
-        static const HttpRequestParams ExchangeOauthRefreshTokenRequest { Modio::Detail::Verb::POST, "/oauth/token/refresh" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams PingRequest { Modio::Detail::Verb::GET, "/ping" }; 
         static const HttpRequestParams SubmitReportRequest { Modio::Detail::Verb::POST, "/report" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams S2sDisconnectUserRequest { Modio::Detail::Verb::DELETE, "/s2s/connections/{portal-id}" , "application/x-www-form-urlencoded" }; 

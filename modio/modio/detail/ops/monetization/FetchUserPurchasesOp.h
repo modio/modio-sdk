@@ -41,8 +41,7 @@ namespace Modio
 			{
 				GameID = Modio::Detail::SDKSessionData::CurrentGameID();
 
-				Modio::Detail::UserDataService& UserService =
-					Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>();
+				Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>();
 
 
 				MODIO_PROFILE_SCOPE(FetchUserPurchases);

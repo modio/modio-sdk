@@ -15,7 +15,6 @@
 
 namespace Modio
 {
-	static auto StartTime = std::chrono::system_clock::now();
 	namespace Detail
 	{
 		/// @docinternal

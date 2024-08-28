@@ -26,7 +26,7 @@ namespace Modio
 		class ShutdownRunOneOp
 		{
 		public:
-			ShutdownRunOneOp(std::shared_ptr<asio::io_context> InTargetContext) : TargetContext(InTargetContext) {};
+			ShutdownRunOneOp(std::shared_ptr<asio::io_context> InTargetContext) : TargetContext(InTargetContext) {}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
@@ -56,7 +56,7 @@ namespace Modio
 			}
 
 			template<typename CoroType>
-			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
+			void operator()(CoroType& Self, Modio::ErrorCode MODIO_UNUSED_ARGUMENT(ec) = {})
 			{
 				reenter(CoroutineState)
 				{
@@ -73,7 +73,6 @@ namespace Modio
 		private:
 			asio::coroutine CoroutineState;
 			std::shared_ptr<asio::io_context> ContextToFlush;
-			int numRun = 0;
 		};
 
 	} // namespace Detail

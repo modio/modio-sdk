@@ -53,7 +53,7 @@ namespace Modio
 
 			public:
 				DownloadFileImpl(Modio::Detail::OperationQueue::Ticket DownloadTicket)
-					: DownloadTicket(std::move(DownloadTicket)) {};
+					: DownloadTicket(std::move(DownloadTicket)) {}
 			};
 
 			Modio::StableStorage<DownloadFileImpl> Impl;
@@ -77,7 +77,7 @@ namespace Modio
 					RequestParams.SetRange(Modio::FileOffset(*CurrentFilePosition), {}));
 				EndOfFileReached = std::make_shared<bool>(false);
 				Impl = std::make_shared<DownloadFileImpl>(std::move(DownloadTicket));
-			};
+			}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
@@ -146,7 +146,7 @@ namespace Modio
 
 						if (Modio::Optional<std::uint32_t> RetryAfter = Request->GetRetryAfter())
 						{
-							Modio::Detail::SDKSessionData::MarkAsRateLimited(RetryAfter.value());
+							Modio::Detail::SDKSessionData::MarkAsRateLimited(std::int32_t(RetryAfter.value()));
 						}
 
 						if (Request->GetResponseCode() >= 301 && Request->GetResponseCode() < 400)

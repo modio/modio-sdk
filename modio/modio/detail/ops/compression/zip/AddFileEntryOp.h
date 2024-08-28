@@ -56,7 +56,7 @@ namespace Modio
 				InputFileSize = InputFile->GetFileSize();
 				IsZip64 = InputFileSize >= (UINT32_MAX - 1);
 				RollingFileHash = FileHash;
-			};
+			}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
@@ -257,13 +257,13 @@ namespace Modio
 						// Compressed size. Must be set to MAX32 if actual value is included in Zip64 Extended
 						// Information
 						.FollowedBy<uint32_t>(IsZip64 ? Constants::ZipTag::MAX32
-													  : (std::uint32_t) CompressionState.total_out)
+													  : std::uint32_t(CompressionState.total_out))
 						// Uncompressed size. Must be set to MAX32 if actual value is included in Zip64 Extended
 						// Information
 						.FollowedBy<uint32_t>(IsZip64 ? Constants::ZipTag::MAX32
-													  : (std::uint32_t) CompressionState.total_in)
+													  : std::uint32_t(CompressionState.total_in))
 						// File name length
-						.FollowedBy<uint16_t>((std::uint16_t) FileName.size())
+						.FollowedBy<uint16_t>(std::uint16_t(FileName.size()))
 						// Extra field length
 						.FollowedBy<uint16_t>(IsZip64 ? Constants::ZipTag::Zip64LocalFileExtraFieldSize : 0);
 

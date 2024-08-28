@@ -20,6 +20,7 @@ namespace Modio
 		class IHttpRequestImplementation
 		{
 		public:
+			virtual ~IHttpRequestImplementation() {}
 			virtual Modio::Detail::HttpRequestParams& GetParameters() = 0;
 			virtual std::uint32_t GetResponseCode() = 0;
 			virtual Modio::Optional<std::string> GetRedirectURL() = 0;

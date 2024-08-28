@@ -62,7 +62,7 @@ namespace Modio
 				Impl->ProgressInfo = ProgressInfo;
 				ResultBuffer = Response;
 				this->AllowCachedResponse = Modio::Detail::CachedResponse::Disallow;
-			};
+			}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})

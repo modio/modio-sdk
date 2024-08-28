@@ -30,5 +30,6 @@ namespace Modio
 
 			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::ResponseError& Error);
 		};
+
 	} // namespace Detail
 } // namespace Modio

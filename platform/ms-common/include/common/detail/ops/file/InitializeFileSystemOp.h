@@ -58,9 +58,9 @@ namespace Modio
 					// Get user data directory in AppData
 					{
 						Modio::filesystem::path UDF;
-						PWSTR path = NULL;
+						PWSTR path = nullptr;
 
-						HRESULT hr = SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &path);
+						HRESULT hr = SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &path);
 
 						if (SUCCEEDED(hr))
 						{

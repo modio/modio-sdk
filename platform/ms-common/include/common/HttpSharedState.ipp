@@ -89,7 +89,7 @@ void HttpSharedStateBase::InitializeRequest(std::shared_ptr<HttpRequestImplement
 			auto Lock = GetInsertLock();
 			// ConnectionHandles[RequestHandle] = ConnectionHandle;
 			CallbackStatus[RequestHandle] = WinHTTPCallbackStatus::Waiting;
-			ExtendedStatus[RequestHandle] = std::make_pair(0, 0);
+			ExtendedStatus[RequestHandle] = std::make_pair<std::uintptr_t, std::intmax_t>(0, 0);
 		}
 		Request->ConnectionHandle = ConnectionHandle;
 		Request->RequestHandle = RequestHandle;
@@ -135,7 +135,7 @@ void HttpSharedStateBase::SetHandleStatus(HINTERNET Handle, WinHTTPCallbackStatu
 	{
 		// This performs an insertion so needs the writer/insertion lock
 		auto Lock = GetInsertLock();
-		ExtendedStatus[Handle] = std::make_pair((std::uintptr_t) ExtendedStatusData, ExtendedStatusLength);
+		ExtendedStatus[Handle] = std::make_pair(std::uintptr_t(ExtendedStatusData), ExtendedStatusLength);
 	}
 	{
 		auto Lock = GetReadOrModifyLock();
@@ -177,10 +177,10 @@ std::pair<std::uintptr_t, std::uintmax_t> HttpSharedStateBase::GetExtendedStatus
 	if (auto MutableExtendedStatus = FindExtendedStatusForRequest(Handle))
 	{
 		auto StatusValues = *MutableExtendedStatus;
-		*MutableExtendedStatus = std::make_pair(0, 0);
-		return StatusValues;
+		*MutableExtendedStatus = std::make_pair<std::uintptr_t, std::intmax_t>(0U, 0);
+		return std::make_pair(StatusValues.first, std::uintmax_t(StatusValues.second));
 	}
-	return std::make_pair(0, 0);
+	return std::make_pair<std::uintptr_t, std::uintmax_t>(0U, 0U);
 }
 
 bool HttpSharedStateBase::IsClosing()

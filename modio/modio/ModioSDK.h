@@ -702,12 +702,8 @@ namespace Modio
 	/// Note: Doing this will invalidate you local cache of mods and game info,
 	///     so that the next time you fetch them you will recieve the correctly localized content.
 	///     This does not call FetchExternalUpdates for you, should you want to call it after changing locale.
-	/// @param Modio::Language to set
+	/// @param Locale language to set
 	MODIOSDK_API void SetLanguage(Modio::Language Locale);
-
-	/// @brief Get the currently applied language
-	/// @return Modio::Language currently set
-	MODIOSDK_API Modio::Language GetLanguage();
 	
 	/// @docpublic
 	/// @brief Attempts to purchase a specified mod with an expected price. Purchasing a mod will add a subscription to
@@ -733,6 +729,22 @@ namespace Modio
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)> Callback);
 
 	/// @docpublic
+	/// @brief Requests mod.io consume available entitlements for the current authenticated user purchased through the
+	/// current portal.
+	/// @param Params Additional parameters
+	/// @param Callback Callback providing an error code indicating success or failure of the refresh operation
+	/// @requires initialized-sdk
+	/// @requires authenticated-user
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @errorcategory MonetizationError|Problems during purchase transaction
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error MonetizationError::RetryEntitlements|Some entitlements could not be verified. Wait some time and try again.
+	MODIOSDK_API void RefreshUserEntitlementsAsync(Modio::EntitlementParams Params,
+		std::function<void(Modio::ErrorCode, Modio::Optional<EntitlementConsumptionStatusList>)> Callback);
+	
 	/// @brief Fetches the updated mod.io wallet balance for the currently logged-in user
 	/// @param Callback Callback providing an error code indicating success or failure, as well as a value indicating
 	/// the updated balance
@@ -746,6 +758,10 @@ namespace Modio
 	/// @error UserDataError::InvalidUser|No authenticated user
 	MODIOSDK_API void GetUserWalletBalanceAsync(
 		std::function<void(Modio::ErrorCode, Modio::Optional<uint64_t>)> Callback);
+
+	/// @brief Get the currently applied language
+	/// @return Modio::Language currently set
+	MODIOSDK_API Modio::Language GetLanguage();
 
 	/// @docpublic
 	/// @brief Fetches a list of all purchases that a User has made. Query the list using <<QueryUserPurchasedMods>> after a successful call.
@@ -781,7 +797,7 @@ namespace Modio
 	/// @docpublic
 	/// @brief Initialize a Temp Mod Set, installing every specified mod 
 	/// given in the param if they are not already subbed.
-	/// @param vector of ModID to install as temp mod
+	/// @param ModIds vector of ModID to install as temp mod
 	///
 	/// @return Modio::ErrorCode indicating if temp mod correctly started
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
@@ -791,7 +807,7 @@ namespace Modio
 	/// @docpublic
 	/// @brief Add mods to an already created Temp Mod Session,  
 	/// install every temp mod given in the param if they already subbed or already in Temp Mod Set
-	/// @param vector of ModID to install as temp mod
+	/// @param ModIds vector of ModID to install as temp mod
 	///
 	/// @return Modio::ErrorCode indicating if temp mod correctly started
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
@@ -802,7 +818,7 @@ namespace Modio
 	/// @docpublic
 	/// @brief Delete mods to an already created Temp Mod Session,
 	/// delete every temp mods given in the param if they already subbed mod, it will not delete them.
-	/// @param vector of ModID to install as temp mod
+	/// @param ModIds vector of ModID to install as temp mod
 	///
 	/// @return Modio::ErrorCode indicating if temp mod correctly started
 	/// @error GenericError::SDKNotInitialized|SDK not initialized

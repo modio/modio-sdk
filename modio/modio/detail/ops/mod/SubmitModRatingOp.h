@@ -25,7 +25,7 @@ namespace Modio
 			SubmitModRatingOp(Modio::ModID Mod, Modio::Rating Rating) : Mod(Mod)
 			{
 				RawRating = fmt::format("{}", static_cast<std::int8_t>(Rating));
-			};
+			}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})

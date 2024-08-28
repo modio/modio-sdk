@@ -51,7 +51,7 @@ namespace Modio
 				  CurrentSeekOffset(0)
 			{}
 
-			~FileObjectImplementation()
+			~FileObjectImplementation() override
 			{
 				Destroy();
 			}
@@ -83,7 +83,7 @@ namespace Modio
 				return FilePath;
 			}
 
-			virtual Modio::ErrorCode Rename(Modio::filesystem::path NewPath) override
+			Modio::ErrorCode Rename(Modio::filesystem::path NewPath) override
 			{
 				Modio::ErrorCode ec;
 				if (FileDescriptor != InvalidFileDescriptor)
@@ -101,20 +101,20 @@ namespace Modio
 				return ec;
 			}
 
-			virtual Modio::ErrorCode Truncate(Modio::FileOffset Offset) override
+			Modio::ErrorCode Truncate(Modio::FileOffset Offset) override
 			{
 				Modio::ErrorCode ec;
 				Modio::filesystem::resize_file(FilePath, Offset, ec);
 				return ec;
 			}
 
-			virtual std::uint64_t GetSize() override
+			std::uint64_t GetSize() override
 			{
 				Modio::ErrorCode ec;
 				return Modio::filesystem::file_size(FilePath, ec);
 			}
 
-			virtual void Seek(Modio::FileOffset Offset, Modio::Detail::SeekDirection Direction) override
+			void Seek(Modio::FileOffset Offset, Modio::Detail::SeekDirection Direction) override
 			{
 				switch (Direction)
 				{

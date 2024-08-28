@@ -47,6 +47,13 @@
 #ifndef BOOST_BEAST_ZLIB_DETAIL_DEFLATE_STREAM_HPP
 #define BOOST_BEAST_ZLIB_DETAIL_DEFLATE_STREAM_HPP
 
+#include "modio/detail/ModioCompilerMacros.h"
+MODIO_DISABLE_WARNING_PUSH
+MODIO_DISABLE_WARNING_OLD_STYLE_CAST
+MODIO_DISABLE_WARNING_MOVE_ASSIGNMENT_IMPLICITLY_DELETED
+MODIO_DISABLE_WARNING_SIGNED_UNSIGNED_INTEGER_CONVERSION
+MODIO_DISABLE_WARNING_UNSAFE_BUFFER_USAGE
+
 #include "modio/core/ModioErrorCode.h"
 #include "modio/detail/compression/zlib/detail/ranges.hpp"
 #include "modio/detail/compression/zlib/zlib.hpp"
@@ -180,7 +187,7 @@ namespace boost
 						// lengths for unused bit length codes.
 						std::uint8_t const bl_order[blCodes] = {16, 17, 18, 0, 8,  7, 9,  6, 10, 5,
 																11, 4,  12, 3, 13, 2, 14, 1, 15};
-						lut_type() : ltree(), dtree(), dist_code(), length_code(), base_length(), base_dist() {};
+						lut_type() : ltree(), dtree(), dist_code(), length_code(), base_length(), base_dist() {}
 
 						ct_data ltree[lCodes + 2];
 
@@ -674,6 +681,8 @@ namespace boost
 		} // namespace zlib
 	} // namespace beast
 } // namespace boost
+
+MODIO_DISABLE_WARNING_POP
 
 #ifndef MODIO_SEPARATE_COMPILATION
 	#include "modio/detail/compression/zlib/detail/deflate_stream.ipp"

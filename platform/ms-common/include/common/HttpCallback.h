@@ -16,34 +16,52 @@
 #include "modio/detail/ModioProfiling.h"
 #include <winhttp.h>
 
-static void __stdcall ModioWinhttpStatusCallback(HINTERNET InternetHandle, DWORD_PTR Context, DWORD InternetStatus,
-	LPVOID StatusInformation, DWORD StatusInformationLength)
+MODIO_DISABLE_WARNING_PUSH
+MODIO_DISABLE_WARNING_UNREFERENCED_FUNCTION
+
+static void __stdcall ModioWinhttpStatusCallback(HINTERNET InternetHandle, DWORD_PTR MODIO_UNUSED_ARGUMENT(Context),
+												 DWORD InternetStatus,
+	LPVOID StatusInformation, DWORD StatusInformationLength) noexcept
 {
 	MODIO_PROFILE_SCOPE(WinhttpCallback);
 
-	// There's only ever a single SharedStateHolder for the entire life of the program
-	std::shared_ptr<HttpSharedStateBase> SharedState = SharedStateHolder::Get().SharedStatePtr.lock();
-
-	if (SharedState)
+	// Can't use try-catch when we're building for UE (which has exceptions disabled)
+	#ifndef MODIO_PLATFORM_UNREAL
+	try
 	{
-		WinHTTPCallbackStatus StatusCode = static_cast<WinHTTPCallbackStatus>(InternetStatus);
-		if (StatusCode == WinHTTPCallbackStatus::DataAvailable)
+	#endif
+
+		// There's only ever a single SharedStateHolder for the entire life of the program
+		std::shared_ptr<HttpSharedStateBase> SharedState = SharedStateHolder::Get().SharedStatePtr.lock();
+
+		if (SharedState)
 		{
-			std::uint64_t Value = *(DWORD*)StatusInformation;
-			SharedState->SetHandleStatus(InternetHandle, StatusCode, (void*)Value, StatusInformationLength);
-		}
-		else
-		{
-			if (StatusCode == WinHTTPCallbackStatus::RequestError)
+			WinHTTPCallbackStatus StatusCode = static_cast<WinHTTPCallbackStatus>(InternetStatus);
+			if (InternetStatus & DWORD(WinHTTPCallbackStatus::DataAvailable))
 			{
-				WINHTTP_ASYNC_RESULT* Result = static_cast<WINHTTP_ASYNC_RESULT*>(StatusInformation);
-				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Http,
-					"Function {:x} returned error code {:x}\r\n",
-					(unsigned long)Result->dwResult, (unsigned long)Result->dwError);
+				std::uint64_t Value = *reinterpret_cast<DWORD*>(StatusInformation);
+				SharedState->SetHandleStatus(InternetHandle, StatusCode, reinterpret_cast<void*>(Value), StatusInformationLength);
 			}
+			else
+			{
+				if (InternetStatus & DWORD(WinHTTPCallbackStatus::RequestError))
+				{
+					WINHTTP_ASYNC_RESULT* Result = static_cast<WINHTTP_ASYNC_RESULT*>(StatusInformation);
+					Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Http,
+												"Function {:x} returned error code {:x}\r\n",
+												Result->dwResult, Result->dwError);
+				}
 
-			SharedState->SetHandleStatus(InternetHandle, StatusCode, StatusInformation, StatusInformationLength);
+				SharedState->SetHandleStatus(InternetHandle, StatusCode, StatusInformation, StatusInformationLength);
+			}
 		}
+	#ifndef MODIO_PLATFORM_UNREAL
 	}
-
+	catch (...)
+	{
+		// prevent UB by catching any errors thrown within a C callback
+	}
+	#endif
 }
+
+MODIO_DISABLE_WARNING_POP

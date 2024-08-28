@@ -22,7 +22,7 @@
 #include <shared_mutex>
 #include <unordered_map>
 #include <utility>
-#include <windows.h>
+#include <Windows.h>
 #include <winhttp.h>
 
 // TODO: @ModioGDK probably move this back up to the parent service

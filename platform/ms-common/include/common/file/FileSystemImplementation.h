@@ -41,6 +41,7 @@ namespace Modio
 			Modio::filesystem::path UserDataPath;
 			Modio::filesystem::path RootTempPath;
 			Modio::GameID CurrentGameID;
+			Modio::UserHandleType CurrentSessionIdentifier;
 
 		protected:
 			std::shared_ptr<Modio::Detail::FileSharedState> SharedState;
@@ -107,6 +108,7 @@ namespace Modio
 			auto InitializeAsync(Modio::InitializeOptions InitParams, CompletionTokenType&& Token)
 			{
 				CurrentGameID = InitParams.GameID;
+				CurrentSessionIdentifier = InitParams.User;
 				return asio::async_compose<CompletionTokenType, void(std::error_code)>(
 					static_cast<Subplatform*>(this)->MakeInitializeStorageOp(InitParams, RootLocalStoragePath,
 																			 UserDataPath, RootTempPath),
@@ -183,7 +185,7 @@ namespace Modio
 
 			Modio::filesystem::path MakeTempModPath(Modio::ModID ModID) const override
 			{
-				return RootLocalStoragePath / fmt::format("{}/temp/{}", CurrentGameID, ModID);
+				return RootLocalStoragePath / fmt::format("{}/temp/{}/{}", CurrentGameID, CurrentSessionIdentifier, ModID);
 			}
 
 			Modio::filesystem::path GetModRootInstallationPath() const override
@@ -193,7 +195,7 @@ namespace Modio
 
 			Modio::filesystem::path GetTempRootInstallationPath() const override
 			{
-				return RootLocalStoragePath / fmt::format("{}/temp/", CurrentGameID);
+				return RootLocalStoragePath / fmt::format("{}/temp/{}/", CurrentGameID, CurrentSessionIdentifier);
 			}
 
 			Modio::filesystem::path MakeModMediaFilePath(Modio::ModID ModID, Modio::LogoSize Size,
@@ -380,7 +382,7 @@ namespace Modio
 				return UserDataPath;
 			}
 
-			virtual const Modio::filesystem::path LocalMetadataFolder() const override
+			Modio::filesystem::path LocalMetadataFolder() const override
 			{
 				// No longer static const because we want to be able to reconfigure RootLocalStoragePath;
 				// Note trailing slash
@@ -395,7 +397,7 @@ namespace Modio
 				return RootLocalStoragePath;
 			}
 
-			virtual Modio::ErrorCode ApplyGlobalConfigOverrides(
+			Modio::ErrorCode ApplyGlobalConfigOverrides(
 				const std::map<std::string, std::string> Overrides) override
 			{
 				auto RootValue = Overrides.find(Modio::Detail::Constants::JSONKeys::RootLocalStoragePath);

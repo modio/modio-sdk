@@ -25,7 +25,7 @@ namespace Modio
 		public:
 			UnsubscribeFromModOp(Modio::GameID GameID, Modio::ModID ModId)
 				: GameID(GameID),
-				  ModId(ModId) {};
+				  ModId(ModId) {}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})

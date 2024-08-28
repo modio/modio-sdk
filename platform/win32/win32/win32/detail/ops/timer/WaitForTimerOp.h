@@ -21,7 +21,7 @@ class WaitForTimerOp
 public:
 	WaitForTimerOp(std::shared_ptr<TimerImplementation> Timer, std::weak_ptr<TimerSharedState> SharedState)
 		: Timer(Timer),
-		  SharedState(SharedState) {};
+		  SharedState(SharedState) {}
 	WaitForTimerOp(WaitForTimerOp&& Other) = default;
 	template<typename CoroType>
 	void operator()(CoroType& Self, Modio::ErrorCode ec = {})

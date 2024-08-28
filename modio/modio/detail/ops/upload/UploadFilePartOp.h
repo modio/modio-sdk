@@ -99,7 +99,7 @@ namespace Modio
 											  Modio::FileOffset(FileSize));
 
 				Request = std::make_shared<Modio::Detail::HttpRequest>(RequestParams);
-			};
+			}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {},

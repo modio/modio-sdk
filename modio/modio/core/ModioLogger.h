@@ -43,12 +43,12 @@ namespace Modio
 			{}
 
 			/// @brief Print a message to the platform output device
-			/// @tparam ...ArgTypes Types of arguments to format
+			/// @tparam ArgTypes Types of arguments to format
 			/// @param Level The verbosity level of the message
 			/// @param Category The category for the message - corresponds to which internal service is originating the
 			/// message
 			/// @param Format Format string for the message. Uses fmtlib syntax for substitutions
-			/// @param ...Args Additional arguments to insert into the format string
+			/// @param Args Additional arguments to insert into the format string
 			template<typename... ArgTypes>
 			void Log(LogLevel Level, LogCategory Category, std::string Format, ArgTypes... Args)
 			{

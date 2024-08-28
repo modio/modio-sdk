@@ -373,7 +373,7 @@ namespace Modio
 				return UserDataPath;
 			}
 
-			virtual const Modio::filesystem::path LocalMetadataFolder() const override
+			Modio::filesystem::path LocalMetadataFolder() const override
 			{
 				// No longer static const because we want to be able to reconfigure RootLocalStoragePath;
 				// Note trailing slash
@@ -388,7 +388,7 @@ namespace Modio
 				return RootLocalStoragePath;
 			}
 
-			virtual Modio::ErrorCode ApplyGlobalConfigOverrides(
+			Modio::ErrorCode ApplyGlobalConfigOverrides(
 				const std::map<std::string, std::string> Overrides) override
 			{
 				auto RootValue = Overrides.find(Modio::Detail::Constants::JSONKeys::RootLocalStoragePath);

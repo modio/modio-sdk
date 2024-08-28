@@ -39,7 +39,7 @@ namespace Modio
 		{
 		public:
 			/// @brief Initializes the static SDK state with the provided parameters.
-			/// @param Options Initialization options for the SDK
+			/// @param Options initialization parameters
 			/// @return false if the SDK is already initialized, or already running when this is called
 			MODIO_IMPL static bool Initialize(const Modio::InitializeOptions& Options);
 
@@ -114,7 +114,7 @@ namespace Modio
 			MODIO_IMPL static Modio::Optional<Modio::ModID> GetPriorityModID()
 			{
 				return Get().ModIDToPrioritize;
-			};
+			}
 
 			MODIO_IMPL static std::weak_ptr<Modio::Detail::TemporaryModSet> InitTempModSet(std::vector<Modio::ModID> ModIds);
 
@@ -184,10 +184,10 @@ namespace Modio
 			MODIO_IMPL static std::shared_timed_mutex& GetRWMutex();
 			MODIO_IMPL static std::shared_timed_mutex& GetShutdownMutex();
 
-			MODIO_IMPL MODIO_NODISCARD static std::shared_lock<std::shared_timed_mutex> GetReadLock();
-			MODIO_IMPL MODIO_NODISCARD static std::unique_lock<std::shared_timed_mutex> GetWriteLock();
-			MODIO_IMPL MODIO_NODISCARD static std::unique_lock<std::shared_timed_mutex> GetShutdownLock();
-			MODIO_IMPL MODIO_NODISCARD static std::unique_lock<std::shared_timed_mutex> TryGetShutdownLock();
+			MODIO_NODISCARD MODIO_IMPL static std::shared_lock<std::shared_timed_mutex> GetReadLock();
+			MODIO_NODISCARD MODIO_IMPL static std::unique_lock<std::shared_timed_mutex> GetWriteLock();
+			MODIO_NODISCARD MODIO_IMPL static std::unique_lock<std::shared_timed_mutex> GetShutdownLock();
+			MODIO_NODISCARD MODIO_IMPL static std::unique_lock<std::shared_timed_mutex> TryGetShutdownLock();
 
 		private:
 			enum class InitializationState

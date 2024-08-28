@@ -37,6 +37,7 @@
 #include <chrono>
 #include <functional>
 #include <thread>
+#include <atomic>
 // Implementation header - do not include directly
 
 namespace Modio
@@ -57,6 +58,25 @@ namespace Modio
 
 	void RunPendingHandlers()
 	{
+		// Static atomic flag to track if the function is already running
+		static std::atomic_flag bIsRunning = ATOMIC_FLAG_INIT;
+
+		// Handle the case where the function is called re-entrantly
+		if (bIsRunning.test_and_set())
+		{
+			assert(false && "RunPendingHandlers was called re-entrantly. This should not happen in callbacks or other concurrent executions.");
+			return;
+		}
+
+		// Ensure the flag is cleared when exiting the function
+		struct RunningFlagClearer
+		{
+			~RunningFlagClearer()
+			{
+				bIsRunning.clear();
+			}
+		} FlagClearer;
+
 		auto ShutdownLock = Modio::Detail::SDKSessionData::TryGetShutdownLock();
 		if (ShutdownLock.owns_lock())
 		{

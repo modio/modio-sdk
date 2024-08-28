@@ -32,7 +32,7 @@ namespace Modio
 			{
 				OutputFile = std::make_unique<Modio::Detail::File>(ArchiveFile->FilePath,
 																   Modio::Detail::FileMode::ReadWrite, false);
-			};
+			}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
@@ -124,7 +124,7 @@ namespace Modio
 										? Constants::ZipTag::MAX32
 										: static_cast<std::uint32_t>(CurrentArchiveEntry->UncompressedSize))
 								// File name length
-								.FollowedBy<std::uint16_t>((std::uint16_t) FileName.size())
+								.FollowedBy<std::uint16_t>(std::uint16_t(FileName.size()))
 								// Extra field length
 								.FollowedBy<std::uint16_t>(ExtraFieldLength)
 								// File comment length

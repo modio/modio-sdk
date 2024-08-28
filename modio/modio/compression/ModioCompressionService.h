@@ -30,13 +30,13 @@ namespace Modio
 				PlatformImplementation.swap(NewImplementation);
 			}
 
-			~CompressionService() {}
+			~CompressionService() override {}
 
 			using implementation_type = CompressionImplementation::IOObjectImplementationType;
 
 			MODIO_IMPL void construct(implementation_type& Implementation);
 
-			MODIO_IMPL void destroy(implementation_type& Implementation) {}
+			MODIO_IMPL void destroy(implementation_type& MODIO_UNUSED_ARGUMENT(Implementation)) {}
 
 			MODIO_IMPL void move_construct(implementation_type& Implementation, implementation_type& Other);
 

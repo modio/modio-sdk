@@ -26,7 +26,7 @@ namespace Modio
 			ProcessNextModInTempModSet() 
 			{
 				ModId = Modio::ModID::InvalidModID();
-			};
+			}
 			
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})

@@ -70,6 +70,22 @@ namespace Modio
 
 		/// @brief Details about 
 		Modio::EntitlementConsumptionVirtualCurrencyDetails VirtualCurrencyDetails;
+		
+		/// @brief Ask the entitlement if it needs to sync with the endpoint given that
+		/// it has not been consumed and the trasaction state is failed or pending.
+		/// @return True when the entitlement needs to sync with the API. Otherwise false
+		bool EntitlementRequiresRetry() const
+		{
+			// The entitlement has been consumed, no need to retry
+			if (EntitlementConsumed == true)
+			{
+				return false;
+			}
+
+			// When the transaction state is failed or pending, it is necessary to retry
+			return (TransactionState == Modio::EntitlementConsumptionState::Failed ||
+					TransactionState == Modio::EntitlementConsumptionState::Pending);
+		}
 
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json,

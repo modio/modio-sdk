@@ -17,7 +17,7 @@ namespace Modio
 		class ITimerServiceImplementation
 		{
 		public:
-			virtual ~ITimerServiceImplementation() {};
+			virtual ~ITimerServiceImplementation() {}
 			virtual void Shutdown() = 0;
 			//virtual void Cancel(IOObjectImplementationType) = 0;
 			//template<typename CompletionToken>

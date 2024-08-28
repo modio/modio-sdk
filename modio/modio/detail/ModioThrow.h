@@ -11,9 +11,10 @@
 #pragma once
 
 #include "modio/detail/HedleyWrapper.h"
+#include "modio/detail/ModioCompilerMacros.h"
 
-MODIO_PRAGMA(warning(push))
-MODIO_PRAGMA(warning(disable:4702))
+MODIO_DISABLE_WARNING_PUSH
+MODIO_DISABLE_WARNING_UNREACHABLE_CODE
 
 namespace Modio
 {
@@ -32,4 +33,4 @@ namespace Modio
 	} // namespace Detail
 } // namespace Modio
 
-MODIO_PRAGMA(warning(pop))
+MODIO_DISABLE_WARNING_POP

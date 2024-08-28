@@ -73,21 +73,21 @@ struct ranges
         std::size_t
         size() const
         {
-            return last - first;
+            return std::size_t(last - first);
         }
 
         // bytes consumed
         std::size_t
         used() const
         {
-            return next - first;
+            return std::size_t(next - first);
         }
 
         // bytes remaining
         std::size_t
         avail() const
         {
-            return last - next;
+            return std::size_t(last - next);
         }
     };
 

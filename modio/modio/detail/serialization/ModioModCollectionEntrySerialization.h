@@ -69,7 +69,7 @@ namespace Modio
 			j.contains(Modio::Detail::Constants::JSONKeys::ModNeverRetryCategory))
 		{
 			Entry.NeverRetryReason = std::error_code(
-				j.at(Modio::Detail::Constants::JSONKeys::ModNeverRetryCode).get<uint32_t>(),
+				j.at(Modio::Detail::Constants::JSONKeys::ModNeverRetryCode).get<int32_t>(),
 				Modio::Detail::GetModioErrorCategoryByID(
 					j.at(Modio::Detail::Constants::JSONKeys::ModNeverRetryCategory).get<uint64_t>()));
 		}

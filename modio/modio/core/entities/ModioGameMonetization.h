@@ -36,7 +36,7 @@ namespace Modio
 		GameMonetization()
 		{
 			Value = Convert(GameMonetizationOptions::None);
-		};
+		}
 		using Modio::FlagImpl<GameMonetizationOptions>::FlagImpl;
 
 		/// @docnone

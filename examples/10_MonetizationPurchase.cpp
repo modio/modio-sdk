@@ -14,8 +14,7 @@
 #include <sstream>
 #include <utility>
 
-/// This example demonstrates usage of the mod.io wallet management features, including 
-/// getting the users wallet balancing and refreshing any platform entitlements.
+/// This example demonstrates purchasing a mod
 /// Once these queries have been performed, the sample initiates an async shutdown of the SDK if necessary and then
 /// terminates.
 
@@ -146,6 +145,29 @@ struct ModioExample
 		{
 			UserWalletBalance = WalletBalance.value();
 			std::cout << "Users wallet balance is: " << std::to_string(UserWalletBalance) << std::endl;
+			NotifyApplicationSuccess();
+		}
+	}
+
+	static void OnRefreshUserEntitlementsCompleted(Modio::ErrorCode ec, Modio::Optional<Modio::EntitlementConsumptionStatusList> EntitlementConsumptionStatus)
+	{
+		if (ec)
+		{
+			NotifyApplicationFailure(ec);
+		}
+		else
+		{
+			// Update the users wallet balance from the refresh call if any adjustments have been made.
+			// Note that if nothing is consumed, then WalletBalance may not exist or be 0.
+			if (EntitlementConsumptionStatus->WalletBalance.has_value())
+			{
+				UserWalletBalance = EntitlementConsumptionStatus.value().WalletBalance.value().Balance;	
+			}
+
+			std::cout << "Updated wallet balance is: " << std::to_string(UserWalletBalance) << std::endl;
+
+			// 
+
 			NotifyApplicationSuccess();
 		}
 	}
@@ -376,6 +398,27 @@ int main()
 		if (!ModioExample::DidAsyncOperationSucceed())
 		{
 			// Error handling for GetWalletBalance errors
+		}
+	}
+
+	// After you have called GetWalletBalanceAsync at startup, you should call RefreshUserEntitlementsAsync
+	// in case there are any unconsumed entitlements that the user has purchased - for instance, making a platform purchase
+	// via a platform companion app or website outside of the game.
+	// Note that you only need to call RefreshUserEntitlementsAsync if you are selling virtual currency packs via a platform store,
+	// such as Steam, Playstation Store or XBox Store. If you are only allowing your users to purchase VC Packs via the mod.io website,
+	// they are directly added to the users wallet and you do not need to call this.
+	{
+		const Modio::EntitlementParams EntitlementParams;
+		Modio::RefreshUserEntitlementsAsync(EntitlementParams, ModioExample::OnRefreshUserEntitlementsCompleted);
+
+		while (!ModioExample::HasAsyncOperationCompleted())
+		{
+			Modio::RunPendingHandlers();
+		}
+
+		if (!ModioExample::DidAsyncOperationSucceed())
+		{
+			// Error handling for RefreshUserEntitlementsAsync errors
 		}
 	}
 

@@ -42,7 +42,7 @@ namespace Modio
 
 			template<typename OpClass>
 			explicit OperationTracker(const char* OpName, OpClass* OpPtr)
-				: OperationTracker(OpName, static_cast<void*>(OpPtr)) {};
+				: OperationTracker(OpName, static_cast<void*>(OpPtr)) {}
 
 			/// @docinternal
 			/// @brief ScopedProfileEvent move constructor
@@ -74,7 +74,7 @@ namespace Modio
 		template<typename Base>
 		struct BaseOperation : public BaseOperationCommonImpl
 		{
-#if MODIO_TRACK_OPS
+#if defined(MODIO_TRACK_OPS) && (MODIO_TRACK_OPS != 0)
 			inline static int32_t Count = 0;
 			bool bMovedFrom = false;
 			BaseOperation();

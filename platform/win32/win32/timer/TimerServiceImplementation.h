@@ -26,12 +26,11 @@ namespace Modio
 		class TimerServiceImplementation : public Modio::Detail::ITimerServiceImplementation
 		{
 			std::shared_ptr<TimerSharedState> SharedState;
-			asio::io_context::service& OwningService;
 
 		public:
 			using IOObjectImplementationType = std::shared_ptr<TimerImplementation>;
 
-			TimerServiceImplementation(asio::io_context::service& OwningService) : OwningService(OwningService)
+			TimerServiceImplementation(asio::io_context::service& MODIO_UNUSED_ARGUMENT(OwningService))
 			{
 				SharedState = std::make_shared<TimerSharedState>();
 			}
@@ -70,7 +69,7 @@ namespace Modio
 					SharedState->CancelAll();
 				}
 				SharedState.reset();
-			};
+			}
 		};
 	} // namespace Detail
 } // namespace Modio

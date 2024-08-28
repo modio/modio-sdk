@@ -12,7 +12,7 @@
 
 extern "C"
 {
-	inline void modio_profile_stub(...) {};
+	inline void modio_profile_stub(...) {}
 	__declspec(selectany) void (*modio_profile_stub_ptr)(...) = modio_profile_stub;
 }
 

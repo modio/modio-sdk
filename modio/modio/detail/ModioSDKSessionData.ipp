@@ -193,7 +193,7 @@ namespace Modio
 			Data["version"] = 1;
 			std::string UserData = Data.dump();
 			Modio::Detail::Buffer DataBuffer(UserData.size());
-			std::copy(UserData.begin(), UserData.end(), DataBuffer.begin());
+			std::copy(UserData.begin(), UserData.end(), reinterpret_cast<char*>(DataBuffer.begin()));
 			return DataBuffer;
 		}
 

@@ -44,7 +44,7 @@ namespace Modio
 					  ArchivePath(ArchivePath),
 					  RootOutputPath(RootOutputPath),
 					  ArchiveView(std::move(ArchiveView)),
-					  ProgressInfo(ProgressInfo) {};
+					  ProgressInfo(ProgressInfo) {}
 			};
 			Modio::StableStorage<ExtractAllImpl> Impl;
 
@@ -56,12 +56,12 @@ namespace Modio
 			ExtractAllToFolderOp(Modio::filesystem::path ArchivePath, Modio::filesystem::path RootOutputPath,
 								 Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo)
 			{
-				Impl = std::make_shared<ExtractAllImpl>(ExtractAllImpl {{},
+				Impl = std::make_shared<ExtractAllImpl>(ExtractAllImpl ({},
 																		ArchivePath,
 																		RootOutputPath,
 																		Modio::Detail::ArchiveReader(ArchivePath),
-																		ProgressInfo});
-			};
+																		ProgressInfo));
+			}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})

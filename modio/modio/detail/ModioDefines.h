@@ -144,3 +144,7 @@
 	#define MODIO_DEFINED_UNICODE
 	#define UNICODE
 #endif
+
+#ifndef MODIO_UNUSED_ARGUMENT
+	#define MODIO_UNUSED_ARGUMENT(x)
+#endif

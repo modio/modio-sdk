@@ -34,7 +34,7 @@ namespace Modio
 				  FilePath(FilePath)
 			{
 				get_implementation()->FilePath = FilePath;
-			};
+			}
 			ArchiveReader(ArchiveReader&& Other)
 				: asio::basic_io_object<CompressionService>(std::move(Other)),
 				  FilePath(std::move(Other.FilePath))

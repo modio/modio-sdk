@@ -21,7 +21,7 @@ namespace Modio
 		class ForceUninstallModOp
 		{
 		public:
-			ForceUninstallModOp(Modio::ModID ModToRemove) : ModToRemove(ModToRemove) {};
+			ForceUninstallModOp(Modio::ModID ModToRemove) : ModToRemove(ModToRemove) {}
 			
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})

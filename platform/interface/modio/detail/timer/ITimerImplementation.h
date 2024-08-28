@@ -17,7 +17,7 @@ namespace Modio
 		class ITimerImplementation
 		{
 		public:
-			virtual ~ITimerImplementation() {};
+			virtual ~ITimerImplementation() {}
 			virtual void ExpiresAfter(std::chrono::steady_clock::duration Duration) = 0;
 			//virtual void ExpireAt(std::chrono::steady_clock::time_point Time) = 0;
 			virtual void Cancel() = 0;

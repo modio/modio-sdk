@@ -43,6 +43,9 @@ namespace Modio
 			}
 		}
 		TagInfo.Locale = Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetLocalLanguage());
+
+		Modio::Detail::ParseSafe(Json, TagInfo.bHidden, "hidden");
+		Modio::Detail::ParseSafe(Json, TagInfo.bLocked, "locked");
 	}
 
 	inline void from_json(const nlohmann::json& Json, Modio::ModTagOptions& Options)

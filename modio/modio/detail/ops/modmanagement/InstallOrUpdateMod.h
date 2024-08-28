@@ -37,7 +37,7 @@ namespace Modio
 				Mod(Mod), IsTempMod(IsTempMod)
 			{
 				ModProgress = Modio::Detail::SDKSessionData::StartModDownloadOrUpdate(Mod);
-			};
+			}
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {}, Modio::FileSize ExtractedSize = {})
 			{
@@ -136,7 +136,7 @@ namespace Modio
 					{
 						Modio::Detail::File DownloadedFile(DownloadPath, Modio::Detail::FileMode::ReadOnly);
 						// Is the downloaded file the correct size?
-						if ((int64_t) DownloadedFile.GetFileSize() == ModInfoData.FileInfo->Filesize)
+						if (std::int64_t(DownloadedFile.GetFileSize()) == ModInfoData.FileInfo->Filesize)
 						{
 							bFileDownloadComplete = true;
 						}

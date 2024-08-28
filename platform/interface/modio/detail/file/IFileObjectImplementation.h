@@ -29,7 +29,7 @@ namespace Modio
 		class IFileObjectImplementation
 		{
 		public:
-			virtual ~IFileObjectImplementation() {};
+			virtual ~IFileObjectImplementation() {}
 
 			virtual void SetFileStrand(asio::strand<asio::io_context::executor_type>& FileStrand) = 0;
 

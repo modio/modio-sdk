@@ -11,8 +11,11 @@
 #pragma once
 
 #include "http/HttpRequestImplementation.h"
-#include "httpparser/httpresponseparser.h"
-#include "httpparser/response.h"
+MODIO_DISABLE_WARNING_PUSH
+MODIO_DISABLE_WARNING_SIGNED_UNSIGNED_INTEGER_CONVERSION
+#include <httpparser/httpresponseparser.h>
+#include <httpparser/response.h>
+MODIO_DISABLE_WARNING_POP
 #include "android/HttpSharedState.h"
 #include "android/detail/ops/http/SSLConnectionReadSomeOp.h"
 #include "modio/core/ModioBuffer.h"

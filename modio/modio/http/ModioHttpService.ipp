@@ -36,7 +36,8 @@ namespace Modio
 			PlatformImplementation->MoveIOObjectImplementation(Implementation, Other);
 		}
 
-		void HttpService::move_assign(implementation_type& Implementation, Modio::Detail::HttpService& OtherService,
+		void HttpService::move_assign(implementation_type& Implementation,
+									  Modio::Detail::HttpService& MODIO_UNUSED_ARGUMENT(OtherService),
 									  implementation_type& Other)
 		{
 			// No difference between this and move_construct for us because our application will only have a single
@@ -56,7 +57,7 @@ namespace Modio
 			move_assign(impl, other_service, other_impl);
 		}
 
-		void HttpService::destroy(implementation_type& Implementation)
+		void HttpService::destroy(implementation_type& MODIO_UNUSED_ARGUMENT(Implementation))
 		{
 		}
 

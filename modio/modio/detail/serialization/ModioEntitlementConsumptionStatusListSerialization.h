@@ -30,10 +30,15 @@ namespace Modio
 
 		Detail::ParseSafe(Json, OutEntitlementConsumptionStatusList.InternalList, "data");
 
+		if (OutEntitlementConsumptionStatusList.InternalList.empty())
+		{
+			return;
+		}
+
 		Modio::EntitlementWalletBalance WalletBalance;
 		if (Detail::ParseSafe(Json, WalletBalance, "wallet"))
 		{
-			OutEntitlementConsumptionStatusList.WalletBalance = WalletBalance;
+			OutEntitlementConsumptionStatusList.WalletBalance = WalletBalance;	
 		}
 	}
 } // namespace Modio

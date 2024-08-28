@@ -33,8 +33,8 @@ namespace Modio
 				{
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						TagResponseBuffer,
-						Modio::Detail::GetGameTagOptionsRequest.SetGameID(
-							Modio::Detail::SDKSessionData::CurrentGameID()),
+						Modio::Detail::GetGameTagOptionsRequest.SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
+							.AddQueryParamRaw(Modio::Detail::Constants::QueryParamStrings::ShowHiddenTags, "true"),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 					if (ec)
 					{

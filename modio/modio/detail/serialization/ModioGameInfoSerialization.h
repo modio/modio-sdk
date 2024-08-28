@@ -85,7 +85,6 @@ namespace Modio
 		nlohmann::json PlatformsJson;
 		if (Detail::GetSubobjectSafe(Json, "platforms", PlatformsJson))
 		{
-			Modio::ModfilePlatform Platform = Modio::ModfilePlatform::Windows;
 			for (nlohmann::json& Entry : PlatformsJson)
 			{
 				GamePlatform GamePlatformDetails = {};

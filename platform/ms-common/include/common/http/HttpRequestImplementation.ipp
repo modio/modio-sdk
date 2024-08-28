@@ -8,10 +8,10 @@
  *
  */
 
-#pragma once
-
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "common/http/HttpRequestImplementation.h"
+#else
+	#pragma once
 #endif
 
 HttpRequestImplementation::~HttpRequestImplementation()

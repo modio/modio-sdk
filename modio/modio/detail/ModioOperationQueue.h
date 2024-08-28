@@ -33,7 +33,7 @@ namespace Modio
 			std::string QueueName;
 
 		public:
-			OperationQueue(asio::io_context& OwningContext, const char* QueueName)
+			OperationQueue(asio::io_context& MODIO_UNUSED_ARGUMENT(OwningContext), const char* QueueName)
 				: OperationInProgress(false),
 				  NumWaiters(0),
 				  QueueName(QueueName)
@@ -130,7 +130,7 @@ namespace Modio
 					// Preserve the associated executor of the queued operation
 
 					QueueImpl.push_back(std::forward<OperationType>(Operation));
-					MODIO_PROFILE_COUNTER_SET_NAMED(QueueName.c_str(), NumWaiters.load());
+					MODIO_PROFILE_COUNTER_SET_NAMED(QueueName.c_str(), std::uint64_t(NumWaiters.load()));
 				}
 				else
 				{
@@ -154,7 +154,7 @@ namespace Modio
 					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 							   std::move(QueueImpl.front()));
 					QueueImpl.pop_front();
-					MODIO_PROFILE_COUNTER_SET_NAMED(QueueName.c_str(), NumWaiters.load());
+					MODIO_PROFILE_COUNTER_SET_NAMED(QueueName.c_str(), std::uint64_t(NumWaiters.load()));
 				}
 			}
 

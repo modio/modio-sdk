@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html >
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.4.0">
+<link rel="stylesheet" href="./assets/css/styles.58715c6c.css" />
+<script src="./assets/js/runtime~main.d4a843a9.js" defer></script>
+<script src="./assets/js/main.43446498.js" defer></script>
+</head>
+<body >
+<script>
+(function() {
+    var defaultMode = 'dark';
+    var respectPrefersColorScheme = false;
+
+    function setDataThemeAttribute(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+
+    function getQueryStringTheme() {
+      try {
+        return new URLSearchParams(window.location.search).get('docusaurus-theme')
+      } catch (e) {
+      }
+    }
+
+    function getStoredTheme() {
+      try {
+        return window['localStorage'].getItem('theme');
+      } catch (err) {
+      }
+    }
+
+    var initialTheme = getQueryStringTheme() || getStoredTheme();
+    if (initialTheme !== null) {
+      setDataThemeAttribute(initialTheme);
+    } else {
+      if (
+        respectPrefersColorScheme &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches
+      ) {
+        setDataThemeAttribute('dark');
+      } else if (
+        respectPrefersColorScheme &&
+        window.matchMedia('(prefers-color-scheme: light)').matches
+      ) {
+        setDataThemeAttribute('light');
+      } else {
+        setDataThemeAttribute(defaultMode === 'dark' ? 'dark' : 'light');
+      }
+    }
+  })();
+
+(function() {
+  try {
+    const entries = new URLSearchParams(window.location.search).entries();
+    for (var [searchKey, value] of entries) {
+      if (searchKey.startsWith('docusaurus-data-')) {
+        var key = searchKey.replace('docusaurus-data-',"data-")
+        document.documentElement.setAttribute(key, value);
+      }
+    }
+  } catch(e) {}
+})();
+
+
+            </script><div id="__docusaurus"></div>
+</body>
+</html>

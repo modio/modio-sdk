@@ -39,7 +39,7 @@ namespace Modio
 									  .SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
 									  .SetModID(CurrentModID)
 									  .AddQueryParamRaw("upload_id", USession.UploadID.value());
-			};
+			}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})

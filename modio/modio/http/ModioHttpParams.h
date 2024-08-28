@@ -170,7 +170,7 @@ namespace Modio
 			template<typename T>
 			HttpRequestParams SetPayload(T RawPayload) const
 			{
-				auto NewParamsInstance = HttpRequestParams(*this);
+				HttpRequestParams NewParamsInstance(*this);
 				NewParamsInstance.SetPayload(RawPayload);
 				return NewParamsInstance;
 			}
@@ -270,7 +270,7 @@ namespace Modio
 				  ModID(0),
 				  UserID(0),
 				  CurrentOperationType(CurrentOperationType),
-				  CurrentAPIVersion(Modio::Detail::APIVersion::V1) {};
+				  CurrentAPIVersion(Modio::Detail::APIVersion::V1) {}
 
 			HttpRequestParams(Modio::Detail::Verb CurrentOperationType, const char* ResourcePath)
 				: ResourcePath(ResourcePath),

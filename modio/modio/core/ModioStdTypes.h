@@ -36,18 +36,18 @@ namespace Modio
 	public:
 		/// @docpublic
 		/// @brief Error code constructor using std::error_code
-		ErrorCode(std::error_code ec) : error_code(ec) {};
+		ErrorCode(std::error_code ec) : error_code(ec) {}
 		
 		/// @docpublic
 		/// @brief Error code constructor using an empty value
-		ErrorCode() : error_code() {};
+		ErrorCode() : error_code() {}
 		using error_code::error_code;
 	};
 
 	/// @docpublic
 	/// @brief nullable wrapper around object of type T. Used by async functions that return values - empty on function
 	/// error/failure
-	/// @tparam T
+	/// @tparam T underlying type
 	template<typename T>
 	using Optional = tl::optional<T>;
 
@@ -59,10 +59,10 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Convenience method to make a shared pointer
-	template<typename Object, class... _Types>
-	StableStorage<Object> MakeStable(_Types&&... _Args)
+	template<typename Object, class... Types>
+	StableStorage<Object> MakeStable(Types&&... Args)
 	{
-		return std::make_shared<Object>(std::forward<_Types>(_Args)...);
+		return std::make_shared<Object>(std::forward<Types>(Args)...);
 	}
 
 	using Timestamp = std::uint64_t;

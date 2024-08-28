@@ -48,7 +48,7 @@ namespace Modio
 
 			MODIO_IMPL void InvalidateOAuthToken();
 
-			MODIO_IMPL const bool IsValid() const;
+			MODIO_IMPL bool IsValid() const;
 
 			Modio::UserSubscriptionList UserSubscriptions;
 			std::vector<Modio::ModID> DeferredUnsubscriptions;

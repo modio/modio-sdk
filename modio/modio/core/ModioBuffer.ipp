@@ -38,13 +38,13 @@ namespace Modio
 			InternalData = std::make_unique<unsigned char[]>(TotalSize);
 			{
 				MODIO_PROFILE_SCOPE(BufferFill);
-				std::fill_n(InternalData.get(), TotalSize, (unsigned char) 0);
+				std::fill_n(InternalData.get(), TotalSize, std::uint8_t(0U));
 			}
 			// Perform the alignment calculation to know where we should consider the start of the data buffer
 			void* RawBufferPtr = InternalData.get();
 			std::align(Alignment, Size, RawBufferPtr, TotalSize);
 			// store the offset required to align reads or writes to the 4k boundary
-			AlignmentOffset = (unsigned char*) RawBufferPtr - InternalData.get();
+			AlignmentOffset = std::size_t( reinterpret_cast<unsigned char*>(RawBufferPtr) - InternalData.get());
 		}
 
 		Buffer::~Buffer()
@@ -70,7 +70,7 @@ namespace Modio
 			{
 				return Buffer(0, Alignment);
 			}
-			Buffer RangedCopy = Buffer(End - Start, Alignment);
+			Buffer RangedCopy = Buffer(std::size_t(End - Start), Alignment);
 			std::copy(Start, End, RangedCopy.begin());
 			return RangedCopy;
 		}
@@ -89,17 +89,17 @@ namespace Modio
 			return MyClone;
 		}
 
-		unsigned char* const Buffer::Data() const
+		unsigned char* Buffer::Data() const
 		{
 			return InternalData.get() + AlignmentOffset;
 		}
 
-		unsigned char* const Buffer::begin() const
+		unsigned char* Buffer::begin() const
 		{
 			return InternalData.get() + AlignmentOffset;
 		}
 
-		unsigned char* const Buffer::end() const
+		unsigned char* Buffer::end() const
 		{
 			return InternalData.get() + AlignmentOffset + Size;
 		}

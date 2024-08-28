@@ -318,7 +318,8 @@ namespace Modio
 		return FilterFields;
 	}
 
-	Modio::FilterParams& FilterParams::AppendValue(std::vector<std::string>& Vector, std::string Tag)
+	Modio::FilterParams& FilterParams::AppendValue(std::vector<std::string>& MODIO_UNUSED_ARGUMENT(Vector),
+												   std::string Tag)
 	{
 		Tags.push_back(Tag);
 		return *this;

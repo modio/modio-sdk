@@ -39,7 +39,7 @@ namespace Modio
 								  .MakeTempFilePath(fmt::format("modfile_{}.zip", ModID))
 								  .value_or("");
 				ProgressInfo = Modio::Detail::SDKSessionData::StartModDownloadOrUpdate(CurrentModID);
-				FileHash = std::make_shared<uint64_t>(0);
+				FileHash = std::make_shared<uint64_t>(0ULL);
 			}
 
 			template<typename CoroType>

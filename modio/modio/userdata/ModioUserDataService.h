@@ -93,7 +93,7 @@ namespace Modio
 					SaveUserDataToStorageOp(), Handler,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
-			MODIO_IMPL Modio::ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string> Overrides) { return {};}
+			MODIO_IMPL Modio::ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string> MODIO_UNUSED_ARGUMENT(Overrides)) { return {};}
 		private:
 		};
 	} // namespace Detail

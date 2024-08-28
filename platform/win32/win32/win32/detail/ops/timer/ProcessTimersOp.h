@@ -18,10 +18,10 @@ class ProcessTimersOp
 	std::weak_ptr<TimerSharedState> SharedState;
 
 public:
-	ProcessTimersOp(std::weak_ptr<TimerSharedState> SharedState) : SharedState(SharedState) {};
+	ProcessTimersOp(std::weak_ptr<TimerSharedState> SharedState) : SharedState(SharedState) {}
 
 	template<typename CoroType>
-	void operator()(CoroType& Self, Modio::ErrorCode ec = {})
+	void operator()(CoroType& Self, Modio::ErrorCode MODIO_UNUSED_ARGUMENT(ec) = {})
 	{
 		std::shared_ptr<TimerSharedState> PinnedState = SharedState.lock();
 		reenter(CoroutineState)

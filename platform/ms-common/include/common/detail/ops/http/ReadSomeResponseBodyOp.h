@@ -42,7 +42,7 @@ public:
 	{}
 
 	template<typename CoroType>
-	void operator()(CoroType& Self, Modio::ErrorCode ec = {})
+	void operator()(CoroType& Self, Modio::ErrorCode MODIO_UNUSED_ARGUMENT(ec) = {})
 	{
 		MODIO_PROFILE_SCOPE(ReadSomeResponseBody);
 		std::shared_ptr<HttpSharedStateBase> PinnedState = SharedState.lock();
@@ -53,7 +53,7 @@ public:
 		}
 		reenter(CoroutineState)
 		{
-			if (!WinHttpQueryDataAvailable(Request->RequestHandle, NULL))
+			if (!WinHttpQueryDataAvailable(Request->RequestHandle, nullptr))
 			{
 				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
 											"query data available received system error code {}", GetLastError());
@@ -84,7 +84,7 @@ public:
 					{
 						BufferSize = std::max<std::uintmax_t>(ExtendedStatus.first, 512 * 1024);
 						ResponseChunkBuffer = std::make_unique<Modio::Detail::Buffer>(BufferSize);
-						WinHttpReadData(Request->RequestHandle, ResponseChunkBuffer->begin(), BufferSize, NULL);
+						WinHttpReadData(Request->RequestHandle, ResponseChunkBuffer->begin(), BufferSize, nullptr);
 						MODIO_PROFILE_PUSH("WaitForDataRead");
 						while (PinnedState->PeekHandleStatus(Request->RequestHandle) == WinHTTPCallbackStatus::Waiting)
 						{

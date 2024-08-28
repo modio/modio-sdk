@@ -73,7 +73,6 @@ namespace Modio
 
 			jobject ActivityObject;
 
-			jmethodID GetCertificatePathMethodId;
 			JavaVM* JVM;
 
 			jobject ClassLoader;

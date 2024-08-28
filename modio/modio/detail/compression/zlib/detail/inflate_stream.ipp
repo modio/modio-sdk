@@ -122,7 +122,7 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
             zs.avail_out = r.out.avail();
             zs.total_in += r.in.used();
             zs.total_out += r.out.used();
-            zs.data_type = bi_.size() + (last_ ? 64 : 0) +
+            zs.data_type = std::int32_t(bi_.size()) + (last_ ? 64 : 0) +
                 (mode_ == TYPE ? 128 : 0) +
                 (mode_ == LEN_ || mode_ == COPY_ ? 256 : 0);
 
@@ -295,7 +295,7 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
                     std::uint16_t copy;
                     if(cp->val == 16)
                     {
-                        if(! bi_.fill(cp->bits + 2, r.in.next, r.in.last))
+                        if(! bi_.fill(cp->bits + 2U, r.in.next, r.in.last))
                             return done();
                         bi_.drop(cp->bits);
                         if(have_ == 0)
@@ -307,7 +307,7 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
                     }
                     else if(cp->val == 17)
                     {
-                        if(! bi_.fill(cp->bits + 3, r.in.next, r.in.last))
+                        if(! bi_.fill(cp->bits + 3U, r.in.next, r.in.last))
                             return done();
                         bi_.drop(cp->bits);
                         bi_.read(copy, 3);
@@ -316,7 +316,7 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
                     }
                     else
                     {
-                        if(! bi_.fill(cp->bits + 7, r.in.next, r.in.last))
+                        if(! bi_.fill(cp->bits + 7U, r.in.next, r.in.last))
                             return done();
                         bi_.drop(cp->bits);
                         bi_.read(copy, 7);
@@ -390,11 +390,11 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
             if(cp->op && (cp->op & 0xf0) == 0)
             {
                 auto prev = cp;
-                if(! bi_.fill(prev->bits + prev->op, r.in.next, r.in.last))
+                if(! bi_.fill(std::size_t(prev->bits + prev->op), r.in.next, r.in.last))
                     return done();
-                bi_.peek(v, prev->bits + prev->op);
+                bi_.peek(v, std::size_t(prev->bits + prev->op));
                 cp = &lencode_[prev->val + (v >> prev->bits)];
-                bi_.drop(prev->bits + cp->bits);
+                bi_.drop(std::size_t(prev->bits + cp->bits));
                 back_ += prev->bits + cp->bits;
             }
             else
@@ -416,7 +416,7 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
             }
             if(cp->op & 64)
                 return err(Modio::make_error_code(Modio::ZlibError::InvalidLiteralLength));
-            extra_ = cp->op & 15;
+            extra_ = cp->op & 15U;
             mode_ = LENEXT;
         }
         MODIO_FALL_THROUGH;
@@ -444,11 +444,11 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
             if((cp->op & 0xf0) == 0)
             {
                 auto prev = cp;
-                if(! bi_.fill(prev->bits + prev->op, r.in.next, r.in.last))
+                if(! bi_.fill(std::size_t(prev->bits + prev->op), r.in.next, r.in.last))
                     return done();
-                bi_.peek(v, prev->bits + prev->op);
+                bi_.peek(v, std::size_t(prev->bits + prev->op));
                 cp = &distcode_[prev->val + (v >> prev->bits)];
-                bi_.drop(prev->bits + cp->bits);
+                bi_.drop(std::size_t(prev->bits + cp->bits));
                 back_ += prev->bits + cp->bits;
             }
             else
@@ -459,7 +459,7 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
             if(cp->op & 64)
                 return err(Modio::make_error_code(Modio::ZlibError::InvalidDistanceCode));
             offset_ = cp->val;
-            extra_ = cp->op & 15;
+            extra_ = cp->op & 15U;
             mode_ = DISTEXT;
         }
         MODIO_FALL_THROUGH;
@@ -535,6 +535,15 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
         case BAD:
             return done();
 
+        case FLAGS:
+        case TIME:
+        case OS:
+        case EXLEN:
+        case EXTRA:
+        case NAME:
+        case COMMENT:
+        case HCRC:
+        case LENGTH:
         case SYNC:
         default:
 			Modio::Detail::MaybeThrowException(std::logic_error {
@@ -657,9 +666,9 @@ inflate_table(
         root = max;
     if (max == 0)
     {                     /* no symbols to code at all */
-        here.op = (std::uint8_t)64;    /* invalid code marker */
-        here.bits = (std::uint8_t)1;
-        here.val = (std::uint16_t)0;
+        here.op = std::uint8_t(64);    /* invalid code marker */
+        here.bits = std::uint8_t(1);
+        here.val = std::uint16_t(0);
         *(*table)++ = here;             /* make a table to force an error */
         *(*table)++ = here;
         *bits = 1;
@@ -692,12 +701,12 @@ inflate_table(
     /* generate offsets into symbol table for each length for sorting */
     offs[1] = 0;
     for (len = 1; len < 15; len++)
-        offs[len + 1] = offs[len] + count[len];
+        offs[len + 1] = std::uint16_t(offs[len] + count[len]);
 
     /* sort symbols by length, by symbol order within each length */
     for (sym = 0; sym < codes; sym++)
         if (lens[sym] != 0)
-            work[offs[lens[sym]]++] = (std::uint16_t)sym;
+            work[offs[lens[sym]]++] = std::uint16_t(sym);
 
     /*
        Create and fill in decoding tables.  In this loop, the table being
@@ -744,6 +753,7 @@ inflate_table(
         extra -= 257;
         end = 256;
         break;
+    case build::dists:
     default:            /* build::dists */
         base = dbase;
         extra = dext;
@@ -757,7 +767,7 @@ inflate_table(
     next = *table;              /* current table to fill in */
     curr = root;                /* current table index bits */
     drop = 0;                   /* current bits to drop from code for index */
-    low = (unsigned)(-1);       /* trigger new sub-table when len > root */
+    low = std::numeric_limits<unsigned>::max(); /* trigger new sub-table when len > root */
     used = 1U << root;          /* use root table entries */
     mask = used - 1;            /* mask for comparing low */
 
@@ -776,20 +786,20 @@ inflate_table(
     for (;;)
     {
         /* create table entry */
-        here.bits = (std::uint8_t)(len - drop);
-        if ((int)(work[sym]) < end)
+        here.bits = std::uint8_t(len - drop);
+        if (int(work[sym]) < end)
         {
-            here.op = (std::uint8_t)0;
+            here.op = std::uint8_t(0);
             here.val = work[sym];
         }
-        else if ((int)(work[sym]) > end)
+        else if (int(work[sym]) > end)
         {
-            here.op = (std::uint8_t)(extra[work[sym]]);
+            here.op = std::uint8_t(extra[work[sym]]);
             here.val = base[work[sym]];
         }
         else
         {
-            here.op = (std::uint8_t)(32 + 64);         /* end of block */
+            here.op = std::uint8_t(32 + 64);         /* end of block */
             here.val = 0;
         }
 
@@ -835,7 +845,7 @@ inflate_table(
 
             /* determine length of next table */
             curr = len - drop;
-            left = (int)(1 << curr);
+            left = int(1 << curr);
             while (curr + drop < max)
             {
                 left -= count[curr + drop];
@@ -852,9 +862,9 @@ inflate_table(
 
             /* point entry in root table to sub-table */
             low = huff & mask;
-            (*table)[low].op = (std::uint8_t)curr;
-            (*table)[low].bits = (std::uint8_t)root;
-            (*table)[low].val = (std::uint16_t)(next - *table);
+            (*table)[low].op = std::uint8_t(curr);
+            (*table)[low].bits = std::uint8_t(root);
+            (*table)[low].val = std::uint16_t(next - *table);
         }
     }
 
@@ -864,7 +874,7 @@ inflate_table(
     if (huff != 0)
     {
         here.op = 64;   // invalid code marker
-        here.bits = (std::uint8_t)(len - drop);
+        here.bits = std::uint8_t(len - drop);
         here.val = 0;
         next[huff] = here;
     }
@@ -1013,22 +1023,22 @@ inflate_fast(ranges& r, Modio::ErrorCode& ec)
         auto cp = &lencode_[bi_.peek_fast() & lmask];
     dolen:
         bi_.drop(cp->bits);
-        op = (unsigned)(cp->op);
+        op = unsigned(cp->op);
         if(op == 0)
         {
             // literal
-            *r.out.next++ = (unsigned char)(cp->val);
+            *r.out.next++ = static_cast<unsigned char>(cp->val);
         }
         else if(op & 16)
         {
             // length base
-            len = (unsigned)(cp->val);
+            len = unsigned(cp->val);
             op &= 15; // number of extra bits
             if(op)
             {
                 if(bi_.size() < op)
                     bi_.fill_8(r.in.next);
-                len += (unsigned)bi_.peek_fast() & ((1U << op) - 1);
+                len += unsigned(bi_.peek_fast()) & ((1U << op) - 1);
                 bi_.drop(op);
             }
             if(bi_.size() < 15)
@@ -1036,11 +1046,11 @@ inflate_fast(ranges& r, Modio::ErrorCode& ec)
             cp = &distcode_[bi_.peek_fast() & dmask];
         dodist:
             bi_.drop(cp->bits);
-            op = (unsigned)(cp->op);
+            op = unsigned(cp->op);
             if(op & 16)
             {
                 // distance base
-                dist = (unsigned)(cp->val);
+                dist = unsigned(cp->val);
                 op &= 15; // number of extra bits
                 if(bi_.size() < op)
                 {
@@ -1048,7 +1058,7 @@ inflate_fast(ranges& r, Modio::ErrorCode& ec)
                     if(bi_.size() < op)
                         bi_.fill_8(r.in.next);
                 }
-                dist += (unsigned)bi_.peek_fast() & ((1U << op) - 1);
+                dist += unsigned(bi_.peek_fast()) & ((1U << op) - 1);
 #ifdef INFLATE_STRICT
                 if(dist > dmax_)
                 {

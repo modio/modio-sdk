@@ -68,7 +68,7 @@ public:
 		  WriteOpParams(std::move(Other.WriteOpParams)),
 		  Coroutine(std::move(Other.Coroutine)),
 		  StatusTimer(std::move(Other.StatusTimer)),
-		  SharedState(Other.SharedState) {};
+		  SharedState(Other.SharedState) {}
 
 	~WriteSomeToFileOp()
 	{
@@ -80,7 +80,7 @@ public:
 	}
 
 	template<typename CoroType>
-	void operator()(CoroType& Self, std::error_code ec = {})
+	void operator()(CoroType& Self, std::error_code MODIO_UNUSED_ARGUMENT(ec) = {})
 	{
 		MODIO_PROFILE_SCOPE(WriteSomeToFile);
 		if (FileImpl->ShouldCancel())
@@ -107,7 +107,7 @@ public:
 										"Begin write of {} bytes to {} at {}", Buffer.GetSize(),
 										FileImpl->GetPath().string(), FileOffset);
 			WriteOpParams = std::make_shared<OVERLAPPED>();
-			WriteOpParams->hEvent = CreateEvent(NULL, false, false, NULL);
+			WriteOpParams->hEvent = CreateEvent(nullptr, false, false, nullptr);
 			if (!WriteOpParams->hEvent)
 			{
 				WriteOpParams->hEvent = INVALID_HANDLE_VALUE;
@@ -119,9 +119,9 @@ public:
 			}
 
 			WriteOpParams->OffsetHigh = FileOffset >> 32;
-			WriteOpParams->Offset = (DWORD) FileOffset;
+			WriteOpParams->Offset = DWORD(FileOffset);
 
-			if (!WriteFile(FileImpl->GetFileHandle(), Buffer.Data(), (DWORD) Buffer.GetSize(), nullptr,
+			if (!WriteFile(FileImpl->GetFileHandle(), Buffer.Data(), DWORD(Buffer.GetSize()), nullptr,
 						   WriteOpParams.get()))
 			{
 				DWORD Error = GetLastError();

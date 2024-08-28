@@ -41,7 +41,7 @@ namespace Modio
 				OutputFile = std::make_unique<Modio::Detail::File>(ArchiveFile->FilePath,
 																   Modio::Detail::FileMode::ReadWrite, false);
 				FileName = DirectoryPath.generic_u8string();
-			};
+			}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
@@ -74,7 +74,7 @@ namespace Modio
 						// Uncompressed size
 						.FollowedBy<uint32_t>(0)
 						// File name length
-						.FollowedBy<uint16_t>((std::uint16_t) FileName.size())
+						.FollowedBy<uint16_t>(std::uint16_t(FileName.size()))
 						// Extra field length
 						.FollowedBy<uint16_t>(0);
 

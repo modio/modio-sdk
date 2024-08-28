@@ -63,6 +63,12 @@ namespace Modio
 		/// @brief True if multiple tags from the group can be used simultaneously
 		bool bAllowMultipleSelection;
 
+		/// @brief True if only visible by admins
+		bool bHidden;
+
+		/// @brief True if only editable by admins
+		bool bLocked;
+
 	private:
 
 		/// @brief the culture code for the mod.io locale at the time the mod.io API returned this data
@@ -81,7 +87,7 @@ namespace Modio
 			Out.GroupName = TagGroupName;
 			if (TagGroupValueLocData.empty() == false)
 			{
-				for (int i = 0; i < TagGroupValueLocData.size(); i++)
+				for (size_t i = 0; i < TagGroupValueLocData.size(); i++)
 				{
 					for (auto const& [key, value] : TagGroupValueLocData[i].Translations)
 					{
@@ -97,7 +103,7 @@ namespace Modio
 				Out.Tags = TagGroupValues;
 			}
 			return Out;
-		};
+		}
 	};
 
 	/// @docpublic

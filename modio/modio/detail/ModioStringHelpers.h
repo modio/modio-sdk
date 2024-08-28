@@ -42,13 +42,13 @@ namespace Modio
 			inline bool MatchesCaseInsensitive(const std::string& a, const std::string& b)
 			{
 				return std::equal(a.begin(), a.end(), b.begin(), b.end(),
-								  [](unsigned char a, unsigned char b) { return tolower(a) == tolower(b); });
+								  [](char a, char b) { return tolower(a) == tolower(b); });
 			}
 
 			/// @brief URL-encodes a string
 			/// @param String The input to encode
 			/// @return The URL-encoded output
-			static inline std::string URLEncode(const std::string& String)
+			inline std::string URLEncode(const std::string& String)
 			{
 				std::string Result;
 				Result.reserve(String.size() * 3);
@@ -79,7 +79,7 @@ namespace Modio
 				return Result;
 			}
 
-			static inline Modio::Optional<std::uint32_t> ParseDateOrInt(std::string Value)
+			inline Modio::Optional<std::uint32_t> ParseDateOrInt(std::string Value)
 			{
 				if (Value == "")
 				{
@@ -108,7 +108,7 @@ namespace Modio
 					std::chrono::system_clock::from_time_t(std::mktime(&Time));
 				std::chrono::system_clock::time_point CurrentTime = std::chrono::system_clock::now();
 				std::size_t SecondsToWait =
-					std::chrono::duration_cast<std::chrono::seconds>(ServerTime - CurrentTime).count();
+					std::size_t(std::chrono::duration_cast<std::chrono::seconds>(ServerTime - CurrentTime).count());
 
 				// In case debugging of time is necessary
 				// std::cout << std::put_time(&Time, "%c") << '\n';
@@ -121,7 +121,7 @@ namespace Modio
 				return {};
 			}
 
-			static std::map<std::string, std::string> ParseRawHeaders(const std::string RawHeaders)
+			inline std::map<std::string, std::string> ParseRawHeaders(const std::string RawHeaders)
 			{
 				std::map<std::string, std::string> ResponseHeaders;
 				std::string MutHeaders = RawHeaders;

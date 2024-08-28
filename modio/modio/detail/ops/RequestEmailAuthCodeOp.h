@@ -21,20 +21,12 @@ namespace Modio::Detail
 	class RequestEmailAuthCodeOp
 	{
 	public:
-		RequestEmailAuthCodeOp(Modio::EmailAddress EmailAddress) : EmailAddress(EmailAddress) {};
+		RequestEmailAuthCodeOp(Modio::EmailAddress EmailAddress) : EmailAddress(EmailAddress) {}
 		template<typename CoroType>
 		void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 		{
 			reenter(CoroutineState)
 			{
-				yield Modio::Detail::VerifyUserAuthenticationAsync(std::move(Self));
-				// No error during verification indicates the user is already authenticated
-				if (!ec)
-				{
-					Self.complete(Modio::make_error_code(Modio::UserAuthError::AlreadyAuthenticated));
-					return;
-				}
-
 				yield Modio::Detail::PerformRequestAndGetResponseAsync(
 					ResponseBuffer,
 					Modio::Detail::RequestEmailSecurityCodeRequest.EncodeAndAppendPayloadValue(

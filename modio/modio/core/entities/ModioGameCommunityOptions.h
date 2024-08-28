@@ -50,7 +50,7 @@ namespace Modio
 		GameCommunityOptionsFlags ()
 		{
 			Value = Convert(GameCommunityOptions::None);
-		};
+		}
 		using Modio::FlagImpl<GameCommunityOptions>::FlagImpl;
 
 		/// @docnone

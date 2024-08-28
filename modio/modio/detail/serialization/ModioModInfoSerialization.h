@@ -40,7 +40,7 @@ namespace Modio
 	/// @docnone
 	inline void to_json(nlohmann::json& Json, const Modio::ModTag& Tag)
 	{
-		Json = nlohmann::json {{"name", Tag.Tag}};
+		Json = nlohmann::json {{"name", Tag.Tag}, {"name_localized", Tag.TagLocalized}};
 	}
 
 	/// @docnone

@@ -54,7 +54,8 @@ namespace Modio
 				PlatformImplementation->MoveIOObjectImplementation(Implementation, Other);
 			}
 
-			void move_assign(implementation_type& Implementation, Modio::Detail::FileService& OtherService,
+			void move_assign(implementation_type& Implementation,
+							 Modio::Detail::FileService& MODIO_UNUSED_ARGUMENT(OtherService),
 							 implementation_type& Other)
 			{
 				// No difference between this and move_construct for us because our application will only have a single

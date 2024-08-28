@@ -61,46 +61,46 @@ namespace Modio
 
 		Modio::Detail::HttpRequestParams& HttpRequestParams::SetGameID(Modio::GameID ID)
 		{
-			this->GameID = ID;
+			this->GameID = std::uint64_t(ID);
 			return *this;
 		}
 
 		Modio::Detail::HttpRequestParams HttpRequestParams::SetGameID(Modio::GameID ID) const
 		{
-			auto NewParamsInstance = HttpRequestParams(*this);
-			NewParamsInstance.GameID = ID;
+			HttpRequestParams NewParamsInstance(*this);
+			NewParamsInstance.GameID = std::uint64_t(ID);
 			return NewParamsInstance;
 		}
 
 		Modio::Detail::HttpRequestParams& HttpRequestParams::SetModID(Modio::ModID ID)
 		{
-			ModID = ID;
+			ModID = std::uint64_t(ID);
 			return *this;
 		}
 
 		Modio::Detail::HttpRequestParams HttpRequestParams::SetModID(Modio::ModID ID) const
 		{
-			auto NewParamsInstance = HttpRequestParams(*this);
-			NewParamsInstance.ModID = ID;
+			HttpRequestParams NewParamsInstance(*this);
+			NewParamsInstance.ModID = std::uint64_t(ID);
 			return NewParamsInstance;
 		}
 
 		Modio::Detail::HttpRequestParams HttpRequestParams::SetUserID(Modio::UserID ID) const
 		{
-			auto NewParamsInstance = HttpRequestParams(*this);
-			NewParamsInstance.UserID= ID;
+			HttpRequestParams NewParamsInstance(*this);
+			NewParamsInstance.UserID = std::uint64_t(ID);
 			return NewParamsInstance;
 		}
 
 		Modio::Detail::HttpRequestParams& HttpRequestParams::SetUserID(Modio::UserID ID)
 		{
-			this->UserID = ID;
+			this->UserID = std::uint64_t(ID);
 			return *this;
 		}
 
 		Modio::Detail::HttpRequestParams HttpRequestParams::AddQueryParamRaw(const std::string& Key, const std::string& Value) const
 		{
-			auto NewParamsInstance = HttpRequestParams(*this);
+			HttpRequestParams NewParamsInstance(*this);
 			if (QueryParameters.count(Key) == 0)
 			{
 				NewParamsInstance.QueryParameters.emplace(Key, Value);	
@@ -123,7 +123,7 @@ namespace Modio
 		Modio::Detail::HttpRequestParams HttpRequestParams::AddHeaderRaw(const std::string& Key,
 																			 const std::string& Value) const
 		{
-			auto NewParamsInstance = HttpRequestParams(*this);
+			HttpRequestParams NewParamsInstance(*this);
 			if (AdditionalHeaders.count(Key) == 0)
 			{
 				NewParamsInstance.AdditionalHeaders.emplace(Key, Value);
@@ -146,7 +146,7 @@ namespace Modio
 		Modio::Detail::HttpRequestParams HttpRequestParams::AppendQueryParameterMap(
 			const std::map<std::string, std::string> InQueryParameterMap) const
 		{
-			auto NewParamsInstance = HttpRequestParams(*this);
+			HttpRequestParams NewParamsInstance(*this);
 			NewParamsInstance.QueryParameters.insert(InQueryParameterMap.begin(), InQueryParameterMap.end());
 			return NewParamsInstance;
 		}
@@ -211,13 +211,13 @@ namespace Modio
 		HttpRequestParams HttpRequestParams::AppendPayloadValue(std::string Key, std::string Value) const
 		{
             Modio::Detail::Buffer ValueBuffer(Value.length());
-            std::copy(Value.begin(), Value.end(), ValueBuffer.begin());
+            std::copy(Value.begin(), Value.end(), reinterpret_cast<char*>(ValueBuffer.begin()));
 			return AppendPayloadValue(Key, std::move(ValueBuffer));
 		}
 
 		HttpRequestParams HttpRequestParams::AppendEmptyPayload(std::string Key) const
 		{
-			HttpRequestParams NewParamsInstance = HttpRequestParams(*this);
+			HttpRequestParams NewParamsInstance(*this);
 
 			Modio::Detail::Buffer ValueBuffer(0);
 
@@ -233,7 +233,7 @@ namespace Modio
 		HttpRequestParams HttpRequestParams::AppendPayloadValue(std::string Key,
 																Modio::Detail::Buffer RawPayloadBuffer) const
 		{
-            HttpRequestParams NewParamsInstance = HttpRequestParams(*this);
+            HttpRequestParams NewParamsInstance(*this);
             
             // No need to try to append an empty buffer
             if (RawPayloadBuffer.GetSize() == 0)
@@ -273,7 +273,7 @@ namespace Modio
 															   Modio::Optional<Modio::FileOffset> FileOffset,
 															   Modio::Optional<Modio::FileSize> ContentSize) const
 		{
-			HttpRequestParams NewParamsInstance = HttpRequestParams(*this);
+			HttpRequestParams NewParamsInstance(*this);
 			Modio::Optional<PayloadContent> MaybePayload =
 				MakePayloadContent(PathToFileToUpload, FileOffset, ContentSize);
 			if (MaybePayload)
@@ -298,7 +298,7 @@ namespace Modio
 
 		Modio::Detail::HttpRequestParams HttpRequestParams::SetAuthTokenOverride(const std::string& AuthToken) const
 		{
-			auto NewParamsInstance = HttpRequestParams(*this);
+			HttpRequestParams NewParamsInstance(*this);
 			NewParamsInstance.AuthTokenOverride = AuthToken;
 			return NewParamsInstance;
 		}
@@ -311,7 +311,7 @@ namespace Modio
 
 		Modio::Detail::HttpRequestParams HttpRequestParams::SuppressPlatformHeader() const
 		{
-			auto NewParamsInstance = HttpRequestParams(*this);
+			HttpRequestParams NewParamsInstance(*this);
 			NewParamsInstance.bSuppressPlatformHeader = true;
 			return NewParamsInstance;
 		}
@@ -328,7 +328,7 @@ namespace Modio
 		Modio::Detail::HttpRequestParams HttpRequestParams::SetRange(Modio::FileOffset Start,
 																	 Modio::Optional<Modio::FileOffset> End) const
 		{
-			auto NewParamsInstance = HttpRequestParams(*this);
+			HttpRequestParams NewParamsInstance(*this);
 			NewParamsInstance.StartOffset = Start;
 			NewParamsInstance.EndOffset = End;
 			return NewParamsInstance;
@@ -447,7 +447,8 @@ namespace Modio
 						PayloadString += "&";
 					}
 					PayloadString +=
-						Entry.first + "=" + std::string(Entry.second.RawBuffer->begin(), Entry.second.RawBuffer->end());
+						Entry.first + "=" + std::string(reinterpret_cast<const char*>(Entry.second.RawBuffer->begin()), 
+														reinterpret_cast<const char*>(Entry.second.RawBuffer->end()));
 				}
 				else
 				{
@@ -570,41 +571,43 @@ namespace Modio
 				Modio::Optional<std::string> PlatformOverride = SDKSessionData::GetPlatformOverride();
 				if (PlatformOverride.has_value())
 				{
-					Headers.push_back({ "x-modio-platform", *PlatformOverride});
+					Headers.emplace_back("x-modio-platform", *PlatformOverride);
 				} else
 				{
-					Headers.push_back({"x-modio-platform", MODIO_TARGET_PLATFORM_HEADER});
+					Headers.emplace_back("x-modio-platform", MODIO_TARGET_PLATFORM_HEADER);
 				}
 			}
 
 			switch (Modio::Detail::SDKSessionData::GetPortal())
 			{
+				case Portal::None:
+					break;
 				case Portal::Apple:
-					Headers.push_back({"x-modio-portal", "Apple"});
+					Headers.emplace_back("x-modio-portal", "Apple");
 					break;
 				case Portal::EpicGamesStore:
-					Headers.push_back({"x-modio-portal", "epicgames"});
+					Headers.emplace_back("x-modio-portal", "epicgames");
 					break;
 				case Portal::GOG:
-					Headers.push_back({"x-modio-portal", "GOG"});
+					Headers.emplace_back("x-modio-portal", "GOG");
 					break;
 				case Portal::Google:
-					Headers.push_back({"x-modio-portal", "Google"});
+					Headers.emplace_back("x-modio-portal", "Google");
 					break;
 				case Portal::Itchio:
-					Headers.push_back({"x-modio-portal", "Itchio"});
+					Headers.emplace_back("x-modio-portal", "Itchio");
 					break;
 				case Portal::Nintendo:
-					Headers.push_back({"x-modio-portal", "Nintendo"});
+					Headers.emplace_back("x-modio-portal", "Nintendo");
 					break;
 				case Portal::PSN:
-					Headers.push_back({"x-modio-portal", "PSN"});
+					Headers.emplace_back("x-modio-portal", "PSN");
 					break;
 				case Portal::Steam:
-					Headers.push_back({"x-modio-portal", "Steam"});
+					Headers.emplace_back("x-modio-portal", "Steam");
 					break;
 				case Portal::XboxLive:
-					Headers.push_back({"x-modio-portal", "XboxLive"});
+					Headers.emplace_back("x-modio-portal", "XboxLive");
 					break;
 				default:
 					break;
@@ -613,36 +616,36 @@ namespace Modio
 			/*if (Payload || CurrentOperationType == Modio::Detail::Verb::POST ||
 				CurrentOperationType == Modio::Detail::Verb::DELETE)
 			{
-				Headers.push_back({"Content-Type", "application/x-www-form-urlencoded"});
+				Headers.emplace_back("Content-Type", "application/x-www-form-urlencoded");
 			}*/
 
 			if (ContentType.has_value())
 			{
 				if (ContainsFormData())
 				{
-					Headers.push_back(
-						{"Content-Type", fmt::format("{}; boundary=\"{}\"", *ContentType, GetBoundaryHash())});
+					Headers.emplace_back(
+						"Content-Type", fmt::format("{}; boundary=\"{}\"", *ContentType, GetBoundaryHash()));
 				}
 				else
 				{
-					Headers.push_back({"Content-Type", *ContentType});
+					Headers.emplace_back("Content-Type", *ContentType);
 				}
 			}
 
 			// Add User Agent Header
 			if (UserAgentOverride.has_value())
 			{
-				Headers.push_back({"User-Agent", UserAgentOverride.value()});
+				Headers.emplace_back("User-Agent", UserAgentOverride.value());
 			}
 			else
 			{
-				Headers.push_back({"User-Agent", "Modio-SDKv2-" MODIO_COMMIT_HASH});
+				Headers.emplace_back("User-Agent", "Modio-SDKv2-" MODIO_COMMIT_HASH);
 			}
 
 			const Modio::Optional<std::string>& AuthToken = GetAuthToken();
 			if (AuthToken)
 			{
-				Headers.push_back({"Authorization", fmt::format("Bearer {}", *AuthToken)});
+				Headers.emplace_back("Authorization", fmt::format("Bearer {}", *AuthToken));
 			}
 
 			// Header Range
@@ -653,7 +656,7 @@ namespace Modio
 				std::string EndValue = EndOffset ? std::to_string(EndOffset.value()) : "";
 
 				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
-				Headers.push_back({"Range", fmt::format("bytes={}-{}", StartValue, EndValue)});
+				Headers.emplace_back("Range", fmt::format("bytes={}-{}", StartValue, EndValue));
 			}
 
 			// Header Content-Range needs all three values to
@@ -666,7 +669,7 @@ namespace Modio
 				std::tie(StartValue, EndValue, TotalValue) = ContentRangeOffsets.value();
 
 				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Range
-				Headers.push_back({"Content-Range", fmt::format("bytes {}-{}/{}", StartValue, EndValue, TotalValue)});
+				Headers.emplace_back("Content-Range", fmt::format("bytes {}-{}/{}", StartValue, EndValue, TotalValue));
 			}
 
 			// Add Local Language Header
@@ -725,7 +728,8 @@ namespace Modio
 
 			Modio::Detail::Buffer HeaderBuffer(HeaderString.length());
 			// Use HeaderBuffer size as param for copy to prevent ever having an overrun
-			std::copy(HeaderString.begin(), HeaderString.begin() + HeaderBuffer.GetSize(), HeaderBuffer.begin());
+			std::copy(HeaderString.begin(), HeaderString.begin() + std::ptrdiff_t(HeaderBuffer.GetSize()),
+					  reinterpret_cast<char*>(HeaderBuffer.begin()));
 			return HeaderBuffer;
 		}
 
@@ -809,7 +813,10 @@ namespace Modio
 			{
 				case PayloadType::Buffer:
 				{
-					RawBuffer = Other.RawBuffer.value().Clone();
+					if (Other.RawBuffer.has_value())
+					{
+						RawBuffer = Other.RawBuffer.value().Clone();
+					}
 					PathToFile = {};
 					break;
 				}

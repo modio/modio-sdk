@@ -26,22 +26,22 @@ public:
 	{}
 
 	template<typename CoroType>
-	void operator()(CoroType& Self, Modio::ErrorCode ec = {})
+	void operator()(CoroType& Self, Modio::ErrorCode MODIO_UNUSED_ARGUMENT(ec) = {})
 	{
 		reenter(CoroutineState)
 		{
-			HINTERNET CurrentSession = NULL;
+			HINTERNET CurrentSession = nullptr;
 
 			CurrentSession = WinHttpOpen(UserAgentString.c_str(), WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY,
 										 WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, WINHTTP_FLAG_ASYNC);
 
-			if (CurrentSession == NULL)
+			if (CurrentSession == nullptr)
 			{
 				CurrentSession = WinHttpOpen(UserAgentString.c_str(), WINHTTP_ACCESS_TYPE_NO_PROXY,
 											 WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, WINHTTP_FLAG_ASYNC);
 			}
 
-			if (CurrentSession == NULL)
+			if (CurrentSession == nullptr)
 			{
 				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
 											"Initialize http open received system error code {}", GetLastError());
@@ -52,7 +52,7 @@ public:
 			*SharedState = std::move(HttpSharedStateBase(CurrentSession));
 
 			SharedStateHolder::Get().SharedStatePtr = SharedState;
-			SharedStateHolder::Get().CurrentSessionId.store((uint64_t) CurrentSession);
+			SharedStateHolder::Get().CurrentSessionId.store(uint64_t(CurrentSession));
 
 			// Set Timeout to 15 seconds
 			unsigned long Timeout = 15000;

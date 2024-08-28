@@ -61,11 +61,11 @@ namespace Modio
 					Modio::Detail::File(RootDirectoryToExtractTo / EntryToExtract.FilePath,
 										Modio::Detail::FileMode::ReadWrite, true),
 					ProgressInfo});
-			};
+			}
 
 			ExtractEntryStoreOp(ExtractEntryStoreOp&& Other)
 				: Impl(std::move(Other.Impl)),
-				  CoroutineState(std::move(Other.CoroutineState)) {};
+				  CoroutineState(std::move(Other.CoroutineState)) {}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})

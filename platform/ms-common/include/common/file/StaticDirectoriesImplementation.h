@@ -21,8 +21,8 @@ namespace Modio
 	{
 		static bool GetDefaultCommonDataPath(Modio::filesystem::path& CommonDataPath)
 		{
-			PWSTR PublicPath = NULL;
-			HRESULT hr = SHGetKnownFolderPath(FOLDERID_Public, 0, NULL, &PublicPath);
+			PWSTR PublicPath = nullptr;
+			HRESULT hr = SHGetKnownFolderPath(FOLDERID_Public, 0, nullptr, &PublicPath);
 			if (SUCCEEDED(hr))
 			{
 				CommonDataPath = Modio::filesystem::path(std::wstring(PublicPath));

@@ -24,7 +24,7 @@ namespace Modio
 		{
 		public:
 			UninstallModOp(Modio::ModID ModId, bool bForce, bool bIsTempMod)
-				: ModId(ModId), bForce(bForce), bIsTempMod(bIsTempMod) {};
+				: ModId(ModId), bForce(bForce), bIsTempMod(bIsTempMod) {}
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{

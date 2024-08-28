@@ -17,7 +17,7 @@ namespace Modio
 		class IHttpServiceImplementation
 		{
 		public:
-			virtual ~IHttpServiceImplementation() {};
+			virtual ~IHttpServiceImplementation() {}
 			virtual void Shutdown() = 0;
 
 			// The implementation of HTTP request on a new platform requires

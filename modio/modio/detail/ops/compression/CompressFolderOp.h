@@ -53,7 +53,7 @@ namespace Modio
 
 				// A variable that stores a file hash and is accesible by callers of this operation
 				RollingFileHash = FileHash;
-			};
+			}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})

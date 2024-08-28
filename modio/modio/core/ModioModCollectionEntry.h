@@ -240,6 +240,8 @@ namespace Modio
 		{
 			switch (State)
 			{
+				case EModProgressState::Initializing:
+					return Modio::FileSize(0);
 				case EModProgressState::Downloading:
 					return DownloadCurrent;
 				case EModProgressState::Extracting:
@@ -261,6 +263,8 @@ namespace Modio
 		{
 			switch (State)
 			{
+				case EModProgressState::Initializing:
+					return Modio::FileSize(0);
 				case EModProgressState::Downloading:
 					return DownloadTotal;
 				case EModProgressState::Extracting:
@@ -287,7 +291,7 @@ namespace Modio
 			  ExtractTotal(0),
 			  UploadCurrent(0),
 			  UploadTotal(0),
-			  CurrentState(EModProgressState::Initializing) {};
+			  CurrentState(EModProgressState::Initializing) {}
 
 	private:
 		/// @docnone
@@ -487,10 +491,10 @@ namespace Modio
 
 		/// @docinternal
 		/// @brief Default constructor
-		MODIO_IMPL ModCollection() : ModEntries {} {};
+		MODIO_IMPL ModCollection() : ModEntries() {}
 		/// @docpublic
 		/// @brief Retrieve a ModCollection given a UserSubscriptionList
-		/// @param UserSubscriptionList patterns that would entitle a filter
+		/// @param UserSubscriptions patterns that would entitle a filter
 		/// @return ModCollection filled with patterns from UserSubscriptions or empty if nothing is found
 		MODIO_IMPL const ModCollection FilterByUserSubscriptions(const UserSubscriptionList& UserSubscriptions) const;
 

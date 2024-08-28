@@ -18,7 +18,7 @@
 namespace
 {
 	template<typename DeleteCallback>
-	auto RecursivelyDeleteFile(Modio::filesystem::path FilePath,
+	inline auto RecursivelyDeleteFile(Modio::filesystem::path FilePath,
 							   std::weak_ptr<Modio::Detail::FileSharedState> SharedState, DeleteCallback&& OnDeleteDone)
 	{
 		return asio::async_compose<DeleteCallback, void(Modio::ErrorCode)>(
@@ -37,7 +37,7 @@ class DeleteFolderOp
 public:
 	DeleteFolderOp(Modio::filesystem::path FolderPath, std::weak_ptr<Modio::Detail::FileSharedState> SharedState)
 		: FolderPath(FolderPath),
-		  SharedState(SharedState) {};
+		  SharedState(SharedState) {}
 	template<typename CoroType>
 	void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 	{

@@ -50,6 +50,31 @@ namespace Modio
 		/// @brief Updated wallet balance from syncing entitlements
 		Modio::Optional<Modio::EntitlementWalletBalance> WalletBalance;
 
+		/// @docpublic
+		/// @brief Filter elements that require a second request to confirm the entitlement
+		/// @return Optional list with the elements that need a retry, otherwise an empty object.
+		Modio::Optional<EntitlementConsumptionStatusList> EntitlementsThatRequireRetry() const
+		{
+			if (InternalList.empty())
+			{
+				return {};
+			}
+
+			EntitlementConsumptionStatusList RetryElements;
+			for (EntitlementConsumptionStatus Entitlement : InternalList)
+			{
+				if (Entitlement.EntitlementRequiresRetry() == true)
+				{
+					Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Http,
+												"Entitlement transaction needs retry with SKU: {} & TransactionID: {}",
+												Entitlement.SkuId, Entitlement.TransactionId);
+					RetryElements.Append(Entitlement);
+				}
+			}
+
+			return RetryElements;
+		}
+
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, EntitlementConsumptionStatusList& OutEntitlementConsumptionStatusList);
 

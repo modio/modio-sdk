@@ -209,7 +209,7 @@ int main()
 
 	// Always finalize the SDK.
 	std::promise<void> ShutdownComplete;
-	Modio::ShutdownAsync([&](Modio::ErrorCode ec) { ShutdownComplete.set_value(); });
+	Modio::ShutdownAsync([&](Modio::ErrorCode) { ShutdownComplete.set_value(); });
 	ShutdownComplete.get_future().wait();
 
 	// Halt execution of Modio::RunPendingHandlers(), and wait for the background thread to finish

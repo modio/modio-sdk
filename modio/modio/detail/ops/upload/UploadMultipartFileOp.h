@@ -87,7 +87,7 @@ namespace Modio
 						.SetModID(CurrentModID);
 				CloseSessionRequest = std::make_shared<Modio::Detail::HttpRequest>(ParamsRequest);
 				SessionParts = std::make_shared<Modio::Detail::UploadSessionPartList>();
-			};
+			}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
@@ -203,9 +203,8 @@ namespace Modio
 					{
 						std::uint64_t FileSize =
 							Modio::Detail::File(ArchivePath, Modio::Detail::FileMode::ReadOnly, false).GetFileSize();
-						// Make sure that NumParts nears to the next integer, for that a + 0.5 happens
-						NumParts = static_cast<int>(
-							std::ceil(FileSize / Constants::Configuration::MultipartMaxFilePartSize + 0.5f));
+						// Make sure that NumParts nears to the next integer
+						NumParts = 1 + static_cast<int>(FileSize / Constants::Configuration::MultipartMaxFilePartSize);
                         
                         // Report to the ProgressInfo that the TotalDownloadSize would be the FileSize
                         std::shared_ptr<Modio::ModProgressInfo> Progress = ProgressInfo.lock();

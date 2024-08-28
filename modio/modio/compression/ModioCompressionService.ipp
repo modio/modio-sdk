@@ -24,7 +24,7 @@ void Modio::Detail::CompressionService::move_construct(implementation_type& Impl
 }
 
 void Modio::Detail::CompressionService::move_assign(implementation_type& Implementation,
-													Modio::Detail::CompressionService& OtherService,
+													Modio::Detail::CompressionService& MODIO_UNUSED_ARGUMENT(OtherService),
 													implementation_type& Other)
 {
 	// No difference between this and move_construct for us because our application will only have a single

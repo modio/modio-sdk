@@ -37,7 +37,7 @@ public:
 	{}
 
 	template<typename CoroType>
-	void operator()(CoroType& Self, Modio::ErrorCode ec = {})
+	void operator()(CoroType& Self, Modio::ErrorCode MODIO_UNUSED_ARGUMENT(ec) = {})
 	{
 		MODIO_PROFILE_SCOPE(SendHttpRequest);
 
@@ -66,7 +66,8 @@ public:
 				{
 					std::string FormattedHeader = fmt::format("{}: {}\r\n", CurrentHeader.first, CurrentHeader.second);
 					if (!WinHttpAddRequestHeaders(Request->RequestHandle,
-												  (LPCWSTR) UTF8ToWideChar(FormattedHeader).c_str(), (DWORD) -1L,
+												  LPCWSTR(UTF8ToWideChar(FormattedHeader).c_str()),
+												  std::numeric_limits<DWORD>::max(),
 												  WINHTTP_ADDREQ_FLAG_ADD))
 					{
 						auto err = GetLastError();
@@ -84,8 +85,8 @@ public:
 				MODIO_PROFILE_SCOPE(WinHttpSendRequest);
 				Payload = std::make_unique<std::string>(Request->Parameters.GetUrlEncodedPayload().value());
 				if (!WinHttpSendRequest(Request->RequestHandle, WINHTTP_NO_ADDITIONAL_HEADERS, 0,
-										(void*) Payload->c_str(), (DWORD) Payload->length(), (DWORD) Payload->length(),
-										(DWORD_PTR) ContextPtr))
+										LPVOID(Payload->c_str()), DWORD(Payload->length()), DWORD(Payload->length()),
+										DWORD_PTR(ContextPtr)))
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
 												"sending request received system error code {}", GetLastError());
@@ -99,7 +100,7 @@ public:
 				MODIO_PROFILE_SCOPE(WinHttpSendRequest);
 				if (!WinHttpSendRequest(Request->RequestHandle, WINHTTP_NO_ADDITIONAL_HEADERS, 0,
 										WINHTTP_NO_REQUEST_DATA, 0, Request->Parameters.GetPayloadSize(),
-										(DWORD_PTR) ContextPtr))
+										DWORD_PTR(ContextPtr)))
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
 												"sending request received system error code {}", GetLastError());

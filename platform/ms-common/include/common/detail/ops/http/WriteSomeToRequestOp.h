@@ -30,10 +30,10 @@ namespace Modio
 								 std::weak_ptr<HttpSharedStateBase> SharedState)
 				: Request(Request),
 				  DataToWrite(std::move(DataToWrite)),
-				  SharedState(SharedState) {};
+				  SharedState(SharedState) {}
 
 			template<typename CoroType>
-			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
+			void operator()(CoroType& Self, Modio::ErrorCode MODIO_UNUSED_ARGUMENT(ec) = {})
 			{
 				std::shared_ptr<HttpSharedStateBase> PinnedState = SharedState.lock();
 				if (PinnedState == nullptr || PinnedState->IsClosing())
@@ -46,8 +46,8 @@ namespace Modio
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
 												"writing {} bytes to request", DataToWrite.GetSize());
-					if (!WinHttpWriteData(Request->RequestHandle, DataToWrite.Data(), (DWORD) DataToWrite.GetSize(),
-										  NULL))
+					if (!WinHttpWriteData(Request->RequestHandle, DataToWrite.Data(), DWORD(DataToWrite.GetSize()),
+										  nullptr))
 					{
 						DWORD LastError = GetLastError();
 						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,

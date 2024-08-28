@@ -15,7 +15,7 @@
 #include <utility>
 
 /// This example demonstrates usage of the mod.io wallet management features, including 
-/// getting the user's wallet balance and refreshing any platform entitlements.
+/// getting the user's wallet balance.
 /// Once these queries have been performed, the sample initiates an async shutdown of the SDK if necessary and then
 /// terminates.
 
@@ -140,6 +140,29 @@ struct ModioExample
 		{
 			UserWalletBalance = WalletBalance.value();
 			std::cout << "Users wallet balance is: " << std::to_string(UserWalletBalance) << std::endl;
+			NotifyApplicationSuccess();
+		}
+	}
+
+	static void OnRefreshUserEntitlementsCompleted(Modio::ErrorCode ec, Modio::Optional<Modio::EntitlementConsumptionStatusList> EntitlementConsumptionStatus)
+	{
+		if (ec)
+		{
+			NotifyApplicationFailure(ec);
+		}
+		else
+		{
+			// Update the users wallet balance from the refresh call if any adjustments have been made.
+			// Note that if nothing is consumed, then WalletBalance may not exist or be 0.
+			if (EntitlementConsumptionStatus->WalletBalance.has_value())
+			{
+				UserWalletBalance = EntitlementConsumptionStatus.value().WalletBalance.value().Balance;	
+			}
+
+			std::cout << "Updated wallet balance is: " << std::to_string(UserWalletBalance) << std::endl;
+
+			// 
+
 			NotifyApplicationSuccess();
 		}
 	}

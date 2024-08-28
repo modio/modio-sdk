@@ -28,7 +28,7 @@ namespace Modio
 			GetModDependenciesOp(Modio::ModID ModID, Modio::GameID GameID, bool Recursive)
 				: ModID(ModID),
 				  GameID(GameID),
-				  Recursive(Recursive) {};
+				  Recursive(Recursive) {}
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{

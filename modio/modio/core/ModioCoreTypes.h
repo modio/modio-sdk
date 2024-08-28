@@ -178,7 +178,7 @@ namespace Modio
 		/// @docpublic
 		/// @brief explicit constructor from a value of the underlying integer type
 		/// @param Value initial value
-		constexpr explicit StrongInteger(UnderlyingIntegerType Value) : Value(Value) {};
+		constexpr explicit StrongInteger(UnderlyingIntegerType Value) : Value(Value) {}
 
 		/// @docnone
 		constexpr explicit StrongInteger() = default;
@@ -314,7 +314,7 @@ namespace Modio
 
 		/// @docpublic
 		/// @brief Explicit constructor
-		/// @param Code The code sent to the user's email
+		/// @param InApiKey The code sent to the user's email
 		explicit ApiKey(const std::string& InApiKey) : InternalApiKey(InApiKey) {}
 
 		/// @docinternal
@@ -352,7 +352,7 @@ namespace Modio
 		using StrongInteger::StrongInteger;
 		/// @docinternal
 		/// @brief Default constructor
-		UserID() : StrongInteger(-1) {};
+		UserID() : StrongInteger(-1) {}
 
 		/// @docinternal
 		/// @brief Compare the UserID to an invalid instance
@@ -378,7 +378,7 @@ namespace Modio
 		using StrongInteger::StrongInteger;
 		/// @docinternal
 		/// @brief Default constructor
-		ModID() : StrongInteger(-1) {};
+		ModID() : StrongInteger(-1) {}
 
 		/// @docinternal
 		/// @brief Compare the ModID to an invalid instance
@@ -439,7 +439,7 @@ namespace Modio
 		using StrongInteger::StrongInteger;
 		/// @docinternal
 		/// @brief Default constructor
-		GameID() : StrongInteger(-1) {};
+		GameID() : StrongInteger(-1) {}
 
 		/// @docinternal
 		/// @brief Compare the GameID to an invalid instance
@@ -504,7 +504,10 @@ namespace Modio
 		Spanish,
 		Thai,
 		ChineseSimplified,
-		ChineseTraditional
+		ChineseTraditional,
+		Turkish,
+		Ukrainian,
+		Arabic
 	};
 
 	/// @docpublic
@@ -664,6 +667,12 @@ namespace Modio
 					return "zh-CN";
 				case Language::ChineseTraditional:
 					return "zh-TW";
+				case Language::Turkish:
+					return "tr";
+				case Language::Ukrainian:
+					return "uk";
+				case Language::Arabic:
+					return "ar";
 			}
 			assert(false && "Invalid value to ToString(Modio::Language)");
 			return "Unknown";

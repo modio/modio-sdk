@@ -36,7 +36,7 @@ public:
 		  FileImpl(IOObject),
 		  Length(MaxBytesToRead),
 		  ReadOpParams(std::make_shared<OVERLAPPED>()),
-		  NumberOfBytesRead(std::make_shared<DWORD>(0)),
+		  NumberOfBytesRead(std::make_shared<DWORD>(0U)),
 		  Destination(Destination)
 
 	{}

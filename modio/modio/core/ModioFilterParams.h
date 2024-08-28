@@ -70,9 +70,7 @@ namespace Modio
 		/// @docpublic
 		/// @brief Only include mods where the name contains at least one of the provided strings (string1 OR string2 OR
 		/// stringN...)
-		/// @tparam ...Args std::string
 		/// @param SearchString First search string
-		/// @param ...args Additional search strings
 		/// @return *this
 		MODIO_IMPL FilterParams& NameContains(const std::vector<std::string>& SearchString);
 

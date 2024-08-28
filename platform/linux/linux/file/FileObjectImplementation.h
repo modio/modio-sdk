@@ -48,7 +48,7 @@ namespace Modio
 				  CurrentSeekOffset(0)
 			{}
 
-			~FileObjectImplementation()
+			~FileObjectImplementation() override
 			{
 				Destroy();
 			}
@@ -75,12 +75,12 @@ namespace Modio
 				return CancelRequested;
 			}
 
-			Modio::filesystem::path GetPath()
+			Modio::filesystem::path GetPath() override
 			{
 				return FilePath;
 			}
 
-			virtual Modio::ErrorCode Rename(Modio::filesystem::path NewPath) override
+			Modio::ErrorCode Rename(Modio::filesystem::path NewPath) override
 			{
 				Modio::ErrorCode ec;
 				if (FileDescriptor != InvalidFileDescriptor)
@@ -98,20 +98,20 @@ namespace Modio
 				return ec;
 			}
 
-			virtual Modio::ErrorCode Truncate(Modio::FileOffset Offset) override
+			Modio::ErrorCode Truncate(Modio::FileOffset Offset) override
 			{
 				Modio::ErrorCode ec;
 				Modio::filesystem::resize_file(FilePath, Offset, ec);
 				return ec;
 			}
 
-			virtual std::uint64_t GetSize() override
+			std::uint64_t GetSize() override
 			{
 				Modio::ErrorCode ec;
 				return Modio::filesystem::file_size(FilePath, ec);
 			}
 
-			virtual void Seek(Modio::FileOffset Offset, Modio::Detail::SeekDirection Direction) override
+			void Seek(Modio::FileOffset Offset, Modio::Detail::SeekDirection Direction) override
 			{
 				switch (Direction)
 				{
@@ -138,17 +138,17 @@ namespace Modio
 				return CurrentSeekOffset;
 			}
 
-			void SetFileStrand(asio::strand<asio::io_context::executor_type>& FileStrand)
+			void SetFileStrand(asio::strand<asio::io_context::executor_type>& FileStrand) override
 			{
 				Strand = &FileStrand;
 			}
 
-			asio::strand<asio::io_context::executor_type>& GetFileStrand()
+			asio::strand<asio::io_context::executor_type>& GetFileStrand() override
 			{
 				return *Strand;
 			}
 
-			Modio::ErrorCode CreateFile(Modio::filesystem::path NewFilePath)
+			Modio::ErrorCode CreateFile(Modio::filesystem::path NewFilePath) override
 			{
 				return OpenFile(NewFilePath, Modio::Detail::FileMode::ReadWrite, true);
 			}
@@ -159,7 +159,7 @@ namespace Modio
 			}
 
 			Modio::ErrorCode OpenFile(Modio::filesystem::path OpenFilePath, Modio::Detail::FileMode Mode,
-									  bool bOverwrite = false)
+									  bool bOverwrite = false) override
 			{
 				Modio::ErrorCode ec;
 				filesystem::create_directories(OpenFilePath.parent_path(), ec);

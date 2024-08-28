@@ -37,9 +37,9 @@ namespace Modio
 			ClearCache();
 		}
 
-		void CacheService::construct(implementation_type& Implementation) {}
+		void CacheService::construct(implementation_type& MODIO_UNUSED_ARGUMENT(Implementation)) {}
 
-		void CacheService::destroy(implementation_type& Implementation) {}
+		void CacheService::destroy(implementation_type& MODIO_UNUSED_ARGUMENT(Implementation)) {}
 
 		void CacheService::SetCacheExpireTime(std::chrono::steady_clock::duration ExpireTime)
 		{
@@ -50,7 +50,7 @@ namespace Modio
 		{
 			MODIO_PROFILE_SCOPE(CacheAddURL);
 			auto Hasher = std::hash<std::string>();
-			std::uint32_t URLHash = (std::uint32_t) Hasher(ResourceURL);
+			std::uint32_t URLHash = std::uint32_t(Hasher(ResourceURL));
 
 			// Don't add the instance again as if the instance is already in there, then we will destroy the old timer
 			// and it will expire causing unnecessary removals
@@ -141,7 +141,7 @@ namespace Modio
 		{
 			MODIO_PROFILE_SCOPE(CacheFetchURL);
 			auto Hasher = std::hash<std::string>();
-			std::uint32_t URLHash = (std::uint32_t) Hasher(ResourceURL);
+			std::uint32_t URLHash = std::uint32_t(Hasher(ResourceURL));
 
 			auto CacheEntryIterator = CacheInstance->CacheEntries.find(URLHash);
 			if (CacheEntryIterator != CacheInstance->CacheEntries.end())

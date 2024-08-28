@@ -36,7 +36,7 @@ namespace Modio
 		  ModProfile(ProfileData),
 		  LocalUserSubscriptions(),
 		  PathOnDisk(CalculatedModPath),
-		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries) {};
+		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries) {}
 
 	ModCollectionEntry::ModCollectionEntry(const ModCollectionEntry& Other)
 		: ID(Other.ID),
@@ -47,7 +47,7 @@ namespace Modio
 		  PathOnDisk(Other.PathOnDisk),
 		  SizeOnDisk(Other.SizeOnDisk),
 		  LastErrorCode(Other.LastErrorCode),
-		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries) {};
+		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries) {}
 
 	uint8_t ModCollectionEntry::GetRetriesRemaining()
 	{
@@ -80,7 +80,7 @@ namespace Modio
 
 			LocalUserSubscriptions.insert(User->UserId);
 		}
-		return (std::uint8_t) LocalUserSubscriptions.size();
+		return std::uint8_t(LocalUserSubscriptions.size());
 	}
 
 	uint8_t ModCollectionEntry::RemoveLocalUserSubscription(Modio::Optional<Modio::User> User)
@@ -95,7 +95,7 @@ namespace Modio
 											"Reference count for mod {} now 0, marking for uninstallation", ID);
 			}
 		}
-		return (std::uint8_t) LocalUserSubscriptions.size();
+		return std::uint8_t(LocalUserSubscriptions.size());
 	}
 
 	void ModCollectionEntry::SetModState(Modio::ModState NewState)
@@ -261,7 +261,7 @@ namespace Modio
 		RetriesRemainingThisSession = Other.RetriesRemainingThisSession;
 		LastErrorCode = Other.LastErrorCode;
 		return *this;
-	};
+	}
 
 	void SetState(Modio::ModProgressInfo& Info, Modio::ModProgressInfo::EModProgressState State)
 	{
@@ -272,6 +272,8 @@ namespace Modio
 	{
 		switch (Info.CurrentState)
 		{
+			case ModProgressInfo::EModProgressState::Initializing:
+				return;
 			case ModProgressInfo::EModProgressState::Downloading:
 				Info.DownloadCurrent = NewValue;
 				return;
@@ -293,6 +295,8 @@ namespace Modio
 	{
 		switch (Info.CurrentState)
 		{
+			case ModProgressInfo::EModProgressState::Initializing:
+				return;
 			case ModProgressInfo::EModProgressState::Downloading:
 				Info.DownloadCurrent += NewValue;
 				return;
@@ -314,6 +318,8 @@ namespace Modio
 	{
 		switch (State)
 		{
+			case ModProgressInfo::EModProgressState::Initializing:
+				return;
 			case ModProgressInfo::EModProgressState::Downloading:
 				Info.DownloadCurrent = Info.DownloadTotal;
 				return;
@@ -336,6 +342,8 @@ namespace Modio
 	{
 		switch (State)
 		{
+			case ModProgressInfo::EModProgressState::Initializing:
+				return;
 			case ModProgressInfo::EModProgressState::Downloading:
 				Info.DownloadTotal = NewTotal;
 				return;

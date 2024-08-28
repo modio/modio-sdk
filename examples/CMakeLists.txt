@@ -33,4 +33,10 @@ if (MODIO_BUILD_EXAMPLES)
 	add_example(09_MonetizationWalletManagement)
 	add_example(10_MonetizationPurchase)
 	add_example(11_TempModSets)
+	add_example(12_RefreshEntitlements)
 endif()
+
+if (MODIO_BUILD_ADVANCED_EXAMPLES)
+    add_subdirectory(advanced)
+endif()
+

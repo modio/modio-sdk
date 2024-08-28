@@ -53,5 +53,5 @@
 #endif
 
 #ifndef MODIO_PRAGMA
-	#define MODIO_PRAGMA(Value) HEDLEY_PRAGMA(Value)
+	#define MODIO_PRAGMA(Value) _Pragma(#Value)
 #endif

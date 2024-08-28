@@ -27,7 +27,7 @@ class TimerSharedState : public std::enable_shared_from_this<TimerSharedState>
 public:
 	TimerMap PendingTimers;
 
-	Modio::ErrorCode InitializeTimer(std::shared_ptr<TimerImplementation> ImplementationToInitialize)
+	Modio::ErrorCode InitializeTimer(std::shared_ptr<TimerImplementation> MODIO_UNUSED_ARGUMENT(ImplementationToInitialize))
 	{
 		return {};
 	}
@@ -43,9 +43,9 @@ public:
 		snprintf(buf, 128, "Timer%Ii", TimerCount);
 		std::chrono::steady_clock::duration TimerDuration = TimerToStart->GetTimerDuration();
 		fu2::unique_function<void(Modio::ErrorCode)> WrappedCallback {
-			[Token = std::move(Token), buf](Modio::ErrorCode ec) mutable {
+			[Token = std::move(Token)](Modio::ErrorCode ec) mutable {
 				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
-						   [Token = std::move(Token), ec, buf]() mutable {
+						   [Token = std::move(Token), ec]() mutable {
 							   MODIO_PROFILE_SCOPE(endTimer);
 							   Token(ec);
 						   });

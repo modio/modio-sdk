@@ -17,8 +17,8 @@ namespace Modio
 		class IFileServiceImplementation
 		{
 		public:
-			virtual ~IFileServiceImplementation() {};
-			virtual const Modio::filesystem::path LocalMetadataFolder() const = 0;
+			virtual ~IFileServiceImplementation() {}
+			virtual Modio::filesystem::path LocalMetadataFolder() const = 0;
 			virtual Modio::filesystem::path GetModRootInstallationPath() const = 0;
 			virtual Modio::filesystem::path GetTempRootInstallationPath() const = 0;
 			virtual Modio::filesystem::path MakeModPath(Modio::ModID ID) const = 0;

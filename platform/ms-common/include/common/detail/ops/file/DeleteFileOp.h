@@ -19,9 +19,9 @@ class DeleteFileOp
 {
 public:
 	DeleteFileOp(Modio::filesystem::path FilePath, std::weak_ptr<Modio::Detail::FileSharedState> SharedState)
-		: FilePath(FilePath), SharedState(SharedState) {};
+		: FilePath(FilePath), SharedState(SharedState) {}
 	template<typename CoroType>
-	void operator()(CoroType& Self, Modio::ErrorCode ec = {})
+	void operator()(CoroType& Self, Modio::ErrorCode MODIO_UNUSED_ARGUMENT(ec) = {})
 	{
 		if (std::shared_ptr<Modio::Detail::FileSharedState> PinnedState = SharedState.lock())
 		{

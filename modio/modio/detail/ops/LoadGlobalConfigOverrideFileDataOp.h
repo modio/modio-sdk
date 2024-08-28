@@ -30,7 +30,7 @@ namespace Modio
 			LoadGlobalConfigOverrideFileDataOp(Modio::Detail::DynamicBuffer FileBuffer) : FileBuffer(FileBuffer)
 			{
 				ConfigJson = std::make_unique<nlohmann::json>();
-			};
+			}
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{

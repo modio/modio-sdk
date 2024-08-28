@@ -37,7 +37,7 @@ public:
 	{}
 
 	template<typename CoroType>
-	void operator()(CoroType& Self, Modio::ErrorCode ec = {})
+	void operator()(CoroType& Self, Modio::ErrorCode MODIO_UNUSED_ARGUMENT(ec) = {})
 	{
 		MODIO_PROFILE_SCOPE(ReadHttpResponseHeaders);
 
@@ -50,7 +50,7 @@ public:
 
 		reenter(CoroutineState)
 		{
-			if (!WinHttpReceiveResponse(Request->RequestHandle, 0))
+			if (!WinHttpReceiveResponse(Request->RequestHandle, nullptr))
 			{
 				Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
 											"ReceiveResponse returned system error code {}", GetLastError());
@@ -101,7 +101,7 @@ public:
 		DWORD DWSize = 0;
 		// For reference: https://learn.microsoft.com/en-us/windows/win32/api/winhttp/nf-winhttp-winhttpqueryheaders
 		bool Result = false;
-		WinHttpQueryHeaders(Request->RequestHandle, WINHTTP_QUERY_RAW_HEADERS_CRLF, WINHTTP_HEADER_NAME_BY_INDEX, NULL,
+		WinHttpQueryHeaders(Request->RequestHandle, WINHTTP_QUERY_RAW_HEADERS_CRLF, WINHTTP_HEADER_NAME_BY_INDEX, nullptr,
 							&DWSize, WINHTTP_NO_HEADER_INDEX);
 
 		// Allocate memory for the buffer.
@@ -111,7 +111,7 @@ public:
 
 			// Now, use WinHttpQueryHeaders to retrieve the header.
 			Result = WinHttpQueryHeaders(Request->RequestHandle, WINHTTP_QUERY_RAW_HEADERS_CRLF,
-										 WINHTTP_HEADER_NAME_BY_INDEX, (LPVOID)LPOutBuffer.begin(), &DWSize, WINHTTP_NO_HEADER_INDEX);
+										 WINHTTP_HEADER_NAME_BY_INDEX, LPOutBuffer.begin(), &DWSize, WINHTTP_NO_HEADER_INDEX);
 
 			if (Result == false) 
 			{
@@ -131,7 +131,7 @@ public:
 				{ 
 					continue;
 				}
-				ParseBuffer += (char) val;
+				ParseBuffer += char(val);
 			}
 				
 			Request->ResponseHeaders = Modio::Detail::String::ParseRawHeaders(ParseBuffer);

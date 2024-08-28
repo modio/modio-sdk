@@ -65,12 +65,16 @@ namespace Modio
 					ArchiveFileImpl, EntryToExtract, RootDirectoryToExtractTo, Modio::Detail::DynamicBuffer {}, 0u,
 					Modio::Detail::File(RootDirectoryToExtractTo / EntryToExtract.FilePath,
 										Modio::Detail::FileMode::ReadWrite, true),
-					ProgressInfo});
-			};
+					ProgressInfo,
+					{},
+					{},
+					{},
+					{}});
+			}
 
 			ExtractEntryDeflateOp(ExtractEntryDeflateOp&& Other)
 				: Impl(std::move(Other.Impl)),
-				  CoroutineState(std::move(Other.CoroutineState)) {};
+				  CoroutineState(std::move(Other.CoroutineState)) {}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})

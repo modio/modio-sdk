@@ -61,7 +61,7 @@ namespace Modio
 		ProfileMaturity()
 		{
 			Value = Convert(MaturityOption::None);
-		};
+		}
 		using Modio::FlagImpl<MaturityOption>::FlagImpl;
 
 		/// @docnone

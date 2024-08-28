@@ -41,7 +41,7 @@ public:
 		  Offset(Offset),
 		  Length(MaxBytesToRead),
 		  ReadOpParams(std::make_shared<OVERLAPPED>()),
-		  NumberOfBytesRead(std::make_shared<DWORD>(0)),
+		  NumberOfBytesRead(std::make_shared<DWORD>(0U)),
 		  Destination(Destination)
 
 	{}
@@ -68,7 +68,7 @@ public:
 	}
 
 	template<typename CoroType>
-	void operator()(CoroType& Self, std::error_code ec = {})
+	void operator()(CoroType& Self, std::error_code MODIO_UNUSED_ARGUMENT(ec) = {})
 	{
 		if (FileImpl->ShouldCancel())
 		{
@@ -89,7 +89,7 @@ public:
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
 										"Begin read of {} bytes from {}", Length, FileImpl->GetPath().string());
 
-			ReadOpParams->hEvent = CreateEvent(NULL, false, false, NULL);
+			ReadOpParams->hEvent = CreateEvent(nullptr, false, false, nullptr);
 
 			if (!ReadOpParams->hEvent)
 			{
@@ -100,9 +100,9 @@ public:
 			}
 
 			ReadOpParams->OffsetHigh = Offset >> 32;
-			ReadOpParams->Offset = (DWORD) Offset;
+			ReadOpParams->Offset = DWORD(Offset);
 
-			if (!ReadFile(FileImpl->GetFileHandle(), Buffer.Data(), Length, NULL, ReadOpParams.get()))
+			if (!ReadFile(FileImpl->GetFileHandle(), Buffer.Data(), Length, nullptr, ReadOpParams.get()))
 			{
 				DWORD Error = GetLastError();
 				if (Error != ERROR_IO_PENDING)

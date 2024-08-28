@@ -29,7 +29,7 @@ namespace Modio
 			{
 				LocalState = std::make_shared<Impl>();
 				LocalState->AuthenticationParams = AuthenticationParams;
-			};
+			}
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{

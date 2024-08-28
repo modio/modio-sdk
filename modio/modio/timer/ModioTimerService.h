@@ -32,7 +32,8 @@ namespace Modio
 				PlatformImplementation->MoveIOObjectImplementation(Implementation, Other);
 			}
 
-			void move_assign(implementation_type& Implementation, Modio::Detail::TimerService& OtherService,
+			void move_assign(implementation_type& Implementation,
+							 Modio::Detail::TimerService& MODIO_UNUSED_ARGUMENT(OtherService),
 							 implementation_type& Other)
 			{
 				PlatformImplementation->MoveIOObjectImplementation(Implementation, Other);
@@ -61,7 +62,7 @@ namespace Modio
 			MODIO_IMPL void Shutdown()
 			{
 				PlatformImplementation->Shutdown();
-			};
+			}
 
 			template<typename CompletionTokenType>
 			auto WaitAsync(implementation_type& PlatformIOObject, CompletionTokenType&& Token)

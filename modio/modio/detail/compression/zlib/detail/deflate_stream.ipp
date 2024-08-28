@@ -47,6 +47,15 @@
 #ifndef BOOST_BEAST_ZLIB_DETAIL_DEFLATE_STREAM_IPP
 #define BOOST_BEAST_ZLIB_DETAIL_DEFLATE_STREAM_IPP
 
+
+#include "modio/detail/ModioCompilerMacros.h"
+MODIO_DISABLE_WARNING_PUSH
+MODIO_DISABLE_WARNING_OLD_STYLE_CAST
+MODIO_DISABLE_WARNING_POSSIBLE_COMMA_MISUSE
+MODIO_DISABLE_WARNING_UNSAFE_BUFFER_USAGE
+MODIO_DISABLE_WARNING_SIGNED_UNSIGNED_INTEGER_CONVERSION
+MODIO_DISABLE_WARNING_SPECTRE_MITIGATION
+
 #ifdef MODIO_SEPARATE_COMPILATION
 #include "modio/detail/compression/zlib/deflate_stream.hpp"
 #endif
@@ -363,7 +372,7 @@ doWrite(z_params& zs, Modio::Optional<Flush> flush, Modio::ErrorCode& ec)
 {
     maybe_init();
 
-    if(zs.next_out == 0 || (zs.next_in == 0 && zs.avail_in != 0) ||
+    if(zs.next_out == nullptr || (zs.next_in == nullptr && zs.avail_in != 0) ||
         (status_ == FINISH_STATE && flush != Flush::finish))
     {
         ec = Modio::make_error_code(Modio::ZlibError::StreamError);
@@ -431,6 +440,9 @@ doWrite(z_params& zs, Modio::Optional<Flush> flush, Modio::ErrorCode& ec)
         case Strategy::rle:
             bstate = deflate_rle(zs, flush.value());
             break;
+        case Strategy::normal:
+        case Strategy::filtered:
+        case Strategy::fixed:
         default:
         {
             bstate = (this->*(get_config(level_).func))(zs, flush.value());
@@ -526,7 +538,7 @@ doDictionary(Byte const* dict, uInt dictLength, Modio::ErrorCode& ec)
     zs.avail_in = dictLength;
     zs.next_in = (const Byte *)dict;
     zs.avail_out = 0;
-    zs.next_out = 0;
+    zs.next_out = nullptr;
     fill_window(zs);
     while(lookahead_ >= minMatch)
     {
@@ -582,9 +594,9 @@ void
 deflate_stream::
 doPending(uint64_t* value, int* bits)
 {
-    if(value != 0)
+    if(value != nullptr)
         *value = pending_;
-    if(bits != 0)
+    if(bits != nullptr)
         *bits = bi_valid_;
 }
 
@@ -1468,7 +1480,7 @@ tr_flush_block(
 #ifdef FORCE_STORED
     if(buf != (char*)0) { /* force stored block */
 #else
-    if(stored_len+4 <= opt_lenb && buf != (char*)0) {
+    if(stored_len+4 <= opt_lenb && buf != nullptr) {
                        /* 4: two words for the lengths */
 #endif
         /* The test buf != NULL is only necessary if LIT_BUFSIZE > WSIZE.
@@ -1694,8 +1706,7 @@ flush_block(z_params& zs, bool last)
 {
     tr_flush_block(zs,
         (block_start_ >= 0L ?
-            (char *)&window_[(unsigned)block_start_] :
-            (char *)0),
+            (char *)&window_[(unsigned)block_start_] : nullptr),
         (std::uint32_t)((long)strstart_ - block_start_),
         last);
    block_start_ = strstart_;
@@ -2320,4 +2331,5 @@ f_huff(z_params& zs, Flush flush) ->
 } // beast
 } // boost
 
+MODIO_DISABLE_WARNING_POP
 #endif

@@ -25,13 +25,13 @@ namespace Modio
 		Modio::Optional<StorageType> Value;
 
 		/// @docnone
-		constexpr FlagImpl<T>() {};
+		constexpr FlagImpl<T>() {}
 
 		/// @docnone
 		constexpr FlagImpl<T>(EnumType InitialValue) : Value(Convert(InitialValue)) {}
 
 		/// @docnone
-		constexpr FlagImpl<T>(StorageType InitialValue) : Value(InitialValue) {};
+		constexpr FlagImpl<T>(StorageType InitialValue) : Value(InitialValue) {}
 
 		/// @docnone
 		constexpr static const FlagImpl<T> Empty()

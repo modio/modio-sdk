@@ -48,6 +48,7 @@ namespace Modio
 			{
 				constexpr const char* Recursive = "recursive";
 				constexpr const char* IncludeDependecies = "include_dependencies";
+				constexpr const char* ShowHiddenTags = "show_hidden_tags";
 			} // namespace QueryParamStrings
 			namespace JSONKeys
 			{

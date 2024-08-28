@@ -37,7 +37,7 @@ namespace Modio
 			ParseArchiveContentsOp(ParseArchiveContentsOp&& Other) = default;
 			ParseArchiveContentsOp(const ParseArchiveContentsOp& Other) = default;
 			ParseArchiveContentsOp(std::shared_ptr<ArchiveFileImplementation> ArchiveState)
-				: ArchiveState(ArchiveState) {};
+				: ArchiveState(ArchiveState) {}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {},

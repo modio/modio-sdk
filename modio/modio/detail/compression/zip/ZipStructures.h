@@ -185,7 +185,7 @@ namespace Modio
 				std::uint64_t LocalHeaderOffset =
 					Modio::Detail::TypedBufferRead<std::uint32_t>(FileChunk, CurrentRecordOffset + 42);
 				std::string EntryFileName =
-					std::string((const char*) FileChunk.Data() + CurrentRecordOffset + 46, FileNameLength);
+					std::string(reinterpret_cast<const char*>(FileChunk.Data()) + CurrentRecordOffset + 46, FileNameLength);
 				// Zip64 files will use 0xffffffff in the (un)compressed part to direct the parser
 				// to the "extra field" section.
 				if (CompressedSize == Constants::ZipTag::MAX32 || UncompressedSize == Constants::ZipTag::MAX32 ||
@@ -212,7 +212,7 @@ namespace Modio
 							// size can be read from this entry.
 							return std::tuple<ArchiveFileImplementation::ArchiveEntry, std::uint64_t,
 											  Modio::ErrorCode> {
-								ArchiveFileImplementation::ArchiveEntry(), 0,
+								ArchiveFileImplementation::ArchiveEntry(), 0ULL,
 								Modio::make_error_code(Modio::ArchiveError::InvalidHeader)};
 						}
 

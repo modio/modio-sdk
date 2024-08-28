@@ -17,10 +17,10 @@ class InitializeTimerServiceOp
 	std::weak_ptr<TimerSharedState> SharedState;
 
 	public:
-	InitializeTimerServiceOp(std::weak_ptr<TimerSharedState> SharedState) : SharedState(SharedState) {};
+	InitializeTimerServiceOp(std::weak_ptr<TimerSharedState> SharedState) : SharedState(SharedState) {}
 
 	template<typename CoroType>
-	void operator()(CoroType& Self, Modio::ErrorCode ec = {})
+	void operator()(CoroType& Self, Modio::ErrorCode MODIO_UNUSED_ARGUMENT(ec) = {})
 	{
 		reenter(CoroState) {
 			BeginTimerLoopAsync(SharedState, [](Modio::ErrorCode) {});

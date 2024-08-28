@@ -39,7 +39,7 @@ public:
 		  Offset(Offset),
 		  Length(Length),
 		  ReadOpParams(std::make_shared<OVERLAPPED>()),
-		  NumberOfBytesRead(std::make_shared<DWORD>(0))
+		  NumberOfBytesRead(std::make_shared<DWORD>(0U))
 
 	{}
 
@@ -64,7 +64,7 @@ public:
 	}
 
 	template<typename CoroType>
-	void operator()(CoroType& Self, std::error_code ec = {})
+	void operator()(CoroType& Self, std::error_code MODIO_UNUSED_ARGUMENT(ec) = {})
 	{
 		if (FileImpl->ShouldCancel())
 		{
@@ -87,7 +87,7 @@ public:
 										"Begin read of {} bytes from {} at {}", Length, FileImpl->GetPath().string(),
 										Offset);
 
-			ReadOpParams->hEvent = CreateEvent(NULL, false, false, NULL);
+			ReadOpParams->hEvent = CreateEvent(nullptr, false, false, nullptr);
 
 			if (!ReadOpParams->hEvent)
 			{
@@ -97,7 +97,7 @@ public:
 			}
 
 			ReadOpParams->OffsetHigh = Offset >> 32;
-			ReadOpParams->Offset = (DWORD) Offset;
+			ReadOpParams->Offset = DWORD(Offset);
 
 			if (!ReadFile(FileImpl->GetFileHandle(), Buffer.Data(), Length, NumberOfBytesRead.get(),
 						  ReadOpParams.get()))

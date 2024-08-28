@@ -57,7 +57,7 @@ namespace Modio
 				{
 					auto Now = std::chrono::system_clock::now();
 					std::size_t CurrentUTCTime =
-						std::chrono::duration_cast<std::chrono::seconds>(Now.time_since_epoch()).count();
+						std::size_t(std::chrono::duration_cast<std::chrono::seconds>(Now.time_since_epoch()).count());
 
 					return CurrentUTCTime <= ExpireDate ? OAuthTokenState::Valid : OAuthTokenState::Invalid;
 				}

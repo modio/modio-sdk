@@ -23,7 +23,7 @@ namespace Modio
 			bool bMovedFrom = false;
 
 		public:
-			Transaction() : bCommitted(false), TargetObject() {};
+			Transaction() : bCommitted(false), TargetObject() {}
 			Transaction(std::weak_ptr<TargetType> TargetObject) : TargetObject(TargetObject)
 			{
 				if (std::shared_ptr<TargetType> ResolvedTarget = TargetObject.lock())
@@ -31,7 +31,7 @@ namespace Modio
 					// Unqualified function name forces ADL to find the hidden friend declared in TargetType
 					BeginTransactionImpl(*ResolvedTarget);
 				}
-			};
+			}
 			Transaction(Transaction&& Other)
 			{
 				bCommitted = std::move(Other.bCommitted);

@@ -76,13 +76,13 @@ namespace Modio
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
 												"Error code {} while trying to open {}: {}", ec.value(), FilePath.string(), ec.message());
 				}
-			};
+			}
 
 			File(Modio::Detail::File&& Other)
 				: asio::basic_io_object<Modio::Detail::FileService>(std::move(Other)),
 				  FilePath(std::move(Other.FilePath)),
 				  FileStrand(std::move(Other.FileStrand)),
-				  Mode(std::move(Other.Mode)) {};
+				  Mode(std::move(Other.Mode)) {}
 
 			std::uint64_t GetFileSize()
 			{

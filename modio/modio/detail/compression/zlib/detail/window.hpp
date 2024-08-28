@@ -143,7 +143,7 @@ public:
             return;
         }
         auto m = capacity_ - i_;
-        std::memcpy(&p_[i_], in, m);
+        std::memcpy(&p_[i_], in, std::size_t(m));
         in += m;
         i_ = static_cast<std::uint16_t>(n - m);
         std::memcpy(&p_[0], in, i_);

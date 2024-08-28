@@ -14,7 +14,8 @@
     "MODIO_TARGET_PLATFORM_ID=\"ANDROID\"",
     "MODIO_UNREAL_PLATFORM_PREAMBLE=\"android/detail/ModioUEPlatformPreamble.h\"",
     "MODIO_UNREAL_PLATFORM_EPILOGUE=\"android/detail/ModioUEPlatformEpilogue.h\"",
-    "MODIO_TARGET_PLATFORM_HEADER=\"Android\""
+    "MODIO_TARGET_PLATFORM_HEADER=\"Android\"",
+    "_LIBCPP_DISABLE_DEPRECATION_WARNINGS"
   ],
   "ModuleDependencies": [
     "mbedtls"

@@ -53,7 +53,7 @@ namespace Modio
 				{
 					Modio::Detail::SDKSessionData::SetPlatformOverride(*PlatformOverride);
 				}
-			};
+			}
 
 			/// @brief Invoked after UserDataService initialization
 			/// @param InitParams Mutable set of initialization options to process
@@ -63,7 +63,7 @@ namespace Modio
 					GetExtendedParameterValue(InitParams, Modio::Detail::InternalConstants::OAuthToken);
 				if (OAuthTokenOverride.has_value())
 				{
-					Modio::Detail::SDKSessionData::InitializeForUser(Modio::User{}, Modio::Detail::OAuthToken(*OAuthTokenOverride, (std::chrono::system_clock::now().time_since_epoch() + std::chrono::hours(8760)).count()));
+					Modio::Detail::SDKSessionData::InitializeForUser(Modio::User{}, Modio::Detail::OAuthToken(*OAuthTokenOverride, Modio::Timestamp((std::chrono::system_clock::now().time_since_epoch() + std::chrono::hours(8760)).count())));
 				}
 			}
 		};

@@ -29,10 +29,6 @@ class StreamWriteOp : public Modio::Detail::BaseOperation<StreamWriteOp>
 	/// </summary>
 	std::shared_ptr<Modio::Detail::FileObjectImplementation> FileImpl;
 	/// <summary>
-	/// Offset within the file to write the data
-	/// </summary>
-	std::uintmax_t FileOffset = 0;
-	/// <summary>
 	/// Win32 control structure for an async file IO operation
 	/// </summary>
 	Modio::StableStorage<OVERLAPPED> WriteOpParams;
@@ -67,7 +63,7 @@ public:
 		  SharedState(std::move(Other.SharedState))
 	{
 		Other.bMovedFrom = true;
-	};
+	}
 
 	~StreamWriteOp()
 	{
@@ -82,7 +78,7 @@ public:
 	}
 
 	template<typename CoroType>
-	void operator()(CoroType& Self, std::error_code ec = {})
+	void operator()(CoroType& Self, std::error_code MODIO_UNUSED_ARGUMENT(ec) = {})
 	{
 		if (FileImpl->ShouldCancel())
 		{
@@ -109,7 +105,7 @@ public:
 										"Begin write of {} bytes to {}", Buffer.GetSize(),
 										FileImpl->GetPath().string());
 			WriteOpParams = std::make_shared<OVERLAPPED>();
-			WriteOpParams->hEvent = CreateEvent(NULL, false, false, NULL);
+			WriteOpParams->hEvent = CreateEvent(nullptr, false, false, nullptr);
 			if (!WriteOpParams->hEvent)
 			{
 				WriteOpParams->hEvent = INVALID_HANDLE_VALUE;
@@ -123,10 +119,10 @@ public:
 			{
 				Modio::FileOffset FilePosition = FileImpl->Tell();
 				WriteOpParams->OffsetHigh = FilePosition >> 32;
-				WriteOpParams->Offset = (DWORD) FilePosition;
+				WriteOpParams->Offset = DWORD(FilePosition);
 			}
 
-			if (!WriteFile(FileImpl->GetFileHandle(), Buffer.Data(), (DWORD) Buffer.GetSize(), nullptr,
+			if (!WriteFile(FileImpl->GetFileHandle(), Buffer.Data(), DWORD(Buffer.GetSize()), nullptr,
 						   WriteOpParams.get()))
 			{
 				DWORD Error = GetLastError();

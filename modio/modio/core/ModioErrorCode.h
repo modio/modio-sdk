@@ -1234,7 +1234,7 @@ namespace Modio
 		}
 		/// @docinternal
 		/// @brief Helper method to serialize a modio error category to a numerical ID
-		inline const std::uint64_t ModioErrorCategoryID(const std::error_category& Category)
+		inline std::uint64_t ModioErrorCategoryID(const std::error_category& Category)
 		{
 			if (Category ==  HttpErrorCategory())
 			{
@@ -1369,8 +1369,8 @@ namespace Modio
 	/// @docnone
 	struct ErrorConditionCategoryImpl : std::error_category
 	{
-		inline const char* name() const noexcept override { return "Modio::ErrorConditionCategory"; }
-		inline std::string message(int ErrorValue) const override
+		const char* name() const noexcept override { return "Modio::ErrorConditionCategory"; }
+		std::string message(int ErrorValue) const override
 		{
 			switch (static_cast<Modio::ErrorConditionTypes>(ErrorValue))
 			{
@@ -1483,8 +1483,13 @@ namespace Modio
 					return "Unknown error condition";
 			}
 		}
+		
+		bool equivalent(int ec, const std::error_condition& cond) const noexcept override 
+		{
+			return std::error_category::equivalent(ec, cond);
+		}
 
-		inline bool equivalent(const std::error_code& ec, int cond) const noexcept override 
+		bool equivalent(const std::error_code& ec, int cond) const noexcept override 
 		{
 			switch (static_cast<Modio::ErrorConditionTypes>(cond))
 			{

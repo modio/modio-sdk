@@ -60,7 +60,7 @@ namespace Modio
 				this->AllowCachedResponse = Request->Parameters().GetTypedVerb() == Modio::Detail::Verb::GET
 												? AllowCachedResponse
 												: Modio::Detail::CachedResponse::Disallow;
-			};
+			}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
@@ -234,7 +234,7 @@ namespace Modio
 
 					if (Modio::Optional<std::uint32_t> RetryAfter = Request->GetRetryAfter())
 					{
-						Modio::Detail::SDKSessionData::MarkAsRateLimited(RetryAfter.value());
+						Modio::Detail::SDKSessionData::MarkAsRateLimited(std::uint32_t(RetryAfter.value()));
 					}
 
 					while (!ec)

@@ -32,7 +32,7 @@ namespace Modio
 
 		public:
 			PerformRequestImpl(Modio::Detail::OperationQueue::Ticket RequestTicket)
-				: RequestTicket(std::move(RequestTicket)) {};
+				: RequestTicket(std::move(RequestTicket)) {}
 			PerformRequestImpl(const PerformRequestImpl& Other) = delete;
 		};
 	} // namespace Detail

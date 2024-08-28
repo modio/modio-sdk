@@ -91,9 +91,9 @@ namespace Modio
 		/// @brief Safe index-based lookup, range-checks provided index
 		/// @param Index The index of the element to retrieve
 		/// @return Pointer to the element if index was valid, or nullptr if not
-		const ValueType* At(int Index) const
+		const ValueType* At(std::size_t Index) const
 		{
-			if (Index >= 0 && Index < InternalList.size())
+			if (Index < InternalList.size())
 			{
 				return &InternalList[Index];
 			}
@@ -104,9 +104,9 @@ namespace Modio
 		/// @brief Safe index-based lookup, range-checks provided index
 		/// @param Index The index of the element to retrieve
 		/// @return Pointer to the element if index was valid, or nullptr if not
-		ValueType* At(int Index)
+		ValueType* At(std::size_t Index)
 		{
-			if (Index >= 0 && Index < InternalList.size())
+			if (Index < InternalList.size())
 			{
 				return &InternalList[Index];
 			}

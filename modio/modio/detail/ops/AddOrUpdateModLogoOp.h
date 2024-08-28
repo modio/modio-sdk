@@ -72,7 +72,7 @@ namespace Modio
 				}
 			}
 
-			void RemoveFileIfExists(Modio::LogoSize Logo)
+			void RemoveFileIfExists(Modio::LogoSize MODIO_UNUSED_ARGUMENT(Logo))
 			{
 				Modio::Detail::FileService& FileService =
 					Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>();

@@ -34,7 +34,7 @@ namespace Modio
 		GameMaturityOptionsFlags ()
 		{
 			Value = Convert(GameMaturityOptions::None);
-		};
+		}
 		using Modio::FlagImpl<GameMaturityOptions>::FlagImpl;
 
 			/// @docnone

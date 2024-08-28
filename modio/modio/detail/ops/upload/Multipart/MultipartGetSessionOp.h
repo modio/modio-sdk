@@ -37,7 +37,7 @@ namespace Modio
 				GetSessionsRequest = Modio::Detail::GetMultipartUploadSessionsRequest
 										 .SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
 										 .SetModID(CurrentModID);
-			};
+			}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
