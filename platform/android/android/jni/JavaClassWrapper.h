@@ -22,8 +22,8 @@ namespace Modio
 			MODIO_IMPL void CallVoidMethod(jmethodID Method, ...);
 
 		protected:
-			jobject Object;
-			jclass Class;
+			jobject Object = NULL;
+			jclass Class = NULL;
 		};
 	}; // namespace Detail
 

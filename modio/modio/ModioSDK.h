@@ -24,6 +24,7 @@
 #include "modio/core/ModioModDependency.h"
 #include "modio/core/ModioReportParams.h"
 #include "modio/core/ModioStdTypes.h"
+#include "modio/core/entities/ModioEntitlementConsumptionStatusList.h"
 #include "modio/core/entities/ModioGameInfo.h"
 #include "modio/core/entities/ModioGameInfoList.h"
 #include "modio/core/entities/ModioModDetails.h"
@@ -34,7 +35,6 @@
 #include "modio/core/entities/ModioUser.h"
 #include "modio/core/entities/ModioUserList.h"
 #include "modio/detail/ModioLibraryConfigurationHelpers.h"
-#include "modio/core/entities/ModioEntitlementConsumptionStatusList.h"
 
 namespace Modio
 {
@@ -207,7 +207,6 @@ namespace Modio
 	/// @return std::map using Mod IDs as keys and ModCollectionEntry objects providing information about the subscribed
 	/// mods
 	MODIOSDK_API std::map<Modio::ModID, Modio::ModCollectionEntry> QueryUserSubscriptions();
-
 
 	/// @docpublic
 	/// @brief Fetches the subset of the user's subscribed mods that are installed and therefore ready for loading
@@ -481,7 +480,8 @@ namespace Modio
 	/// @docpublic
 	/// @brief For a given Mod ID, fetches a list of any mods that the creator has marked as dependencies
 	/// @param ModID The mod to retrieve dependencies for
-	/// @param Recursive Include child dependencies in a recursive manner. \r\n NOTE: Recursion supports a maximum depth of 5.
+	/// @param Recursive Include child dependencies in a recursive manner. \r\n NOTE: Recursion supports a maximum depth
+	/// of 5.
 	/// @param Callback Callback providing a status code and an optional xref:ModDependencyList[ModDependencyList]
 	/// @requires initialized-sdk
 	/// @requires no-rate-limiting
@@ -490,8 +490,7 @@ namespace Modio
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void GetModDependenciesAsync(
-		Modio::ModID ModID,
-		bool Recursive,
+		Modio::ModID ModID, bool Recursive,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback);
 
 	/// @docpublic
@@ -529,7 +528,7 @@ namespace Modio
 	/// @docpublic
 	/// @brief De-authenticates the current mod.io user for the current session, and clears all user-specific data
 	/// stored on the current device. Any subscribed mods that are installed but do not have other local users
-	/// subscribed will be marked for uninstallation
+	/// subscribed will be marked for uninstallation. This method also disables mod management.
 	/// @param Callback Callback providing a status code indicating the outcome of clearing the user data. Error codes
 	/// returned by this function are informative only - it will always succeed.
 	/// @requires initialized-sdk
@@ -704,7 +703,7 @@ namespace Modio
 	///     This does not call FetchExternalUpdates for you, should you want to call it after changing locale.
 	/// @param Locale language to set
 	MODIOSDK_API void SetLanguage(Modio::Language Locale);
-	
+
 	/// @docpublic
 	/// @brief Attempts to purchase a specified mod with an expected price. Purchasing a mod will add a subscription to
 	/// it
@@ -741,10 +740,12 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @error UserDataError::InvalidUser|No authenticated user
-	/// @error MonetizationError::RetryEntitlements|Some entitlements could not be verified. Wait some time and try again.
-	MODIOSDK_API void RefreshUserEntitlementsAsync(Modio::EntitlementParams Params,
+	/// @error MonetizationError::RetryEntitlements|Some entitlements could not be verified. Wait some time and try
+	/// again.
+	MODIOSDK_API void RefreshUserEntitlementsAsync(
+		Modio::EntitlementParams Params,
 		std::function<void(Modio::ErrorCode, Modio::Optional<EntitlementConsumptionStatusList>)> Callback);
-	
+
 	/// @brief Fetches the updated mod.io wallet balance for the currently logged-in user
 	/// @param Callback Callback providing an error code indicating success or failure, as well as a value indicating
 	/// the updated balance
@@ -764,7 +765,8 @@ namespace Modio
 	MODIOSDK_API Modio::Language GetLanguage();
 
 	/// @docpublic
-	/// @brief Fetches a list of all purchases that a User has made. Query the list using <<QueryUserPurchasedMods>> after a successful call.
+	/// @brief Fetches a list of all purchases that a User has made. Query the list using <<QueryUserPurchasedMods>>
+	/// after a successful call.
 	/// @param OnFetchDone Callback invoked with a status code for whether the fetch was successful
 	/// @requires initialized-sdk
 	/// @requires authenticated-user
@@ -777,9 +779,10 @@ namespace Modio
 	MODIOSDK_API void FetchUserPurchasesAsync(std::function<void(Modio::ErrorCode)> OnFetchDone);
 
 	/// @docpublic
-	/// @brief Fetches the locally cached view of the user's purchased mods, populated from <<RefreshUserPurchasesAsync>>
-	/// @return std::map using Mod IDs as keys and ModInfo objects providing information about the mod that was purchased.
-	/// mods
+	/// @brief Fetches the locally cached view of the user's purchased mods, populated from
+	/// <<RefreshUserPurchasesAsync>>
+	/// @return std::map using Mod IDs as keys and ModInfo objects providing information about the mod that was
+	/// purchased. mods
 	MODIOSDK_API std::map<Modio::ModID, Modio::ModInfo> QueryUserPurchasedMods();
 
 	/// @docpublic
@@ -795,7 +798,7 @@ namespace Modio
 	MODIOSDK_API void GetUserDelegationTokenAsync(std::function<void(Modio::ErrorCode, std::string)> Callback);
 
 	/// @docpublic
-	/// @brief Initialize a Temp Mod Set, installing every specified mod 
+	/// @brief Initialize a Temp Mod Set, installing every specified mod
 	/// given in the param if they are not already subbed.
 	/// @param ModIds vector of ModID to install as temp mod
 	///
@@ -805,7 +808,7 @@ namespace Modio
 	MODIOSDK_API Modio::ErrorCode InitTempModSet(std::vector<Modio::ModID> ModIds);
 
 	/// @docpublic
-	/// @brief Add mods to an already created Temp Mod Session,  
+	/// @brief Add mods to an already created Temp Mod Session,
 	/// install every temp mod given in the param if they already subbed or already in Temp Mod Set
 	/// @param ModIds vector of ModID to install as temp mod
 	///
@@ -835,13 +838,70 @@ namespace Modio
 	/// @error ModManagementError::TempModSetNotInitialized|Temp Mod Set is not initialize, call InitTempModSet.
 	MODIOSDK_API Modio::ErrorCode CloseTempModSet();
 
-
 	/// @docpublic
-	/// @brief Fetches the temp mod added to Temp Mod Set  
-	/// 
+	/// @brief Fetches the temp mod added to Temp Mod Set
+	///
 	/// @return std::map using Mod IDs as keys and ModCollectionEntry objects providing information about the mods
 	/// added to temp mod set
-	MODIOSDK_API std::map<Modio::ModID, Modio::ModCollectionEntry>  QueryTempModSet();
+	MODIOSDK_API std::map<Modio::ModID, Modio::ModCollectionEntry> QueryTempModSet();
+
+	/// @docpublic
+	/// @brief Start a Metrics play session
+	/// @param Params Modio::MetricsServiceParams object containing information of what and how to start a metrics
+	/// session
+	/// @param Callback Callback providing an error code indicating success or failure of the session start operation
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error MetricsError::SessionNotInitialized|Metrics session has not yet been initialized
+	/// @error MetricsError::SessionIsActive|Metrics session is currently active and running
+	/// @error GenericError::BadParameter|One or more values in the Metric Session Parameters are invalid
+	/// @premiumfeature Metrics
+	///	@experimental
+	MODIOSDK_API void MetricsSessionStartAsync(Modio::MetricsSessionParams Params,
+											   std::function<void(Modio::ErrorCode)> Callback);
+	/// @docpublic
+	/// @brief Sends a single heartbeat to the mod.io server to indicate a session is still active
+	/// @param Callback Callback providing an error code indicating success or failure of the session heartbeat
+	/// operation
+	///
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error MetricsError::SessionNotInitialized|Metrics session has not yet been initialized
+	/// @error MetricsError::SessionIsNotActive|Metrics session is not currently running.
+	/// Call MetricsSessionStartAsync before attempting to sending a heartbeat.
+	/// @premiumfeature Metrics
+	///	@experimental
+	MODIOSDK_API void MetricsSessionSendHeartbeatOnceAsync(std::function<void(Modio::ErrorCode)> Callback);
+
+	/// @docpublic
+	/// @brief Sends a constant heartbeat at a given interval to the mod.io server to indicate a session is still active
+	/// @param IntervalSeconds The frequency in seconds to send a heartbeat to the mod.io server
+	/// @param Callback Callback providing an error code indicating success or failure of the session heartbeat
+	/// operation
+	///
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error MetricsError::SessionNotInitialized|Metrics session has not yet been initialized
+	/// @error MetricsError::SessionIsNotActive|Metrics session is not currently running.
+	/// Call MetricsSessionStartAsync before attempting to sending a heartbeat.
+	/// @premiumfeature Metrics
+	///	@experimental
+	MODIOSDK_API void MetricsSessionSendHeartbeatAtIntervalAsync(uint32_t IntervalSeconds,
+																 std::function<void(Modio::ErrorCode)> Callback);
+	/// @docpublic
+	/// @brief Ends a Metrics play session
+	/// @param Callback Callback providing an error code indicating success or failure of the session end operation
+	///
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error MetricsError::SessionNotInitialized|Metrics session has not yet been initialized
+	/// @error MetricsError::SessionIsNotActive|Metrics session is not currently running.
+	/// Call MetricsSessionStartAsync before attempting to end a session.
+	/// @premiumfeature Metrics
+	///	@experimental
+	MODIOSDK_API void MetricsSessionEndAsync(std::function<void(Modio::ErrorCode)> Callback);
 
 } // namespace Modio
 
@@ -849,10 +909,11 @@ namespace Modio
 
 #ifndef MODIO_SEPARATE_COMPILATION
 	#include "modio/impl/SDKCore.ipp"
+	#include "modio/impl/SDKMetrics.ipp"
 	#include "modio/impl/SDKModManagement.ipp"
 	#include "modio/impl/SDKModMetadata.ipp"
-	#include "modio/impl/SDKUserData.ipp"
 	#include "modio/impl/SDKMonetization.ipp"
+	#include "modio/impl/SDKUserData.ipp"
 #endif
 
 #include "modio/detail/ModioUndefs.h"

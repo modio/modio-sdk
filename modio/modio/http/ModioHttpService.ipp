@@ -61,6 +61,11 @@ namespace Modio
 		{
 		}
 
+		std::string_view HttpService::GetPlatformHeaderString()
+		{
+			return PlatformImplementation -> GetPlatformHeaderString();
+		}
+
 		Modio::Detail::OperationQueue::Ticket HttpService::GetAPIRequestTicket()
 		{
 			return APIQueue->GetTicket();

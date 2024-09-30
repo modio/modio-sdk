@@ -15,6 +15,17 @@ namespace Modio
 		JavaClassWrapper("com/modio/modiosdk/Modio", "(Landroid/app/Activity;)V", Activity)
 		{
 			JNIEnv* Env = Modio::Detail::AndroidContextService::Get().GetJavaEnv();
+			if (Env == NULL)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to get JNI environment");
+				return;
+			}
+
+			if (Class == NULL)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to find class: com/modio/modiosdk/Modio");
+				return;
+			}
 			
 			GetCertificatePathMethodId = Env->GetMethodID(Class, "getCertificatePath", "()Ljava/lang/String;");
 			if (Modio::Detail::JavaExceptionHelper::CheckJavaException(Env) || GetCertificatePathMethodId == NULL)

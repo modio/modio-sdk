@@ -274,5 +274,4 @@ namespace Modio
 		auto Lock = Modio::Detail::SDKSessionData::GetReadLock();
 		return Modio::Detail::SDKSessionData::GetLocalLanguage();
 	}
-
 } // namespace Modio

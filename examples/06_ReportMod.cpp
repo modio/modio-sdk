@@ -159,7 +159,7 @@ int main()
 	while (!ModioExample::HasAsyncOperationCompleted())
 	{
 		Modio::RunPendingHandlers();
-	};
+	}
 
 	if (!ModioExample::DidAsyncOperationSucceed())
 	{
@@ -180,7 +180,7 @@ int main()
 	while (!ModioExample::HasAsyncOperationCompleted())
 	{
 		Modio::RunPendingHandlers();
-	};
+	}
 
 	if (!ModioExample::DidAsyncOperationSucceed())
 	{
@@ -196,7 +196,7 @@ int main()
 	while (!ModioExample::HasAsyncOperationCompleted())
 	{
 		Modio::RunPendingHandlers();
-	};
+	}
 
 	if (!ModioExample::DidAsyncOperationSucceed())
 	{

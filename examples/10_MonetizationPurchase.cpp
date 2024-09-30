@@ -91,6 +91,18 @@ struct ModioExample
 		}
 	}
 
+	static void OnVerifyUserAuthenticationAsync(Modio::ErrorCode ec)
+	{
+		if (ec)
+		{
+			NotifyApplicationFailure(ec);
+		}
+		else
+		{
+			NotifyApplicationSuccess();
+		}
+	}
+
 	/// @brief User callback invoked by Modio::RunPendingHandlers() when Modio::RequestEmailAuthCodeAsync has completed
 	/// @param ec Error code indicating the success or failure of RequestEmailAuthCodeAsync
 	static void OnRequestEmailAuthCodeCompleted(Modio::ErrorCode ec)
@@ -304,7 +316,7 @@ int main()
 	while (!ModioExample::HasAsyncOperationCompleted())
 	{
 		Modio::RunPendingHandlers();
-	};
+	}
 
 	// Modio::InitializeAsync completed, but we now need to check if it resulted in a success or a failure
 	if (!ModioExample::DidAsyncOperationSucceed())
@@ -313,76 +325,88 @@ int main()
 		return -1;
 	}
 
-	{
-		// Prompt user for input here
-		std::string UserEmailAddress = ModioExample::RetrieveUserInput("Enter email address:");
-
-		// Email authentication with mod.io is a two-step process. First, a user email address is submitted via
-		// RequestEmailAuthCodeAsync, which triggers an email containing an authentication code to that address.
-		Modio::RequestEmailAuthCodeAsync(Modio::EmailAddress(UserEmailAddress),
-										 ModioExample::OnRequestEmailAuthCodeCompleted);
-	}
+	// Check if the user has already been authenticated and the auth token is still valid
+	Modio::VerifyUserAuthenticationAsync(ModioExample::OnVerifyUserAuthenticationAsync);
 
 	while (!ModioExample::HasAsyncOperationCompleted())
 	{
 		Modio::RunPendingHandlers();
-	};
+	}
 
 	if (!ModioExample::DidAsyncOperationSucceed())
 	{
-		// It is possible to check the error type and identify what next steps to follow
-		if (Modio::ErrorCodeMatches(Example.LastError, Modio::ErrorConditionTypes::NetworkError)) // NetworkError group
 		{
-			// Error code represents some network error kind. Possibly ask the user to try again later.
-			std::cout << "A network error" << std::endl;
-		}
-		else if (Modio::ErrorCodeMatches(Example.LastError,
-										 Modio::ErrorConditionTypes::EntityNotFoundError)) // Entity Not Found group
-		{
-			// An mod entity is not located with this configuration. Therefore, the list you're fetching the ModID from
-			// is probably stale. A remedy could be to fetch an updated version of the list from the server.
-			std::cout << "The entity requested was not found" << std::endl;
-		}
-		else if (Modio::ErrorCodeMatches(Example.LastError,
-										 Modio::GenericError::OperationCanceled)) // SDK Operation cancelled
-		{
-			// Your application cancelled a SDK function
-			std::cout << "SDK operation cancelled" << std::endl;
+			// Prompt user for input here
+			std::string UserEmailAddress = ModioExample::RetrieveUserInput("Enter email address:");
+
+			// Email authentication with mod.io is a two-step process. First, a user email address is submitted via
+			// RequestEmailAuthCodeAsync, which triggers an email containing an authentication code to that address.
+			Modio::RequestEmailAuthCodeAsync(Modio::EmailAddress(UserEmailAddress),
+											 ModioExample::OnRequestEmailAuthCodeCompleted);
 		}
 
-		// We initialized the SDK, but received an error when requesting an email auth code. Begin async shutdown
-		Modio::ShutdownAsync(ModioExample::OnShutdownComplete);
-
-		// Wait for async shutdown to complete
 		while (!ModioExample::HasAsyncOperationCompleted())
 		{
 			Modio::RunPendingHandlers();
 		}
 
-		// Bail without running any other calls
-		return -1;
-	}
+		if (!ModioExample::DidAsyncOperationSucceed())
+		{
+			// It is possible to check the error type and identify what next steps to follow
+			if (Modio::ErrorCodeMatches(Example.LastError,
+										Modio::ErrorConditionTypes::NetworkError)) // NetworkError group
+			{
+				// Error code represents some network error kind. Possibly ask the user to try again later.
+				std::cout << "A network error" << std::endl;
+			}
+			else if (Modio::ErrorCodeMatches(Example.LastError,
+											 Modio::ErrorConditionTypes::EntityNotFoundError)) // Entity Not Found group
+			{
+				// An mod entity is not located with this configuration. Therefore, the list you're fetching the ModID
+				// from is probably stale. A remedy could be to fetch an updated version of the list from the server.
+				std::cout << "The entity requested was not found" << std::endl;
+			}
+			else if (Modio::ErrorCodeMatches(Example.LastError,
+											 Modio::GenericError::OperationCanceled)) // SDK Operation cancelled
+			{
+				// Your application cancelled a SDK function
+				std::cout << "SDK operation cancelled" << std::endl;
+			}
 
-	{
-		// Prompt user for input here
-		std::string UserEmailAuthCode = ModioExample::RetrieveUserInput("Enter email auth code:");
+			// We initialized the SDK, but received an error when requesting an email auth code. Begin async shutdown
+			Modio::ShutdownAsync(ModioExample::OnShutdownComplete);
 
-		// The second part of email authentication with the mod.io SDK involves submitting the user's email
-		// authentication code. To do this, you will need to prompt your user for input and then pass that input to
-		// AuthenticateUserEmailAsync. If this function returns successfully, the mod.io account will be stored in the
-		// Local User Session passed into InitializeAsync earlier.
-		Modio::AuthenticateUserEmailAsync(Modio::EmailAuthCode(UserEmailAuthCode),
-										  ModioExample::OnAuthenticateUserEmailCompleted);
-	}
+			// Wait for async shutdown to complete
+			while (!ModioExample::HasAsyncOperationCompleted())
+			{
+				Modio::RunPendingHandlers();
+			}
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	}
+			// Bail without running any other calls
+			return -1;
+		}
 
-	if (!ModioExample::DidAsyncOperationSucceed())
-	{
-		// Perform any auth error handling here as appropriate.
+		{
+			// Prompt user for input here
+			std::string UserEmailAuthCode = ModioExample::RetrieveUserInput("Enter email auth code:");
+
+			// The second part of email authentication with the mod.io SDK involves submitting the user's email
+			// authentication code. To do this, you will need to prompt your user for input and then pass that input to
+			// AuthenticateUserEmailAsync. If this function returns successfully, the mod.io account will be stored in
+			// the Local User Session passed into InitializeAsync earlier.
+			Modio::AuthenticateUserEmailAsync(Modio::EmailAuthCode(UserEmailAuthCode),
+											  ModioExample::OnAuthenticateUserEmailCompleted);
+		}
+
+		while (!ModioExample::HasAsyncOperationCompleted())
+		{
+			Modio::RunPendingHandlers();
+		}
+
+		if (!ModioExample::DidAsyncOperationSucceed())
+		{
+			// Perform any auth error handling here as appropriate.
+		}
 	}
 
 	// Get the user's wallet balance for the current game. Note that if a wallet does not exist for a user, this call will automatically
@@ -427,7 +451,7 @@ int main()
 		// Set a Search filter to return only Paid mods. You can also use RevenueFilterType::FreeAndPaid to get both free and paid mods
 		Modio::FilterParams Filter;
 		Filter = Filter.RevenueType(Modio::FilterParams::RevenueFilterType::Paid);
-		Modio::ListAllModsAsync({}, ModioExample::OnListAllModsComplete);
+		Modio::ListAllModsAsync(Filter, ModioExample::OnListAllModsComplete);
 
 		while (!ModioExample::HasAsyncOperationCompleted())
 		{

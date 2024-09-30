@@ -100,6 +100,14 @@ namespace Modio
 					}
 					else
 					{
+						// Don't wait for content if none is expected
+						if (Request->GetContentLength().value_or(0) == 0)
+						{
+							Self.complete(Modio::make_error_code(Modio::GenericError::EndOfFile));
+
+							return;
+						}
+
 						yield SSLConnectionReadSomeAsync(Request, Request->ResponseDataBuffer, SharedState,
 														 std::move(Self));
 

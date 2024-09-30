@@ -37,6 +37,14 @@ namespace Modio
 		{
 			Value = Convert(GameMonetizationOptions::None);
 		}
+
+		/// @docinternal
+		/// @brief Initialize flags from underlying integer type
+		/// @param InitialValue the bitfield value
+		GameMonetization(StorageType InitialValue) : Modio::FlagImpl<GameMonetizationOptions>(InitialValue)
+		{
+		}
+
 		using Modio::FlagImpl<GameMonetizationOptions>::FlagImpl;
 
 		/// @docnone

@@ -114,6 +114,11 @@ namespace Modio
 			{
 				HttpState->Close();
 			}
+
+			std::string_view GetPlatformHeaderString()
+			{
+				return "Mac";
+			}
 		};
 	} // namespace Detail
 } // namespace Modio

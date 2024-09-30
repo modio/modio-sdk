@@ -50,7 +50,17 @@ namespace Modio
 		GameCommunityOptionsFlags ()
 		{
 			Value = Convert(GameCommunityOptions::None);
+
 		}
+
+		/// @docinternal
+		/// @brief Construct from a set of flags
+		/// @param InitialValue the flags to set
+		GameCommunityOptionsFlags(StorageType InitialValue)
+			: Modio::FlagImpl<GameCommunityOptions>(InitialValue)
+		{
+		}
+
 		using Modio::FlagImpl<GameCommunityOptions>::FlagImpl;
 
 		/// @docnone

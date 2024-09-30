@@ -82,6 +82,9 @@ namespace Modio
 				// The maximum size a file section to upload using a multipart operation
 				// For reference, these are 50MiB = 52MB
 				constexpr uintmax_t MultipartMaxFilePartSize = 52428800;
+				// A heartbeat POST request is required to be submitted at-most every 5 minutes (300s).
+				// We send a heartbeat by default at half that requirement to ensure we do not time out.
+				constexpr uint32_t MetricsHeartbeatIntervalSeconds = 150;
 			} // namespace Configuration
 			namespace PlatformNames
 			{

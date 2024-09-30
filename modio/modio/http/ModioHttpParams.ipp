@@ -15,6 +15,7 @@
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ModioProfiling.h"
+#include "modio/http/ModioHttpService.h"
 
 namespace Modio
 {
@@ -230,6 +231,16 @@ namespace Modio
 			return NewParamsInstance;
 		}
 
+		HttpRequestParams HttpRequestParams::AppendJsonPayloadValue(std::string JsonPayload) const
+		{
+			HttpRequestParams NewParamsInstance = HttpRequestParams(*this);
+
+			NewParamsInstance.Payload = JsonPayload;
+			NewParamsInstance.ContentType = "application/json";
+
+			return NewParamsInstance;
+		}
+
 		HttpRequestParams HttpRequestParams::AppendPayloadValue(std::string Key,
 																Modio::Detail::Buffer RawPayloadBuffer) const
 		{
@@ -427,12 +438,21 @@ namespace Modio
 				return {};
 			}
 
+			
+			// We're handling Json so we just want to send this as the raw body
+			if (ContentType.value() == "application/json")
+			{
+				return Payload;
+			}
+
 			// TODO: make this more performant by treating the mime type as a constant so we can do a early exit if we
 			// are using form-data
 			if (Modio::Detail::hash_64_fnv1a_const(ContentType->c_str()) != "application/x-www-form-urlencoded"_hash)
 			{
 				return {};
 			}
+
+
 			std::string PayloadString;
 			for (auto& Entry : PayloadMembers)
 			{
@@ -574,7 +594,7 @@ namespace Modio
 					Headers.emplace_back("x-modio-platform", *PlatformOverride);
 				} else
 				{
-					Headers.emplace_back("x-modio-platform", MODIO_TARGET_PLATFORM_HEADER);
+					Headers.emplace_back("x-modio-platform", Modio::Detail::Services::GetGlobalService<HttpService>().GetPlatformHeaderString());
 				}
 			}
 

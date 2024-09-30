@@ -190,7 +190,7 @@ int main()
 	while (!ModioExample::HasAsyncOperationCompleted())
 	{
 		Modio::RunPendingHandlers();
-	};
+	}
 
 	// Modio::InitializeAsync completed, but we now need to check if it resulted in a success or a failure
 	if (!ModioExample::DidAsyncOperationSucceed())
@@ -208,7 +208,7 @@ int main()
 	while (!ModioExample::HasAsyncOperationCompleted())
 	{
 		Modio::RunPendingHandlers();
-	};
+	}
 
 	// No need for explicit handling of an error in ShutdownAsync, the application is about to exit
 }

@@ -46,4 +46,11 @@ enum class EModioErrorCondition: uint8
 	PaymentTransactionFailed = 33 UMETA(ToolTip="The transaction requires a payment but it could not be fulfilled. Please retry with funds on the wallet") ,
 	IncorrectPrice = 34 UMETA(ToolTip="The display price for the mod is out-of-date or incorrect. Please retry with the correct display price.") ,
 	ItemAlreadyOwned = 35 UMETA(ToolTip="The authenticated user already has acquired this item") ,
+	ParentalControlRestrictions = 36 UMETA(ToolTip="Parental control restrictions prevent this account from accessing UGC.") ,
+	MetricsSessionNotInitialized = 37 UMETA(ToolTip="Metrics session has not yet been initialized. Ensure that you have a metrics secret key set for your project.") ,
+	MetricsSessionAlreadyInitialized = 38 UMETA(ToolTip="Metrics session has already been been initialized.") ,
+	MetricsSessionIsActive = 39 UMETA(ToolTip="Metrics session has been started.") ,
+	MetricsSessionIsNotActive = 40 UMETA(ToolTip="Metrics session has not been started. Please call MetricsSessionStartAsync.") ,
+	MetricsSessionHasNoMods = 41 UMETA(ToolTip="No mods have been added to the session.") ,
+	PremiumFeatureNotAvailable = 42 UMETA(ToolTip="This premium feature is not available for your project.") ,
 };

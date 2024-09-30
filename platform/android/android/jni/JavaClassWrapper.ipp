@@ -13,7 +13,12 @@ namespace Modio
 		{
 			AndroidContextService& AndroidService = Modio::Detail::AndroidContextService::Get();
 
-			auto Env = AndroidService.GetJavaEnv();
+			JNIEnv* Env = AndroidService.GetJavaEnv();
+			if (Env == NULL)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to get JNI environment");
+				return;
+			}
 
 			jobject ClassLoader = Modio::Detail::AndroidContextService::Get().GetClassLoader();
 
@@ -48,6 +53,12 @@ namespace Modio
 				}
 				Class = (jclass) Env->NewGlobalRef(LocalClass);
 				Env->DeleteLocalRef(LocalClass);
+			}
+
+			if (Class == NULL)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to find class: " + ClassName);
+				return;
 			}
 
 			// Get the constructor

@@ -101,6 +101,8 @@ namespace Modio
 
 		void SDKSessionData::DisableModManagement()
 		{
+			Modio::Detail::Logger().Log(LogLevel::Info, Modio::LogCategory::Core, "Mod Management has been disabled.");
+
 			Get().bModManagementEnabled = false;
 			if (Get().CurrentModInProgress != nullptr)
 			{
@@ -422,6 +424,7 @@ namespace Modio
 			}
 			return false;
 		}
+
 
 		std::weak_ptr<Modio::ModProgressInfo> SDKSessionData::StartModDownloadOrUpdate(Modio::ModID ID)
 		{

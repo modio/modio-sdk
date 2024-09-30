@@ -48,7 +48,7 @@ namespace Modio
 
 		/// @docinternal
 		/// @brief Retrievet the StorageType inside the FlagImpl
-		constexpr StorageType RawValue()
+		constexpr StorageType RawValue() const
 		{
 			return Value.disjunction(static_cast<StorageType>(0)).value();
 		}

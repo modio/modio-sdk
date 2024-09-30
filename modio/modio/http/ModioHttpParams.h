@@ -160,6 +160,8 @@ namespace Modio
 
 			MODIO_IMPL HttpRequestParams& AppendPayloadValue(std::string Key, Modio::Detail::Buffer RawPayloadBuffer);
 
+			MODIO_IMPL HttpRequestParams AppendJsonPayloadValue(std::string Payload) const;
+
 			// TODO: @modio-core consider if this should return Modio::Optional instead. Breaks method chaining but we
 			// probably want to fail early
 			MODIO_IMPL HttpRequestParams AppendPayloadFile(std::string Key, Modio::filesystem::path PathToFileToUpload,

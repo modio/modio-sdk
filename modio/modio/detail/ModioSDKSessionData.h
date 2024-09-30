@@ -120,6 +120,7 @@ namespace Modio
 
 			MODIO_IMPL static bool CloseTempModSet();
 
+
 			/// @brief Initializes a ModProgressInfo for the specified mod, storing it in the global state. This method
 			/// is only intended for use by InstallOrUpdateModOp
 			/// @param ID Mod ID for the mod to begin reporting progress on

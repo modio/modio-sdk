@@ -32,16 +32,27 @@ namespace Modio
 
 		void AndroidContextService::InternalInitializeJNI(JavaVM* InJavaVM, jobject InClassLoader)
 		{
-			JNIEnv* Env = nullptr;
-			InJavaVM->GetEnv((void**) &Env, JNI_CURRENT_VERSION);
 			JVM = InJavaVM;
-
 			ClassLoader = InClassLoader;
 
-			auto EnvClass = Modio::Detail::NewScopedJavaObject(Env, Env->FindClass("android/os/Environment"));
-			if (Modio::Detail::JavaExceptionHelper::CheckJavaException(Env))
+			JNIEnv* Env = GetJavaEnv();
+			if (Env == NULL)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to get JNIEnv");
+				return;
+			}
+
+			jclass environmentClass = Env->FindClass("android/os/Environment");
+			if (environmentClass == NULL)
 			{
 				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to find Environment class");
+				return;
+			}
+
+			auto EnvClassObj = Modio::Detail::NewScopedJavaObject(Env, environmentClass);
+			if (Modio::Detail::JavaExceptionHelper::CheckJavaException(Env) || !EnvClassObj)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to create Environment class object");
 				return;
 			}
 
@@ -69,6 +80,10 @@ namespace Modio
 
 		JNIEnv* AndroidContextService::GetJavaEnv()
 		{
+			if (JVM == NULL)
+			{
+				return nullptr;
+			}
 		    JNIEnv* Env = nullptr;
 			jint GetEnvResult = JVM->GetEnv((void**) &Env, JNI_CURRENT_VERSION);
 

@@ -194,7 +194,7 @@ int main()
 	while (!ModioExample::HasAsyncOperationCompleted())
 	{
 		Modio::RunPendingHandlers();
-	};
+	}
 
 	// Modio::InitializeAsync completed, but we now need to check if it resulted in a success or a failure
 	if (!ModioExample::DidAsyncOperationSucceed())
@@ -220,7 +220,7 @@ int main()
 		while (!ModioExample::HasAsyncOperationCompleted())
 		{
 			Modio::RunPendingHandlers();
-		};
+		}
 
 		if (!ModioExample::DidAsyncOperationSucceed())
 		{
@@ -264,7 +264,7 @@ int main()
 		while (!ModioExample::HasAsyncOperationCompleted())
 		{
 			Modio::RunPendingHandlers();
-		};
+		}
 
 		if (!ModioExample::DidAsyncOperationSucceed())
 		{
@@ -309,7 +309,7 @@ int main()
 		while (!ModioExample::HasAsyncOperationCompleted())
 		{
 			Modio::RunPendingHandlers();
-		};
+		}
 
 		if (!ModioExample::DidAsyncOperationSucceed())
 		{
@@ -355,7 +355,7 @@ int main()
 		while (!ModioExample::HasAsyncOperationCompleted())
 		{
 			Modio::RunPendingHandlers();
-		};
+		}
 
 		if (!ModioExample::DidAsyncOperationSucceed())
 		{
@@ -403,7 +403,7 @@ int main()
 		while (!ModioExample::HasAsyncOperationCompleted())
 		{
 			Modio::RunPendingHandlers();
-		};
+		}
 
 		if (!ModioExample::DidAsyncOperationSucceed())
 		{

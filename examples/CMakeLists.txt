@@ -9,17 +9,21 @@
 
 set (CMAKE_CXX_STANDARD 17)
 
+
 function(add_example FileName)
 	add_executable(modio_${FileName}  ${CMAKE_CURRENT_LIST_DIR}/${FileName}.cpp)
-	target_link_libraries(modio_${FileName} ${MODIO_TARGET_NAME}Static)
-	set_target_properties(modio_${FileName} PROPERTIES FOLDER "examples")
-	target_include_directories(modio_${FileName} PRIVATE "${CMAKE_SOURCE_DIR}/ext/inja/third_party/include")
 	install(
 		TARGETS modio_${FileName} RUNTIME
 		DESTINATION ${CMAKE_INSTALL_PREFIX}/examples
 		COMPONENT examples
 	)
+	target_link_libraries(modio_${FileName} ${MODIO_TARGET_NAME}Static)
+	set_target_properties(modio_${FileName} PROPERTIES FOLDER "examples")
+	target_include_directories(modio_${FileName} PRIVATE "${CMAKE_SOURCE_DIR}/ext/inja/third_party/include")
+
 endfunction()
+
+
 
 if (MODIO_BUILD_EXAMPLES)
 	add_example(01_Initialization)
@@ -34,6 +38,7 @@ if (MODIO_BUILD_EXAMPLES)
 	add_example(10_MonetizationPurchase)
 	add_example(11_TempModSets)
 	add_example(12_RefreshEntitlements)
+	add_example(13_MetricsSession)
 endif()
 
 if (MODIO_BUILD_ADVANCED_EXAMPLES)

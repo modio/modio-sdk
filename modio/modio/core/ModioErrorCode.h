@@ -880,6 +880,181 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
+	enum class ParentalControlRestriction
+	{
+		ParentalControlRestriction = 23297
+	};
+
+	/// @docnone
+	struct ParentalControlRestrictionCategoryImpl : std::error_category
+	{
+		inline const char* name() const noexcept override { return "Modio::ParentalControlRestriction"; }
+		inline std::string message(int ErrorValue) const override
+		{
+			switch (static_cast<Modio::ParentalControlRestriction>(ErrorValue))
+			{
+				case ParentalControlRestriction::ParentalControlRestriction:
+						return "UGC access is restricted by parental controls";
+					break;
+				default:
+					return "Unknown ParentalControlRestriction error";
+			}
+		}
+	};
+
+	/// @docnone
+	inline const std::error_category& ParentalControlRestrictionCategory()
+	{
+		static ParentalControlRestrictionCategoryImpl CategoryInstance;
+		return CategoryInstance;
+	}
+
+	/// @docnone
+	inline std::error_code make_error_code(ParentalControlRestriction e)
+	{
+		return { static_cast<int>(e), ParentalControlRestrictionCategory() };
+	}
+
+	/// @docnone
+	inline bool operator==(std::error_code A, ParentalControlRestriction B)
+	{
+		return A.category() == ParentalControlRestrictionCategory() && A.value() == static_cast<int>(B);
+	}
+
+	/// @docnone
+	inline bool operator!=(std::error_code A, ParentalControlRestriction B)
+	{
+		return ! (A == B);
+	}
+
+	/// @docnone
+	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, ParentalControlRestriction RawErrorValue )
+	{
+		return ec == RawErrorValue;
+	}
+
+	enum class MetricsError
+	{
+		NoModsInSession = 23553,
+		SessionAlreadyInitialized = 23554,
+		SessionIsActive = 23555,
+		SessionIsNotActive = 23556,
+		SessionNotInitialized = 23557
+	};
+
+	/// @docnone
+	struct MetricsErrorCategoryImpl : std::error_category
+	{
+		inline const char* name() const noexcept override { return "Modio::MetricsError"; }
+		inline std::string message(int ErrorValue) const override
+		{
+			switch (static_cast<Modio::MetricsError>(ErrorValue))
+			{
+				case MetricsError::NoModsInSession:
+						return "No mods have been added to the session. Please supply mods when calling MetricsSessionStartAsync.";
+					break;
+				case MetricsError::SessionAlreadyInitialized:
+						return "Metrics session has already been been initialized.";
+					break;
+				case MetricsError::SessionIsActive:
+						return "Metrics session is currently active and running.";
+					break;
+				case MetricsError::SessionIsNotActive:
+						return "Metrics session has not been started. Please call MetricsSessionStartAsync.";
+					break;
+				case MetricsError::SessionNotInitialized:
+						return "Metrics session has not yet been initialized. Ensure that you have a metrics secret key set for your project.";
+					break;
+				default:
+					return "Unknown MetricsError error";
+			}
+		}
+	};
+
+	/// @docnone
+	inline const std::error_category& MetricsErrorCategory()
+	{
+		static MetricsErrorCategoryImpl CategoryInstance;
+		return CategoryInstance;
+	}
+
+	/// @docnone
+	inline std::error_code make_error_code(MetricsError e)
+	{
+		return { static_cast<int>(e), MetricsErrorCategory() };
+	}
+
+	/// @docnone
+	inline bool operator==(std::error_code A, MetricsError B)
+	{
+		return A.category() == MetricsErrorCategory() && A.value() == static_cast<int>(B);
+	}
+
+	/// @docnone
+	inline bool operator!=(std::error_code A, MetricsError B)
+	{
+		return ! (A == B);
+	}
+
+	/// @docnone
+	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, MetricsError RawErrorValue )
+	{
+		return ec == RawErrorValue;
+	}
+
+	enum class PremiumFeaturesError
+	{
+		FeatureNotEnabled = 23809
+	};
+
+	/// @docnone
+	struct PremiumFeaturesErrorCategoryImpl : std::error_category
+	{
+		inline const char* name() const noexcept override { return "Modio::PremiumFeaturesError"; }
+		inline std::string message(int ErrorValue) const override
+		{
+			switch (static_cast<Modio::PremiumFeaturesError>(ErrorValue))
+			{
+				case PremiumFeaturesError::FeatureNotEnabled:
+						return "Premium feature not enabled";
+					break;
+				default:
+					return "Unknown PremiumFeaturesError error";
+			}
+		}
+	};
+
+	/// @docnone
+	inline const std::error_category& PremiumFeaturesErrorCategory()
+	{
+		static PremiumFeaturesErrorCategoryImpl CategoryInstance;
+		return CategoryInstance;
+	}
+
+	/// @docnone
+	inline std::error_code make_error_code(PremiumFeaturesError e)
+	{
+		return { static_cast<int>(e), PremiumFeaturesErrorCategory() };
+	}
+
+	/// @docnone
+	inline bool operator==(std::error_code A, PremiumFeaturesError B)
+	{
+		return A.category() == PremiumFeaturesErrorCategory() && A.value() == static_cast<int>(B);
+	}
+
+	/// @docnone
+	inline bool operator!=(std::error_code A, PremiumFeaturesError B)
+	{
+		return ! (A == B);
+	}
+
+	/// @docnone
+	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, PremiumFeaturesError RawErrorValue )
+	{
+		return ec == RawErrorValue;
+	}
+
 	enum class ApiError
 	{
 		APIKeyForTestOnly = 11017,
@@ -925,6 +1100,9 @@ namespace Modio
 		MonetizationWalletFetchFailed = 900008,
 		MuteUserNotFound = 17000,
 		OpenIDNotConfigured = 11086,
+		PSNChildAccountNotPermitted = 11085,
+		PSNNotAllowedToInteractWithUGC = 11096,
+		PremiumFeatureNotEnabled = 14040,
 		Ratelimited = 11008,
 		RatelimitedSameEndpoint = 11009,
 		ReportedEntityUnavailable = 15030,
@@ -944,7 +1122,9 @@ namespace Modio
 		UserMonetizationNotConfigured = 900007,
 		UserNoAcceptTermsOfUse = 11074,
 		UserNoModRating = 15043,
-		ValidationErrors = 13009
+		ValidationErrors = 13009,
+		XBoxLiveChildAccountNotPermitted = 11030,
+		XBoxLiveNotAllowedToInteractWithUGC = 11028
 	};
 
 	/// @docnone
@@ -1084,6 +1264,15 @@ namespace Modio
 				case ApiError::OpenIDNotConfigured:
 						return "You must configure your OpenID config for your game in your game authentication settings before being able to authenticate users.";
 					break;
+				case ApiError::PSNChildAccountNotPermitted:
+						return "Child accounts are not permitted";
+					break;
+				case ApiError::PSNNotAllowedToInteractWithUGC:
+						return "Account not allowed to interact with UGC";
+					break;
+				case ApiError::PremiumFeatureNotEnabled:
+						return "Premium feature not enabled";
+					break;
 				case ApiError::Ratelimited:
 						return "You have been ratelimited for making too many requests. See Rate Limiting.";
 					break;
@@ -1143,6 +1332,12 @@ namespace Modio
 					break;
 				case ApiError::ValidationErrors:
 						return "The request contains validation errors for the data supplied. See the attached errors field within the Error Object to determine which input failed.";
+					break;
+				case ApiError::XBoxLiveChildAccountNotPermitted:
+						return "Child accounts are not permitted";
+					break;
+				case ApiError::XBoxLiveNotAllowedToInteractWithUGC:
+						return "Account not allowed to interact with UGC";
 					break;
 				default:
 					return "Unknown ApiError error";
@@ -1225,6 +1420,15 @@ namespace Modio
 					return MonetizationErrorCategory();
 				break;
 				case 12:
+					return ParentalControlRestrictionCategory();
+				break;
+				case 13:
+					return MetricsErrorCategory();
+				break;
+				case 14:
+					return PremiumFeaturesErrorCategory();
+				break;
+				case 15:
 					return ApiErrorCategory();
 				break;
 				default:
@@ -1280,9 +1484,21 @@ namespace Modio
 			{
 					return 11;
 			}
-			if (Category ==  ApiErrorCategory())
+			if (Category ==  ParentalControlRestrictionCategory())
 			{
 					return 12;
+			}
+			if (Category ==  MetricsErrorCategory())
+			{
+					return 13;
+			}
+			if (Category ==  PremiumFeaturesErrorCategory())
+			{
+					return 14;
+			}
+			if (Category ==  ApiErrorCategory())
+			{
+					return 15;
 			}
 			return 0;
 		}
@@ -1363,7 +1579,21 @@ namespace Modio
 		/// @brief The display price for the mod is out-of-date or incorrect. Please retry with the correct display price.
 		IncorrectPrice = 34,
 		/// @brief The authenticated user already has acquired this item
-		ItemAlreadyOwned = 35
+		ItemAlreadyOwned = 35,
+		/// @brief Parental control restrictions prevent this account from accessing UGC.
+		ParentalControlRestrictions = 36,
+		/// @brief Metrics session has not yet been initialized. Ensure that you have a metrics secret key set for your project.
+		MetricsSessionNotInitialized = 37,
+		/// @brief Metrics session has already been been initialized.
+		MetricsSessionAlreadyInitialized = 38,
+		/// @brief Metrics session has been started.
+		MetricsSessionIsActive = 39,
+		/// @brief Metrics session has not been started. Please call MetricsSessionStartAsync.
+		MetricsSessionIsNotActive = 40,
+		/// @brief No mods have been added to the session.
+		MetricsSessionHasNoMods = 41,
+		/// @brief This premium feature is not available for your project.
+		PremiumFeatureNotAvailable = 42
 	};
 
 	/// @docnone
@@ -1478,6 +1708,27 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::ItemAlreadyOwned:
 					return "The authenticated user already has acquired this item";
+				break;
+				case ErrorConditionTypes::ParentalControlRestrictions:
+					return "Parental control restrictions prevent this account from accessing UGC.";
+				break;
+				case ErrorConditionTypes::MetricsSessionNotInitialized:
+					return "Metrics session has not yet been initialized. Ensure that you have a metrics secret key set for your project.";
+				break;
+				case ErrorConditionTypes::MetricsSessionAlreadyInitialized:
+					return "Metrics session has already been been initialized.";
+				break;
+				case ErrorConditionTypes::MetricsSessionIsActive:
+					return "Metrics session has been started.";
+				break;
+				case ErrorConditionTypes::MetricsSessionIsNotActive:
+					return "Metrics session has not been started. Please call MetricsSessionStartAsync.";
+				break;
+				case ErrorConditionTypes::MetricsSessionHasNoMods:
+					return "No mods have been added to the session.";
+				break;
+				case ErrorConditionTypes::PremiumFeatureNotAvailable:
+					return "This premium feature is not available for your project.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -2796,6 +3047,209 @@ namespace Modio
 					}
 
 					if (ec == Modio::MonetizationError::WalletFetchFailed)
+					{
+						return true;
+					}
+
+	
+				break;
+				case ErrorConditionTypes::ParentalControlRestrictions:
+					if (ec == Modio::ParentalControlRestriction::ParentalControlRestriction)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::MetricsSessionNotInitialized:
+					if (ec == Modio::MetricsError::SessionNotInitialized)
+					{
+						return true;
+					}
+
+
+
+					if (ec == Modio::MetricsError::NoModsInSession)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionAlreadyInitialized)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionIsActive)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionIsNotActive)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionNotInitialized)
+					{
+						return true;
+					}
+
+	
+				break;
+				case ErrorConditionTypes::MetricsSessionAlreadyInitialized:
+					if (ec == Modio::MetricsError::SessionAlreadyInitialized)
+					{
+						return true;
+					}
+
+
+
+					if (ec == Modio::MetricsError::NoModsInSession)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionAlreadyInitialized)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionIsActive)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionIsNotActive)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionNotInitialized)
+					{
+						return true;
+					}
+
+	
+				break;
+				case ErrorConditionTypes::MetricsSessionIsActive:
+					if (ec == Modio::MetricsError::SessionIsActive)
+					{
+						return true;
+					}
+
+
+
+					if (ec == Modio::MetricsError::NoModsInSession)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionAlreadyInitialized)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionIsActive)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionIsNotActive)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionNotInitialized)
+					{
+						return true;
+					}
+
+	
+				break;
+				case ErrorConditionTypes::MetricsSessionIsNotActive:
+					if (ec == Modio::MetricsError::SessionIsNotActive)
+					{
+						return true;
+					}
+
+
+
+					if (ec == Modio::MetricsError::NoModsInSession)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionAlreadyInitialized)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionIsActive)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionIsNotActive)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionNotInitialized)
+					{
+						return true;
+					}
+
+	
+				break;
+				case ErrorConditionTypes::MetricsSessionHasNoMods:
+					if (ec == Modio::MetricsError::NoModsInSession)
+					{
+						return true;
+					}
+
+
+
+					if (ec == Modio::MetricsError::NoModsInSession)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionAlreadyInitialized)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionIsActive)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionIsNotActive)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MetricsError::SessionNotInitialized)
+					{
+						return true;
+					}
+
+	
+				break;
+				case ErrorConditionTypes::PremiumFeatureNotAvailable:
+					if (ec == Modio::PremiumFeaturesError::FeatureNotEnabled)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::PremiumFeatureNotEnabled)
+					{
+						return true;
+					}
+
+
+
+					if (ec == Modio::PremiumFeaturesError::FeatureNotEnabled)
 					{
 						return true;
 					}

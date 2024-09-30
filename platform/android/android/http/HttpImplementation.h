@@ -115,6 +115,11 @@ namespace Modio
 			{
 				HttpState->Close();
 			}
+
+			std::string_view GetPlatformHeaderString()
+			{
+				return "Android";
+			}
 		};
 	} // namespace Detail
 } // namespace Modio

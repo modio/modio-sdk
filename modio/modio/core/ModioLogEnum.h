@@ -60,6 +60,8 @@ namespace Modio
 				return "Test";
 			case LogCategory::System:
 				return "System";
+			case LogCategory::ModMetrics:
+				return "ModMetrics";
 			default:
 				return "UNKNOWN";
 		}

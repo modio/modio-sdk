@@ -23,8 +23,8 @@ namespace Modio
 		/// @brief Container for the error codes a response can store
 		struct ResponseError
 		{
-			std::int32_t Code;
-			std::int32_t ErrorRef;
+			std::int32_t Code = -1;
+			std::int32_t ErrorRef = -1;
 			std::string Error;
 			Modio::Optional<std::vector<Modio::FieldError>> ExtendedErrorInformation;
 

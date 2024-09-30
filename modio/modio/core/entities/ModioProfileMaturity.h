@@ -62,6 +62,13 @@ namespace Modio
 		{
 			Value = Convert(MaturityOption::None);
 		}
+
+		/// @docinternal
+		/// @brief Construct from a set of flags
+		/// @param InitialValue the flags to set
+		ProfileMaturity(StorageType InitialValue) : Modio::FlagImpl<MaturityOption>(InitialValue)
+		{
+		}
 		using Modio::FlagImpl<MaturityOption>::FlagImpl;
 
 		/// @docnone

@@ -15,6 +15,7 @@
 #include "modio/core/entities/ModioProfileMaturity.h"
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioFormatters.h"
+#include "modio/detail/ModioStringHelpers.h"
 
 namespace Modio
 {
@@ -213,7 +214,7 @@ namespace Modio
 			std::string SearchStr;
 			for (std::string Keyword : SearchKeywords)
 			{
-				SearchStr += Keyword + " ";
+				SearchStr += Modio::Detail::String::URLEncode(Keyword) + " ";
 			}
 			SearchStr.resize(SearchStr.size() - 1);
 			FilterFields.emplace("_q", SearchStr);
@@ -248,7 +249,7 @@ namespace Modio
 			std::string TagStr;
 			for (std::string Tag : Tags)
 			{
-				TagStr += Tag + ",";
+				TagStr += Modio::Detail::String::URLEncode(Tag) + ",";
 			}
 			TagStr.resize(TagStr.size() - 1);
 			FilterFields.emplace("tags", TagStr);
@@ -259,7 +260,7 @@ namespace Modio
 			std::string ExcludedTagStr;
 			for (std::string Tag : ExcludedTags)
 			{
-				ExcludedTagStr += Tag + ",";
+				ExcludedTagStr += Modio::Detail::String::URLEncode(Tag) + ",";
 			}
 			ExcludedTagStr.resize(ExcludedTagStr.size() - 1);
 			FilterFields.emplace("tags-not-in", ExcludedTagStr);

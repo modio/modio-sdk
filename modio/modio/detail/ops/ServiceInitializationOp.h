@@ -35,6 +35,8 @@
 	#include "modio/detail/ModioExtInitParamStub.h"
 #endif
 
+#include "modio/core/ModioMetricsService.h"
+
 #include <asio/yield.hpp>
 
 class ServiceInitializationOp
@@ -72,6 +74,7 @@ public:
 		Modio::Optional<std::string> InstallationDirectory =
 			GetExtendedParameterValue(InitParams, "IgnoreModInstallationDirectoryOverride");
 		Modio::Optional<std::string> PlatformEnvironment = GetExtendedParameterValue(InitParams, "PlatformEnvironment");
+		Modio::Optional<std::string> MetricsSecretKey = GetExtendedParameterValue(InitParams, "MetricsSecretKey");
 
 		reenter(CoroutineState)
 		{
@@ -91,6 +94,12 @@ public:
 			if (PlatformEnvironment.has_value())
 			{
 				Modio::Detail::SDKSessionData::SetPlatformEnvironment(*PlatformEnvironment);
+			}
+
+			if (MetricsSecretKey.has_value())
+			{
+				Modio::Detail::Services::GetGlobalService<Modio::Detail::MetricsService>().InitMetricsSession(
+					*MetricsSecretKey);
 			}
 			
 			Modio::Detail::SDKSessionData::SetPlatformStatusFilter(*PendingOnlyResults);

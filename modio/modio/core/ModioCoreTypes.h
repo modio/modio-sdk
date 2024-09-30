@@ -13,6 +13,8 @@
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/JsonWrapper.h"
 #include <cstdint>
+#include <random>
+#include <sstream>
 #include <string>
 
 namespace Modio
@@ -459,6 +461,87 @@ namespace Modio
 	};
 
 	/// @docpublic
+	/// @brief Strong type representing a Guid
+	struct Guid
+	{
+		/// @docinternal
+		/// @brief Default constructor
+		Guid() = default;
+
+		/// @docpublic
+		/// @brief Generates a new Guid.
+		/// NOTE: This is a minimalistic implementation of generating a Guid for metrics, an improved more robust
+		/// per-platform implementation is planned
+		static Guid GenerateGuid()
+		{
+			std::random_device rd;
+			std::mt19937 gen(rd());
+			std::uniform_int_distribution<> dis(0, 15);
+			std::uniform_int_distribution<> dis2(8, 11);
+
+			std::stringstream ss;
+			int i;
+			ss << std::hex;
+			for (i = 0; i < 8; i++)
+			{
+				ss << dis(gen);
+			}
+			ss << "-";
+			for (i = 0; i < 4; i++)
+			{
+				ss << dis(gen);
+			}
+			ss << "-4";
+			for (i = 0; i < 3; i++)
+			{
+				ss << dis(gen);
+			}
+			ss << "-";
+			ss << dis2(gen);
+			for (i = 0; i < 3; i++)
+			{
+				ss << dis(gen);
+			}
+			ss << "-";
+			for (i = 0; i < 12; i++)
+			{
+				ss << dis(gen);
+			}
+
+			Modio::Guid guid(ss.str());
+			return guid;
+		}
+
+		/// @docpublic
+		/// @brief Explicit constructor
+		/// @param InGuid string based Guid
+		explicit Guid(const std::string& InGuid) : InternalGuid(InGuid) {}
+
+		/// @docinternal
+		/// @brief Compare the Guid to an empty string
+		bool IsValid() const
+		{
+			return InternalGuid != *InvalidGuid();
+		}
+
+		/// @docinternal
+		/// @brief Static function to an invalid Guid
+		static Guid InvalidGuid()
+		{
+			return Guid();
+		}
+
+		/// @docnone
+		const std::string& operator*() const
+		{
+			return InternalGuid;
+		}
+
+	private:
+		std::string InternalGuid;
+	};
+
+	/// @docpublic
 	/// @brief Strong type wrapping a handle to an as-yet-uncreated mod
 	struct ModCreationHandle : public StrongInteger<std::int64_t>
 	{
@@ -561,7 +644,8 @@ namespace Modio
 		User,
 		ModManagement,
 		Test,
-		System
+		System,
+		ModMetrics
 	};
 
 	/// @docpublic
@@ -581,8 +665,9 @@ namespace Modio
 		Hidden = 0,
 		Public = 1
 	};
-	
-	///	@brief File approval status to filter by. Passed in ExtendedInitializationParameters for the duration of a session.
+
+	///	@brief File approval status to filter by. Passed in ExtendedInitializationParameters for the duration of a
+	/// session.
 	enum class PlatformStatus
 	{
 		LiveAndPending,
@@ -590,13 +675,24 @@ namespace Modio
 		ApprovedOnly
 	};
 
-
 	/// @docpublic
 	/// @brief Simple struct to encapsulate portal-specific data required when consuming entitlements
 	struct EntitlementParams
 	{
 		/// @brief ExtendedParameters A map to store extended parameters required by some portals.
 		std::map<std::string, std::string> ExtendedParameters;
+	};
+
+	/// @docpublic
+	/// @brief Simple struct to store metric session specific parameters for use in
+	/// xref:Modio::MetricsSessionStartAsync[]
+	struct MetricsSessionParams
+	{
+		/// @brief Set a custom Session Id to be used in the metrics service for your session
+		Modio::Optional<Modio::Guid> SessionId;
+
+		/// @brief Includes mods which will be tracked as part of the metrics service
+		std::vector<Modio::ModID> ModIds;
 	};
 
 } // namespace Modio

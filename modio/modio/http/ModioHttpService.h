@@ -47,6 +47,8 @@ namespace Modio
 
 			MODIO_IMPL void destroy(implementation_type& Implementation);
 
+			MODIO_IMPL std::string_view GetPlatformHeaderString();
+
 			template<typename CompletionHandler>
 			auto InitializeAsync(CompletionHandler Handler)
 			{

@@ -61,4 +61,4 @@ cmake --preset win
 ----
 
 
-For more details, follow the general details described in the https://github.com/modio/modio-sdk[mod.io repository]
+For more details, follow the general details described in the [mod.io repository](https://github.com/modio/modio-sdk)

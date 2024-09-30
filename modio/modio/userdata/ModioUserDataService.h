@@ -46,7 +46,7 @@ namespace Modio
 			}
 
 			template<typename CompletionHandlerType>
-			auto ClearUserDataAsync(CompletionHandlerType&& Handler)
+			auto ClearUserDataAsync(CompletionHandlerType&& Handler, bool bShouldDisableModManagement = true)
 			{
 				ModCollection FilteredModCollection =
 					Modio::Detail::SDKSessionData::FilterSystemModCollectionByUserSubscriptions();
@@ -80,7 +80,10 @@ namespace Modio
 						SDKSessionData::CancelModDownloadOrUpdate(ModEntry.first);
 					}
 
-					Modio::DisableModManagement();
+					if (bShouldDisableModManagement)
+					{
+						Modio::DisableModManagement();	
+					}
 				}
 				
 				return SaveUserDataToStorageAsync(std::forward<CompletionHandlerType>(Handler));			

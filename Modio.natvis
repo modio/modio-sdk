@@ -1,0 +1,17 @@
+?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+  <Type Name="tl::optional<*>">
+    <DisplayString Condition="m_has_value == true">{{ Value = {m_value}}}</DisplayString>
+    <DisplayString Condition="m_has_value == false">{{Not Set}}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::StrongInteger<*>">
+    <DisplayString>{{ID = {Value}}}</DisplayString>
+  </Type>
+
+    <Type Name="Modio::ErrorCode">
+    <DisplayString>{{{_Myval} - {message()}}}</DisplayString>
+  </Type>
+
+</AutoVisualizer>

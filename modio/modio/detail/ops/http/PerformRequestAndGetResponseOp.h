@@ -121,8 +121,7 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
-
-					if (Request->Parameters().ContainsFormData())
+					else if (Request->Parameters().ContainsFormData())
 					{
 						while ((Impl->PayloadElement = Request->Parameters().TakeNextPayloadElement()))
 						{
@@ -161,8 +160,7 @@ namespace Modio
 								Impl->CurrentPayloadFileBytesRead = Modio::FileSize(0);
 
 								Impl->CurrentPayloadFile = std::make_unique<Modio::Detail::File>(
-									Impl->PayloadElement->second.PathToFile.value(),
-									Modio::Detail::FileMode::ReadOnly);
+									Impl->PayloadElement->second.PathToFile.value(), Modio::Detail::FileMode::ReadOnly);
 
 								while (Impl->CurrentPayloadFileBytesRead < Impl->CurrentPayloadFile->GetFileSize())
 								{
@@ -226,6 +224,8 @@ namespace Modio
 
 					yield Request->ReadResponseHeadersAsync(std::move(Self));
 
+					Modio::Detail::SDKSessionData::ClearLastValidationError();
+
 					if (ec)
 					{
 						Self.complete(ec);
@@ -280,7 +280,6 @@ namespace Modio
 						}
 					}
 #endif
-					Modio::Detail::SDKSessionData::ClearLastValidationError();
 					if (ResponseCode < 200 || ResponseCode > 204)
 					{
 						// Servers massively overloaded, so we return a http page instead
@@ -297,6 +296,16 @@ namespace Modio
 						Modio::Optional<ResponseError> Error = TryMarshalResponse<ResponseError>(ResultBuffer);
 						if (Error.has_value())
 						{
+							// We got a response, but we were not able to marshall it successfully.
+							if (Error->Code == -1)
+							{
+								Modio::Detail::Logger().Log(
+									Modio::LogLevel::Warning, Modio::LogCategory::Http,
+									"Non 200-204 response received which was unable to be marshaled successfully.");
+								Self.complete(Modio::make_error_code(Modio::HttpError::InvalidResponse));
+								return;
+							}
+
 							Modio::ErrorCode ErrRef =
 								Modio::make_error_code(static_cast<Modio::ApiError>(Error->ErrorRef));
 							if (Error->ExtendedErrorInformation.has_value())
@@ -339,7 +348,8 @@ namespace Modio
 					}
 
 					Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Http,
-												"Response received for {}; status code was: {}", Request->Parameters().GetFormattedResourcePath(), ResponseCode);
+												"Response received for {}; status code was: {}",
+												Request->Parameters().GetFormattedResourcePath(), ResponseCode);
 
 					Modio::Detail::Buffer ResponseBuffer(ResultBuffer.size());
 					Modio::Detail::BufferCopy(ResponseBuffer, ResultBuffer);

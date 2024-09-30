@@ -40,6 +40,11 @@ namespace Modio
 			}
 
 			ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string>& Overrides);
+
+			std::string_view GetPlatformHeaderString()
+			{
+				return "Windows";
+			}
 		};
 	} // namespace Detail
 } // namespace Modio

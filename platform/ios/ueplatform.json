@@ -14,7 +14,6 @@
     "MODIO_TARGET_PLATFORM_ID=\"ios\"",
     "MODIO_UNREAL_PLATFORM_PREAMBLE=\"ios/detail/ModioUEPlatformPreamble.h\"",
     "MODIO_UNREAL_PLATFORM_EPILOGUE=\"ios/detail/ModioUEPlatformEpilogue.h\"",
-    "MODIO_TARGET_PLATFORM_HEADER=\"iOS\"",
     "FU2_WITH_NO_EMPTY_PROPAGATION",
     "ASIO_INITIALIZE_CALL_STACK"
   ],

@@ -34,11 +34,35 @@ namespace Modio
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
 				auto& UserDataService = Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>();
+				bool bShouldDisableModManagement = true;
+
 				reenter(LocalState->CoroutineState)
 				{
+					
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						LocalState->ResponseBuffer, LocalState->AuthenticationParams, Detail::CachedResponse::Disallow,
 						std::move(Self));
+
+					{
+						Modio::Optional<ResponseError> Error =
+							TryMarshalResponse<ResponseError>(LocalState->ResponseBuffer);
+						if (Error.has_value())
+						{
+							Modio::ErrorCode ErrRef =
+								Modio::make_error_code(static_cast<Modio::ApiError>(Error->ErrorRef));
+
+							if (ErrRef == Modio::ApiError::PSNChildAccountNotPermitted ||
+								ErrRef == Modio::ApiError::XBoxLiveChildAccountNotPermitted ||
+								ErrRef == Modio::ApiError::PSNNotAllowedToInteractWithUGC||
+								ErrRef == Modio::ApiError::XBoxLiveNotAllowedToInteractWithUGC)
+							{
+								Self.complete(Modio::make_error_code(Modio::ParentalControlRestriction::ParentalControlRestriction));
+								return;
+							}
+
+						}
+					}
+
 
 					if (ec)
 					{
@@ -85,10 +109,19 @@ namespace Modio
 						}
 					}
 					LocalState->ResponseBuffer.Clear();
+
 					if (!Modio::Detail::SDKSessionData::GetAuthenticatedUser() ||
 						LocalState->AuthUser.UserId != Modio::Detail::SDKSessionData::GetAuthenticatedUser()->UserId)
 					{
-						yield UserDataService.ClearUserDataAsync(std::move(Self));
+						// If we do not have a currently authenticated user (ie this is a fresh login), then we do
+						// not want to disable mod management
+						if (!Modio::Detail::SDKSessionData::GetAuthenticatedUser())
+						{
+							bShouldDisableModManagement = false;
+						}
+
+						yield UserDataService.ClearUserDataAsync(std::move(Self), bShouldDisableModManagement);
+
 						Modio::Detail::SDKSessionData::InitializeForUser(
 							std::move(LocalState->AuthUser), Modio::Detail::OAuthToken(LocalState->AuthResponse));
 					}

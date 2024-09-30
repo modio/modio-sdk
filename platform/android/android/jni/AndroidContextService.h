@@ -71,14 +71,14 @@ namespace Modio
 		private:
 			MODIO_IMPL void InternalInitializeJNI(JavaVM* InJavaVM, jobject InClassLoader);
 
-			jobject ActivityObject;
+			jobject ActivityObject = NULL;
 
-			JavaVM* JVM;
+			JavaVM* JVM = NULL;
 
-			jobject ClassLoader;
-			jmethodID FindClassMethod;
+			jobject ClassLoader = NULL;
+			jmethodID FindClassMethod = NULL;
 
-			JavaClassWrapperModio* JavaClassModio;
+			JavaClassWrapperModio* JavaClassModio = NULL;
 		};
 	} // namespace Detail
 } // namespace Modio
