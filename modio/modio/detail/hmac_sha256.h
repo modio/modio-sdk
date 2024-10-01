@@ -32,8 +32,6 @@ extern "C"
 
 #define ror(value, bits) (((value) >> (bits)) | ((value) << (32 - (bits))))
 
-#define MIN(x, y) (((x) < (y)) ? (x) : (y))
-
 #define STORE32H(x, y)                          \
 	{                                           \
 		(y)[0] = (uint8_t) (((x) >> 24) & 255); \
@@ -75,8 +73,10 @@ extern "C"
 		0x19a4c116UL, 0x1e376c08UL, 0x2748774cUL, 0x34b0bcb5UL, 0x391c0cb3UL, 0x4ed8aa4aUL, 0x5b9cca4fUL, 0x682e6ff3UL,
 		0x748f82eeUL, 0x78a5636fUL, 0x84c87814UL, 0x8cc70208UL, 0x90befffaUL, 0xa4506cebUL, 0xbef9a3f7UL, 0xc67178f2UL};
 
-#define BLOCK_SIZE 64
-
+	inline uint32_t GetBlockSize()
+	{
+		return 64;
+	}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  INTERNAL FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -196,24 +196,25 @@ extern "C"
 
 		while (BufferSize > 0)
 		{
-			if (Context->curlen == 0 && BufferSize >= BLOCK_SIZE)
+			if (Context->curlen == 0 && BufferSize >= GetBlockSize())
 			{
 				TransformFunction(Context, (uint8_t*) Buffer);
-				Context->length += BLOCK_SIZE * 8;
-				Buffer = (uint8_t*) Buffer + BLOCK_SIZE;
-				BufferSize -= BLOCK_SIZE;
+				Context->length += GetBlockSize() * 8;
+				Buffer = (uint8_t*) Buffer + GetBlockSize();
+				BufferSize -= GetBlockSize();
 			}
 			else
 			{
-				n = MIN(BufferSize, (BLOCK_SIZE - Context->curlen));
+				n = (((BufferSize) < (GetBlockSize() - Context->curlen)) ? (BufferSize)
+																		 : (GetBlockSize() - Context->curlen));
 				memcpy(Context->buf + Context->curlen, Buffer, (size_t) n);
 				Context->curlen += n;
 				Buffer = (uint8_t*) Buffer + n;
 				BufferSize -= n;
-				if (Context->curlen == BLOCK_SIZE)
+				if (Context->curlen == GetBlockSize())
 				{
 					TransformFunction(Context, Context->buf);
-					Context->length += 8 * BLOCK_SIZE;
+					Context->length += 8 * GetBlockSize();
 					Context->curlen = 0;
 				}
 			}
