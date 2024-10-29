@@ -16,6 +16,8 @@
 
 namespace Modio::Detail
 {
+	/// @docinternal
+	/// @brief Container for metadata related to gallery images
 	struct GalleryImageType
 	{
 		GalleryImageType(Modio::ModID ModId, const Modio::GalleryList& GalleryList, Modio::GallerySize GallerySize,

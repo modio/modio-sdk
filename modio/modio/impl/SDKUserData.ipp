@@ -131,7 +131,7 @@ namespace Modio
 						break;
 				}
 			}
-		});
+			});
 
 		// Return immediately if the SDK is not initialized or the API rate limit is reached
 	}

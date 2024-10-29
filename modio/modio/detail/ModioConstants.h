@@ -85,6 +85,12 @@ namespace Modio
 				// A heartbeat POST request is required to be submitted at-most every 5 minutes (300s).
 				// We send a heartbeat by default at half that requirement to ensure we do not time out.
 				constexpr uint32_t MetricsHeartbeatIntervalSeconds = 150;
+				// The maximum path length (260 characters) defined by the Win32 API as MAX_PATH.
+				// This value is enforced to ensure compatibility across platforms, particularly
+				// preventing issues on Windows where path lengths are restricted.
+				// By applying this universally, we avoid mod creation on platforms without the limit
+				// that would otherwise encounter issues when run on Windows systems.
+				constexpr std::size_t UniversalMaxPath = 260;
 			} // namespace Configuration
 			namespace PlatformNames
 			{

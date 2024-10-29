@@ -18,17 +18,25 @@ namespace Modio
 {
 	namespace Detail
 	{
-
+		/// @docinternal
+		/// @brief Access token object
 		struct AccessTokenObject
 		{
+			/// @brief The default constructor
 			std::int32_t HttpResponseCode;
+
+			/// @brief The access token
 			std::string AccessToken;
+
+			/// @brief The date the token expires
 			Modio::Timestamp DateExpires;
 
 			/// @docnone
 			MODIO_IMPL friend void from_json(const nlohmann::json& Json, AccessTokenObject& AccessToken);
 		};
 
+		/// @docinternal
+		/// @brief OAuth token object
 		enum class OAuthTokenState : std::uint8_t
 		{
 			Valid,
@@ -36,21 +44,37 @@ namespace Modio
 			Invalid
 		};
 
+		/// @docinternal
+		/// @brief OAuth token object
 		struct OAuthToken
 		{
+			/// @docinternal
+			/// @brief The default constructor
 			OAuthToken() = default;
+
+			/// @docinternal
+			/// @brief Constructor to create a valid token
 			OAuthToken(const std::string& InToken, Modio::Timestamp InExpireDate)
 				: Token(InToken),
 				  ExpireDate(InExpireDate),
 				  State(OAuthTokenState::Valid)
 			{}
+
+			/// @docinternal
+			/// @brief Constructor that creates token from an access token object
 			OAuthToken(Modio::Detail::AccessTokenObject AccessToken)
 				: OAuthToken(AccessToken.AccessToken, AccessToken.DateExpires)
 			{}
+
+			/// @docinternal
+			/// @brief Invalidate the token
 			void SetInvalidState()
 			{
 				State = OAuthTokenState::Invalid;
 			}
+
+			/// @docinternal
+			/// @brief Get the state of the token
 			OAuthTokenState GetTokenState() const
 			{
 				if (State == OAuthTokenState::Valid)
@@ -63,11 +87,17 @@ namespace Modio
 				}
 				return OAuthTokenState::Invalid;
 			}
+
+			/// @docinternal
+			/// @brief Implicit conversion to bool
 			operator bool() const
 			{
 				return GetTokenState() == OAuthTokenState::Valid;
 			}
-			const Modio::Optional<std::string> GetToken() const
+
+			/// @docinternal
+			/// @brief Get the token
+			Modio::Optional<std::string> GetToken() const
 			{
 				if (GetTokenState() == OAuthTokenState::Valid)
 				{
@@ -85,11 +115,17 @@ namespace Modio
 			MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::Detail::OAuthToken& InToken);
 
 		private:
-			// Optional here so that the accessors can return references to avoid memcpy, will always be set
+			/// @docinternal
+			/// @brief Optional here so that the accessors can return references to avoid memcpy, will always be set
 			Modio::Optional<std::string> Token;
+
+			/// @docinternal
+			/// @brief The date the token expires
 			Modio::Timestamp ExpireDate;
 
 		private:
+			/// @docinternal
+			/// @brief The state of the token
 			OAuthTokenState State = OAuthTokenState::Invalid;
 
 			/// @docnone

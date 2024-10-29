@@ -18,6 +18,8 @@ namespace Modio
 {
 	namespace Detail
 	{
+		/// @docinternal
+		/// @brief Container for metadata related to logo images
 		struct LogoImageType
 		{
 			LogoImageType(Modio::ModID ModID, Modio::LogoSize LogoSize, const Modio::Detail::Logo& Logo)

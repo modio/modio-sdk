@@ -23,6 +23,7 @@
 
 namespace Modio
 {
+	/// @docpublic
 	/// @brief Details about a platform that this game supports
 	struct GamePlatform
 	{
@@ -35,6 +36,8 @@ namespace Modio
 		/// @brief Whether or not files submitted for this platform are required to go through moderation
 		bool Moderated;
 	};
+
+	/// @docpublic
 	/// @brief Contains media URLs to the preview header image for the game
 	struct HeaderImage
 	{
@@ -45,6 +48,7 @@ namespace Modio
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::HeaderImage& HeaderImage);
 	};
 
+	/// @docpublic
 	/// @brief Creator defined URLs to share
 	struct OtherUrl
 	{
@@ -55,6 +59,7 @@ namespace Modio
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::OtherUrl& OtherUrl);
 	};
 
+	/// @docpublic
 	/// @brief Theme color values for the game
 	struct Theme
 	{
@@ -69,6 +74,8 @@ namespace Modio
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Theme& Theme);
 	};
 
+	/// @docpublic
+	/// @brief Details about a game
 	struct GameInfo
 	{
 		/// @brief Unique Game ID

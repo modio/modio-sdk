@@ -69,12 +69,10 @@ namespace Modio
 				ExpectedFilesize = Filesize;
 				File = std::make_shared<Modio::Detail::File>(DestinationPath += Modio::filesystem::path(".download"),
 															 Modio::Detail::FileMode::ReadWrite, false);
-				CurrentFilePosition =
-					std::make_shared<std::uintmax_t>(File->GetFileSize() - (File->GetFileSize() % (1024 * 1024)));
-				File->Truncate(Modio::FileOffset(*CurrentFilePosition));
-				File->Seek(Modio::FileOffset(*CurrentFilePosition));
-				Request = std::make_shared<Modio::Detail::HttpRequest>(
-					RequestParams.SetRange(Modio::FileOffset(*CurrentFilePosition), {}));
+				// Initialize CurrentFilePosition to 0 - we'll set the actual value after truncate
+				CurrentFilePosition = std::make_shared<std::uintmax_t>(0);
+				// Initialize the request without range header - we'll update it after setting the position
+				Request = std::make_shared<Modio::Detail::HttpRequest>(RequestParams);
 				EndOfFileReached = std::make_shared<bool>(false);
 				Impl = std::make_shared<DownloadFileImpl>(std::move(DownloadTicket));
 			}
@@ -116,6 +114,21 @@ namespace Modio
 
 				reenter(Coroutine)
 				{
+					// Initialize file position and perform truncate/seek operations
+					*CurrentFilePosition = File->GetFileSize() - (File->GetFileSize() % (static_cast<std::int64_t>(1024) * 1024));
+
+					ec = File->Truncate(Modio::FileOffset(*CurrentFilePosition));
+					if (ec)
+					{
+						Self.complete(ec);
+						return;
+					}
+
+					File->Seek(Modio::FileOffset(*CurrentFilePosition));
+
+					// Update request with range header now that we have the correct position
+					Request->Parameters().SetRange(Modio::FileOffset(*CurrentFilePosition), {});
+
 					yield Impl->DownloadTicket.WaitForTurnAsync(std::move(Self));
 
 					if (ec)

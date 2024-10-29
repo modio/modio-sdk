@@ -9,20 +9,20 @@
  */
 
 #pragma once
+#include "ModioPlatformDefines.h"
 
-#include "ModioGeneratedVariables.h"
 #include "common/UTF16Support.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/OptionalWrapper.h"
+#include <Windows.h>
 #include <atomic>
 #include <memory>
 #include <queue>
 #include <shared_mutex>
 #include <unordered_map>
 #include <utility>
-#include <Windows.h>
 #include <winhttp.h>
 
 // TODO: @ModioGDK probably move this back up to the parent service

@@ -9,7 +9,8 @@
  */
 
 #pragma once
-#include "ModioGeneratedVariables.h"
+#include "ModioPlatformDefines.h"
+
 #include "http/HttpRequestImplementation.h"
 #include "macos/HttpSharedState.h"
 #include "macos/detail/ops/http/InitializeHttpOp.h"
@@ -56,8 +57,12 @@ namespace Modio
 			template<typename CompletionToken>
 			auto InitializeHTTPAsync(CompletionToken&& Token)
 			{
+#ifdef MODIO_TARGET_PLATFORM_ID
 				constexpr const char* ModioAgentString =
 					"Modio SDK v2 built from " MODIO_COMMIT_HASH ":" MODIO_TARGET_PLATFORM_ID;
+#else
+				constexpr const char* ModioAgentString = "Modio SDK v2 built from " MODIO_COMMIT_HASH ": MACOS";
+#endif
 				HttpState = std::make_shared<HttpSharedState>();
 				HttpState->UserAgentString = ModioAgentString;
 				return asio::async_compose<CompletionToken, void(Modio::ErrorCode)>(

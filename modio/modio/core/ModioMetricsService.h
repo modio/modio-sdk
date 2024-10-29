@@ -116,7 +116,7 @@ namespace Modio
 			std::string ModIdsString;
 			std::vector<ModID> ModIds;
 			time_t SessionStartTime;
-			int CurrentSessionOrderId;
+			uint64_t CurrentSessionOrderId;
 
 			time_t LastHeartbeatPerformed;
 

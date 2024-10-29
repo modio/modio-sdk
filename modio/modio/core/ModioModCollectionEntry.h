@@ -506,6 +506,13 @@ namespace Modio
 		MODIO_IMPL bool AddOrUpdateMod(Modio::ModInfo ModToAdd, std::string CalculatedModPath);
 
 		/// @docpublic
+		/// @brief Updates a mod in the collection if it exists, otherwise does nothing
+		/// @param ModToUpdate The mod to update
+		/// @param CalculatedModPath The new path to the mod on disk
+		/// @return True of mod was updated, false if mod was not present
+		MODIO_IMPL bool UpdateMod(Modio::ModInfo ModToUpdate, std::string CalculatedModPath);
+
+		/// @docpublic
 		/// @brief Retrieve a dictionary of ModID - ModCollectionEntry stored in this ModCollection
 		/// @return Dictionary where keys are ModID and values are ModCollectionEntry
 		MODIO_IMPL const std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& Entries() const;

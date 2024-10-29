@@ -22,6 +22,14 @@
 #include <string>
 #undef DELETE
 
+#ifndef MODIO_COMMIT_HASH
+	#if __has_include("modio/detail/ModioGeneratedVariables.h")
+		#include "modio/detail/ModioGeneratedVariables.h"
+	#else
+		#define MODIO_COMMIT_HASH "UNKNOWN"
+	#endif
+#endif
+
 namespace Modio
 {
 	namespace Detail
@@ -50,7 +58,7 @@ namespace Modio
 		{
 			Allow,
 			Disallow
-		};	
+		};
 
 		/// @docinternal
 		/// @brief Container for payloads retrieved/uploaded by HTTP operations
@@ -84,13 +92,13 @@ namespace Modio
 			MODIO_IMPL PayloadContent& operator=(const PayloadContent& Other);
 			MODIO_IMPL PayloadContent(PayloadContent&& Other) = default;
 			MODIO_IMPL PayloadContent& operator=(PayloadContent&& Other);
-            
-            // Search in "Members" for any attribute that has a PayloadContent with
-            // ContentSize != 0 and add that to the result "FileSize"
+
+			// Search in "Members" for any attribute that has a PayloadContent with
+			// ContentSize != 0 and add that to the result "FileSize"
 			MODIO_IMPL static Modio::Optional<Modio::FileSize> PayloadContentSize(
 				std::map<std::string, PayloadContent> Members);
 		};
-		
+
 		/// @docinternal
 		/// @brief Set of operations to construct HTTP requests
 		class HttpRequestParams
@@ -126,8 +134,8 @@ namespace Modio
 
 			MODIO_IMPL HttpRequestParams AddStatusFilter() const;
 
-			MODIO_IMPL HttpRequestParams AppendQueryParameterMap(const std::map<std::string, std::string> InQueryParameterMap) const;
-
+			MODIO_IMPL HttpRequestParams
+				AppendQueryParameterMap(const std::map<std::string, std::string> InQueryParameterMap) const;
 
 			// Overload to silently drop nulled keys - doesn't have to be a template strictly, but is one so that it's
 			// lower priority than the std::string version in the overload set
@@ -235,7 +243,7 @@ namespace Modio
 
 			// It would enable the HTTP header "Range: bytes=Start-End"
 			MODIO_IMPL HttpRequestParams& SetRange(Modio::FileOffset Start, Modio::Optional<Modio::FileOffset> End);
-			
+
 			// It would enable the HTTP header "ContentRange: bytes Start-End/TotalBytes"
 			MODIO_IMPL HttpRequestParams& SetContentRange(Modio::FileOffset Start, Modio::FileOffset End,
 														  Modio::FileOffset TotalBytes);
@@ -272,7 +280,8 @@ namespace Modio
 				  ModID(0),
 				  UserID(0),
 				  CurrentOperationType(CurrentOperationType),
-				  CurrentAPIVersion(Modio::Detail::APIVersion::V1) {}
+				  CurrentAPIVersion(Modio::Detail::APIVersion::V1)
+			{}
 
 			HttpRequestParams(Modio::Detail::Verb CurrentOperationType, const char* ResourcePath)
 				: ResourcePath(ResourcePath),
@@ -357,7 +366,7 @@ namespace Modio
 			// Three variables needed to create the header Content-Range
 			// {Start, End, Total}
 			Modio::Optional<std::tuple<Modio::FileOffset, Modio::FileOffset, Modio::FileOffset>> ContentRangeOffsets;
-			
+
 			Modio::Optional<std::string> UserAgentOverride;
 
 			std::map<std::string, std::string> QueryParameters;

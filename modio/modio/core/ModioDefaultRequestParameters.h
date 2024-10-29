@@ -126,6 +126,8 @@ namespace Modio
         static const HttpRequestParams PingRequest { Modio::Detail::Verb::GET, "/ping" }; 
         static const HttpRequestParams SubmitReportRequest { Modio::Detail::Verb::POST, "/report" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams S2sDisconnectUserRequest { Modio::Detail::Verb::DELETE, "/s2s/connections/{portal-id}" , "application/x-www-form-urlencoded" }; 
+        static const HttpRequestParams GetMonetizationTransactionsRequest { Modio::Detail::Verb::GET, "/s2s/monetization-teams/{monetization-team-id}/transactions" }; 
+        static const HttpRequestParams GetMonetizationTransactionRequest { Modio::Detail::Verb::GET, "/s2s/monetization-teams/{monetization-team-id}/transactions/{transaction-id}" }; 
         static const HttpRequestParams S2sTransactionClawbackRequest { Modio::Detail::Verb::POST, "/s2s/transactions/clawback" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams S2sTransactionCommitRequest { Modio::Detail::Verb::POST, "/s2s/transactions/commit" , "application/x-www-form-urlencoded" }; 
         static const HttpRequestParams S2sTransactionIntentRequest { Modio::Detail::Verb::POST, "/s2s/transactions/intent" , "application/x-www-form-urlencoded" }; 

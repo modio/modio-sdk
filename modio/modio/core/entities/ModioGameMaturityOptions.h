@@ -14,6 +14,7 @@
 
 namespace Modio
 {
+	/// @docpublic
 	/// @brief Maturity options for a game
 	///	* 0 = Don't allow mature content in mods (default)
 	///	* 1 = This game allows mods containing mature content
@@ -37,7 +38,7 @@ namespace Modio
 		}
 		using Modio::FlagImpl<GameMaturityOptions>::FlagImpl;
 
-			/// @docnone
+		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GameMaturityOptionsFlags& GameMaturity);
 
 		/// @docnone

@@ -454,7 +454,8 @@ int main()
 			// Once the set has been created, you can add or remove mods to it later
 			std::vector<Modio::ModID> TempModList;
 			TempModList.emplace_back(UserModID);
-			Modio::InitTempModSet(TempModList);
+
+			(void) Modio::InitTempModSet(TempModList);
 
 			// Note that the TempModSet functions are not Async, meaning you get an immediate return.
 			// You will, however receive a Mod Management event once installation of the Temp Mod is successful
@@ -521,7 +522,7 @@ int main()
 		// and close the set, requiring a new one to be initialized next time.
 		// If you do not do this, temp mods will be auto cleaned up next time the SDK is initialized
 
-		Modio::CloseTempModSet();
+		(void) Modio::CloseTempModSet();
 	}
 
 	Modio::ShutdownAsync(ModioExample::OnShutdownComplete);

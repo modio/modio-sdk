@@ -18,6 +18,8 @@
 
 namespace Modio
 {
+	/// @docpublic
+	/// @brief Parameters to start a metrics session
 	struct MetricsSessionStartParams
 	{
 	public:

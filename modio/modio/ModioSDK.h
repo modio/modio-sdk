@@ -606,6 +606,8 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
 	/// @error GenericError::BadParameter|The supplied mod ID is invalid
+	/// @error APIError::CannotArchiveModWithDependents|This mod is a dependency of other mods and as such cannot be
+	/// archived
 	MODIOSDK_API void ArchiveModAsync(Modio::ModID ModID, std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic

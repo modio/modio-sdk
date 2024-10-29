@@ -17,6 +17,8 @@
 
 namespace Modio
 {
+	/// @docpublic
+	/// @brief Localization data for a tag value
 	struct ModTagLocalizationData
 	{
 		/// @docpublic
@@ -32,11 +34,10 @@ namespace Modio
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModTagLocalizationData& TagLocalization);
 	};
 
+	/// @docpublic
+	/// @brief Struct containing pre-localized display strings for a tag group
 	struct LocalizedTagCategory
 	{
-		/// @docpublic
-		/// @brief Struct containing pre-localized display strings for a tag group
-
 		/// @brief Localized display string for this tag category's name
 		std::string GroupName;
 

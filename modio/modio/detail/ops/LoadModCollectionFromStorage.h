@@ -41,7 +41,9 @@ namespace Modio
 						Modio::Detail::FileMode::ReadOnly, false);
 					if (DestinationFile->GetFileSize() == std::numeric_limits<std::uint64_t>::max())
 					{
-						Self.complete(Modio::make_error_code(Modio::FilesystemError::FileNotFound));
+						Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::ModManagement,
+													"Could not find state.json at path: {}", DestinationFile->GetPath().string());
+						Self.complete(ec);
 						return;
 					}
 					yield DestinationFile->ReadAsync(DestinationFile->GetFileSize(), DataBuffer, std::move(Self));

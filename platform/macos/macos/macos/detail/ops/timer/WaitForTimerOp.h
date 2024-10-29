@@ -35,7 +35,11 @@ public:
 		}
 		reenter(CoroutineState)
 		{
-			PinnedState->InitializeTimer(Timer);
+			if (Modio::ErrorCode TimerErrorCode = PinnedState->InitializeTimer(Timer))
+			{
+				Self.complete(TimerErrorCode);
+				return;
+			}
 			yield PinnedState->BeginTimerInternalAsync(Timer, std::move(Self));
 			Self.complete(ec);
 			return;

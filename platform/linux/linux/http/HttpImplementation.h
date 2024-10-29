@@ -9,14 +9,15 @@
  */
 
 #pragma once
-#include "ModioGeneratedVariables.h"
+#include "ModioPlatformDefines.h"
+
 #include "http/HttpRequestImplementation.h"
 #include "linux/HttpSharedState.h"
 #include "linux/detail/ops/http/InitializeHttpOp.h"
 #include "linux/detail/ops/http/ReadHttpResponseHeadersOp.h"
 #include "linux/detail/ops/http/ReadSomeResponseBodyOp.h"
-#include "linux/detail/ops/http/SendHttpRequestOp.h"
 #include "linux/detail/ops/http/SSLConnectionWriteOp.h"
+#include "linux/detail/ops/http/SendHttpRequestOp.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
@@ -56,9 +57,13 @@ namespace Modio
 			template<typename CompletionToken>
 			auto InitializeHTTPAsync(CompletionToken&& Token)
 			{
+#ifdef MODIO_TARGET_PLATFORM_ID
 				constexpr const char* ModioAgentString =
 					"Modio SDK v2 built from " MODIO_COMMIT_HASH ":" MODIO_TARGET_PLATFORM_ID;
-					HttpState = std::make_shared<HttpSharedState>();
+#else
+				constexpr const char* ModioAgentString = "Modio SDK v2 built from " MODIO_COMMIT_HASH ": LINUX";
+#endif
+				HttpState = std::make_shared<HttpSharedState>();
 				return asio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
 					InitializeHttpOp(ModioAgentString, HttpState), Token,
 					Modio::Detail::Services::GetGlobalContext().get_executor());

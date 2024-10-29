@@ -8,6 +8,7 @@
 #
 
 if(MODIO_PLATFORM STREQUAL "IOS")
+	#set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
     set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake;${CMAKE_MODULE_PATH}")
 	set (MODIO_PLATFORM_IOS ON INTERNAL "building for iOS")
 
@@ -40,5 +41,12 @@ if(MODIO_PLATFORM STREQUAL "IOS")
 
 	if (MODIO_BUILD_EXAMPLES)
 		add_subdirectory(examples/modioSSO EXCLUDE_FROM_ALL)
+
+		if(${CMAKE_GENERATOR} MATCHES "^Xcode.*")
+			## Adding the Swift language as part of the project using Ninja, complains 
+			## about not correctly compiling the sample code. 
+			add_subdirectory(examples/modioSwift EXCLUDE_FROM_ALL)
+		endif()
+		
 	endif()
 endif()

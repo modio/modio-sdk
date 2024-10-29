@@ -9,7 +9,9 @@
  */
 
 #pragma once
-#include "ModioGeneratedVariables.h"
+#include "ModioPlatformDefines.h"
+
+#include "common/UTF16Support.h"
 #include "common/detail/ops/http/ReadHttpResponseHeadersOp.h"
 #include "common/detail/ops/http/ReadSomeResponseBodyOp.h"
 #include "common/detail/ops/http/SendHttpRequestOp.h"
@@ -66,11 +68,19 @@ namespace Modio
 			template<typename CompletionToken>
 			auto InitializeHTTPAsync(CompletionToken&& Token)
 			{
+#ifdef MODIO_TARGET_PLATFORM_ID
 				constexpr const wchar_t* ModioAgentString =
-					L"Modio SDK v2 built from " MODIO_COMMIT_HASH ":" MODIO_TARGET_PLATFORM_ID;
+					L"Modio SDK v2 built from " MODIO_COMMIT_HASH ": " MODIO_TARGET_PLATFORM_ID;
+				std::wstring ComputedAgentString = std::wstring(ModioAgentString);
+#else
+				constexpr const char* ModioAgentString = "Modio SDK v2 built from " MODIO_COMMIT_HASH ": ";
+				std::wstring ComputedAgentString =
+					UTF8ToWideChar(std::string(ModioAgentString) +
+								   std::string(static_cast<Subplatform*>(this)->GetPlatformHeaderString()));
+#endif
 				HttpState = std::make_shared<SharedStateType>(nullptr);
 				return asio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
-					static_cast<Subplatform*>(this)->MakeInitializeHttpOp(ModioAgentString, HttpState), Token,
+					static_cast<Subplatform*>(this)->MakeInitializeHttpOp(ComputedAgentString, HttpState), Token,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 
@@ -104,8 +114,7 @@ namespace Modio
 			auto BeginWriteAsync(IOObjectImplementationType MODIO_UNUSED_ARGUMENT(PlatformIOObjectInstance),
 								 Modio::FileSize MODIO_UNUSED_ARGUMENT(TotalLength),
 								 CompletionToken&& MODIO_UNUSED_ARGUMENT(Token))
-			{
-			}
+			{}
 
 			template<typename CompletionToken>
 			auto WriteSomeAsync(IOObjectImplementationType PlatformIOObjectInstance, Modio::Detail::Buffer Data,

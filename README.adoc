@@ -238,10 +238,10 @@ FILE HEADER VALUES
 
 Please see the https://docs.mod.io/cppsdk/[Getting Started documentation] for a breakdown of the mod.io SDK's concepts and usage, including:
 
-* https://docs.mod.io/cppsdk/getting-started/#sdk-quick-start-initialization-and-teardown[SDK initialization and event loop]
-* https://docs.mod.io/cppsdk/getting-started/#sdk-quick-start-user-authentication[Authentication]
-* https://docs.mod.io/cppsdk/getting-started/#sdk-quick-start-browsing-available-mods[Mod Browsing]
-* https://docs.mod.io/cppsdk/getting-started/#sdk-quick-start-mod-management-and-subscriptions[Mod Subscription Management]
+* https://docs.mod.io/cppsdk/getting-started/#initialization-and-teardown[SDK initialization and event loop]
+* https://docs.mod.io/cppsdk/getting-started/#user-authentication[Authentication]
+* https://docs.mod.io/cppsdk/getting-started/#browsing-available-mods[Mod Browsing]
+* https://docs.mod.io/cppsdk/getting-started/#mod-management-and-subscriptions[Mod Subscription Management]
 
 == Game studios and Publishers [[contact-us]]
 If you need assistance with 1st party approvals, or require a private, white-label UGC solution. mailto:developers@mod.io[Contact us] to discuss.

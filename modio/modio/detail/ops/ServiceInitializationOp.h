@@ -132,7 +132,7 @@ public:
 				if (ec)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File,
-												"Failed to load global configuration overrides");
+												"Failed to load global configuration overrides: " + ec.message());
 					ConfigurationValues = {};
 				}
 				else

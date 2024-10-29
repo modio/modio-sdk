@@ -27,7 +27,7 @@ namespace Modio
 		Live
 	};
 
-	/// @docpublic
+	/// @docnone
 	/// @brief Transform the EnumValue into the underlying type
 	/// @param EnumValue The enumerator value
 	/// @return A statically casted value related to the enumerator
@@ -52,7 +52,7 @@ namespace Modio
 		XboxLive
 	};
 
-	/// @docpublic
+	/// @docnone
 	/// @brief Transform the EnumValue into the underlying type
 	/// @param EnumValue The enumerator value
 	/// @return A statically casted value related to the enumerator
@@ -79,7 +79,7 @@ namespace Modio
 		Source
 	};
 
-	/// @docpublic
+	/// @docnone
 	/// @brief Transform the EnumValue into the underlying type
 	/// @param EnumValue The enumerator value
 	/// @return A statically casted value related to the enumerator
@@ -98,7 +98,7 @@ namespace Modio
 		Thumb1280 ///< 1280x720
 	};
 
-	/// @docpublic
+	/// @docnone
 	/// @brief Transform the EnumValue into the underlying type
 	/// @param EnumValue The enumerator value
 	/// @return A statically casted value related to the enumerator
@@ -117,7 +117,7 @@ namespace Modio
 		Thumb256 ///< 256x256
 	};
 
-	/// @docpublic
+	/// @docnone
 	/// @brief Transform the EnumValue into the underlying type
 	/// @param EnumValue The enumerator value
 	/// @return A statically casted value related to the enumerator
@@ -135,7 +135,7 @@ namespace Modio
 		Thumb100 ///< 100x100
 	};
 
-	/// @docpublic
+	/// @docnone
 	/// @brief Transform the EnumValue into the underlying type
 	/// @param EnumValue The enumerator value
 	/// @return A statically casted value related to the enumerator
@@ -153,7 +153,7 @@ namespace Modio
 		Thumb1280 ///< 1280x720
 	};
 
-	/// @docpublic
+	/// @docnone
 	/// @brief Transform the EnumValue into the underlying type
 	/// @param EnumValue The enumerator value
 	/// @return A statically casted value related to the enumerator
@@ -807,6 +807,8 @@ namespace Modio
 					return "googleidtoken";
 				case AuthenticationProvider::GoogleServerSideToken:
 					return "googleserversidetoken";
+                default:
+                    return "none";
 			}
 
 			assert(false && "Invalid value to ToString(Modio::Provider)");

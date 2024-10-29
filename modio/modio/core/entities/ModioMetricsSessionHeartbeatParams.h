@@ -18,6 +18,8 @@
 
 namespace Modio
 {
+	/// @docpublic
+	/// @brief Parameters to keep alive a metrics session
 	struct MetricsSessionHeartbeatParams
 	{
 	public:

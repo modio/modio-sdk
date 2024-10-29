@@ -1140,8 +1140,6 @@ The mod.io SDK supports all of the mod.io metrics features, allowing you to star
 
 NOTE: Running metrics play sessions is a premium feature. If you are interested in mod.io premium features, please contact developers@mod.io.
 
-The Metrics session functionality is all accessible through the `modiosdk.h`, as well as suplemented with a global Metrics Service to manage session data, accessed via `Modio::Detail::Services::GetGlobalService<Modio::Detail::MetricsService>()`
-
 Metrics based on the platform and portal, are transparently taken care of with no additional consideration needed when using the SDK.
 
 ==== Initialization

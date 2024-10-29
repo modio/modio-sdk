@@ -18,6 +18,8 @@
 
 namespace Modio
 {
+	/// @docpublic
+	/// @brief Parameters to end a metrics session
 	struct MetricsSessionEndParams
 	{
 	public:

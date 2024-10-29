@@ -164,10 +164,6 @@ namespace Modio
 		std::map<std::string, std::string> FilterFields;
 		std::string SortStr;
 
-		// The sorts listed at https://docs.mod.io/restapiref/#get-mods is inverted for some reason compared to the explanation at
-		// https://docs.mod.io/restapiref/#sorting
-		bool bInvertedSort = false;
-
 		switch (SortField)
 		{
 			case SortFieldType::DateMarkedLive:
@@ -177,22 +173,19 @@ namespace Modio
 				SortStr = "date_updated";
 				break;
 			case SortFieldType::DownloadsToday:
-				SortStr = "popular";
+				SortStr = "downloads_today";
 				break;
 			case SortFieldType::Rating:
-				SortStr = "rating";
-				bInvertedSort = true;
+				SortStr = "ratings_weighted_aggregate";
 				break;
 			case SortFieldType::SubscriberCount:
-				SortStr = "subscribers";
-				bInvertedSort = true;
+				SortStr = "subscribers_total";
 				break;
 			case SortFieldType::ID:
 				SortStr = "id";
 				break;
 			case SortFieldType::DownloadsTotal:
-				SortStr = "downloads";
-				bInvertedSort = true;
+				SortStr = "downloads_total";
 				break;
 			case SortFieldType::Alphabetical:
 				SortStr = "name";
@@ -202,12 +195,8 @@ namespace Modio
 				break;
 		}
 
-		FilterFields.emplace("_sort", fmt::format("{}{}",
-												  ((Direction == SortDirection::Descending && !bInvertedSort) ||
-														   (Direction == SortDirection::Ascending && bInvertedSort)
-													   ? "-"
-													   : ""),
-												  SortStr));
+		FilterFields.emplace("_sort",
+							 fmt::format("{}{}", (Direction == SortDirection::Descending ? "-" : ""), SortStr));
 
 		if (!SearchKeywords.empty())
 		{

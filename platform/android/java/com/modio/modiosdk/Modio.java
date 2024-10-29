@@ -11,13 +11,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import androidx.annotation.Keep;
+
+@Keep
 public class Modio {
     private final Activity _context;
 
+    @Keep
     public Modio(Activity context)
     {
         _context = context;
     }
+
+    @Keep
     public String getCertificatePath()
     {
         copyAsset("modio.crt", _context.getFilesDir().getAbsolutePath() + "/" + "Certificates");
@@ -25,11 +31,13 @@ public class Modio {
         return _context.getFilesDir().getAbsolutePath() + "/" + "Certificates/modio.crt";
     }
 
+    @Keep
     public String getStorageDirectory()
     {
         return _context.getFilesDir().getAbsolutePath() + "/";
     }
 
+    @Keep
     private void copyAsset(String asset, String to) {
 
         File dir = new File(to);
@@ -76,6 +84,7 @@ public class Modio {
         }
     }
 
+    @Keep
     private void copyFile(InputStream in, OutputStream out) throws IOException {
         byte[] buffer = new byte[1024];
         int read;

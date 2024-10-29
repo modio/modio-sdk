@@ -1,0 +1,17 @@
+= mod.io iOS SDK Example
+
+== About this Sample
+
+This sample demonstrates the interactions between Swift and the mod.io SDK. This allows users to engage with the mod.io service and access your game's User Generated Content.
+
+iOS has two options to run: Simulator and device. To choose either, enable/disable the variable `MODIO_IOS_DEVICE`. When it is `True``, it will load the frameworks that allow Xcode to run on device. When `False` (default), it will load the simulator binaries offered by the Apple SDK.
+
+In case you want to run any binary on device, you need a paid Apple Developer Account, which you can get at https://developer.apple.com[Apple Developer account].
+
+As of the date of this writing, Swift does not support `std::function` as callbacks with the C++ support. Therefore, the easiest way to integrate the mod.io SDK is using Objective-C++ and the bridging header. This example uses both.
+
+== Running the sample
+
+Once you have built the mod.io SDK project with CMake and flag `MODIO_BUILD_EXAMPLES` enabled, you will have access to the target `modioSwift`. This project is configured to run on Xcode.
+
+After these steps, make sure to update your `GAME_ID` and `API_KEY` in the `ModioSDKHelper.mm` file.

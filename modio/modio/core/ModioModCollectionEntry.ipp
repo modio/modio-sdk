@@ -498,6 +498,20 @@ namespace Modio
 		}
 	}
 
+	bool ModCollection::UpdateMod(Modio::ModInfo ModToUpdate, std::string CalculatedModPath)
+	{
+		auto ModEntry = ModEntries.find(ModToUpdate.ModId);
+		if (ModEntry == ModEntries.end())
+		{
+			return false;
+		}
+		else
+		{
+			(ModEntry)->second->UpdateModProfile(ModToUpdate);
+			return true;
+		}
+	}
+
 	const std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& ModCollection::Entries() const
 	{
 		return ModEntries;

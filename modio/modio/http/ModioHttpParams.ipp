@@ -11,10 +11,9 @@
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "modio/http/ModioHttpParams.h"
 #endif
-#include "ModioGeneratedVariables.h"
 #include "modio/core/ModioLogger.h"
-#include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ModioProfiling.h"
+#include "modio/detail/ModioSDKSessionData.h"
 #include "modio/http/ModioHttpService.h"
 
 namespace Modio
@@ -99,19 +98,20 @@ namespace Modio
 			return *this;
 		}
 
-		Modio::Detail::HttpRequestParams HttpRequestParams::AddQueryParamRaw(const std::string& Key, const std::string& Value) const
+		Modio::Detail::HttpRequestParams HttpRequestParams::AddQueryParamRaw(const std::string& Key,
+																			 const std::string& Value) const
 		{
 			HttpRequestParams NewParamsInstance(*this);
 			if (QueryParameters.count(Key) == 0)
 			{
-				NewParamsInstance.QueryParameters.emplace(Key, Value);	
+				NewParamsInstance.QueryParameters.emplace(Key, Value);
 			}
 
 			return NewParamsInstance;
 		}
 
 		Modio::Detail::HttpRequestParams& HttpRequestParams::AddQueryParamRaw(const std::string& Key,
-																			 const std::string& Value)
+																			  const std::string& Value)
 		{
 			if (QueryParameters.count(Key) == 0)
 			{
@@ -122,7 +122,7 @@ namespace Modio
 		}
 
 		Modio::Detail::HttpRequestParams HttpRequestParams::AddHeaderRaw(const std::string& Key,
-																			 const std::string& Value) const
+																		 const std::string& Value) const
 		{
 			HttpRequestParams NewParamsInstance(*this);
 			if (AdditionalHeaders.count(Key) == 0)
@@ -134,7 +134,7 @@ namespace Modio
 		}
 
 		Modio::Detail::HttpRequestParams& HttpRequestParams::AddHeaderRaw(const std::string& Key,
-																			  const std::string& Value)
+																		  const std::string& Value)
 		{
 			if (QueryParameters.count(Key) == 0)
 			{
@@ -173,7 +173,7 @@ namespace Modio
 			{
 				return AddQueryParamRaw(
 					"platform_status",
-					Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetPlatformStatusFilter().value()));	
+					Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetPlatformStatusFilter().value()));
 			}
 
 			return HttpRequestParams(*this);
@@ -187,10 +187,10 @@ namespace Modio
 			}
 
 			return HttpRequestParams(*this);
-
 		}
 
-		HttpRequestParams HttpRequestParams::EncodeAndAppendPayloadValue(std::string Key, Modio::Optional<std::string> Value) const
+		HttpRequestParams HttpRequestParams::EncodeAndAppendPayloadValue(std::string Key,
+																		 Modio::Optional<std::string> Value) const
 		{
 			if (Value)
 			{
@@ -205,14 +205,14 @@ namespace Modio
 		HttpRequestParams HttpRequestParams::EncodeAndAppendPayloadValue(std::string Key, std::string Value) const
 		{
 			// This line makes sure that any string value appended to the HttpRequest is URL encoded
-            std::string StringValue = Modio::Detail::String::URLEncode(Value);
-            return AppendPayloadValue(Key, StringValue);
+			std::string StringValue = Modio::Detail::String::URLEncode(Value);
+			return AppendPayloadValue(Key, StringValue);
 		}
 
 		HttpRequestParams HttpRequestParams::AppendPayloadValue(std::string Key, std::string Value) const
 		{
-            Modio::Detail::Buffer ValueBuffer(Value.length());
-            std::copy(Value.begin(), Value.end(), reinterpret_cast<char*>(ValueBuffer.begin()));
+			Modio::Detail::Buffer ValueBuffer(Value.length());
+			std::copy(Value.begin(), Value.end(), reinterpret_cast<char*>(ValueBuffer.begin()));
 			return AppendPayloadValue(Key, std::move(ValueBuffer));
 		}
 
@@ -244,14 +244,14 @@ namespace Modio
 		HttpRequestParams HttpRequestParams::AppendPayloadValue(std::string Key,
 																Modio::Detail::Buffer RawPayloadBuffer) const
 		{
-            HttpRequestParams NewParamsInstance(*this);
-            
-            // No need to try to append an empty buffer
-            if (RawPayloadBuffer.GetSize() == 0)
-            {
-                return HttpRequestParams(*this);
-            }
-            
+			HttpRequestParams NewParamsInstance(*this);
+
+			// No need to try to append an empty buffer
+			if (RawPayloadBuffer.GetSize() == 0)
+			{
+				return HttpRequestParams(*this);
+			}
+
 			auto KeyIterator = NewParamsInstance.PayloadMembers.find(Key);
 			if (KeyIterator != NewParamsInstance.PayloadMembers.end())
 			{
@@ -264,12 +264,12 @@ namespace Modio
 		HttpRequestParams& HttpRequestParams::AppendPayloadValue(std::string Key,
 																 Modio::Detail::Buffer RawPayloadBuffer)
 		{
-            // No need to try to append an empty buffer
-            if (RawPayloadBuffer.GetSize() == 0)
-            {
-                return *this;
-            }
-            
+			// No need to try to append an empty buffer
+			if (RawPayloadBuffer.GetSize() == 0)
+			{
+				return *this;
+			}
+
 			auto KeyIterator = PayloadMembers.find(Key);
 			if (KeyIterator != PayloadMembers.end())
 			{
@@ -326,7 +326,6 @@ namespace Modio
 			NewParamsInstance.bSuppressPlatformHeader = true;
 			return NewParamsInstance;
 		}
-
 
 		Modio::Detail::HttpRequestParams& HttpRequestParams::SetRange(Modio::FileOffset Start,
 																	  Modio::Optional<Modio::FileOffset> End)
@@ -392,7 +391,8 @@ namespace Modio
 				QueryParams += fmt::format("{}={}&", QueryParam.first, QueryParam.second);
 			}
 
-			return fmt::format("{}{}?{}{}", GetAPIVersionString(), GetResolvedResourcePath(), QueryParams, GetAPIKeyString());
+			return fmt::format("{}{}?{}{}", GetAPIVersionString(), GetResolvedResourcePath(), QueryParams,
+							   GetAPIKeyString());
 		}
 
 		std::string HttpRequestParams::GetVerb() const
@@ -438,7 +438,6 @@ namespace Modio
 				return {};
 			}
 
-			
 			// We're handling Json so we just want to send this as the raw body
 			if (ContentType.value() == "application/json")
 			{
@@ -451,7 +450,6 @@ namespace Modio
 			{
 				return {};
 			}
-
 
 			std::string PayloadString;
 			for (auto& Entry : PayloadMembers)
@@ -466,9 +464,9 @@ namespace Modio
 					{
 						PayloadString += "&";
 					}
-					PayloadString +=
-						Entry.first + "=" + std::string(reinterpret_cast<const char*>(Entry.second.RawBuffer->begin()), 
-														reinterpret_cast<const char*>(Entry.second.RawBuffer->end()));
+					PayloadString += Entry.first + "=" +
+									 std::string(reinterpret_cast<const char*>(Entry.second.RawBuffer->begin()),
+												 reinterpret_cast<const char*>(Entry.second.RawBuffer->end()));
 				}
 				else
 				{
@@ -592,9 +590,12 @@ namespace Modio
 				if (PlatformOverride.has_value())
 				{
 					Headers.emplace_back("x-modio-platform", *PlatformOverride);
-				} else
+				}
+				else
 				{
-					Headers.emplace_back("x-modio-platform", Modio::Detail::Services::GetGlobalService<HttpService>().GetPlatformHeaderString());
+					Headers.emplace_back(
+						"x-modio-platform",
+						Modio::Detail::Services::GetGlobalService<HttpService>().GetPlatformHeaderString());
 				}
 			}
 
@@ -643,8 +644,8 @@ namespace Modio
 			{
 				if (ContainsFormData())
 				{
-					Headers.emplace_back(
-						"Content-Type", fmt::format("{}; boundary=\"{}\"", *ContentType, GetBoundaryHash()));
+					Headers.emplace_back("Content-Type",
+										 fmt::format("{}; boundary=\"{}\"", *ContentType, GetBoundaryHash()));
 				}
 				else
 				{
@@ -693,7 +694,8 @@ namespace Modio
 			}
 
 			// Add Local Language Header
-			Headers.push_back({ "Accept-Language", Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetLocalLanguage()) });
+			Headers.push_back(
+				{"Accept-Language", Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetLocalLanguage())});
 
 			// Add any additional headers that this request might have added
 			for (auto& AdditionalHeader : AdditionalHeaders)
@@ -906,7 +908,7 @@ namespace Modio
 					RawBuffer = Other.RawBuffer.value().Clone();
 					PathToFile = {};
 				}
-				MODIO_FALL_THROUGH;
+					MODIO_FALL_THROUGH;
 				case PayloadType::File:
 				case PayloadType::FilePortion:
 				{

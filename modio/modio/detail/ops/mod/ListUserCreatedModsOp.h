@@ -80,6 +80,13 @@ namespace Modio
 						if (List.has_value())
 						{
 							Services::GetGlobalService<CacheService>().AddToCache(GameID, List.value());
+							for (const Modio::ModInfo& Mod : *List)
+							{
+								Modio::Detail::SDKSessionData::GetSystemModCollection().UpdateMod(
+									Mod, Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+											 .MakeModPath(Mod.ModId)
+											 .u8string());
+							}
 							Self.complete(ec, std::move(List));
 						}
 						else

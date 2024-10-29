@@ -33,9 +33,7 @@ function (add_generated_defines_to_platform)
 	message(STATUS "Generating global definitions in ${CMAKE_BINARY_DIR}/generated/ModioGeneratedVariables.h")
 
 	set(MODIO_TARGET_PLATFORM_ID ${MODIO_PLATFORM})
-
 	configure_file(cmake/ModioGeneratedVariables.h.in ${CMAKE_BINARY_DIR}/generated/ModioGeneratedVariables.h)
-	target_include_directories(platform INTERFACE ${CMAKE_BINARY_DIR}/generated)
-	target_sources(platform INTERFACE ${CMAKE_BINARY_DIR}/generated/ModioGeneratedVariables.h)
+	target_compile_definitions(platform INTERFACE MODIO_TARGET_PLATFORM_ID="${MODIO_TARGET_PLATFORM_ID}" MODIO_COMMIT_HASH="${MODIO_COMMIT_HASH}")
 
 endfunction()

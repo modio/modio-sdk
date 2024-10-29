@@ -14,6 +14,7 @@
 
 namespace Modio
 {
+	/// @docpublic
 	/// @brief Maturity types classification according to the mod.io API
 	///	* 0 = None set (default)
 	///	* 1 = Alcohol
@@ -29,6 +30,8 @@ namespace Modio
 		Explicit = 8
 	};
 
+	/// @docpublic
+	/// @brief Transform an MaturityOption to an std::string
 	inline std::string ToString(Modio::MaturityOption option)
 	{
 		switch (option)

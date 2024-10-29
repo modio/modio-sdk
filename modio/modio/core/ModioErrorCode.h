@@ -130,10 +130,11 @@ namespace Modio
 		FileNotFound = 20740,
 		InsufficientSpace = 20741,
 		NoPermission = 20742,
-		ReadError = 20743,
-		UnableToCreateFile = 20744,
-		UnableToCreateFolder = 20745,
-		WriteError = 20746
+		PathTooLong = 20743,
+		ReadError = 20744,
+		UnableToCreateFile = 20745,
+		UnableToCreateFolder = 20746,
+		WriteError = 20747
 	};
 
 	/// @docnone
@@ -161,6 +162,9 @@ namespace Modio
 					break;
 				case FilesystemError::NoPermission:
 						return "Insufficient permission for filesystem operation";
+					break;
+				case FilesystemError::PathTooLong:
+						return "Path too long";
 					break;
 				case FilesystemError::ReadError:
 						return "Error reading file";
@@ -1065,9 +1069,11 @@ namespace Modio
 		BannedUserAccount = 11007,
 		BinaryFileCorrupted = 13001,
 		BinaryFileUnreadable = 13002,
+		CannotArchiveModWithDependents = 15074,
 		CannotMuteYourself = 17039,
 		CannotVerifyExternalCredentials = 11032,
 		CrossOriginForbidden = 10001,
+		EmailExchangeCodeAlreadyRedeemed = 11011,
 		EmailLoginCodeExpired = 11012,
 		EmailLoginCodeInvalid = 11014,
 		ExpiredOrRevokedAccessToken = 11005,
@@ -1159,6 +1165,9 @@ namespace Modio
 				case ApiError::BinaryFileUnreadable:
 						return "The submitted binary file is unreadable.";
 					break;
+				case ApiError::CannotArchiveModWithDependents:
+						return "This mod is a dependency of other mods and cannot be archived.";
+					break;
 				case ApiError::CannotMuteYourself:
 						return "You cannot mute yourself.";
 					break;
@@ -1167,6 +1176,9 @@ namespace Modio
 					break;
 				case ApiError::CrossOriginForbidden:
 						return "Cross-origin request forbidden.";
+					break;
+				case ApiError::EmailExchangeCodeAlreadyRedeemed:
+						return "The email security code has already been redeemed.";
 					break;
 				case ApiError::EmailLoginCodeExpired:
 						return "Email login code has expired. Please request a new login code.";
@@ -1562,7 +1574,7 @@ namespace Modio
 		ModManagementAlreadyEnabled = 25,
 		/// @brief When this condition is true, the error code indicates that the current user does not have the required permissions for this operation.
 		InsufficientPermissions = 26,
-		/// @brief The email login code is incorrect or has expired.
+		/// @brief The email login code is incorrect, has expired, or has already been used.
 		EmailLoginCodeInvalid = 27,
 		/// @brief The specified mod is already subscribed to.
 		AlreadySubscribed = 28,
@@ -1593,7 +1605,9 @@ namespace Modio
 		/// @brief No mods have been added to the session.
 		MetricsSessionHasNoMods = 41,
 		/// @brief This premium feature is not available for your project.
-		PremiumFeatureNotAvailable = 42
+		PremiumFeatureNotAvailable = 42,
+		/// @brief The email security code has already been redeemed.
+		EmailExchangeCodeAlreadyRedeemed = 43
 	};
 
 	/// @docnone
@@ -1683,7 +1697,7 @@ namespace Modio
 					return "When this condition is true, the error code indicates that the current user does not have the required permissions for this operation.";
 				break;
 				case ErrorConditionTypes::EmailLoginCodeInvalid:
-					return "The email login code is incorrect or has expired.";
+					return "The email login code is incorrect, has expired, or has already been used.";
 				break;
 				case ErrorConditionTypes::AlreadySubscribed:
 					return "The specified mod is already subscribed to.";
@@ -1729,6 +1743,9 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::PremiumFeatureNotAvailable:
 					return "This premium feature is not available for your project.";
+				break;
+				case ErrorConditionTypes::EmailExchangeCodeAlreadyRedeemed:
+					return "The email security code has already been redeemed.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -2001,6 +2018,11 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::FilesystemError::PathTooLong)
+					{
+						return true;
+					}
+
 					if (ec == Modio::FilesystemError::ReadError)
 					{
 						return true;
@@ -2232,6 +2254,11 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::FilesystemError::PathTooLong)
+					{
+						return true;
+					}
+
 					if (ec == Modio::FilesystemError::ReadError)
 					{
 						return true;
@@ -2308,6 +2335,11 @@ namespace Modio
 					}
 
 					if (ec == Modio::FilesystemError::NoPermission)
+					{
+						return true;
+					}
+
+					if (ec == Modio::FilesystemError::PathTooLong)
 					{
 						return true;
 					}
@@ -2675,6 +2707,11 @@ namespace Modio
 					}
 
 					if (ec == Modio::UserAuthError::EmailLoginCodeInvalid)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::EmailExchangeCodeAlreadyRedeemed)
 					{
 						return true;
 					}
@@ -3255,6 +3292,14 @@ namespace Modio
 					}
 
 	
+				break;
+				case ErrorConditionTypes::EmailExchangeCodeAlreadyRedeemed:
+					if (ec == Modio::ApiError::EmailExchangeCodeAlreadyRedeemed)
+					{
+						return true;
+					}
+
+
 				break;
 			}
 			return false;

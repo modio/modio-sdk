@@ -50,7 +50,7 @@ namespace Modio
 					A.ProfileUrl == B.ProfileUrl && A.Avatar == B.Avatar) && (A.DisplayNamePortal == B.DisplayNamePortal);
 		}
 
-			/// @docnone
+		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::User& User);
 
 		/// @docnone

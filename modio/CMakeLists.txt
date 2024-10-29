@@ -48,6 +48,7 @@ target_sources(${MODIO_TARGET_NAME} INTERFACE
 
 add_public_header(${MODIO_TARGET_NAME} modio/ModioSDK.h)
 
+endif()
 
 target_include_directories(${MODIO_TARGET_NAME} INTERFACE ${ModioGeneratedHeaderPath})
 
@@ -97,31 +98,19 @@ if (MODIO_STATIC_LIB_SUFFIX)
 set_target_properties(${MODIO_TARGET_NAME}Static PROPERTIES SUFFIX ${MODIO_STATIC_LIB_SUFFIX})
 endif()
 
-# Set up a header-only target that we can build for verifying header-only functionality in a lightweight way
-file(WRITE "${CMAKE_BINARY_DIR}/header-only/main.cpp" 
-"// Automatically generated dummy file for validating header-only compilation.
-#include \"modio/ModioSDK.h\"
-int main() 
-{
-	Modio::SetLogLevel(Modio::LogLevel::Info);	
-	return 0;
-}
-")
-file(WRITE "${CMAKE_BINARY_DIR}/header-only/CMakeLists.txt" 
-"Project(modioHeaderOnly)\n
-set( CMAKE_EXPORT_COMPILE_COMMANDS ON)\n 
-add_executable(modioHeaderOnly main.cpp)\n 
-target_link_libraries(modioHeaderOnly PUBLIC ${MODIO_TARGET_NAME})\n
-")
 
-	FetchContent_Declare(
-    headerOnly
-    SOURCE_DIR "${CMAKE_BINARY_DIR}/header-only/"
-    CMAKE_GENERATOR Ninja
-	EXCLUDE_FROM_ALL 
+install(
+	FILES ${CMAKE_BINARY_DIR}/generated/ModioGeneratedVariables.h
+	DESTINATION ${CMAKE_INSTALL_PREFIX}/static/inc/modio/detail
+	COMPONENT static_library
 )
 
-FetchContent_MakeAvailable(headerOnly)
+install(
+	FILES ${CMAKE_BINARY_DIR}/generated/ModioGeneratedVariables.h
+	DESTINATION ${CMAKE_INSTALL_PREFIX}/header_only/common/modio/detail
+	COMPONENT static_library
+)
+
 
 install(
 	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/modio/core
@@ -140,13 +129,6 @@ install(
 	PATTERN "*.h"
 	PATTERN "*.hpp"
 	PATTERN "ops/*" EXCLUDE
-)
-
-install(
-	DIRECTORY ${ModioGeneratedHeaderPath}/
-	DESTINATION ${CMAKE_INSTALL_PREFIX}/static/inc
-	COMPONENT static_library
-	PATTERN ModioTestConfig.h EXCLUDE	
 )
 
 install(
@@ -169,10 +151,4 @@ install(
 	
 )
 
-install(
-	DIRECTORY ${ModioGeneratedHeaderPath}/
-	DESTINATION ${CMAKE_INSTALL_PREFIX}/header_only/common
-	COMPONENT header_only
-	PATTERN ModioTestConfig.h EXCLUDE
-)
 

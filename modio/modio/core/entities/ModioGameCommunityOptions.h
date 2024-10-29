@@ -14,6 +14,7 @@
 
 namespace Modio
 {
+	/// @docpublic
 	/// @brief Community options for a game
 	///	* 0 = None set (default)
 	///	* 1 = Comments are enabled

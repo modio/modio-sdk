@@ -9,20 +9,21 @@
  */
 
 #pragma once
-#include "ModioGeneratedVariables.h"
-#include "http/HttpRequestImplementation.h"
+#include "ModioPlatformDefines.h"
+
 #include "android/HttpSharedState.h"
 #include "android/detail/ops/http/InitializeHttpOp.h"
 #include "android/detail/ops/http/ReadHttpResponseHeadersOp.h"
 #include "android/detail/ops/http/ReadSomeResponseBodyOp.h"
-#include "android/detail/ops/http/SendHttpRequestOp.h"
 #include "android/detail/ops/http/SSLConnectionWriteOp.h"
+#include "android/detail/ops/http/SendHttpRequestOp.h"
+#include "http/HttpRequestImplementation.h"
 #include "modio/core/ModioErrorCode.h"
+#include "modio/core/ModioInitializeOptions.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/http/IHttpServiceImplementation.h"
 #include "modio/http/ModioHttpParams.h"
-#include "modio/core/ModioInitializeOptions.h"
 #include <iostream>
 #include <map>
 #include <memory>
@@ -56,8 +57,12 @@ namespace Modio
 			template<typename CompletionToken>
 			auto InitializeHTTPAsync(CompletionToken&& Token)
 			{
+#ifdef MODIO_TARGET_PLATFORM_ID
 				constexpr const char* ModioAgentString =
 					"Modio SDK v2 built from " MODIO_COMMIT_HASH ":" MODIO_TARGET_PLATFORM_ID;
+#else
+				constexpr const char* ModioAgentString = "Modio SDK v2 built from " MODIO_COMMIT_HASH ": ANDROID";
+#endif
 				HttpState = std::make_shared<HttpSharedState>();
 				return asio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
 					InitializeHttpOp(ModioAgentString, HttpState), Token,

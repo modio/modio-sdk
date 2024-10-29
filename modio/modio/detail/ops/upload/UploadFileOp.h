@@ -110,6 +110,21 @@ namespace Modio
 					{
 						while ((Impl->PayloadElement = Request->Parameters().TakeNextPayloadElement()))
 						{
+							if (Impl->PayloadElement->second.PType == PayloadContent::PayloadType::File)
+							{
+								if (Impl->PayloadElement->second.PathToFile->native().length() >=
+									Modio::Detail::Constants::Configuration::UniversalMaxPath)
+								{
+									Modio::Detail::Logger().Log(
+										Modio::LogLevel::Warning, Modio::LogCategory::File,
+										"File path `{}` contains more than {} characters, which is not supported",
+										Impl->PayloadElement->second.PathToFile->string(),
+										Modio::Detail::Constants::Configuration::UniversalMaxPath);
+									Self.complete(Modio::make_error_code(Modio::FilesystemError::PathTooLong));
+									return;
+								}
+							}
+
 							// Write the header for the field in the form data
 							{
 								{

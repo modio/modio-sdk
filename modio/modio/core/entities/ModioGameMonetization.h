@@ -14,6 +14,7 @@
 
 namespace Modio
 {
+	/// @docpublic
 	/// @brief Monetization properties of a game
 	///	* 0 = None set (default)
 	///	* 1 = Monetization is enabled

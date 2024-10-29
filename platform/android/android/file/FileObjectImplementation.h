@@ -195,7 +195,7 @@ namespace Modio
 				else
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-												"Error opening file: {}", errno);
+												"Error opening file: {}, errno: {}", Path.u8string(), errno);
 					return Modio::make_error_code(Modio::FilesystemError::ReadError);
 				}
 			}

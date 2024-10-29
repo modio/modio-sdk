@@ -205,8 +205,9 @@ extern "C"
 			}
 			else
 			{
-				n = (((BufferSize) < (GetBlockSize() - Context->curlen)) ? (BufferSize)
-																		 : (GetBlockSize() - Context->curlen));
+				n = uint32_t((((BufferSize) < (GetBlockSize() - Context->curlen))
+									? (BufferSize)
+									: (GetBlockSize() - Context->curlen)));
 				memcpy(Context->buf + Context->curlen, Buffer, (size_t) n);
 				Context->curlen += n;
 				Buffer = (uint8_t*) Buffer + n;

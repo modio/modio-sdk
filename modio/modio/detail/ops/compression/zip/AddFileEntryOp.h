@@ -72,6 +72,16 @@ namespace Modio
 
 				reenter(CoroutineState)
 				{
+					if (InputFile->GetPath().native().length() >=
+						Modio::Detail::Constants::Configuration::UniversalMaxPath)
+					{
+						Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File,
+							"File path `{}` contains more than {} characters, which is not supported",
+							InputFile->GetPath().string(), Modio::Detail::Constants::Configuration::UniversalMaxPath);
+						Self.complete(Modio::make_error_code(Modio::FilesystemError::PathTooLong));
+						return;
+					}
+
 					// If a file name uses a double dot the operation will fail
 					if (InputFile->GetPath().filename().string().find("..") != std::string::npos)
 					{

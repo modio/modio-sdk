@@ -12,6 +12,7 @@
 #include "modio/core/ModioSplitCompilation.h"
 #include "modio/detail/ModioDefines.h"
 
+#include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/OptionalWrapper.h"
 #include <chrono>
 #include <cstdint>
@@ -31,7 +32,7 @@ namespace Modio
 	/// @brief Trivial wrapper around link:https://en.cppreference.com/w/cpp/error/error_code[std::error_code].
 	/// Implemented as a class instead of a type alias to allow it to be forward-declared in wrappers, eg the UE4
 	/// plugin.
-	class ErrorCode : public std::error_code
+	class MODIO_NODISCARD ErrorCode : public std::error_code
 	{
 	public:
 		/// @docpublic
@@ -57,7 +58,7 @@ namespace Modio
 	template<typename Object>
 	using StableStorage = std::shared_ptr<Object>;
 
-	/// @docpublic
+	/// @docnone
 	/// @brief Convenience method to make a shared pointer
 	template<typename Object, class... Types>
 	StableStorage<Object> MakeStable(Types&&... Args)

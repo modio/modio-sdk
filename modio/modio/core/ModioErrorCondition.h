@@ -37,7 +37,7 @@ enum class EModioErrorCondition: uint8
 	SDKAlreadyInitialized = 24 UMETA(ToolTip="When this condition is true, the error code indicates that the SDK has already been initialized.") ,
 	ModManagementAlreadyEnabled = 25 UMETA(ToolTip="When this condition is true, the error code indicates that Mod Management has already been enabled.") ,
 	InsufficientPermissions = 26 UMETA(ToolTip="When this condition is true, the error code indicates that the current user does not have the required permissions for this operation.") ,
-	EmailLoginCodeInvalid = 27 UMETA(ToolTip="The email login code is incorrect or has expired.") ,
+	EmailLoginCodeInvalid = 27 UMETA(ToolTip="The email login code is incorrect, has expired, or has already been used.") ,
 	AlreadySubscribed = 28 UMETA(ToolTip="The specified mod is already subscribed to.") ,
 	InstallOrUpdateCancelled = 29 UMETA(ToolTip="The current mod installation or update was cancelled.") ,
 	UploadCancelled = 30 UMETA(ToolTip="The current modfile upload was cancelled.") ,
@@ -53,4 +53,5 @@ enum class EModioErrorCondition: uint8
 	MetricsSessionIsNotActive = 40 UMETA(ToolTip="Metrics session has not been started. Please call MetricsSessionStartAsync.") ,
 	MetricsSessionHasNoMods = 41 UMETA(ToolTip="No mods have been added to the session.") ,
 	PremiumFeatureNotAvailable = 42 UMETA(ToolTip="This premium feature is not available for your project.") ,
+	EmailExchangeCodeAlreadyRedeemed = 43 UMETA(ToolTip="The email security code has already been redeemed.") ,
 };
