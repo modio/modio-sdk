@@ -33,9 +33,9 @@ struct ModioExampleFlags
 
 	/// @brief Keeps a reference to the last error received
 	Modio::ErrorCode LastError;
-    
-    /// @brief Keeps a reference to the last mod management event
-    Modio::ModManagementEvent LastEvent;
+
+	/// @brief Keeps a reference to the last mod management event
+	Modio::ModManagementEvent LastEvent;
 };
 
 /// @brief Static definition of the ModioExampleFlags. Consider a more sophisticated process
@@ -144,9 +144,9 @@ struct ModioExample
 
 	static void OnModManagementEvent(Modio::ModManagementEvent ManagementEvent)
 	{
-        // Register the last event
-        Example.LastEvent = ManagementEvent;
-        
+		// Register the last event
+		Example.LastEvent = ManagementEvent;
+
 		// Inspect the type of event - Installed, Updated, Uploaded, or Uninstalled
 		switch (ManagementEvent.Event)
 		{
@@ -327,53 +327,56 @@ int main()
 	// This means that if you have an open file handle on a file from a mod, but the user unsubscribes to it and no
 	// other local accounts have a subscription to it, if Mod Management is enabled then the SDK will attempt to delete
 	// that file.
+	//
 	// As a result, in most circumstances you will want Mod Management to be disabled during active gameplay while mod
 	// files are being opened by your game.
-	// EnableModManagement requires you provide it with a callback - *unlike the callbacks provided to Async methods,
+	//
+	// EnableModManagement requires you provide it with a callback. Unlike the callbacks provided to async methods,
 	// this callback will be invoked any time a mod management event is emitted by the SDK until Mod
-	// Management is disabled, which means it will potentially be invoked multiple times.*
-	// Mod management MUST be enabled in order for calls to Subscribe or Unsubscribe to succeed.
-	// Parameters:
-	// Callback Callback invoked for each management event
-	// Returns a Modio::ErrorCode indicating if mod management was enabled successfully
+	// Management is disabled. It will likely be invoked multiple times for multiple events.
+	//
+	// Mod management MUST be enabled for calls to Subscribe or Unsubscribe to succeed.
+	//
+	// Parameters: Callback - Callback invoked for each management event. Returns a Modio::ErrorCode indicating if mod
+	// management was enabled successfully
 	if (Modio::ErrorCode ec = Modio::EnableModManagement(ModioExample::OnModManagementEvent))
 	{
 		// An error occurred, bail early
 		std::cout << "Could not enable mod management: " << ec.message() << std::endl;
 		return -1;
 	}
-    
-    {
-        // Request a list of the user's subscriptions from the server, and cache them locally
-        // This updates the local view of the users subscriptions, including any that were added from another device, or a
-        // web browser
-        // This requires mod management to be enabled and will immediately enqueue any pending installs, updates or
-        // uninstallations based on the new subscription list
-        // Parameters:
-        // Callback Callback invoked when fetching updates has completed. Takes a Modio::ErrorCode indicating if the fetch
-        // was successful
-        Modio::FetchExternalUpdatesAsync(ModioExample::OnFetchExternalUpdatesComplete);
 
-        while (!ModioExample::HasAsyncOperationCompleted())
-        {
-            Modio::RunPendingHandlers();
-        }
+	{
+		// Request a list of the user's subscriptions from the server and cache them locally
+		// This updates the local view of the users subscriptions, including any that were added from another device or
+		// a web browser. This requires mod management to be enabled and will immediately enqueue any pending installs,
+		// updates or uninstallations based on the new subscription list.
+		//
+		// Parameters: Callback - Callback invoked when fetching updates has completed. Takes a Modio::ErrorCode
+		// indicating if the fetch was successful
+		Modio::FetchExternalUpdatesAsync(ModioExample::OnFetchExternalUpdatesComplete);
 
-        if (!ModioExample::DidAsyncOperationSucceed())
-        {
-            // No need for explicit handling of an error from FetchExternalUpdates in this simple sample
-        }
-    }
-	
-    // Using QuerySystemInstallations here to get all mods installed, regardless of whether they are in the current
-    // user's subscriptions or not
-    std::map<Modio::ModID, Modio::ModCollectionEntry> InstalledMods = Modio::QuerySystemInstallations();
-    
-    if (InstalledMods.size() <= 0) // Continue when no mods are installed
-    {
-        std::cout << "This example requires multiple mods installed to force an uninstall. Finishing execution." << std::endl;
-    }
-    else // Prompt the user for a Mod ID to uninstall
+		while (!ModioExample::HasAsyncOperationCompleted())
+		{
+			Modio::RunPendingHandlers();
+		}
+
+		if (!ModioExample::DidAsyncOperationSucceed())
+		{
+			// No need for explicit handling of an error from FetchExternalUpdates in this simple sample
+		}
+	}
+
+	// Using QuerySystemInstallations here to get all mods installed, regardless of whether they are in the current
+	// user's subscriptions or not
+	std::map<Modio::ModID, Modio::ModCollectionEntry> InstalledMods = Modio::QuerySystemInstallations();
+
+	if (InstalledMods.size() <= 0) // Continue when no mods are installed
+	{
+		std::cout << "This example requires multiple mods installed to force an uninstall. Finishing execution."
+				  << std::endl;
+	}
+	else // Prompt the user for a Mod ID to uninstall
 	{
 		for (const auto& Mod : InstalledMods)
 		{
@@ -381,31 +384,27 @@ int main()
 					  << Mod.second.GetSizeOnDisk().value_or(Modio::FileSize(0)) << std::endl;
 		}
 		std::int64_t UserModID = -1;
-		std::string UserModString = ModioExample::RetrieveUserInput("Enter the ID of the mod you wish to force remove:");
-		
-		try
-		{
-			UserModID = std::stoll(UserModString);
-		}
-		catch (const std::exception&)
+		std::string UserModString =
+			ModioExample::RetrieveUserInput("Enter the ID of the mod you wish to force remove:");
+
+		UserModID = std::stoll(UserModString);
+		if (UserModID < 0)
 		{
 			std::cout << "Invalid Input" << std::endl;
 			return -1;
 		}
-        
-        auto IsModContained = InstalledMods.find(Modio::ModID(UserModID));
-        
-        if (UserModID != -1 &&
-            IsModContained != InstalledMods.end())
+
+		auto IsModContained = InstalledMods.find(Modio::ModID(UserModID));
+		if (IsModContained != InstalledMods.end())
 		{
 			std::cout << "Force Uninstalling Mod ID:" << UserModID << std::endl;
-			
-            /// Forcibly uninstalls a mod from the system. This is intended for use when a host application requires more
-            /// room for a mod that the user wants to install. It returns an error if the current user is
-            /// subscribed to the mod. To remove a mod the current user is subscribed to, use "UnsubscribeFromModAsync"
-            /// @param ModToRemove The ID for the mod to force remove.
-            /// @param Callback Callback invoked when the uninstallation is successful, or if it failed because the current user
-            /// remains subscribed.
+
+			/// Forcibly uninstalls a mod from the system. This is intended for use when a host application requires
+			/// more room for a mod that the user wants to install. It returns an error if the current user is
+			/// subscribed to the mod. To remove a mod the current user is subscribed to, use "UnsubscribeFromModAsync"
+			/// @param ModToRemove The ID for the mod to force remove.
+			/// @param Callback Callback invoked when the uninstallation is successful, or if it failed because the
+			/// current user remains subscribed.
 			Modio::ForceUninstallModAsync(Modio::ModID(UserModID), ModioExample::OnUninstallationComplete);
 
 			while (!ModioExample::HasAsyncOperationCompleted())
@@ -416,22 +415,22 @@ int main()
 			if (!ModioExample::DidAsyncOperationSucceed())
 			{
 				// Explicit handling of an error from ForceUninstallModAsync in this simple sample
-                // Most likely "ForceUninstallModAsync" could not execute if the user is subscribed to the mod
-                std::cout << "Consider authentication with another user if the operation failed." << std::endl;
+				// Most likely "ForceUninstallModAsync" could not execute if the user is subscribed to the mod
+				std::cout << "Consider authentication with another user if the operation failed." << std::endl;
 			}
 			else
 			{
 				// Wait for the mod management system to finish removing the mod
-                while (Example.LastEvent.Event != Modio::ModManagementEvent::EventType::Uninstalled)
+				while (Example.LastEvent.Event != Modio::ModManagementEvent::EventType::Uninstalled)
 				{
 					Modio::RunPendingHandlers();
 				}
 			}
 		}
-        else
-        {
-            std::cout << "Invalid ModID registered, closing execution now" << std::endl;
-        }
+		else
+		{
+			std::cout << "Invalid ModID registered, closing execution now" << std::endl;
+		}
 	}
 
 	Modio::ShutdownAsync(ModioExample::OnShutdownComplete);

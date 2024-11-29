@@ -386,7 +386,7 @@ static void* sha256(const void* data, const size_t datalen, void* out, const siz
 	SHA256_HASH hash;
 
 	Sha256Initialise(&ctx);
-	Sha256Update(&ctx, data, datalen);
+	Sha256Update(&ctx, data, uint32_t(datalen));
 	Sha256Finalise(&ctx, &hash);
 
 	sz = (outlen > SHA256_HASH_SIZE) ? SHA256_HASH_SIZE : outlen;

@@ -564,7 +564,7 @@ namespace Modio
 	/// @brief Sends a content report to mod.io. When using this function, please inform your users that if they provide
 	/// their contact name or details in the Report parameter, that those may be shared with the person responsible for
 	/// the content being reported. For more information on what data in a report will be shared with whom, please see
-	/// link:https://mod.io/report/widget[our website's report form] for more information.
+	/// link: [our website's report form](https://mod.io/report) for more information.
 	/// @param Report Information about the content being reported and a description of the report.
 	/// @param Callback Callback providing a status code to indicate successful submission of the report.
 	/// @requires initialized-sdk

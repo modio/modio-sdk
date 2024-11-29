@@ -21,11 +21,6 @@ if (MODIO_SERVER_SIDE_TEST)
     message(STATUS "Setting MODIO_SERVER_SIDE_TEST")
 endif()
 
-if (MODIO_TEST_REQUIRES_STATE)
-        target_compile_definitions(${MODIO_TARGET_NAME} INTERFACE MODIO_TEST_REQUIRES_STATE=1)
-        message(STATUS "Setting MODIO_TEST_REQUIRES_STATE")
-endif()
-
 if (MODIO_CI)
 target_compile_definitions(${MODIO_TARGET_NAME} INTERFACE MODIO_CI=1)
         message(STATUS "Setting MODIO_CI")

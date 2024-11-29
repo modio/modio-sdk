@@ -34,8 +34,8 @@ struct ModioExampleFlags
 
 	/// @brief Keeps a reference to the list of mod results
 	Modio::Optional<Modio::ModInfoList> LastResults;
-	
-    /// @brief Keeps a reference to the last mod management event
+
+	/// @brief Keeps a reference to the last mod management event
 	Modio::ModManagementEvent LastEvent;
 };
 
@@ -161,7 +161,8 @@ struct ModioExample
 		}
 	}
 
-	static void OnRefreshUserEntitlementsCompleted(Modio::ErrorCode ec, Modio::Optional<Modio::EntitlementConsumptionStatusList> EntitlementConsumptionStatus)
+	static void OnRefreshUserEntitlementsCompleted(
+		Modio::ErrorCode ec, Modio::Optional<Modio::EntitlementConsumptionStatusList> EntitlementConsumptionStatus)
 	{
 		if (ec)
 		{
@@ -173,12 +174,12 @@ struct ModioExample
 			// Note that if nothing is consumed, then WalletBalance may not exist or be 0.
 			if (EntitlementConsumptionStatus->WalletBalance.has_value())
 			{
-				UserWalletBalance = EntitlementConsumptionStatus.value().WalletBalance.value().Balance;	
+				UserWalletBalance = EntitlementConsumptionStatus.value().WalletBalance.value().Balance;
 			}
 
 			std::cout << "Updated wallet balance is: " << std::to_string(UserWalletBalance) << std::endl;
 
-			// 
+			//
 
 			NotifyApplicationSuccess();
 		}
@@ -198,7 +199,7 @@ struct ModioExample
 		Example.LastResults = ModList;
 	}
 
-		static void OnModManagementEvent(Modio::ModManagementEvent ManagementEvent)
+	static void OnModManagementEvent(Modio::ModManagementEvent ManagementEvent)
 	{
 		// Register the last event
 		Example.LastEvent = ManagementEvent;
@@ -251,7 +252,8 @@ struct ModioExample
 		}
 		else
 		{
-			// The Transaction Record will contain an updated Wallet Balance, where you can update your local wallet balance state.
+			// The Transaction Record will contain an updated Wallet Balance, where you can update your local wallet
+			// balance state.
 			UserWalletBalance = TransactionRecord.value().UpdatedUserWalletBalance;
 
 			NotifyApplicationSuccess();
@@ -409,8 +411,8 @@ int main()
 		}
 	}
 
-	// Get the user's wallet balance for the current game. Note that if a wallet does not exist for a user, this call will automatically
-	// create the wallet for them.
+	// Get the user's wallet balance for the current game. Note that if a wallet does not exist for a user, this call
+	// will automatically create the wallet for them.
 	{
 		Modio::GetUserWalletBalanceAsync(ModioExample::OnGetWalletBalanceCompleted);
 
@@ -426,10 +428,10 @@ int main()
 	}
 
 	// After you have called GetWalletBalanceAsync at startup, you should call RefreshUserEntitlementsAsync
-	// in case there are any unconsumed entitlements that the user has purchased - for instance, making a platform purchase
-	// via a platform companion app or website outside of the game.
-	// Note that you only need to call RefreshUserEntitlementsAsync if you are selling virtual currency packs via a platform store,
-	// such as Steam, Playstation Store or XBox Store. If you are only allowing your users to purchase VC Packs via the mod.io website,
+	// in case there are any unconsumed entitlements that the user has purchased - for instance, making a platform
+	// purchase via a platform companion app or website outside of the game. Note that you only need to call
+	// RefreshUserEntitlementsAsync if you are selling virtual currency packs via a platform store, such as Steam,
+	// Playstation Store or XBox Store. If you are only allowing your users to purchase VC Packs via the mod.io website,
 	// they are directly added to the users wallet and you do not need to call this.
 	{
 		const Modio::EntitlementParams EntitlementParams;
@@ -448,7 +450,8 @@ int main()
 
 	// Search for all Paid mods so a user can purchase one
 	{
-		// Set a Search filter to return only Paid mods. You can also use RevenueFilterType::FreeAndPaid to get both free and paid mods
+		// Set a Search filter to return only Paid mods. You can also use RevenueFilterType::FreeAndPaid to get both
+		// free and paid mods
 		Modio::FilterParams Filter;
 		Filter = Filter.RevenueType(Modio::FilterParams::RevenueFilterType::Paid);
 		Modio::ListAllModsAsync(Filter, ModioExample::OnListAllModsComplete);
@@ -482,11 +485,8 @@ int main()
 		std::int64_t UserModID = -1;
 		std::string UserModString = ModioExample::RetrieveUserInput("Enter the ID of the mod you wish to purchase:");
 
-		try
-		{
-			UserModID = std::stoll(UserModString);
-		}
-		catch (const std::exception&)
+		UserModID = std::stoll(UserModString);
+		if (UserModID < 0)
 		{
 			std::cout << "Invalid Input" << std::endl;
 			return -1;
@@ -495,7 +495,7 @@ int main()
 		// In order to purchase a mod, you need the full ModInfo, as you must provide the expected price of the mod,
 		// along with the Mod ID.
 		Modio::ModInfo ModToPurchase;
-		for (auto &ModInfo : Example.LastResults.value())
+		for (auto& ModInfo : Example.LastResults.value())
 		{
 			if (ModInfo.ModId == UserModID)
 			{
@@ -504,32 +504,29 @@ int main()
 			}
 		}
 
-		if (UserModID != -1)
+		std::cout << "Installing Mod ID:" << UserModID << std::endl;
+
+		// Purchase the specific mod.
+		// Note that you need to provide the price the user is expecting to pay for the mod. If the expected price
+		// and the actual price on the server do not match, you will receive an error on purchase.
+		Modio::PurchaseModAsync(Modio::ModID(UserModID), ModToPurchase.Price, ModioExample::OnPurchaseComplete);
+
+		while (!ModioExample::HasAsyncOperationCompleted())
 		{
-			std::cout << "Installing Mod ID:" << UserModID << std::endl;
+			Modio::RunPendingHandlers();
+		};
 
-			// Purchase the specific mod.
-			// Note that you need to provide the price the user is expecting to pay for the mod. If the expected price
-			// and the actual price on the server do not match, you will receive an error on purchase.
-			Modio::PurchaseModAsync(Modio::ModID(UserModID), ModToPurchase.Price, ModioExample::OnPurchaseComplete);
-
-			while (!ModioExample::HasAsyncOperationCompleted())
+		if (!ModioExample::DidAsyncOperationSucceed())
+		{
+			// No need for explicit handling of an error from SubscribeToModAsync in this simple sample
+		}
+		else
+		{
+			// Wait for the mod management system to finish installing the new mod and anything else which is
+			// pending
+			while (Modio::IsModManagementBusy())
 			{
 				Modio::RunPendingHandlers();
-			};
-
-			if (!ModioExample::DidAsyncOperationSucceed())
-			{
-				// No need for explicit handling of an error from SubscribeToModAsync in this simple sample
-			}
-			else
-			{
-				// Wait for the mod management system to finish installing the new mod and anything else which is
-				// pending
-				while (Modio::IsModManagementBusy())
-				{
-					Modio::RunPendingHandlers();
-				}
 			}
 		}
 	}

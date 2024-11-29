@@ -46,6 +46,54 @@ namespace Modio
 		};
 
 		/// @docinternal
+		/// @brief Enum for HTTP content types
+		enum class ContentType
+		{
+			None, // Represents no content type specified
+			ApplicationJson, // application/json
+			MultipartFormData, // multipart/form-data
+			ApplicationXWwwFormUrlEncoded // application/x-www-form-urlencoded
+		};
+
+		/// @docinternal
+		/// @brief Converts a string to a ContentType enum
+		constexpr ContentType GetContentTypeEnum(std::string_view contentType)
+		{
+			constexpr size_t ApplicationJsonHash = "application/json"_hash;
+			constexpr size_t MultipartFormDataHash = "multipart/form-data"_hash;
+			constexpr size_t ApplicationXWwwFormUrlencodedHash = "application/x-www-form-urlencoded"_hash;
+
+			switch (hash_64_fnv1a_const(contentType.data()))
+			{
+				case ApplicationJsonHash:
+					return ContentType::ApplicationJson;
+				case MultipartFormDataHash:
+					return ContentType::MultipartFormData;
+				case ApplicationXWwwFormUrlencodedHash:
+					return ContentType::ApplicationXWwwFormUrlEncoded;
+				default:
+					return ContentType::None;
+			}
+		}
+
+		/// @docinternal
+		/// @brief Converts a ContentType enum to a string
+		constexpr std::string_view ContentTypeToString(ContentType type)
+		{
+			switch (type)
+			{
+				case ContentType::ApplicationJson:
+					return "application/json";
+				case ContentType::MultipartFormData:
+					return "multipart/form-data";
+				case ContentType::ApplicationXWwwFormUrlEncoded:
+					return "application/x-www-form-urlencoded";
+				default:
+					return "";
+			}
+		}
+
+		/// @docinternal
 		/// @brief Enum with the API version in use
 		enum class APIVersion
 		{
@@ -256,6 +304,10 @@ namespace Modio
 
 			MODIO_IMPL Verb GetTypedVerb() const;
 
+			MODIO_IMPL std::string_view GetContentType() const;
+
+			MODIO_IMPL ContentType GetTypedContentType() const;
+
 			MODIO_IMPL bool ContainsFormData() const;
 
 			/// @brief Gets the URL-encoded payload for the request
@@ -273,9 +325,9 @@ namespace Modio
 			MODIO_IMPL HeaderList GetHeaders() const;
 
 			HttpRequestParams(Modio::Detail::Verb CurrentOperationType, const char* ResourcePath,
-							  const char* ContentType)
+							  const ContentType& ContentType)
 				: ResourcePath(ResourcePath),
-				  ContentType(ContentType),
+				  CurrentContentType(ContentType),
 				  GameID(0),
 				  ModID(0),
 				  UserID(0),
@@ -285,7 +337,7 @@ namespace Modio
 
 			HttpRequestParams(Modio::Detail::Verb CurrentOperationType, const char* ResourcePath)
 				: ResourcePath(ResourcePath),
-				  ContentType(),
+				  CurrentContentType(ContentType::None),
 				  GameID(0),
 				  ModID(0),
 				  UserID(0),
@@ -295,7 +347,7 @@ namespace Modio
 
 			HttpRequestParams()
 				: ResourcePath("NOT_SET"),
-				  ContentType(),
+				  CurrentContentType(ContentType::None),
 				  GameID(0),
 				  ModID(0),
 				  UserID(0),
@@ -335,7 +387,7 @@ namespace Modio
 
 			std::string ResourcePath = "";
 
-			Modio::Optional<std::string> ContentType = {};
+			ContentType CurrentContentType;
 
 			std::uint64_t GameID;
 			std::uint64_t ModID;

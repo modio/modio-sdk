@@ -33,8 +33,7 @@ namespace Modio
 		class InstallOrUpdateModOp : public Modio::Detail::BaseOperation<InstallOrUpdateModOp>
 		{
 		public:
-			InstallOrUpdateModOp(Modio::ModID Mod, bool IsTempMod) : 
-				Mod(Mod), IsTempMod(IsTempMod)
+			InstallOrUpdateModOp(Modio::ModID Mod, bool IsTempMod) : Mod(Mod), IsTempMod(IsTempMod)
 			{
 				ModProgress = Modio::Detail::SDKSessionData::StartModDownloadOrUpdate(Mod);
 			}
@@ -51,15 +50,15 @@ namespace Modio
 				}
 				if (ModProgress.lock() == nullptr)
 				{
-					// Avoid rollback of state when ModProgress is null, should only happen when unsubing to an installing mod
+					// Avoid rollback of state when ModProgress is null, should only happen when unsubing to an
+					// installing mod
 					Transaction.Commit();
 					Self.complete(Modio::make_error_code(Modio::ModManagementError::InstallOrUpdateCancelled));
 					return;
 				}
-				
+
 				reenter(CoroutineState)
 				{
-
 					CollectionEntry = IsTempMod
 										  ? Modio::Detail::SDKSessionData::GetTempModCollection().Entries().at(Mod)
 										  : Modio::Detail::SDKSessionData::GetSystemModCollection().Entries().at(Mod);
@@ -77,8 +76,7 @@ namespace Modio
 						return;
 					}
 
-					CollectionEntry->SetModState(
-						ModState::Downloading);
+					CollectionEntry->SetModState(ModState::Downloading);
 
 					// TryMarshalResponse to get ModInfo object
 					if (Modio::Optional<Modio::ModInfo> ModInfoResponse =
@@ -121,7 +119,7 @@ namespace Modio
 						return;
 					}
 
-					//Is there room in the installation path for the extracted files?
+					// Is there room in the installation path for the extracted files?
 					if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CheckSpaceAvailable(
 							CollectionEntry->GetPath(), Modio::FileSize(ModInfoData.FileInfo->FilesizeUncompressed)))
 					{
@@ -141,7 +139,8 @@ namespace Modio
 							bFileDownloadComplete = true;
 						}
 					}
-					// If we either don't have the file on disk or its size is wrong, check if we have enough space to download the file
+					// If we either don't have the file on disk or its size is wrong, check if we have enough space to
+					// download the file
 					if (!bFileDownloadComplete &&
 						!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CheckSpaceAvailable(
 							DownloadPath, Modio::FileSize(ModInfoData.FileInfo->Filesize)))
@@ -159,8 +158,7 @@ namespace Modio
 										 Modio::FileSize(ModInfoData.FileInfo->Filesize));
 						if (bFileDownloadComplete)
 						{
-							CompleteProgressState(*MPI.get(),
-													Modio::ModProgressInfo::EModProgressState::Downloading);
+							CompleteProgressState(*MPI.get(), Modio::ModProgressInfo::EModProgressState::Downloading);
 						}
 					}
 					else
@@ -173,8 +171,10 @@ namespace Modio
 					if (!bFileDownloadComplete)
 					{
 						Modio::Detail::Logger().Log(
-							LogLevel::Detailed, LogCategory::Http, "Starting download of modfile {} for mod {} \"{}\"",
-							ModInfoData.FileInfo->Filename, ModInfoData.ModId, ModInfoData.ProfileName);
+							LogLevel::Detailed, LogCategory::Http,
+							"Starting download of modfile `{}` total size `{}`, for mod {} \"{}\"",
+							ModInfoData.FileInfo->Filename, ModInfoData.FileInfo.value().Filesize, ModInfoData.ModId,
+							ModInfoData.ProfileName);
 
 						yield Modio::Detail::DownloadFileAsync(
 							Modio::Detail::HttpRequestParams::FileDownload(ModInfoData.FileInfo->DownloadBinaryURL)

@@ -236,7 +236,7 @@ namespace Modio
 			HttpRequestParams NewParamsInstance = HttpRequestParams(*this);
 
 			NewParamsInstance.Payload = JsonPayload;
-			NewParamsInstance.ContentType = "application/json";
+			NewParamsInstance.CurrentContentType = ContentType::ApplicationJson;
 
 			return NewParamsInstance;
 		}
@@ -418,35 +418,36 @@ namespace Modio
 			return CurrentOperationType;
 		}
 
+		std::string_view HttpRequestParams::GetContentType() const
+		{
+			return Modio::Detail::ContentTypeToString(CurrentContentType);
+		}
+
+		ContentType HttpRequestParams::GetTypedContentType() const
+		{
+			return CurrentContentType;
+		}
+
 		bool HttpRequestParams::ContainsFormData() const
 		{
-			if (ContentType)
-			{
-				if (Modio::Detail::hash_64_fnv1a_const(ContentType->c_str()) == "multipart/form-data"_hash)
-				{
-					return true;
-				}
-			}
-			return false;
+			return CurrentContentType == ContentType::MultipartFormData;
 		}
 
 		const Modio::Optional<std::string> HttpRequestParams::GetUrlEncodedPayload() const
 		{
 			// Check first if ContentType has a value before accessing it.
-			if (ContentType.has_value() == false)
+			if (CurrentContentType == ContentType::None)
 			{
 				return {};
 			}
 
 			// We're handling Json so we just want to send this as the raw body
-			if (ContentType.value() == "application/json")
+			if (CurrentContentType == ContentType::ApplicationJson)
 			{
 				return Payload;
 			}
 
-			// TODO: make this more performant by treating the mime type as a constant so we can do a early exit if we
-			// are using form-data
-			if (Modio::Detail::hash_64_fnv1a_const(ContentType->c_str()) != "application/x-www-form-urlencoded"_hash)
+			if (CurrentContentType != ContentType::ApplicationXWwwFormUrlEncoded)
 			{
 				return {};
 			}
@@ -497,7 +498,7 @@ namespace Modio
 				return Modio::FileSize(0);
 			}
 
-			if (ContentType.has_value() && ContentType.value() == "application/x-www-form-urlencoded")
+			if (CurrentContentType == ContentType::ApplicationXWwwFormUrlEncoded)
 			{
 				// Try to find a PayloadContent that has ContentSize != 0
 				// this avoids the utilization of falible "uploadMultipart-binarydata"
@@ -640,16 +641,16 @@ namespace Modio
 				Headers.emplace_back("Content-Type", "application/x-www-form-urlencoded");
 			}*/
 
-			if (ContentType.has_value())
+			if (CurrentContentType != ContentType::None)
 			{
 				if (ContainsFormData())
 				{
 					Headers.emplace_back("Content-Type",
-										 fmt::format("{}; boundary=\"{}\"", *ContentType, GetBoundaryHash()));
+										 fmt::format("{}; boundary=\"{}\"", GetContentType(), GetBoundaryHash()));
 				}
 				else
 				{
-					Headers.emplace_back("Content-Type", *ContentType);
+					Headers.emplace_back("Content-Type", GetContentType());
 				}
 			}
 

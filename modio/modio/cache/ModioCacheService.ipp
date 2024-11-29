@@ -87,7 +87,7 @@ namespace Modio
 										ModInfoDetails.ModId);
 			// The ModInfoCache would clean only when the mod.io SDK session ends. For that reason there is no
 			// timer for this case. Another way to remove this is by calling "ClearCache"
-			CacheInstance->ModInfoCache.emplace(ModInfoDetails.ModId, ModInfoDetails);
+			CacheInstance->ModInfoCache.insert_or_assign(ModInfoDetails.ModId, ModInfoDetails);
 		}
 
 		void CacheService::AddToCache(Modio::GameInfo GameInfoDetails)
@@ -95,7 +95,7 @@ namespace Modio
 			Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Adding GameID {} to cache",
 										GameInfoDetails.GameID);
 
-			CacheInstance->GameInfoCache.emplace(GameInfoDetails.GameID, GameInfoDetails);
+			CacheInstance->GameInfoCache.insert_or_assign(GameInfoDetails.GameID, GameInfoDetails);
 		}
 
 		void CacheService::AddToCache(Modio::GameID GameIDDetail, Modio::ModInfoList ModInfoDetails)
@@ -116,10 +116,9 @@ namespace Modio
 
 		List<std::vector, Modio::ModID> CacheService::GetAllModIdsInCache()
 		{
-
 			List<std::vector, Modio::ModID> listModId;
 
-			//Get ModIds from primary cache
+			// Get ModIds from primary cache
 			for (auto& CacheEntry : CacheInstance->ModInfoCache)
 			{
 				listModId.GetRawList().push_back(CacheEntry.second.ModId);
@@ -128,12 +127,13 @@ namespace Modio
 			// Get ModIds from secondary cache
 			for (auto ModEntry : Modio::Detail::SDKSessionData::GetSystemModCollection().Entries())
 			{
-				if (std::find(listModId.GetRawList().begin(), listModId.GetRawList().end(), ModEntry.first) != listModId.GetRawList().end())
+				if (std::find(listModId.GetRawList().begin(), listModId.GetRawList().end(), ModEntry.first) !=
+					listModId.GetRawList().end())
 				{
 					listModId.GetRawList().push_back(ModEntry.first);
 				}
 			}
-			
+
 			return listModId;
 		}
 

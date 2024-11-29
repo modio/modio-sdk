@@ -18,8 +18,8 @@ namespace Modio
 		/// @brief Stub struct for handling internal-only initialization options
 		struct ExtendedInitParamHandler
 		{
-			static void PostSessionDataInit(struct Modio::InitializeOptions& Opts) {};
-			static void PostUserDataServiceInit(Modio::InitializeOptions& InitParams) {};
+			static void PostSessionDataInit(struct Modio::InitializeOptions&) {};
+			static void PostUserDataServiceInit(Modio::InitializeOptions&) {};
 		};
 	} // namespace Detail
 } // namespace Modio

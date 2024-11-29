@@ -373,20 +373,13 @@ int main()
 		std::string UserModString =
 			ModioExample::RetrieveUserInput("Enter the ID of the mod to add to a session:", std::to_string(UserModID));
 
-		try
-		{
-			UserModID = std::stoll(UserModString);
-		}
-		catch (const std::exception&)
+		UserModID = std::stoll(UserModString);
+		if (UserModID < 0)
 		{
 			std::cout << "Invalid Input" << std::endl;
 			return -1;
 		}
-
-		if (UserModID != -1)
-		{
-			std::cout << "Mod ID will be added to the session:" << UserModID << std::endl;
-		}
+		std::cout << "Mod ID will be added to the session:" << UserModID << std::endl;
 	}
 
 	// Start a new metrics session with our session parameters

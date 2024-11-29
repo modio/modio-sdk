@@ -22,7 +22,6 @@
 ///	a single map without requiring subscription.
 ///	Temporary mods are cleared on SDK re-initialization, so storage is not persisted across sessions.
 
-
 /// @brief Simple struct containing state variables for the example
 struct ModioExampleFlags
 {
@@ -37,11 +36,11 @@ struct ModioExampleFlags
 	/// @brief Keeps a reference to the last error received
 	Modio::ErrorCode LastError;
 
-    /// @brief Keeps a reference to the list of mod results
-    Modio::Optional<Modio::ModInfoList> LastResults;
-    
-    /// @brief Keeps a reference to the last mod management event
-    Modio::ModManagementEvent LastEvent;
+	/// @brief Keeps a reference to the list of mod results
+	Modio::Optional<Modio::ModInfoList> LastResults;
+
+	/// @brief Keeps a reference to the last mod management event
+	Modio::ModManagementEvent LastEvent;
 };
 
 /// @brief Static definition of the ModioExampleFlags. Consider a more sophisticated process
@@ -112,8 +111,8 @@ struct ModioExample
 			NotifyApplicationSuccess();
 		}
 	}
-    
-    static void OnListAllModsComplete(Modio::ErrorCode ec, Modio::Optional<Modio::ModInfoList> ModList)
+
+	static void OnListAllModsComplete(Modio::ErrorCode ec, Modio::Optional<Modio::ModInfoList> ModList)
 	{
 		if (ec)
 		{
@@ -157,9 +156,9 @@ struct ModioExample
 	/// error code if an error occurred
 	static void OnModManagementEvent(Modio::ModManagementEvent ManagementEvent)
 	{
-        // Register the last event
-        Example.LastEvent = ManagementEvent;
-        
+		// Register the last event
+		Example.LastEvent = ManagementEvent;
+
 		// Inspect the type of event - Installed, Updated, Uploaded, or Uninstalled
 		switch (ManagementEvent.Event)
 		{
@@ -339,7 +338,7 @@ int main()
 		else
 		{
 			std::string UserEmailAuthCode = ModioExample::RetrieveUserInput("Enter email auth code:");
-			
+
 			Modio::AuthenticateUserEmailAsync(Modio::EmailAuthCode(UserEmailAuthCode),
 											  ModioExample::OnAuthenticateUserEmailCompleted);
 			while (!ModioExample::HasAsyncOperationCompleted())
@@ -392,15 +391,18 @@ int main()
 	// This means that if you have an open file handle on a file from a mod, but the user unsubscribes to it and no
 	// other local accounts have a subscription to it, if Mod Management is enabled then the SDK will attempt to delete
 	// that file.
+	//
 	// As a result, in most circumstances you will want Mod Management to be disabled during active gameplay while mod
 	// files are being opened by your game.
-	// EnableModManagement requires you provide it with a callback - *unlike the callbacks provided to Async methods,
+	//
+	// EnableModManagement requires you provide it with a callback. Unlike the callbacks provided to async methods,
 	// this callback will be invoked any time a mod management event is emitted by the SDK until Mod
-	// Management is disabled, which means it will potentially be invoked multiple times.*
-	// Mod management MUST be enabled in order for calls to Subscribe or Unsubscribe to succeed.
-	// Parameters:
-	// Callback Callback invoked for each management event
-	// Returns a Modio::ErrorCode indicating if mod management was enabled successfully
+	// Management is disabled. It will likely be invoked multiple times for multiple events.
+	//
+	// Mod management MUST be enabled for calls to Subscribe or Unsubscribe to succeed.
+	//
+	// Parameters: Callback - Callback invoked for each management event. Returns a Modio::ErrorCode indicating if mod
+	// management was enabled successfully
 	if (Modio::ErrorCode ec = Modio::EnableModManagement(ModioExample::OnModManagementEvent))
 	{
 		// An error occurred, bail early
@@ -410,61 +412,54 @@ int main()
 
 	std::cout << "Checking for subscription updates from the mod.io service.." << std::endl;
 
-    {
-        // Request a list of the user's subscriptions from the server, and cache them locally
-        // This updates the local view of the users subscriptions, including any that were added from another device, or a
-        // web browser
-        // This requires mod management to be enabled and will immediately enqueue any pending installs, updates or
-        // uninstallations based on the new subscription list
-        // Parameters:
-        // Callback Callback invoked when fetching updates has completed. Takes a Modio::ErrorCode indicating if the fetch
-        // was successful
-        Modio::FetchExternalUpdatesAsync(ModioExample::OnFetchExternalUpdatesComplete);
+	{
+		// Request a list of the user's subscriptions from the server and cache them locally
+		// This updates the local view of the users subscriptions, including any that were added from another device or
+		// a web browser. This requires mod management to be enabled and will immediately enqueue any pending installs,
+		// updates or uninstallations based on the new subscription list.
+		//
+		// Parameters: Callback - Callback invoked when fetching updates has completed. Takes a Modio::ErrorCode
+		// indicating if the fetch was successful
+		Modio::FetchExternalUpdatesAsync(ModioExample::OnFetchExternalUpdatesComplete);
 
-        while (!ModioExample::HasAsyncOperationCompleted())
-        {
-            Modio::RunPendingHandlers();
-        };
+		while (!ModioExample::HasAsyncOperationCompleted())
+		{
+			Modio::RunPendingHandlers();
+		};
 
-        if (!ModioExample::DidAsyncOperationSucceed())
-        {
-            // No need for explicit handling of an error from FetchExternalUpdates in this simple sample
-        }
-    }
-    
+		if (!ModioExample::DidAsyncOperationSucceed())
+		{
+			// No need for explicit handling of an error from FetchExternalUpdates in this simple sample
+		}
+	}
+
 	// Prompt the user for a Mod ID to install
 	{
 		std::int64_t UserModID = -1;
 		// An example ModID: "2281875", named "Sherlock Holmes"
 		std::string UserModString = ModioExample::RetrieveUserInput("Enter the ID of the mod you wish to install:");
-		
-		try
-		{
-			UserModID = std::stoll(UserModString);
-		}
-		catch (const std::exception&)
+
+		UserModID = std::strtoll(UserModString.c_str(), nullptr,10);
+		if (UserModID <= 0)
 		{
 			std::cout << "Invalid Input" << std::endl;
 			return -1;
 		}
-		if (UserModID != -1)
+		std::cout << "Initializing a Temporary Mod Set with Mod ID: " << UserModID << std::endl;
+		// Initialize a Temporary Mod Set with a given set of Mod IDs.
+		// Once the set has been created, you can add or remove mods to it later
+		std::vector<Modio::ModID> TempModList;
+		TempModList.emplace_back(UserModID);
+
+		(void) Modio::InitTempModSet(TempModList);
+
+		// Note that the TempModSet functions are not Async, meaning you get an immediate return.
+		// You will, however receive a Mod Management event once installation of the Temp Mod is successful
+		// Wait for the mod management system to finish installing the new mod and anything else which is
+		// pending
+		while (Modio::IsModManagementBusy())
 		{
-			std::cout << "Initializing a Temporary Mod Set with Mod ID: " << UserModID << std::endl;
-			// Initialize a Temporary Mod Set with a given set of Mod IDs.
-			// Once the set has been created, you can add or remove mods to it later
-			std::vector<Modio::ModID> TempModList;
-			TempModList.emplace_back(UserModID);
-
-			(void) Modio::InitTempModSet(TempModList);
-
-			// Note that the TempModSet functions are not Async, meaning you get an immediate return.
-			// You will, however receive a Mod Management event once installation of the Temp Mod is successful
-			// Wait for the mod management system to finish installing the new mod and anything else which is
-			// pending
-			while (Modio::IsModManagementBusy())
-			{
-				Modio::RunPendingHandlers();
-			}
+			Modio::RunPendingHandlers();
 		}
 	}
 
@@ -474,43 +469,32 @@ int main()
 		std::string UserModString =
 			ModioExample::RetrieveUserInput("Enter the ID of the mod you wish to add to the Temp Mod Set:");
 
-		try
-		{
-			UserModID = std::stoll(UserModString);
-		}
-		catch (const std::exception&)
+		if (UserModID < 0)
 		{
 			std::cout << "Invalid Input" << std::endl;
 			return -1;
 		}
-        
-		if (UserModID != -1)
+
+		std::cout << "Adding Mod ID to Temp Mod Set: " << UserModID << std::endl;
+
+		// After you have initialized a TempModSet, you can add additional mods to it - for instance if a user
+		// changes their cosmetic attachments, or if a new player joins the game
+		std::vector<Modio::ModID> TempModList;
+		TempModList.emplace_back(Modio::ModID(UserModID));
+		Modio::ErrorCode ec = Modio::AddToTempModSet(TempModList);
+
+		// Once again, the TempModSet functions are not async, but will trigger a ModManagement event, so
+		// we should wait for mod management to install this mod.
+		while (Modio::IsModManagementBusy())
 		{
-			std::cout << "Adding Mod ID to Temp Mod Set: " << UserModID << std::endl;
-
-			// After you have initialized a TempModSet, you can add additional mods to it - for instance if a user changes
-			// their cosmetic attachments, or if a new player joins the game
-			std::vector<Modio::ModID> TempModList;
-			TempModList.emplace_back(Modio::ModID(UserModID));
-			Modio::ErrorCode ec = Modio::AddToTempModSet(TempModList);
-
-			// Once again, the TempModSet functions are not async, but will trigger a ModManagement event, so
-			// we should wait for mod management to install this mod.
-			while (Modio::IsModManagementBusy())
-			{
-				Modio::RunPendingHandlers();
-			}
+			Modio::RunPendingHandlers();
 		}
-        else
-        {
-            std::cout << "Invalid ModID, closing execution now" << std::endl;
-        }
 	}
 
-	// Query the Temp Mod Set 
+	// Query the Temp Mod Set
 	{
 		// Once you have installed Temp Mods, you can query their installation location using QueryTempModSet.
-		for(auto Mod : Modio::QueryTempModSet())
+		for (auto Mod : Modio::QueryTempModSet())
 		{
 			std::cout << "Mod ID " << Mod.first << " is installed to location " << Mod.second.GetPath() << std::endl;
 		}

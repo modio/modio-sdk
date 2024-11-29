@@ -16,6 +16,12 @@ if(MODIO_PLATFORM STREQUAL "LINUX")
 	set (MODIO_PLATFORM_LINUX ON INTERNAL "building for linux")
 	set (MODIO_MBEDTLS_LINUX_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/mbedtls/library/")
 
+	if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+		message(STATUS "Configuring for ARM64 architecture")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv8-a")
+	endif()
+
 	enable_language(C)
 	enable_language(CXX)
 

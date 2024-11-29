@@ -7,7 +7,7 @@
 #   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
 # 
 
-if(MODIO_PLATFORM STREQUAL "ANDROID")
+if(MODIO_PLATFORM STREQUAL "ANDROID" OR MODIO_PLATFORM STREQUAL "OCULUS")
 
 	# Look for CMAKE_ANDROID_NDK and fall back to env var is its empty
 	if (DEFINED CMAKE_ANDROID_NDK)
@@ -20,7 +20,13 @@ if(MODIO_PLATFORM STREQUAL "ANDROID")
 	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
     cmake_policy(SET CMP0077 NEW)
 	set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake;${CMAKE_MODULE_PATH}")
-	set (MODIO_PLATFORM_ANDROID ON INTERNAL "building for android")
+
+	if (MODIO_PLATFORM STREQUAL "ANDROID")
+		set (MODIO_PLATFORM_ANDROID ON INTERNAL "building for android")
+	elseif (MODIO_PLATFORM STREQUAL "OCULUS")
+		set (MODIO_PLATFORM_OCULUS ON INTERNAL "building for oculus")
+	endif()
+
 	set (MODIO_MBEDTLS_ANDROID_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/mbedtls/library/")
 
 	
