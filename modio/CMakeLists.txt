@@ -43,8 +43,6 @@ target_sources(${MODIO_TARGET_NAME} INTERFACE
 
 add_public_header(${MODIO_TARGET_NAME} modio/ModioSDK.h)
 
-endif()
-
 target_include_directories(${MODIO_TARGET_NAME} INTERFACE ${ModioGeneratedHeaderPath})
 
 target_link_libraries(${MODIO_TARGET_NAME} INTERFACE asio tl::optional platform nlohmann_json function2 concurrentqueue)
