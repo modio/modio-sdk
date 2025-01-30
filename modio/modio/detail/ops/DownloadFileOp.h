@@ -70,7 +70,7 @@ namespace Modio
 				File = std::make_shared<Modio::Detail::File>(DestinationPath += Modio::filesystem::path(".download"),
 															 Modio::Detail::FileMode::ReadWrite, false);
 				// Initialize CurrentFilePosition to 0 - we'll set the actual value after truncate
-				CurrentFilePosition = std::make_shared<std::uintmax_t>(0);
+				CurrentFilePosition = std::make_shared<std::uintmax_t>(0ULL);
 				// Initialize the request without range header - we'll update it after setting the position
 				Request = std::make_shared<Modio::Detail::HttpRequest>(RequestParams);
 				EndOfFileReached = std::make_shared<bool>(false);

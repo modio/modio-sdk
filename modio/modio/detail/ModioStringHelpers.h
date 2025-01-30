@@ -81,7 +81,7 @@ namespace Modio
 
 			inline Modio::Optional<std::uint32_t> ParseDateOrInt(std::string Value)
 			{
-				if (Value == "")
+				if (Value.empty())
 				{
 					return {};
 				}

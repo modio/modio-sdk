@@ -114,6 +114,32 @@ namespace Modio
 			CacheInstance->ModInfoListCache.emplace(GameIDDetail, ModIDVec);
 		}
 
+		void CacheService::AddToCache(Modio::ModID ModId, std::uint64_t Filesize, bool recursive)
+		{
+			Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Adding ModID {} filesize to cache = {}",
+										ModId, Filesize);
+
+			// See if we already have this mod cached, and then set the appropriate filesize depending on the recursive
+			// flag
+			ModDependencyFilesizeEntry Entry;
+			auto CacheEntryIterator = CacheInstance->ModDependenciesFilesize.find(ModId);
+			if (CacheEntryIterator != CacheInstance->ModDependenciesFilesize.end())
+			{
+				Entry = std::move(CacheEntryIterator->second);
+			}
+
+			if (recursive)
+			{
+				Entry.FilesizeRecursive = Filesize;
+			}
+			else
+			{
+				Entry.FilesizeFirstDepth = Filesize;
+			}
+
+			CacheInstance->ModDependenciesFilesize.emplace(ModId, std::move(Entry));
+		}
+
 		List<std::vector, Modio::ModID> CacheService::GetAllModIdsInCache()
 		{
 			List<std::vector, Modio::ModID> listModId;
@@ -227,6 +253,42 @@ namespace Modio
 			}
 
 			return ModElems;
+		}
+
+		Modio::Optional<std::uint64_t> CacheService::FetchModDependencyFilesizeFromCache(Modio::ModID ModIDDetail,
+																						 bool recursive) const
+		{
+			MODIO_PROFILE_SCOPE(CacheFetchModDependencyFilesize);
+			auto CacheEntryIterator = CacheInstance->ModDependenciesFilesize.find(ModIDDetail);
+			if (CacheEntryIterator != CacheInstance->ModDependenciesFilesize.end())
+			{
+				Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http,
+											"Retrieving mod {} dependency filesize from primary cache", ModIDDetail);
+
+				if (Modio::Detail::SDKSessionData::IsModCacheInvalid(ModIDDetail) == true)
+				{
+					return {};
+				}
+
+				// Grab the appropriate cache value based on the recursive flag
+				std::uint64_t Filesize = 0;
+				if (recursive)
+				{
+					Filesize = CacheEntryIterator->second.FilesizeRecursive;
+				}
+				else
+				{
+					Filesize = CacheEntryIterator->second.FilesizeFirstDepth;
+				}
+
+				// If we haven't cached a filesize for this mod, it should return the "empty" from optional
+				if (Filesize == 0)
+				{
+					return {};
+				}
+			}
+
+			return {};
 		}
 
 		void CacheService::ClearCache()

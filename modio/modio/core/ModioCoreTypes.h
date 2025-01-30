@@ -9,9 +9,9 @@
  */
 
 #pragma once
-
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/JsonWrapper.h"
+#include "modio/detail/platform/IPlatformUtilImplementation.h"
 #include <cstdint>
 #include <random>
 #include <sstream>
@@ -461,6 +461,162 @@ namespace Modio
 	};
 
 	/// @docpublic
+	/// @brief Strong type representing a Guid as 16byte binary value
+	struct GuidV4
+	{
+		/// @docinternal
+		GuidV4() 
+		{
+			Raw64[1] = Raw64[0] = 0;
+		}
+
+		/// @docinternal
+		GuidV4(const uint8_t UUID[16])
+		{
+			std::memmove(Raw8, UUID, 16);
+			//assert(IsValid());
+		}
+
+		/// @docinternal
+		GuidV4(const GuidV4& UUID)
+		{
+			std::memmove(Raw8, UUID.Raw8, 16);
+			//assert(IsValid());
+		}
+
+		/// @docinternal
+		GuidV4(const std::string& UUID)
+		{
+			Parse(UUID);
+		}
+
+		/// @docinternal
+		GuidV4& operator=(const GuidV4& UUID)
+		{
+			std::memcpy(Raw8, UUID.Raw8, 16);
+			//assert(IsValid());
+			return *this;
+		}
+
+		/// @docinternal
+		GuidV4& operator=(const std::string& UUID)
+		{
+			Parse(UUID);
+			return *this;
+		}
+
+		void ConvertByteOrder()
+		{
+			std::swap(Raw8[0], Raw8[3]);
+			std::swap(Raw8[1], Raw8[2]);
+			std::swap(Raw8[4], Raw8[5]);
+			std::swap(Raw8[6], Raw8[7]);
+		}
+
+		/// @brief Given a GUID of the form: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX,
+		/// convert into the binary representation
+		/// @param Input 
+		/// @return 
+		bool Parse(const std::string& Input)
+		{
+			FromString(Input);
+			return IsValid();
+		}
+
+		/// @docinternal
+		void Generate()
+		{
+			*this = Detail::PlatformUtilService::GuidCreate();
+		}
+
+		/// @docinternal
+		/// @brief Static function to generate an invalid Guid
+		static GuidV4 InvalidGuid()
+		{
+			return GuidV4();
+		}
+
+		/// @docinternal
+		/// @brief Ensure the GUID value conforms to a randomised version 4 GUID. 
+		bool IsValid() const
+		{
+			// ensure we have a valid Version 4 UUID, variant 2.
+			return (Raw8[7] & 0xF0) == 0x40 && (Raw8[8] & 0xC0) == 0x80;
+		}
+
+		/// @brief converts from a binary UUID to a text string UUID
+		/// @return the UUID as a text string
+		std::string ToString() const
+		{
+			return Detail::PlatformUtilService::GuidToString(*this);
+		}
+
+		/// @brief converts from a text string UUID to a binary UUID
+		/// @param String the UUID as a text string
+		void FromString(const std::string& String)
+		{
+			*this = Detail::PlatformUtilService::GuidFromString(String);
+		}
+
+		/// @brief Test for equality
+		/// @param Other the UUID to compare against
+		/// @return true if the GUIDs are equal
+		bool operator==(const GuidV4& Other) const
+		{
+			return Raw64[0] == Other.Raw64[0] && Raw64[1] == Other.Raw64[1];
+		}
+
+		/// @brief test for inequality
+		/// @param Other the UUID to compare against
+		/// @return true if the GUIDs are equal
+		bool operator!=(const GuidV4& Other) const
+		{
+			return !(*this == Other);
+		}
+
+		/// @brief less that comparison for sorting
+		/// @param Other the UUID to compare against
+		/// @return true if this UUID is less than Other
+		bool operator<(const GuidV4& Other) const
+		{
+			if(Raw64[0] == Other.Raw64[0])
+				return Raw64[1] < Other.Raw64[1];
+			return Raw64[0] < Other.Raw64[0];
+		}
+
+		/// @brief greater that comparison for sorting
+		/// @param Other
+		/// @return true if this UUID is greater than Other
+		bool operator>(const GuidV4& Other) const
+		{
+			if (Raw64[0] == Other.Raw64[0])
+				return Raw64[1] > Other.Raw64[1];
+			return Raw64[0] > Other.Raw64[0];
+		}
+
+		/// @brief returns the raw bytes. Note, internally this is stored in MS binary format
+		/// @return pointer to the raw bytes in the GUID
+		uint8_t* Bytes()
+		{
+			return Raw8;
+		}
+
+		/// @brief returns the raw bytes. Note, internally this is stored in MS binary format
+		/// @return pointer to the raw bytes in the GUID
+		const uint8_t* Bytes() const
+		{
+			return Raw8;
+		}
+
+	private:
+		union
+		{
+			uint8_t Raw8[16];
+			uint64_t Raw64[2];
+		};
+	};
+		
+	/// @docpublic
 	/// @brief Strong type representing a Guid
 	struct Guid
 	{
@@ -474,48 +630,21 @@ namespace Modio
 		/// per-platform implementation is planned
 		static Guid GenerateGuid()
 		{
-			std::random_device rd;
-			std::mt19937 gen(rd());
-			std::uniform_int_distribution<> dis(0, 15);
-			std::uniform_int_distribution<> dis2(8, 11);
-
-			std::stringstream ss;
-			int i;
-			ss << std::hex;
-			for (i = 0; i < 8; i++)
-			{
-				ss << dis(gen);
-			}
-			ss << "-";
-			for (i = 0; i < 4; i++)
-			{
-				ss << dis(gen);
-			}
-			ss << "-4";
-			for (i = 0; i < 3; i++)
-			{
-				ss << dis(gen);
-			}
-			ss << "-";
-			ss << dis2(gen);
-			for (i = 0; i < 3; i++)
-			{
-				ss << dis(gen);
-			}
-			ss << "-";
-			for (i = 0; i < 12; i++)
-			{
-				ss << dis(gen);
-			}
-
-			Modio::Guid guid(ss.str());
-			return guid;
+			return Guid(Detail::PlatformUtilService::GuidCreate());
 		}
 
 		/// @docpublic
 		/// @brief Explicit constructor
 		/// @param InGuid string based Guid
 		explicit Guid(const std::string& InGuid) : InternalGuid(InGuid) {}
+
+		/// @docpublic
+		/// @brief Explicit constructor
+		/// @param InGuid raw 128bit Guid
+		explicit Guid(const Modio::GuidV4& InGuid)
+		{
+			InternalGuid = InGuid.ToString();
+		}
 
 		/// @docinternal
 		/// @brief Compare the Guid to an empty string
@@ -658,8 +787,7 @@ namespace Modio
 	};
 
 	/// @docpublic
-
-	/// @brief The visiblility of a mod.
+	/// @brief The visibility of a mod.
 	enum class ObjectVisibility : int8_t
 	{
 		Hidden = 0,
@@ -695,6 +823,53 @@ namespace Modio
 		std::vector<Modio::ModID> ModIds;
 	};
 
+	/// @docpublic
+	/// @brief Where the storage has been written to
+	enum class StorageLocation : uint8_t
+	{
+		Local = 0,
+	};
+
+	/// @docpublic
+	/// @brief The type of storage usage
+	enum class StorageUsage : uint8_t
+	{
+		Consumed = 0,
+		Available = 1,
+	};
+
+	/// @docpublic
+	/// @brief Structure containing storage usage information including availability and consumption
+	struct StorageInfo
+	{
+		/// @docpublic
+		/// @brief Returns the recorded storage space for a given storage location and usage type
+		/// @param Location Where the storage has been written to
+		/// @param Usage The type of storage usage recorded
+		/// @return Modio::FileSize for total storage space in bytes
+		Modio::FileSize GetSpace(Modio::StorageLocation Location, Modio::StorageUsage Usage) const
+		{
+			const auto It = StorageData.find({Location, Usage});
+			if (It != StorageData.end())
+			{
+				return It->second;
+			}
+
+			return Modio::FileSize(0);
+		}
+
+		/// @docinternal
+		/// @brief Default constructor
+		StorageInfo() {}
+
+	private:
+		/// @docnone
+		std::map<std::tuple<Modio::StorageLocation, Modio::StorageUsage>, Modio::FileSize> StorageData;
+
+		/// @docnone
+		friend MODIO_IMPL void SetSpace(Modio::StorageInfo& Info, Modio::StorageLocation Location,
+										Modio::StorageUsage Usage, Modio::FileSize Space);
+	};
 } // namespace Modio
 
 namespace Modio
@@ -807,8 +982,8 @@ namespace Modio
 					return "googleidtoken";
 				case AuthenticationProvider::GoogleServerSideToken:
 					return "googleserversidetoken";
-                default:
-                    return "none";
+				default:
+					return "none";
 			}
 
 			assert(false && "Invalid value to ToString(Modio::Provider)");
@@ -816,3 +991,5 @@ namespace Modio
 		}
 	} // namespace Detail
 } // namespace Modio
+
+#include "platform/PlatformUtilImplementation.h"

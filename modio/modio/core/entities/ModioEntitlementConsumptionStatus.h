@@ -54,13 +54,13 @@ namespace Modio
 	struct EntitlementConsumptionStatus
 	{
 		/// @brief ID of the transaction to redeem this entitlement
-		std::string TransactionId = "";
+		std::string TransactionId;
 
 		/// @brief State of the transaction
 		Modio::EntitlementConsumptionState TransactionState = Modio::EntitlementConsumptionState::Failed;
 
 		/// @brief ID of the SKU that we attempted to consume
-		std::string SkuId = "";
+		std::string SkuId;
 
 		/// @brief Whether this entitlement was consumed or not
 		bool EntitlementConsumed;

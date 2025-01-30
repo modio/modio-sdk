@@ -31,7 +31,7 @@ namespace Modio
 		Modio::Detail::ParseSafe(Json, TagInfo.TagGroupValueLocData, "tags_localization");
 		if (Json.contains("type") && !Json.at("type").is_null())
 		{
-			std::string TypeValue = "";
+			std::string TypeValue;
 			Json.at("type").get_to<std::string>(TypeValue);
 			if (TypeValue.compare("checkboxes"))
 			{

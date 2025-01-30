@@ -38,6 +38,12 @@ wget http://mirrors.kernel.org/ubuntu/pool/main/libu/liburing/liburing1_0.7-3ubu
 sudo apt install ./liburing*deb
 ```
 
+The mod.io SDK also requires libuuid, which is available in the standard `uuid-dev` package, e.g.
+
+```bash 
+sudo apt install uuid-dev
+```
+
 :::note
 If you are using the "header_only" release mode, the mod.io SDK includes MbedTLS headers, but requires the library installed in your system, which was tested with libmbedtls-dev 2.28.0 in Ubuntu. The "static" mode includes these libraries in the same folder as the libmodioStatic.a
 :::

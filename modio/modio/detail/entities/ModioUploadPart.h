@@ -23,7 +23,7 @@ namespace Modio
 		struct UploadSessionPart
 		{
 			/// @brief Related multipart upload session string
-			std::string UploadID = "";
+			std::string UploadID;
 
 			/// @brief The part number within an upload session
 			std::uint32_t PartNumber = 0;

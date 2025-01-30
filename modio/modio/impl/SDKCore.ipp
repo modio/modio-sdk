@@ -28,6 +28,7 @@
 #include "modio/detail/serialization/ModioGameMaturityOptionsSerialization.h"
 #include "modio/detail/serialization/ModioGameMonetizationSerialization.h"
 #include "modio/detail/serialization/ModioGameStatsSerialization.h"
+#include "modio/detail/serialization/ModioModCommunityOptionsSerialization.h"
 #include "modio/detail/serialization/ModioIconSerialization.h"
 #include "modio/file/ModioFileService.h"
 #include "modio/http/ModioHttpService.h"

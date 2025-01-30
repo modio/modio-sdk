@@ -118,7 +118,7 @@ public:
 				return false;
 			}
 
-			std::string ParseBuffer = "";
+			std::string ParseBuffer;
 			bool SkipOther = true;
 			
 			// It is necessary to "skip" one other because the buffer returns as a "wide char" which is

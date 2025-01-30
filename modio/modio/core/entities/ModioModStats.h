@@ -44,7 +44,7 @@ namespace Modio
 		/// Positive -> Very Positive -> Positive -> Mostly Positive -> Mixed ->
 		/// Negative -> Mostly Negative -> Very Negative -> Overwhelmingly
 		/// Negative -> Unrated
-		std::string RatingDisplayText = "";
+		std::string RatingDisplayText;
 
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModStats& ModStats);

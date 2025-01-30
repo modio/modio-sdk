@@ -31,11 +31,14 @@
 #include "modio/detail/ops/mod/SubmitNewModFileOp.h"
 #include "modio/detail/ops/mod/SubmitNewModOp.h"
 #include "modio/detail/ops/modmanagement/ForceUninstallModOp.h"
+#include "modio/detail/serialization/ModioAvatarSerialization.h"
 #include "modio/detail/serialization/ModioFileMetadataSerialization.h"
 #include "modio/detail/serialization/ModioGalleryListSerialization.h"
+#include "modio/detail/serialization/ModioImageSerialization.h"
 #include "modio/detail/serialization/ModioModStatsSerialization.h"
 #include "modio/detail/serialization/ModioProfileMaturitySerialization.h"
 #include "modio/detail/serialization/ModioResponseErrorSerialization.h"
+#include "modio/detail/serialization/ModioImageSerialization.h"
 #include "modio/file/ModioFileService.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 #include "modio/userdata/ModioUserDataService.h"
@@ -344,6 +347,39 @@ namespace Modio
 		{
 			return {};
 		}
+	}
+
+	Modio::StorageInfo QueryStorageInfo()
+	{
+		Modio::Detail::FileService& FileService =
+			Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>();
+
+		Modio::StorageInfo Info;
+
+		// Get the total available storage from the file system
+		const auto AvailableLocalSpace = FileService.GetSpaceAvailable(FileService.GetRootLocalStoragePath());
+		SetSpace(Info, Modio::StorageLocation::Local, Modio::StorageUsage::Available, AvailableLocalSpace);
+
+		// Calculate the total consumption from system installations
+		const auto SystemInstallations = QuerySystemInstallations();
+		Modio::FileSize ConsumedLocalSpace;
+		for (auto& Mod : SystemInstallations)
+		{
+			if (Mod.second.GetSizeOnDisk().has_value() == false)
+			{
+				continue;
+			}
+			ConsumedLocalSpace += Mod.second.GetSizeOnDisk().value();
+		}
+		SetSpace(Info, Modio::StorageLocation::Local, Modio::StorageUsage::Consumed, ConsumedLocalSpace);
+
+		return Info;
+	}
+
+	MODIO_IMPL void SetSpace(Modio::StorageInfo& Info, Modio::StorageLocation Location, Modio::StorageUsage Usage,
+							 Modio::FileSize Space)
+	{
+		Info.StorageData[{Location, Usage}] = Space;
 	}
 
 	void ForceUninstallModAsync(Modio::ModID ModToRemove, std::function<void(Modio::ErrorCode)> Callback)

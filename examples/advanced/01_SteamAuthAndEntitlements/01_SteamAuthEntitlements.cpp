@@ -29,9 +29,9 @@ static uint64_t UserWalletBalance;
 /// @param Prompt The string to show related to the expected user input
 /// @param DefaultValue If the user wants to use a default input, this will be used
 /// @return String with the user input or default value
-static std::string RetrieveUserInput(std::string Prompt, std::string DefaultValue = "")
+static std::string RetrieveUserInput(std::string Prompt, std::string DefaultValue = std::string())
 {
-	std::string UserInput = "";
+	std::string UserInput;
 	std::cout << Prompt << std::endl;
 
 	if (!DefaultValue.empty())

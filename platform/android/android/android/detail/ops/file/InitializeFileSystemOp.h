@@ -10,12 +10,15 @@
 
 #pragma once
 #include "fmt/format.h"
+
 #include "android/FileSharedState.h"
+
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioInitializeOptions.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
+
 #include "ModioAndroid.h"
 #include "jni/AndroidContextService.h"
 
@@ -51,7 +54,7 @@ namespace Modio
 							   fmt::format("{}/{}/", InitParams.GameID, InitParams.User);
 
 				TempPath = Modio::filesystem::path(CommonDataPath) / "mod.io" / "temp";
-			
+
 				// EC should never be null at this point
 				Self.complete(Modio::ErrorCode {});
 			}

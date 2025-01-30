@@ -128,7 +128,7 @@ namespace Modio
 							// Write the header for the field in the form data
 							{
 								{
-									std::string PayloadContentFilename = "";
+									std::string PayloadContentFilename;
 									if (Impl->PayloadElement->second.PType == PayloadContent::PayloadType::File)
 									{
 										PayloadContentFilename =

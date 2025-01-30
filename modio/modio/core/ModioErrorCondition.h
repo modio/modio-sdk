@@ -54,4 +54,9 @@ enum class EModioErrorCondition: uint8
 	MetricsSessionHasNoMods = 41 UMETA(ToolTip="No mods have been added to the session.") ,
 	PremiumFeatureNotAvailable = 42 UMETA(ToolTip="This premium feature is not available for your project.") ,
 	EmailExchangeCodeAlreadyRedeemed = 43 UMETA(ToolTip="The email security code has already been redeemed.") ,
+	ModDependenciesNotAllowed = 44 UMETA(ToolTip="Cannot add a dependency because the target mod has not opted in to dependencies.") ,
+	ModCannotAddDependencyMonetized = 45 UMETA(ToolTip="Cannot add a dependency because the mod is monetized.") ,
+	ModIsDependency = 46 UMETA(ToolTip="Cannot turn off mod dependencies when the mod is currently a dependency for other mods.") ,
+	ModCannotAllowDependencyMonetized = 47 UMETA(ToolTip="This mod cannot allow dependencies because it is monetized.") ,
+	ModCannotDeleteDependency = 48 UMETA(ToolTip="This mod is a dependency of other mods and cannot be deleted.") ,
 };

@@ -11,8 +11,7 @@
 #pragma once
 
 #include "httpparser/response.h"
-#include "mbedtls/net_sockets.h"
-#include "mbedtls/ssl.h"
+#include "modio/detail/MbedtlsWrapper.h"
 #include "modio/detail/ModioStringHelpers.h"
 #include "modio/detail/http/IHttpRequestImplementation.h"
 #include "modio/http/ModioHttpParams.h"

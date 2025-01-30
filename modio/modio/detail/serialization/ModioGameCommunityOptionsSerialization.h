@@ -32,13 +32,11 @@ namespace Modio
 				Modio::LogLevel::Warning, Modio::LogCategory::Core,
 				"GameCommunity from_json requires an integer.  Using default GameCommunityOptions 0");
 		}
-		GameCommunity.Value = static_cast<Modio::GameCommunityOptionsFlags::StorageType>(gameCommunity);
+		GameCommunity = static_cast<Modio::GameCommunityOptionsFlags::StorageType>(gameCommunity);
 	}
 
 	inline void to_json(nlohmann::json& Json, const Modio::GameCommunityOptionsFlags& GameCommunity)
 	{
-		// In case the Value inside GameCommunity is Optional::None, then it matches GameCommunity::None
-		std::uint32_t DefaultGameCommunity = static_cast<uint32_t>(GameCommunityOptions::None);
-		Json = GameCommunity.Value.value_or(DefaultGameCommunity);
+		Json = GameCommunity.RawValue();
 	}
 } // namespace Modio

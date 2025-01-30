@@ -10,13 +10,17 @@
 
 #pragma once
 #include "file/FileObjectImplementation.h"
+
 #include "android/FileSharedState.h"
+
 #include "file/StaticDirectoriesImplementation.h"
+
 #include "android/detail/ops/file/DeleteFolderOp.h"
 #include "android/detail/ops/file/InitializeFileSystemOp.h"
 #include "android/detail/ops/file/ReadSomeFromFileBufferedOp.h"
 #include "android/detail/ops/file/ReadSomeFromFileOp.h"
 #include "android/detail/ops/file/WriteSomeToFileOp.h"
+
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioSDKSessionData.h"
@@ -26,6 +30,7 @@
 #include "modio/detail/file/IFileObjectImplementation.h"
 #include "modio/detail/file/IFileServiceImplementation.h"
 #include "modio/file/ModioFileService.h"
+
 #include "jni/JavaClassWrapperModio.h"
 #include <memory>
 
@@ -224,7 +229,8 @@ namespace Modio
 				return RootLocalStoragePath / fmt::format("{}/cache/mods/{}/logos/", CurrentGameID, ModID);
 			}
 
-			Modio::filesystem::path MakeGalleryFolderPath(Modio::ModID ModID, Modio::GalleryIndex ImageIndex) const override
+			Modio::filesystem::path MakeGalleryFolderPath(Modio::ModID ModID,
+														  Modio::GalleryIndex ImageIndex) const override
 			{
 				// @todonow: Change this to temporary storage
 				return RootLocalStoragePath /
@@ -246,8 +252,8 @@ namespace Modio
 				return RootLocalStoragePath / fmt::format("{}/cache/users/{}/avatars/", CurrentGameID, UserId);
 			}
 
-			bool DirectoryExists(const Modio::filesystem::path& DirectoryPath) const override 
-			{ 	
+			bool DirectoryExists(const Modio::filesystem::path& DirectoryPath) const override
+			{
 				Modio::ErrorCode ec;
 				if (Modio::filesystem::exists(DirectoryPath, ec) && !ec)
 				{
@@ -388,8 +394,12 @@ namespace Modio
 				return RootLocalStoragePath;
 			}
 
-			Modio::ErrorCode ApplyGlobalConfigOverrides(
-				const std::map<std::string, std::string> Overrides) override
+			const Modio::filesystem::path& GetRootTempStoragePath() const override
+			{
+				return RootTempPath;
+			}
+
+			Modio::ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string> Overrides) override
 			{
 				auto RootValue = Overrides.find(Modio::Detail::Constants::JSONKeys::RootLocalStoragePath);
 				if (RootValue != Overrides.end())
@@ -413,12 +423,11 @@ namespace Modio
 
 			bool CheckSpaceAvailable(const Modio::filesystem::path& Destination, Modio::FileSize DesiredSize) override
 			{
-				Modio::ErrorCode ec;
+				Modio::filesystem::path ValidDestination =
+					Modio::Detail::AndroidContextService::Get().GetJavaClassModio()->GetStoragePath();
 
-				Modio::filesystem::space_info SpaceInfo = Modio::filesystem::space(
-					Modio::Detail::AndroidContextService::Get().GetJavaClassModio()->GetStoragePath().c_str(), ec);
-
-				if (!ec && SpaceInfo.available >= DesiredSize)
+				const Modio::FileSize SpaceAvailable = GetSpaceAvailable(ValidDestination);
+				if (SpaceAvailable >= DesiredSize)
 				{
 					return true;
 				}
@@ -426,8 +435,22 @@ namespace Modio
 				{
 					return false;
 				}
+			}
 
-				return true;
+			Modio::FileSize GetSpaceAvailable(const Modio::filesystem::path& Destination) override
+			{
+				Modio::ErrorCode ec;
+				const Modio::filesystem::path ValidDestination = Destination.root_path();
+
+				const Modio::filesystem::space_info SpaceInfo = Modio::filesystem::space(ValidDestination, ec);
+				if (!ec)
+				{
+					return FileSize(SpaceInfo.available);
+				}
+
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::File,
+											"Failed to get space available. Received error {}", ec.message());
+				return Modio::FileSize(0);
 			}
 
 			static Modio::filesystem::path GetDefaultCommonDataPath(Modio::filesystem::path& CommonDataPath)

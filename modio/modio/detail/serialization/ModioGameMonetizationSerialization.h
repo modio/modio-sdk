@@ -31,13 +31,11 @@ namespace Modio
 				Modio::LogLevel::Warning, Modio::LogCategory::Core,
 				"GameMonetization from_json requires an integer.  Using default GameMonetizationOptions 0");
 		}
-		GameMonetization.Value = monetization;
+		GameMonetization = monetization;
 	}
 
 	inline void to_json(nlohmann::json& Json, const Modio::GameMonetization& GameMonetization)
 	{
-		// In case the Value inside GameMonetization is Optional::None, then it matches GameMonetizationOptions::None
-		std::uint8_t DefaultGameMonetization = static_cast<uint8_t>(GameMonetizationOptions::None);
-		Json = GameMonetization.Value.value_or(DefaultGameMonetization);
+		Json = GameMonetization.RawValue();
 	}
 } // namespace Modio

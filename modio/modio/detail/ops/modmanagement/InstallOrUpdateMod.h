@@ -67,7 +67,9 @@ namespace Modio
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ModInfoBuffer,
 						Modio::Detail::GetModRequest.SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
-							.SetModID(Mod),
+							.SetModID(Mod)
+							.AddPlatformStatusFilter()
+							.AddStatusFilter(),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 					if (ec)
 					{
@@ -134,7 +136,7 @@ namespace Modio
 					{
 						Modio::Detail::File DownloadedFile(DownloadPath, Modio::Detail::FileMode::ReadOnly);
 						// Is the downloaded file the correct size?
-						if (std::int64_t(DownloadedFile.GetFileSize()) == ModInfoData.FileInfo->Filesize)
+						if (DownloadedFile.GetFileSize() == ModInfoData.FileInfo->Filesize)
 						{
 							bFileDownloadComplete = true;
 						}

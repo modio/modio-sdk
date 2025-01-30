@@ -86,7 +86,7 @@ namespace Modio
 				std::string KeyStr = CFStringToStdString(Key);
 				std::string ValueStr = CFStringToStdString(Value);
 
-				if (KeyStr == "" || ValueStr == "")
+				if (KeyStr.empty() || ValueStr.empty())
 				{
 					// Some CFString do not translate well to std::string, avoid those here
 					return;

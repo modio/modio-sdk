@@ -11,9 +11,7 @@
 #pragma once
 
 #include "linux/HttpSharedState.h"
-#include "mbedtls/ctr_drbg.h"
-#include "mbedtls/entropy.h"
-#include "mbedtls/ssl.h"
+#include "modio/detail/MbedtlsWrapper.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/detail/AsioWrapper.h"

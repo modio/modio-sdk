@@ -34,14 +34,14 @@ namespace Modio
 		{
 			return PageCount;
 		}
-		
+
 		/// @docpublic
 		/// @brief Get the PageIndex
 		inline std::int32_t GetPageIndex() const
 		{
 			return PageIndex;
 		}
-		
+
 		/// @docpublic
 		/// @brief Get the PageSize
 		inline std::int32_t GetPageSize() const
@@ -65,5 +65,10 @@ namespace Modio
 
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::PagedResult& PagedResult);
+
+		/// @docnone
+		MODIO_IMPL friend void InitializePageResult(Modio::PagedResult& PagedResult, std::int32_t PageIndex,
+													std::int32_t PageSize, std::int32_t PageCount,
+													std::int32_t TotalResultCount, std::int32_t ResultCount);
 	};
 } // namespace Modio

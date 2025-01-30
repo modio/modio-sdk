@@ -19,6 +19,8 @@
 #include "modio/detail/JsonWrapper.h"
 #include "modio/detail/entities/ModioGalleryList.h"
 #include "modio/detail/entities/ModioLogo.h"
+#include "modio/core/entities/ModioModCommunityOptions.h"
+#include "modio/detail/serialization/ModioModCommunityOptionsSerialization.h"
 #include <string>
 #include <vector>
 
@@ -83,15 +85,15 @@ namespace Modio
 		/// @brief Unique Mod ID
 		Modio::ModID ModId = Modio::ModID::InvalidModID();
 		/// @brief Name of the mod
-		std::string ProfileName = "";
+		std::string ProfileName;
 		/// @brief Summary of the mod
-		std::string ProfileSummary = "";
+		std::string ProfileSummary;
 		/// @brief Detailed description in HTML format
-		std::string ProfileDescription = "";
+		std::string ProfileDescription;
 		/// @brief Detailed description in plaintext
-		std::string ProfileDescriptionPlaintext = "";
+		std::string ProfileDescriptionPlaintext;
 		/// @brief URL to the mod profile
-		std::string ProfileURL = "";
+		std::string ProfileURL;
 		/// @brief Information on the user who submitted the mod
 		Modio::User ProfileSubmittedBy;
 		/// @brief Unix timestamp of the date the mod was registered
@@ -105,8 +107,10 @@ namespace Modio
 		///	* be labeled as mature. The value of this field will default to None unless the parent game allows
 		/// * to flag mature content.
 		Modio::ProfileMaturity ProfileMaturityOption;
+		/// @brief Community options for the mod
+		Modio::ModCommunityOptionsFlags CommunityOptions;
 		/// @brief Metadata stored by the game developer.
-		std::string MetadataBlob = "";
+		std::string MetadataBlob;
 		/// @brief Information about the mod's most recent public release
 		Modio::Optional<Modio::FileMetadata> FileInfo = {};
 		/// @brief Arbitrary key-value metadata set for this mod
@@ -126,6 +130,7 @@ namespace Modio
 		/// @brief Media data related to the mod logo
 		Modio::Detail::Logo ModLogo;
 		/// @brief The current ModInfo version. This property is updated when changes to the class happen.
+		/// This is NOT the version of the mod itself. Mod versioning is tied to FileInfo, not ModInfo.
 		std::string Version = "1.0";
 		/// @brief The current ModStatus on the server: Accepted, NotAccepted, or Deleted.
 		Modio::ModServerSideStatus ModStatus = Modio::ModServerSideStatus::NotAccepted;
@@ -135,14 +140,15 @@ namespace Modio
 		/// @brief Price of this mod
 		uint64_t Price = 0;
 
-		/// @brief If this mod has any direct dependencie.
+		/// @brief If this mod has any direct dependencies
 		bool Dependencies;
 
 		/// @docnone
 		friend bool operator==(const Modio::ModInfo& A, const Modio::ModInfo& B)
 		{
 			if ((A.NumGalleryImages == B.NumGalleryImages) && (A.SketchfabURLs == B.SketchfabURLs) &&
-				(A.ProfileMaturityOption == B.ProfileMaturityOption) && (A.GalleryImages == B.GalleryImages) &&
+				(A.ProfileMaturityOption == B.ProfileMaturityOption) &&
+				(A.CommunityOptions == B.CommunityOptions) && (A.GalleryImages == B.GalleryImages) &&
 				(A.ModId == B.ModId) && (A.ProfileName == B.ProfileName) && (A.ProfileSummary == B.ProfileSummary) &&
 				(A.ProfileDescription == B.ProfileDescription) &&
 				(A.ProfileDescriptionPlaintext == B.ProfileDescriptionPlaintext) && (A.ProfileURL == B.ProfileURL) &&

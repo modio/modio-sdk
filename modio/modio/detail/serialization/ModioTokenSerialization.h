@@ -29,7 +29,7 @@ namespace Modio
 		{
 			Detail::ParseSafe(Json, InToken.ExpireDate, "expiry");
 			Detail::ParseSafe(Json, InToken.State, "status");
-			std::string TokenString = "";
+			std::string TokenString;
 
 			if (Detail::ParseSafe(Json, TokenString, "token"))
 			{

@@ -84,7 +84,7 @@ namespace Modio
 					}
 
 					// We did not find any open UploadIDs. Return error
-					if (UploadSession->UploadID == "")
+					if (!UploadSession->UploadID.has_value() || UploadSession->UploadID.value().empty())
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
 													"There are no incomplete upload session");

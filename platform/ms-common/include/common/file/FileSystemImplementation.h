@@ -89,7 +89,7 @@ namespace Modio
 				Implementation = std::move(OtherImplementation);
 			}
 
-			void Shutdown() override 
+			void Shutdown() override
 			{
 				if (SharedState)
 				{
@@ -120,8 +120,9 @@ namespace Modio
 								  Modio::Detail::Buffer Buffer, CompletionTokenType&& Token)
 			{
 				return asio::async_compose<CompletionTokenType, void(std::error_code)>(
-					static_cast<Subplatform*>(this)->MakeWriteSomeToFileOp(PlatformIOObjectInstance, Offset, std::move(Buffer)), Token,
-					Modio::Detail::Services::GetGlobalContext().get_executor());
+					static_cast<Subplatform*>(this)->MakeWriteSomeToFileOp(PlatformIOObjectInstance, Offset,
+																		   std::move(Buffer)),
+					Token, Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 
 			template<typename CompletionTokenType>
@@ -160,8 +161,8 @@ namespace Modio
 							CompletionTokenType&& Token)
 			{
 				return asio::async_compose<CompletionTokenType, void(std::error_code)>(
-					static_cast<Subplatform*>(this)->MakeStreamWriteOp(PlatformIOObjectInstance, std::move(Buffer)), Token,
-					Modio::Detail::Services::GetGlobalContext().get_executor());
+					static_cast<Subplatform*>(this)->MakeStreamWriteOp(PlatformIOObjectInstance, std::move(Buffer)),
+					Token, Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 
 			template<typename CompletionTokenType>
@@ -173,7 +174,7 @@ namespace Modio
 			}
 
 			// do we need to maintain a cache of temporary files?
-			Modio::filesystem::path MakeTempFilePath(std::string FileName) const override 
+			Modio::filesystem::path MakeTempFilePath(std::string FileName) const override
 			{
 				return RootTempPath / FileName;
 			}
@@ -185,7 +186,8 @@ namespace Modio
 
 			Modio::filesystem::path MakeTempModPath(Modio::ModID ModID) const override
 			{
-				return RootLocalStoragePath / fmt::format("{}/temp/{}/{}", CurrentGameID, CurrentSessionIdentifier, ModID);
+				return RootLocalStoragePath /
+					   fmt::format("{}/temp/{}/{}", CurrentGameID, CurrentSessionIdentifier, ModID);
 			}
 
 			Modio::filesystem::path GetModRootInstallationPath() const override
@@ -223,7 +225,8 @@ namespace Modio
 				return RootLocalStoragePath / fmt::format("{}/cache/mods/{}/logos/", CurrentGameID, ModID);
 			}
 
-			Modio::filesystem::path MakeGalleryFolderPath(Modio::ModID ModID, Modio::GalleryIndex ImageIndex) const override
+			Modio::filesystem::path MakeGalleryFolderPath(Modio::ModID ModID,
+														  Modio::GalleryIndex ImageIndex) const override
 			{
 				// @todonow: Change this to temporary storage
 				return RootLocalStoragePath /
@@ -397,8 +400,12 @@ namespace Modio
 				return RootLocalStoragePath;
 			}
 
-			Modio::ErrorCode ApplyGlobalConfigOverrides(
-				const std::map<std::string, std::string> Overrides) override
+			const Modio::filesystem::path& GetRootTempStoragePath() const override
+			{
+				return RootTempPath;
+			}
+
+			Modio::ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string> Overrides) override
 			{
 				auto RootValue = Overrides.find(Modio::Detail::Constants::JSONKeys::RootLocalStoragePath);
 				if (RootValue != Overrides.end())
@@ -422,11 +429,8 @@ namespace Modio
 
 			bool CheckSpaceAvailable(const Modio::filesystem::path& Destination, Modio::FileSize DesiredSize) override
 			{
-				Modio::ErrorCode ec;
-				Modio::filesystem::path ValidDestination = Destination.root_path();
-
-				Modio::filesystem::space_info SpaceInfo = Modio::filesystem::space(ValidDestination, ec);
-				if (!ec && SpaceInfo.available >= DesiredSize)
+				const Modio::FileSize SpaceAvailable = GetSpaceAvailable(Destination);
+				if (SpaceAvailable >= DesiredSize)
 				{
 					return true;
 				}
@@ -434,6 +438,23 @@ namespace Modio
 				{
 					return false;
 				}
+			}
+
+			Modio::FileSize GetSpaceAvailable(const Modio::filesystem::path& Destination) override
+			{
+				Modio::ErrorCode ec;
+				const Modio::filesystem::path ValidDestination = Destination.root_path();
+
+				const Modio::filesystem::space_info SpaceInfo = Modio::filesystem::space(ValidDestination, ec);
+				if (!ec)
+				{
+					return FileSize(SpaceInfo.available);
+				}
+
+				const DWORD LastError = GetLastError();
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::File,
+											"Failed to get space available. Received error {}", LastError);
+				return Modio::FileSize(0);
 			}
 		};
 	} // namespace Detail

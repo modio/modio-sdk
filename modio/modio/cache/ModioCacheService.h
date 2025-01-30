@@ -11,8 +11,8 @@
 #pragma once
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioStdTypes.h"
-#include "modio/core/entities/ModioModInfo.h"
 #include "modio/core/entities/ModioGameInfo.h"
+#include "modio/core/entities/ModioModInfo.h"
 #include "modio/core/entities/ModioModInfoList.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/timer/ModioTimer.h"
@@ -53,7 +53,9 @@ namespace Modio
 
 			MODIO_IMPL void AddToCache(Modio::GameID GameIDDetail, Modio::ModInfoList ModInfoDetails);
 
-			MODIO_IMPL List<std::vector, Modio::ModID>  GetAllModIdsInCache();
+			MODIO_IMPL void AddToCache(Modio::ModID ModId, std::uint64_t Filesize, bool recursive);
+
+			MODIO_IMPL List<std::vector, Modio::ModID> GetAllModIdsInCache();
 
 			MODIO_IMPL Modio::Optional<Modio::Detail::DynamicBuffer> FetchFromCache(std::string ResourceURL) const;
 
@@ -62,6 +64,9 @@ namespace Modio
 			MODIO_IMPL Modio::Optional<Modio::GameInfo> FetchGameInfoFromCache(Modio::GameID GameIDDetail) const;
 
 			MODIO_IMPL Modio::Optional<Modio::ModInfoList> FetchFromCache(Modio::GameID GameIDDetail) const;
+
+			MODIO_IMPL Modio::Optional<std::uint64_t> FetchModDependencyFilesizeFromCache(Modio::ModID ModIDDetail,
+																						  bool recursive) const;
 
 			MODIO_IMPL void ClearCache();
 
@@ -73,12 +78,21 @@ namespace Modio
 				Modio::Detail::DynamicBuffer Data;
 			};
 
+			struct ModDependencyFilesizeEntry
+			{
+				// The filesize calculated of the immediate child dependencies
+				std::uint64_t FilesizeFirstDepth = 0;
+				// The filesize calculated from a recursive request of dependencies
+				std::uint64_t FilesizeRecursive = 0;
+			};
+
 			struct Cache
 			{
 				std::unordered_map<std::uint32_t, CacheEntry> CacheEntries;
 				std::unordered_map<std::int64_t, Modio::ModInfo> ModInfoCache;
 				std::unordered_map<std::int64_t, Modio::GameInfo> GameInfoCache;
 				std::unordered_map<std::int64_t, std::vector<Modio::ModID>> ModInfoListCache;
+				std::unordered_map<std::int64_t, ModDependencyFilesizeEntry> ModDependenciesFilesize;
 			};
 
 			std::shared_ptr<Cache> CacheInstance;

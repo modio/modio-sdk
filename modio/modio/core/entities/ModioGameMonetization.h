@@ -32,21 +32,12 @@ namespace Modio
 	/// @brief A strong type flag object to represent GameMonetizationOptions from a mod.io info.
 	struct GameMonetization : public Modio::FlagImpl<GameMonetizationOptions>
 	{
-		/// @docinternal
-		/// @brief The default constructor sets GameMonetizationOptions to "None"
-		GameMonetization()
-		{
-			Value = Convert(GameMonetizationOptions::None);
-		}
-
-		/// @docinternal
-		/// @brief Initialize flags from underlying integer type
-		/// @param InitialValue the bitfield value
-		GameMonetization(StorageType InitialValue) : Modio::FlagImpl<GameMonetizationOptions>(InitialValue)
-		{
-		}
-
 		using Modio::FlagImpl<GameMonetizationOptions>::FlagImpl;
+
+		/// @docnone
+		constexpr GameMonetization(const Modio::FlagImpl<GameMonetizationOptions>& InitialValue)
+			: Modio::FlagImpl<GameMonetizationOptions>(InitialValue)
+		{}
 
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GameMonetization& GameMonetization);
@@ -54,4 +45,6 @@ namespace Modio
 		/// @docnone
 		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::GameMonetization& GameMonetization);
 	};
+	MODIO_DEFINE_FLAG_OPERATORS(GameMonetizationOptions, GameMonetization);
+
 } // namespace Modio

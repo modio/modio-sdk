@@ -16,5 +16,5 @@ target_compile_features(platform INTERFACE cxx_std_17)
 target_include_directories(platform INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 
 target_link_libraries(platform INTERFACE mbedtls mbedcrypto mbedx509)
-target_link_libraries(platform INTERFACE httpparser pthread uring ghc_filesystem)
+target_link_libraries(platform INTERFACE httpparser pthread uring ghc_filesystem uuid)
 

@@ -43,7 +43,7 @@ target_sources(${MODIO_TARGET_NAME} INTERFACE
 
 add_public_header(${MODIO_TARGET_NAME} modio/ModioSDK.h)
 
-endif()
+
 
 target_include_directories(${MODIO_TARGET_NAME} INTERFACE ${ModioGeneratedHeaderPath})
 

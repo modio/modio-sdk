@@ -64,7 +64,9 @@ namespace Modio
 						yield Modio::Detail::PerformRequestAndGetResponseAsync(
 							ResponseBodyBuffer,
 							Modio::Detail::GetModRequest.SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
-								.SetModID(ModId),
+								.SetModID(ModId)
+								.AddPlatformStatusFilter()
+								.AddStatusFilter(),
 							CachedResponse, std::move(Self));
 
 						if (ec)

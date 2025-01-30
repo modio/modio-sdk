@@ -48,6 +48,10 @@ namespace Modio
 		Modio::Optional<Modio::MaturityOption> MaturityRating;
 
 		/// @docpublic
+		/// @brief Community options for the mod
+		Modio::Optional<Modio::ModCommunityOptionsFlags> CommunityOptions;
+
+		/// @docpublic
 		/// @brief Optional metadata blob for this mod
 		Modio::Optional<std::string> MetadataBlob;
 

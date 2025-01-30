@@ -16,6 +16,7 @@
 
 MODIO_DISABLE_WARNING_PUSH 
 MODIO_DISABLE_WARNING_L2R_EVALUATION_ORDER_OPERATOR
+MODIO_DISABLE_WARNING_L2R_EVALUATION_ORDER_INITIALIZER
 
 namespace Modio 
 {
@@ -109,6 +110,8 @@ namespace Modio
         static const HttpRequestParams GetAuthenticatedUserRequest { Modio::Detail::Verb::GET, "/me" }; 
         static const HttpRequestParams GetUserEventsRequest { Modio::Detail::Verb::GET, "/me/events" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetUserModfilesRequest { Modio::Detail::Verb::GET, "/me/files" }; 
+        static const HttpRequestParams MeGetFollowersRequest { Modio::Detail::Verb::GET, "/me/followers" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
+        static const HttpRequestParams GetUsersFollowingRequest { Modio::Detail::Verb::GET, "/me/following" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetUserGamesRequest { Modio::Detail::Verb::GET, "/me/games" }; 
         static const HttpRequestParams SyncAppleEntitlementRequest { Modio::Detail::Verb::POST, "/me/iap/apple/sync" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams SyncGoogleEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/google/sync" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
@@ -138,6 +141,10 @@ namespace Modio
         static const HttpRequestParams S2sTransactionCommitRequest { Modio::Detail::Verb::POST, "/s2s/transactions/commit" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams S2sTransactionIntentRequest { Modio::Detail::Verb::POST, "/s2s/transactions/intent" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetUserPublicProfileRequest { Modio::Detail::Verb::GET, "/users/{user-id}" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
+        static const HttpRequestParams GetUserFollowersRequest { Modio::Detail::Verb::GET, "/users/{user-id}/followers" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
+        static const HttpRequestParams GetUserFollowingRequest { Modio::Detail::Verb::GET, "/users/{user-id}/following" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
+        static const HttpRequestParams FollowUserRequest { Modio::Detail::Verb::POST, "/users/{user-id}/following" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
+        static const HttpRequestParams UnfollowUserRequest { Modio::Detail::Verb::DELETE, "/users/{user-id}/following/{target-user-id}" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams UnmuteAUserRequest { Modio::Detail::Verb::DELETE, "/users/{user-id}/mute" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams MuteAUserRequest { Modio::Detail::Verb::POST, "/users/{user-id}/mute" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
     }

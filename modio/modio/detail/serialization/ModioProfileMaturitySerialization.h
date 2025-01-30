@@ -31,13 +31,11 @@ namespace Modio
 				Modio::LogLevel::Warning, Modio::LogCategory::Core,
 				"ProfileMaturity from_json requires an integer.  Using default ProfileMaturity 0");
 		}
-		ProfileMaturity.Value = maturity;
+		ProfileMaturity = maturity;
 	}
 
 	inline void to_json(nlohmann::json& Json, const Modio::ProfileMaturity& ProfileMaturity)
 	{
-		// In case the Value inside ProfileMaturity is Optional::None, then it matches MaturityOption::None
-		std::uint8_t DefaultMaturity = static_cast<uint8_t>(MaturityOption::None);
-		Json = ProfileMaturity.Value.value_or(DefaultMaturity);
+		Json = ProfileMaturity.RawValue();
 	}
 } // namespace Modio

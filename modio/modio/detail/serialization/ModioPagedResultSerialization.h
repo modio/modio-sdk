@@ -34,4 +34,14 @@ namespace Modio
 				? std::int32_t(std::ceil(float(PagedResult.TotalResultCount) / float(PagedResult.PageSize)))
 				: 0;
 	}
+
+	inline void InitializePageResult(Modio::PagedResult& PagedResult, std::int32_t PageIndex, std::int32_t PageSize,
+									 std::int32_t PageCount, std::int32_t TotalResultCount, std::int32_t ResultCount)
+	{
+		PagedResult.PageIndex = PageIndex;
+		PagedResult.PageSize = PageSize;
+		PagedResult.PageCount = PageCount;
+		PagedResult.TotalResultCount = TotalResultCount;
+		PagedResult.ResultCount = ResultCount;
+	}
 } // namespace Modio

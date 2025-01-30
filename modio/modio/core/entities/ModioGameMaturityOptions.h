@@ -30,19 +30,19 @@ namespace Modio
 	/// @brief A strong type flag object to represent GameMaturityOptions from a mod.io info.
 	struct GameMaturityOptionsFlags : public Modio::FlagImpl<GameMaturityOptions>
 	{
-		/// @docinternal
-		/// @brief The default constructor sets GameMaturityOptions to "None"
-		GameMaturityOptionsFlags ()
-		{
-			Value = Convert(GameMaturityOptions::None);
-		}
 		using Modio::FlagImpl<GameMaturityOptions>::FlagImpl;
+
+		/// @docnone
+		constexpr GameMaturityOptionsFlags(const Modio::FlagImpl<GameMaturityOptions>& InitialValue)
+			: Modio::FlagImpl<GameMaturityOptions>(InitialValue)
+		{}
 
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GameMaturityOptionsFlags& GameMaturity);
 
 		/// @docnone
 		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::GameMaturityOptionsFlags& GameMaturity);
-
 	};
+	MODIO_DEFINE_FLAG_OPERATORS(GameMaturityOptions, GameMaturityOptionsFlags);
+
 } // namespace Modio

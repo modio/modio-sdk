@@ -314,6 +314,11 @@ namespace Modio
 				return Result;
 			}
 
+			const Modio::filesystem::path& GetRootTempStoragePath() const
+			{
+				return PlatformImplementation->GetRootTempStoragePath();
+			}
+
 			const Modio::filesystem::path& GetRootLocalStoragePath() const
 			{
 				return PlatformImplementation->GetRootLocalStoragePath();
@@ -340,6 +345,12 @@ namespace Modio
 			{
 				MODIO_PROFILE_SCOPE(CheckSpaceAvailable);
 				return PlatformImplementation->CheckSpaceAvailable(Destination, DesiredSize);
+			}
+
+			Modio::FileSize GetSpaceAvailable(const Modio::filesystem::path& Destination)
+			{
+				MODIO_PROFILE_SCOPE(GetSpaceAvailable);
+				return PlatformImplementation->GetSpaceAvailable(Destination);
 			}
 
 		private:

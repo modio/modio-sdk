@@ -61,6 +61,12 @@ namespace Modio
 					SubmitParams = SubmitParams.AppendPayloadValue(
 						"maturity_option", fmt::format("{}", static_cast<std::uint8_t>(Params.MaturityRating.value())));
 				}
+
+				if (Params.CommunityOptions)
+				{
+					SubmitParams = SubmitParams.AppendPayloadValue(
+						"community_options", fmt::format("{}", Params.CommunityOptions->RawValue()));
+				}
 			}
 
 			template<typename CoroType>

@@ -17,7 +17,7 @@ namespace Modio
 	{
 		namespace Hash
 		{
-			static std::string HMACSHA256String(const std::string& SecretKey, const std::string& StringToHash)
+			inline static std::string HMACSHA256String(const std::string& SecretKey, const std::string& StringToHash)
 			{
 				std::stringstream ss_result;
 				std::vector<uint8_t> out(SHA256_HASH_SIZE);

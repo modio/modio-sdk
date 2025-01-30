@@ -89,7 +89,7 @@ namespace Modio
 				case ContentType::ApplicationXWwwFormUrlEncoded:
 					return "application/x-www-form-urlencoded";
 				default:
-					return "";
+					return std::string_view();
 			}
 		}
 
@@ -383,9 +383,9 @@ namespace Modio
 			// Whether this request should suppress the X-Modio-Platform header
 			bool bSuppressPlatformHeader = false;
 
-			std::string FileDownloadServer = "";
+			std::string FileDownloadServer;
 
-			std::string ResourcePath = "";
+			std::string ResourcePath;
 
 			ContentType CurrentContentType;
 

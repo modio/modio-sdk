@@ -34,6 +34,7 @@
 #include "modio/core/entities/ModioTransactionRecord.h"
 #include "modio/core/entities/ModioUser.h"
 #include "modio/core/entities/ModioUserList.h"
+#include "modio/core/entities/ModioModCommunityOptions.h"
 #include "modio/detail/ModioLibraryConfigurationHelpers.h"
 
 namespace Modio
@@ -229,6 +230,12 @@ namespace Modio
 	/// to uninstall. Then call <<ForceUninstallModAsync>> to remove mods selected by the user.
 	/// - Execute <<QueryUserInstallations>> and prompt the user to unsubscribe from large mods.
 	MODIOSDK_API std::map<Modio::ModID, Modio::ModCollectionEntry> QuerySystemInstallations();
+
+	/// @docpublic
+	/// @brief Retrieves a snapshot of current storage related information such as space consumed by mod
+	/// installations and total available space
+	/// @return Structure containing storage information
+	MODIOSDK_API StorageInfo QueryStorageInfo();
 
 	/// @docpublic
 	/// @brief Forcibly uninstalls a mod from the system. This is intended for use when a host application requires more
@@ -492,6 +499,40 @@ namespace Modio
 	MODIOSDK_API void GetModDependenciesAsync(
 		Modio::ModID ModID, bool Recursive,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback);
+
+
+	/// @docpublic
+	/// @brief Adds dependencies to a specified mod, linking it with other mods that are required for it to function
+	/// @param ModID The mod to add dependencies to
+	/// @param Dependencies List of mod dependencies to add
+	/// @param Callback Callback providing a status code to indicate if the dependencies were added successfully
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @requires authenticated-user
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @errorcategory EntityNotFoundError|Specified mod could not be found
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
+	MODIOSDK_API void AddModDependenciesAsync(Modio::ModID ModID, std::vector<Modio::ModID> Dependencies,
+											  std::function<void(Modio::ErrorCode)> Callback);
+
+	/// @docpublic
+	/// @brief Deletes dependencies from a specified mod, unlinking it from other mods that are no longer required.
+	/// @param ModID The mod to delete dependencies from
+	/// @param Dependencies List of mod IDs to delete as dependencies
+	/// @param Callback Callback providing a status code to indicate if the dependencies were deleted successfully
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @requires authenticated-user
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod IDs are invalid
+	MODIOSDK_API void DeleteModDependenciesAsync(Modio::ModID ModID, std::vector<Modio::ModID> Dependencies,
+												 std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
 	/// @brief Begins email authentication for the current session by requesting a one-time code be sent to the

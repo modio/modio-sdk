@@ -312,7 +312,8 @@ namespace Modio
 				Params.Visibility.has_value() || 
 				Params.Description.has_value() || 
 				Params.HomepageURL.has_value() ||
-				Params.MaturityRating.has_value() || 
+				Params.MaturityRating.has_value() ||
+				Params.CommunityOptions.has_value() ||
 				Params.MetadataBlob.has_value() || 
 				Params.Name.has_value() ||
 				Params.NamePath.has_value() ||

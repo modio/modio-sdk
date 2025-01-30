@@ -50,7 +50,8 @@ namespace Modio
 						}
 					}
 
-					if (OpState.User.Avatar.Filename == "" && OpState.User.UserId == 0 && OpState.User.Username == "")
+					if (OpState.User.Avatar.Filename.empty() && OpState.User.UserId == 0 &&
+						OpState.User.Username.empty())
 					{
 						// Fetch the details about the request from the server. Let's hope it's in the cache (would be
 						// nice if we could extend the cache for this call)

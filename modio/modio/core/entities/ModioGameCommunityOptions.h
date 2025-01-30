@@ -27,6 +27,8 @@ namespace Modio
 	///	* 128 = Allow Preview Share-URL (Previews must be enabled)
 	///	* 256 = Allow negative ratings
 	///	* 512 = Allow mods to be edited on web
+	///	* 1024 = Allow mod dependencies
+	///	* 2048 = Allow comments on guides
 	enum class GameCommunityOptions : uint32_t
 	{
 		None = 0,
@@ -39,30 +41,21 @@ namespace Modio
 		EnablePreviews = 64,
 		AllowPreviewShareURL = 128,
 		AllowNegativeRatings = 256,
-		AllowModsToBeEditedOnWeb = 512
+		AllowModsToBeEditedOnWeb = 512,
+		AllowModDependencies = 1024,
+		AllowCommentsOnGuides = 2048,
 	};
 
 	/// @docpublic
 	/// @brief A strong type flag object to represent GameCommunityOptions from a mod.io info.
 	struct GameCommunityOptionsFlags : public Modio::FlagImpl<GameCommunityOptions>
 	{
-		/// @docinternal
-		/// @brief The default constructor sets GameCommunityOptions to "None"
-		GameCommunityOptionsFlags ()
-		{
-			Value = Convert(GameCommunityOptions::None);
-
-		}
-
-		/// @docinternal
-		/// @brief Construct from a set of flags
-		/// @param InitialValue the flags to set
-		GameCommunityOptionsFlags(StorageType InitialValue)
-			: Modio::FlagImpl<GameCommunityOptions>(InitialValue)
-		{
-		}
-
 		using Modio::FlagImpl<GameCommunityOptions>::FlagImpl;
+
+		/// @docnone
+		constexpr GameCommunityOptionsFlags(const Modio::FlagImpl<GameCommunityOptions>& InitialValue)
+			: Modio::FlagImpl<GameCommunityOptions>(InitialValue)
+		{}
 
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GameCommunityOptionsFlags& GameCommunity);
@@ -71,4 +64,5 @@ namespace Modio
 		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::GameCommunityOptionsFlags& GameCommunity);
 
 	};
+	MODIO_DEFINE_FLAG_OPERATORS(GameCommunityOptions, GameCommunityOptions);
 } // namespace Modio

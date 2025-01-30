@@ -13,7 +13,7 @@
 #include "http/HttpRequestImplementation.h"
 #include "android/HttpSharedState.h"
 #include "android/detail/ops/http/SSLConnectionWriteSomeOp.h"
-#include "mbedtls/ssl.h"
+#include "modio/detail/MbedtlsWrapper.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"

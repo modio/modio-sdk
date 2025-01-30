@@ -374,7 +374,7 @@ namespace Modio
 					case Environment::Test:
 						return "api.test.mod.io";
 				}
-				return "";
+				return std::string();
 			}
 		}
 
@@ -410,7 +410,7 @@ namespace Modio
 				case Verb::DELETE:
 					return "DELETE";
 			}
-			return "";
+			return std::string();
 		}
 
 		Modio::Detail::Verb HttpRequestParams::GetTypedVerb() const
@@ -675,7 +675,7 @@ namespace Modio
 			{
 				std::uintmax_t StartValue = StartOffset ? StartOffset.value() : static_cast<uintmax_t>(0);
 				// In case EndOffset does not have a value, return an empty string
-				std::string EndValue = EndOffset ? std::to_string(EndOffset.value()) : "";
+				std::string EndValue = EndOffset ? std::to_string(EndOffset.value()) : std::string();
 
 				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
 				Headers.emplace_back("Range", fmt::format("bytes={}-{}", StartValue, EndValue));
@@ -792,7 +792,7 @@ namespace Modio
 				case APIVersion::V1:
 					return "/v1";
 			}
-			return "";
+			return std::string();
 		}
 
 		std::string HttpRequestParams::GetAPIKeyString() const

@@ -71,6 +71,12 @@ namespace Modio
 						EditRequestParams = EditRequestParams.AppendEmptyPayload("tags[]");
 					}
 				}
+
+				if (Params.CommunityOptions)
+				{
+					EditRequestParams = EditRequestParams.AppendPayloadValue(
+						"community_options", fmt::format("{}", Params.CommunityOptions->RawValue()));
+				}
 			}
 
 			template<typename CoroType>

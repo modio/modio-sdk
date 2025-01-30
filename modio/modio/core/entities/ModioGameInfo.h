@@ -41,8 +41,8 @@ namespace Modio
 	/// @brief Contains media URLs to the preview header image for the game
 	struct HeaderImage
 	{
-		std::string Filename = "";
-		std::string Original = "";
+		std::string Filename;
+		std::string Original;
 
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::HeaderImage& HeaderImage);
@@ -52,8 +52,8 @@ namespace Modio
 	/// @brief Creator defined URLs to share
 	struct OtherUrl
 	{
-		std::string Label = "";
-		std::string Url = "";
+		std::string Label;
+		std::string Url;
 
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::OtherUrl& OtherUrl);
@@ -63,12 +63,12 @@ namespace Modio
 	/// @brief Theme color values for the game
 	struct Theme
 	{
-		std::string Primary = "";
-		std::string Dark = "";
-		std::string Light = "";
-		std::string Success = "";
-		std::string Warning = "";
-		std::string Danger = "";
+		std::string Primary;
+		std::string Dark;
+		std::string Light;
+		std::string Success;
+		std::string Warning;
+		std::string Danger;
 
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Theme& Theme);
@@ -87,7 +87,7 @@ namespace Modio
 		/// @brief Unix timestamp of date game was set live
 		std::int64_t DateLive = 0;
 		/// @brief Word used to describe user-generated content (mods, items, addons etc)
-		std::string UgcName = "";
+		std::string UgcName;
 		/// @brief Contains media URLs to the icon for the game
 		Modio::Detail::Icon Icon = {};
 		/// @brief Contains media URLs to the logo for the game
@@ -95,16 +95,16 @@ namespace Modio
 		/// @brief Contains media URLs to the preview header image for the game
 		Modio::HeaderImage HeaderImage = {};
 		/// @brief Name of the game
-		std::string Name = "";
+		std::string Name;
 		/// @brief Summary of the game's mod support
-		std::string Summary = "";
+		std::string Summary;
 		/// @brief A guide about creating and uploading mods for this game to mod.io
-		std::string Instructions = "";
+		std::string Instructions;
 		/// @brief Link to a mod.io guide, modding wiki, or a page where modders can learn how to make and submit mods
 		/// to this game's profile
-		std::string InstructionsUrl = "";
+		std::string InstructionsUrl;
 		/// @brief URL to the game
-		std::string ProfileUrl = "";
+		std::string ProfileUrl;
 		/// @brief Theme color values for the game
 		Modio::Theme Theme = {};
 		/// @brief Numerous aggregate stats for the game
@@ -120,7 +120,7 @@ namespace Modio
 		/// @brief Maturity options for the game
 		Modio::GameMaturityOptionsFlags	MaturityOptions;
 		/// @brief Name of the Virtual Tokens for this game
-		std::string VirtualTokenName = "";
+		std::string VirtualTokenName;
 		/// @brief Tags for this game
 		std::vector<Modio::ModTagInfo> TagOptions;
 

@@ -26,7 +26,8 @@ set(CPACK_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
 #Enable policy forcing CMake to explicitly tell non-MSVC compilers IPP files are CXX files
 cmake_policy(SET CMP0119 NEW)
-set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS};ipp)
+set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS}[
+ipp)
 
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -65,10 +66,10 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "mod.io SDKv2")
 
 # Capture a version number, result is just discarded
 string(REGEX MATCHALL 
-	"^v([0-9]+)\.([0-9]+)\.([0-9]+).*$" result "${MODIO_VERSION}")
+	"^v([0-9]+)[.([0-9]+)[.([0-9]+).*$" result "${MODIO_VERSION}")
 
 if(NOT "${CMAKE_MATCH_COUNT}" EQUAL "3")
-	message(FATAL_ERROR "MODIO_VERSION has a invalid format \"${MODIO_VERSION}\"")
+	message(FATAL_ERROR "MODIO_VERSION has a invalid format ["${MODIO_VERSION}["")
 endif()
 
 set(CPACK_PACKAGE_VERSION_MAJOR "${CMAKE_MATCH_1}")

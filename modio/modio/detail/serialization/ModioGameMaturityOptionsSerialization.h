@@ -32,13 +32,11 @@ namespace Modio
 				Modio::LogLevel::Warning, Modio::LogCategory::Core,
 				"GameMaturity from_json requires an integer.  Using default GameMaturityOptions 0");
 		}
-		GameMaturity.Value = static_cast<Modio::GameMaturityOptionsFlags::StorageType>(gameMaturity);
+		GameMaturity = static_cast<Modio::GameMaturityOptionsFlags::StorageType>(gameMaturity);
 	}
 
 	inline void to_json(nlohmann::json& Json, const Modio::GameMaturityOptionsFlags& GameMaturity)
 	{
-		// In case the Value inside GameMaturity is Optional::None, then it matches GameMaturity::None
-		std::uint32_t DefaultGameMaturity = static_cast<uint32_t>(GameMaturityOptions::None);
-		Json = GameMaturity.Value.value_or(DefaultGameMaturity);
+		Json = GameMaturity.RawValue();
 	}
 } // namespace Modio

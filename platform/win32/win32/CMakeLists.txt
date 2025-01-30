@@ -12,10 +12,18 @@ if (NOT TARGET platform)
 endif()
 
 target_compile_features(platform INTERFACE cxx_std_17)
+target_compile_options(platform INTERFACE 
+	$<$<CXX_COMPILER_ID:MSVC>:
+		/WX # Enable warnings as errors
+	>
+	$<$<CXX_COMPILER_ID:Clang>:
+		-Werror # Enable warnings as errors
+	>
+)
 
 target_include_directories(platform INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 
-target_link_libraries(platform INTERFACE utf8cpp ws2_32 winhttp ghc_filesystem)
+target_link_libraries(platform INTERFACE utf8cpp ws2_32 winhttp ghc_filesystem rpcrt4)
 
 # In case you have a custom FMT library, update accordingly below
 # The default linking of the library uses the FMT Header only mode

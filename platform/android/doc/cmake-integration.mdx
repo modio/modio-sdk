@@ -37,8 +37,10 @@ target_link_libraries(your_project PUBLIC modioStatic)
 To simplify the CMake configuration, the folder `cmake/` has the file `CMakePresets.json` with the basic configuration required to guide the mod.io SDK compilation using the Windows SDK. If you copy that file to the folder root, it can be used as follows:
 
 ```cmake
-cmake --preset android
+cmake --preset android-arm64
 ```
+
+> **Note:** When using the `android-arm64` preset, you must provide your own NDK path by setting `CMAKE_ANDROID_NDK`. The path in the preset file is just an example. You can also customize `ANDROID_PLATFORM` and `ANDROID_ABI` values according to your needs.
 
 7. There are some resources that must be copied from the mod.io SDK to your own Java application in order to compile and use the SDK. Make sure you include the following somewhere in your CMake scripts.
 

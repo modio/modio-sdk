@@ -388,8 +388,12 @@ namespace Modio
 				return RootLocalStoragePath;
 			}
 
-			Modio::ErrorCode ApplyGlobalConfigOverrides(
-				const std::map<std::string, std::string> Overrides) override
+			const Modio::filesystem::path& GetRootTempStoragePath() const override
+			{
+				return RootTempPath;
+			}
+
+			Modio::ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string> Overrides) override
 			{
 				auto RootValue = Overrides.find(Modio::Detail::Constants::JSONKeys::RootLocalStoragePath);
 				if (RootValue != Overrides.end())
@@ -413,11 +417,8 @@ namespace Modio
 
 			bool CheckSpaceAvailable(const Modio::filesystem::path& Destination, Modio::FileSize DesiredSize) override
 			{
-				Modio::ErrorCode ec;
-				Modio::filesystem::path ValidDestination = Destination.root_path();
-
-				Modio::filesystem::space_info SpaceInfo = Modio::filesystem::space(ValidDestination, ec);
-				if (!ec && SpaceInfo.available >= DesiredSize)
+				const Modio::FileSize SpaceAvailable = GetSpaceAvailable(Destination);
+				if (SpaceAvailable >= DesiredSize)
 				{
 					return true;
 				}
@@ -425,6 +426,22 @@ namespace Modio
 				{
 					return false;
 				}
+			}
+
+			Modio::FileSize GetSpaceAvailable(const Modio::filesystem::path& Destination) override
+			{
+				Modio::ErrorCode ec;
+				const Modio::filesystem::path ValidDestination = Destination.root_path();
+
+				const Modio::filesystem::space_info SpaceInfo = Modio::filesystem::space(ValidDestination, ec);
+				if (!ec)
+				{
+					return FileSize(SpaceInfo.available);
+				}
+
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::File,
+											"Failed to get space available. Received error {}", ec.message());
+				return Modio::FileSize(0);
 			}
 
 			static Modio::filesystem::path GetDefaultCommonDataPath(Modio::filesystem::path& CommonDataPath)

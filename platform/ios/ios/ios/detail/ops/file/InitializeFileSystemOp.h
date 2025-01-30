@@ -51,7 +51,7 @@ namespace Modio
 
 				std::string HomeDir = std::getenv("HOME");
 
-				if (HomeDir == "")
+				if (HomeDir.empty())
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
 												"Could not get home directory environment variable!");

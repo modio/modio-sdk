@@ -1069,7 +1069,6 @@ namespace Modio
 		BannedUserAccount = 11007,
 		BinaryFileCorrupted = 13001,
 		BinaryFileUnreadable = 13002,
-		CannotArchiveModWithDependents = 15074,
 		CannotMuteYourself = 17039,
 		CannotVerifyExternalCredentials = 11032,
 		CrossOriginForbidden = 10001,
@@ -1092,6 +1091,11 @@ namespace Modio
 		MissingContentTypeHeader = 13005,
 		MissingReadPermission = 11004,
 		MissingWritePermission = 11003,
+		ModCannotAddDependencyMonetized = 15076,
+		ModCannotAllowDependencyMonetized = 15073,
+		ModCannotDeleteDependency = 15074,
+		ModDependenciesNotAllowed = 15072,
+		ModIsDependency = 15071,
 		ModfileNoUploadPermission = 15006,
 		ModioOutage = 10000,
 		MonetizationAuthentication = 900002,
@@ -1165,9 +1169,6 @@ namespace Modio
 				case ApiError::BinaryFileUnreadable:
 						return "The submitted binary file is unreadable.";
 					break;
-				case ApiError::CannotArchiveModWithDependents:
-						return "This mod is a dependency of other mods and cannot be archived.";
-					break;
 				case ApiError::CannotMuteYourself:
 						return "You cannot mute yourself.";
 					break;
@@ -1233,6 +1234,21 @@ namespace Modio
 					break;
 				case ApiError::MissingWritePermission:
 						return "Access token is missing the write scope to perform the request.";
+					break;
+				case ApiError::ModCannotAddDependencyMonetized:
+						return "Cannot add a dependency because the mod is monetized.";
+					break;
+				case ApiError::ModCannotAllowDependencyMonetized:
+						return "This mod cannot allow dependencies because it is monetized.";
+					break;
+				case ApiError::ModCannotDeleteDependency:
+						return "This mod is a dependency of other mods and cannot be deleted.";
+					break;
+				case ApiError::ModDependenciesNotAllowed:
+						return "Cannot add a dependency because the target mod has not opted in to dependencies.";
+					break;
+				case ApiError::ModIsDependency:
+						return "Cannot turn off mod dependencies when the mod is currently a dependency for other mods.";
 					break;
 				case ApiError::ModfileNoUploadPermission:
 						return "The authenticated user does not have permission to upload modfiles for the specified mod. Ensure the user is a team manager or administrator.";
@@ -1607,7 +1623,17 @@ namespace Modio
 		/// @brief This premium feature is not available for your project.
 		PremiumFeatureNotAvailable = 42,
 		/// @brief The email security code has already been redeemed.
-		EmailExchangeCodeAlreadyRedeemed = 43
+		EmailExchangeCodeAlreadyRedeemed = 43,
+		/// @brief Cannot add a dependency because the target mod has not opted in to dependencies.
+		ModDependenciesNotAllowed = 44,
+		/// @brief Cannot add a dependency because the mod is monetized.
+		ModCannotAddDependencyMonetized = 45,
+		/// @brief Cannot turn off mod dependencies when the mod is currently a dependency for other mods.
+		ModIsDependency = 46,
+		/// @brief This mod cannot allow dependencies because it is monetized.
+		ModCannotAllowDependencyMonetized = 47,
+		/// @brief This mod is a dependency of other mods and cannot be deleted.
+		ModCannotDeleteDependency = 48
 	};
 
 	/// @docnone
@@ -1746,6 +1772,21 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::EmailExchangeCodeAlreadyRedeemed:
 					return "The email security code has already been redeemed.";
+				break;
+				case ErrorConditionTypes::ModDependenciesNotAllowed:
+					return "Cannot add a dependency because the target mod has not opted in to dependencies.";
+				break;
+				case ErrorConditionTypes::ModCannotAddDependencyMonetized:
+					return "Cannot add a dependency because the mod is monetized.";
+				break;
+				case ErrorConditionTypes::ModIsDependency:
+					return "Cannot turn off mod dependencies when the mod is currently a dependency for other mods.";
+				break;
+				case ErrorConditionTypes::ModCannotAllowDependencyMonetized:
+					return "This mod cannot allow dependencies because it is monetized.";
+				break;
+				case ErrorConditionTypes::ModCannotDeleteDependency:
+					return "This mod is a dependency of other mods and cannot be deleted.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -3295,6 +3336,46 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::EmailExchangeCodeAlreadyRedeemed:
 					if (ec == Modio::ApiError::EmailExchangeCodeAlreadyRedeemed)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::ModDependenciesNotAllowed:
+					if (ec == Modio::ApiError::ModDependenciesNotAllowed)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::ModCannotAddDependencyMonetized:
+					if (ec == Modio::ApiError::ModCannotAddDependencyMonetized)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::ModIsDependency:
+					if (ec == Modio::ApiError::ModIsDependency)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::ModCannotAllowDependencyMonetized:
+					if (ec == Modio::ApiError::ModCannotAllowDependencyMonetized)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::ModCannotDeleteDependency:
+					if (ec == Modio::ApiError::ModCannotDeleteDependency)
 					{
 						return true;
 					}

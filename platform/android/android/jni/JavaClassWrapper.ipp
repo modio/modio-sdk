@@ -113,7 +113,7 @@ namespace Modio
 		{
 			if (Method == NULL || Object == NULL)
 			{
-				return NULL;
+				return std::string();
 			}
 
 			JNIEnv* Env = Modio::Detail::AndroidContextService::Get().GetJavaEnv();

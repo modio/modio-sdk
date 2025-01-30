@@ -13,7 +13,7 @@
 #include "http/HttpRequestImplementation.h"
 #include "linux/HttpSharedState.h"
 #include "linux/detail/ops/http/SSLConnectionWriteSomeOp.h"
-#include "mbedtls/ssl.h"
+#include "modio/detail/MbedtlsWrapper.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"

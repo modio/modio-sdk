@@ -24,10 +24,10 @@ namespace Modio
 		Detail::ParseSafe(Json, User.Username, "username");
 		Detail::ParseSafe(Json, User.DateOnline, "date_online");
 		Detail::ParseSafe(Json, User.ProfileUrl, "profile_url");
-		nlohmann::json AvatarJson;
-		if (Detail::GetSubobjectSafe(Json, "avatar", AvatarJson))
+		nlohmann::json AvatarJsonData;
+		if (Detail::GetSubobjectSafe(Json, "avatar", AvatarJsonData))
 		{
-			Modio::Detail::from_json(AvatarJson, User.Avatar);
+			Modio::Detail::from_json(AvatarJsonData, User.Avatar);
 		}
 
 		Detail::ParseSafe(Json, User.DisplayNamePortal, "display_name_portal");

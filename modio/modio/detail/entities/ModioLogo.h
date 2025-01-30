@@ -73,7 +73,7 @@ namespace Modio
 
 			// Should never reach this
 			assert(false);
-			static std::string NoResult("");
+			static std::string NoResult;
 			return NoResult;
 		}
 

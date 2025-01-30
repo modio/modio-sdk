@@ -29,6 +29,8 @@
 #include "modio/detail/ops/mod/ListAllModsOp.h"
 #include "modio/detail/ops/mod/ListUserCreatedModsOp.h"
 #include "modio/detail/ops/mod/SubmitModRatingOp.h"
+#include "modio/detail/ops/mod/AddModDependenciesOp.h"
+#include "modio/detail/ops/mod/DeleteModDependenciesOp.h"
 #include "modio/detail/serialization/ModioFileMetadataSerialization.h"
 #include "modio/detail/serialization/ModioImageSerialization.h"
 #include "modio/detail/serialization/ModioModStatsSerialization.h"
@@ -189,6 +191,38 @@ namespace Modio
 					Modio::Detail::GetModDependenciesOp(ModID, Modio::Detail::SDKSessionData::CurrentGameID(),
 														Recursive),
 					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
+		});
+	}
+
+	void AddModDependenciesAsync(Modio::ModID ModID, std::vector<Modio::ModID> Dependencies,
+								 std::function<void(Modio::ErrorCode)> Callback)
+	{
+		Modio::Detail::SDKSessionData::EnqueueTask([ModID, Dependencies = std::move(Dependencies),
+													Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireUserIsAuthenticated(Callback) &&
+				Modio::Detail::RequireValidModID(ModID, Callback))
+			{
+				asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
+					Modio::Detail::AddModDependenciesOp(ModID, Dependencies), Callback,
+					Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
+		});
+	}
+
+	void DeleteModDependenciesAsync(Modio::ModID ModID, std::vector<Modio::ModID> Dependencies,
+												 std::function<void(Modio::ErrorCode)> Callback)
+	{
+		Modio::Detail::SDKSessionData::EnqueueTask([ModID, Dependencies = std::move(Dependencies),
+													Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireUserIsAuthenticated(Callback) &&
+				Modio::Detail::RequireValidModID(ModID, Callback))
+			{
+				asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
+					Modio::Detail::DeleteModDependenciesOp(ModID, Dependencies), Callback,
+					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 		});
 	}

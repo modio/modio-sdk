@@ -77,6 +77,7 @@ namespace Modio
 			Detail::ParseSafe(Json, ModInfo.ProfileDescription, "description");
 			Detail::ParseSafe(Json, ModInfo.ProfileDescriptionPlaintext, "description_plaintext");
 			Detail::ParseSafe(Json, ModInfo.ProfileMaturityOption, "maturity_option");
+			Detail::ParseSafe(Json, ModInfo.CommunityOptions, "community_options");
 			Detail::ParseSafe(Json, ModInfo.ProfileName, "name");
 			Detail::ParseSafe(Json, ModInfo.ProfileURL, "profile_url");
 			Detail::ParseSafe(Json, ModInfo.ProfileSubmittedBy, "submitted_by");
@@ -114,6 +115,7 @@ namespace Modio
 							   {"description", Info.ProfileDescription},
 							   {"description_plaintext", Info.ProfileDescriptionPlaintext},
 							   {"maturity_option", Info.ProfileMaturityOption},
+							   {"community_options", Info.CommunityOptions},
 							   {"name", Info.ProfileName},
 							   {"profile_url", Info.ProfileURL},
 							   {"submitted_by", Info.ProfileSubmittedBy},

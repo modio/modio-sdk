@@ -203,9 +203,9 @@ struct ModioExample
 	/// @param Prompt The string to show related to the expected user input
 	/// @param DefaultValue If the user wants to use a default input, this will be used
 	/// @return String with the user input or default value
-	static std::string RetrieveUserInput(std::string Prompt, std::string DefaultValue = "")
+	static std::string RetrieveUserInput(std::string Prompt, std::string DefaultValue = std::string())
 	{
-		std::string UserInput = "";
+		std::string UserInput;
 		std::cout << Prompt << std::endl;
 
 		if (DefaultValue.size() != 0)
@@ -229,7 +229,8 @@ int main()
 {
 	// Ask user for their input and offer default values
 	std::stringstream IntTransformer;
-	IntTransformer << ModioExample::RetrieveUserInput("Game ID:", "3609");
+	std::string UserInput = ModioExample::RetrieveUserInput("Game ID:", "3609");
+	IntTransformer << UserInput;
 	std::string APIStr = ModioExample::RetrieveUserInput("API key:", "ca842a1f60c40bc8fb2044bc9932d763");
 	std::string ModioEnvStr = ModioExample::RetrieveUserInput("Modio Environment:", "Live");
 	std::string SessionID = ModioExample::RetrieveUserInput("SessionID:", "ExampleSession");

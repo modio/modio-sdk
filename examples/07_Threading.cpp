@@ -33,9 +33,9 @@ static void PrintModInfoList(Modio::ModInfoList& List)
 }
 
 /// @brief Helper method to retrieve input from a user with an string prompt
-static std::string RetrieveUserInput(std::string Prompt, std::string DefaultValue = "")
+static std::string RetrieveUserInput(std::string Prompt, std::string DefaultValue = std::string())
 {
-	std::string UserInput = "";
+	std::string UserInput;
 	std::cout << Prompt << std::endl;
 
 	if (DefaultValue.size() != 0)
@@ -70,7 +70,8 @@ int main()
 
 	// Ask user for their input and offer default values
 	std::stringstream IntTransformer;
-	IntTransformer << RetrieveUserInput("Game ID:", "3609");
+	std::string UserInput = RetrieveUserInput("Game ID:", "3609");
+	IntTransformer << UserInput;
 	std::string APIStr = RetrieveUserInput("API key:", "ca842a1f60c40bc8fb2044bc9932d763");
 	std::string ModioEnvStr = RetrieveUserInput("Modio Environment:", "Live");
 	std::string SessionID = RetrieveUserInput("SessionID:", "ExampleSession");

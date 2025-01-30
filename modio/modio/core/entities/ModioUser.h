@@ -25,7 +25,7 @@ namespace Modio
 		Modio::UserID UserId = Modio::UserID(0);
 
 		/// @brief Username of the user
-		std::string Username = "";
+		std::string Username;
 
 		/// @brief Authentification token of the user
 		Modio::Optional<Modio::Detail::OAuthToken> AuthToken;
@@ -34,14 +34,14 @@ namespace Modio
 		std::int64_t DateOnline = 0;
 
 		/// @brief URL of the user's mod.io profile
-		std::string ProfileUrl = "";
+		std::string ProfileUrl;
 
 		/// @brief Cached information about the user's avatar
 		Modio::Detail::Avatar Avatar;
 		
 		/// @brief The display name of the User for the given Portal that the mod search is coming from
 		/// * ie if the Portal is PSN, then this is the owning user's PSN profile name if accounts are linked.
-		std::string DisplayNamePortal = "";
+		std::string DisplayNamePortal;
 
 		/// @docnone
 		friend bool operator==(const Modio::User& A, const Modio::User& B)

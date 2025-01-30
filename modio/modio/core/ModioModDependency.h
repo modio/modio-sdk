@@ -28,7 +28,8 @@ namespace Modio
 		std::int64_t DateAdded = 0;
 		/// @brief Unix timestamp of the date the mod was updated
 		std::int64_t DateUpdated = 0;
-		/// @brief The level at which this dependency sits. When greater than zero (0), it means that this dependency relies on additional dependencies.
+		/// @brief The level at which this dependency sits. When greater than zero (0), it means that this dependency
+		/// relies on additional dependencies.
 		std::uint8_t DependencyDepth = 0;
 		/// @brief Media data related to the mod logo
 		Modio::Detail::Logo Logo;
@@ -40,9 +41,21 @@ namespace Modio
 		Modio::ModServerSideStatus Status = Modio::ModServerSideStatus::NotAccepted;
 		/// @brief The visibility status of the mod, default to Public
 		Modio::ObjectVisibility Visibility = Modio::ObjectVisibility::Public;
-		
+
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModDependency& Dependency);
+
+		/// @docnone
+		friend bool operator==(const ModDependency& A, const ModDependency& B)
+		{
+			return A.ModID == B.ModID;
+		}
+
+		/// @docnone
+		friend bool operator!=(const ModDependency& A, const ModDependency& B)
+		{
+			return A.ModID != B.ModID;
+		}
 	};
 
 	/// @docpublic
@@ -50,10 +63,35 @@ namespace Modio
 	class ModDependencyList : public PagedResult, public List<std::vector, ModDependency>
 	{
 	public:
+		/// @docpublic
+		/// @brief Insert the unique contents of a ModDependencyList to the end of this list
+		void AppendUnique(const ModDependencyList& Other)
+		{
+			for (auto& dependency : Other)
+			{
+				AppendUnique(dependency);
+			}
+		}
+
+		/// @docpublic
+		/// @brief Insert a unique ModDependency to the end of this list
+		void AppendUnique(const ModDependency& ModDependencyData)
+		{
+			if (std::find(InternalList.begin(), InternalList.end(), ModDependencyData) == InternalList.end())
+			{
+				InternalList.push_back(ModDependencyData);
+				if (ModDependencyData.FileInfo.has_value())
+				{
+					TotalFilesize += ModDependencyData.FileInfo.value().Filesize;
+					TotalFilesizeUncompressed += ModDependencyData.FileInfo.value().FilesizeUncompressed;
+				}
+			}
+		}
+
 		/// @brief Total size of all the dependency files in bytes.
-		std::int64_t TotalFilesize = 0;
+		std::uint64_t TotalFilesize = 0;
 		/// @brief Total Size of the uncompressed dependency files in bytes.
-		std::int64_t TotalFilesizeUncompressed = 0;
+		std::uint64_t TotalFilesizeUncompressed = 0;
 
 	private:
 		/// @docnone

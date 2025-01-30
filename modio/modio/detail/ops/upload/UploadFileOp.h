@@ -129,7 +129,7 @@ namespace Modio
 							{
 								{
 									MODIO_PROFILE_SCOPE(UploadFileFormatHeader);
-									std::string PayloadContentFilename = "";
+									std::string PayloadContentFilename;
 									if (Impl->PayloadElement->second.PType == PayloadContent::PayloadType::File)
 									{
 										PayloadContentFilename =

@@ -36,6 +36,7 @@ namespace Modio
 																  const std::string& OriginalFilename) const = 0;
 			virtual Modio::filesystem::path MakeAvatarFolderPath(Modio::UserID ID) const = 0;
 
+			virtual Modio::FileSize GetSpaceAvailable(const Modio::filesystem::path& Destination) = 0;
 			virtual bool CheckSpaceAvailable(const Modio::filesystem::path& Destination,
 											 Modio::FileSize DesiredSize) = 0;
 			virtual bool DirectoryExists(const Modio::filesystem::path& PathToCheck) const = 0;
@@ -44,6 +45,7 @@ namespace Modio
 			virtual bool DeleteFile(const Modio::filesystem::path& FilePath) const = 0;
 			virtual const Modio::filesystem::path& UserDataFolder() const = 0;
 			virtual const Modio::filesystem::path& GetRootLocalStoragePath() const = 0;
+			virtual const Modio::filesystem::path& GetRootTempStoragePath() const = 0;
 			virtual Modio::ErrorCode ApplyGlobalConfigOverrides(
 				const class std::map<std::string, std::string> Overrides) = 0;
 			virtual void Shutdown() = 0;

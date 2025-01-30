@@ -58,7 +58,10 @@ namespace Modio
 
 						yield Modio::Detail::PerformRequestAndGetResponseAsync(
 							ResponseBodyBuffer,
-								Modio::Detail::GetModsRequest.SetGameID(GameID).AppendQueryParameterMap(Filter.ToQueryParamaters()),
+								Modio::Detail::GetModsRequest.SetGameID(GameID)
+								.AddPlatformStatusFilter()
+								.AddStatusFilter()
+								.AppendQueryParameterMap(Filter.ToQueryParamaters()),
 							Modio::Detail::CachedResponse::Allow, std::move(Self));
 					
 					if (ec)

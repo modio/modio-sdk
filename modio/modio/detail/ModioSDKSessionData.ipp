@@ -20,6 +20,7 @@
 #include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/serialization/ModioTokenSerialization.h"
 #include "modio/detail/serialization/ModioUserDataContainerSerialization.h"
+#include "modio/detail/serialization/ModioAvatarSerialization.h"
 
 MODIO_DIAGNOSTIC_PUSH
 
@@ -574,7 +575,7 @@ namespace Modio
 				}
 			}
 
-			return "";
+			return std::string();
 		}
 
 		void SDKSessionData::SetLocalLanguage(Modio::Language Local)
