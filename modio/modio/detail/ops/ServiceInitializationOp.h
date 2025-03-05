@@ -27,7 +27,9 @@
 #include "modio/timer/ModioTimerService.h"
 #include "modio/userdata/ModioUserDataService.h"
 #include <algorithm>
+#include <cctype>
 #include <memory>
+#include <string>
 
 #ifdef MODIO_PROCESS_INTERNAL_INITPARAMS
 	#include "modio/detail/ModioExtendedInitParamHandler.h"
@@ -75,6 +77,8 @@ public:
 			GetExtendedParameterValue(InitParams, "IgnoreModInstallationDirectoryOverride");
 		Modio::Optional<std::string> PlatformEnvironment = GetExtendedParameterValue(InitParams, "PlatformEnvironment");
 		Modio::Optional<std::string> MetricsSecretKey = GetExtendedParameterValue(InitParams, "MetricsSecretKey");
+		Modio::Optional<std::string> ModStorageQuotaMB = GetExtendedParameterValue(InitParams, "ModStorageQuotaMB");
+		Modio::Optional<std::string> CacheStorageQuotaMB = GetExtendedParameterValue(InitParams, "CacheStorageQuotaMB");
 
 		reenter(CoroutineState)
 		{
@@ -101,7 +105,7 @@ public:
 				Modio::Detail::Services::GetGlobalService<Modio::Detail::MetricsService>().InitMetricsSession(
 					*MetricsSecretKey);
 			}
-			
+
 			Modio::Detail::SDKSessionData::SetPlatformStatusFilter(*PendingOnlyResults);
 
 			Modio::Detail::ExtendedInitParamHandler::PostSessionDataInit(InitParams);
@@ -123,6 +127,73 @@ public:
 			}
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::File, "Initialized File Service");
+
+			{
+				// 25MB minimum storage
+				// Note that the image cache checks for at least 8MB of free space before downloading an image, so the
+				// effective minimum image cache storage is 17MB
+				Modio::FileSize MinimumStorageQuota = Modio::FileSize(25 * 1024 * 1024);
+				if (ModStorageQuotaMB.has_value())
+				{
+					// ensure numeric input
+					for (char c : ModStorageQuotaMB.value())
+					{
+						if (!std::isdigit(c))
+						{
+							Modio::Detail::SDKSessionData::Deinitialize();
+							Modio::Detail::Logger().Log(
+								Modio::LogLevel::Error, Modio::LogCategory::File,
+								"Extended parameter ModStorageQuotaMB must be a positive integer");
+							Self.complete(Modio::make_error_code(Modio::GenericError::BadParameter));
+							return;
+						}
+					}
+					// convert to Modio::FileSize in bytes
+					Modio::FileSize ModStorageQuota = Modio::FileSize(
+						static_cast<std::uintmax_t>(std::stoull(ModStorageQuotaMB.value())) * 1024 * 1024);
+					if (ModStorageQuota < MinimumStorageQuota)
+					{
+						Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File,
+													"Cannot set mod storage quota lower than {} bytes",
+													MinimumStorageQuota);
+						ModStorageQuota = MinimumStorageQuota;
+					}
+					Modio::Detail::SDKSessionData::SetModStorageQuota(ModStorageQuota);
+				}
+				if (CacheStorageQuotaMB.has_value())
+				{
+					// ensure numeric input
+					for (char c : CacheStorageQuotaMB.value())
+					{
+						if (!std::isdigit(c))
+						{
+							Modio::Detail::SDKSessionData::Deinitialize();
+							Modio::Detail::Logger().Log(
+								Modio::LogLevel::Error, Modio::LogCategory::File,
+								"Extended parameter CacheStorageQuotaMB must be a positive integer");
+							Self.complete(Modio::make_error_code(Modio::GenericError::BadParameter));
+							return;
+						}
+					}
+					// convert to Modio::FileSize in bytes
+					Modio::FileSize CacheStorageQuota = Modio::FileSize(
+						static_cast<std::uintmax_t>(std::stoull(CacheStorageQuotaMB.value())) * 1024 * 1024);
+					if (CacheStorageQuota < MinimumStorageQuota)
+					{
+						Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File,
+													"Cannot set cache storage quota lower than {} bytes",
+													MinimumStorageQuota);
+						CacheStorageQuota = MinimumStorageQuota;
+					}
+					ec = Modio::Detail::SDKSessionData::SetCacheStorageQuota(CacheStorageQuota);
+					if (ec)
+					{
+						Modio::Detail::SDKSessionData::Deinitialize();
+						Self.complete(ec);
+						return;
+					}
+				}
+			}
 
 			// Override root storage location unless extended param IgnoreModInstallationDirectoryOverride is set
 			if (!InstallationDirectory.has_value())
@@ -223,9 +294,9 @@ public:
 			// killing initialization.
 			yield Modio::Detail::ValidateAllInstalledModsAsync(std::move(Self));
 
-
 			yield Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFolderAsync(
-				Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().GetTempRootInstallationPath(),
+				Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+					.GetTempModRootInstallationPath(),
 				std::move(Self));
 
 			yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
@@ -234,7 +305,7 @@ public:
 										"mod.io service initialization complete");
 
 			Modio::Detail::SDKSessionData::ConfirmInitialize();
-			
+
 			Self.complete({});
 		}
 	}

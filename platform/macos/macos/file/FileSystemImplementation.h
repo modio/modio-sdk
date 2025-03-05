@@ -185,7 +185,7 @@ namespace Modio
 				return RootLocalStoragePath / fmt::format("{}/mods/", CurrentGameID);
 			}
 
-			Modio::filesystem::path GetTempRootInstallationPath() const override
+			Modio::filesystem::path GetTempModRootInstallationPath() const override
 			{
 				return RootLocalStoragePath / fmt::format("{}/temp/", CurrentGameID);
 			}
@@ -198,6 +198,11 @@ namespace Modio
 			Modio::filesystem::path MakeTempModPath(Modio::ModID ModID) const override
 			{
 				return RootLocalStoragePath / fmt::format("{}/temp/{}", CurrentGameID, ModID);
+			}
+
+			Modio::filesystem::path MakeMediaCachePath() const override
+			{
+				return RootLocalStoragePath / fmt::format("{}/cache/", CurrentGameID);
 			}
 
 			Modio::filesystem::path MakeModMediaFilePath(Modio::ModID ModID, Modio::LogoSize Size,
@@ -222,15 +227,14 @@ namespace Modio
 			Modio::filesystem::path MakeLogoFolderPath(Modio::ModID ModID) const override
 			{
 				// @todonow: Change this to temporary storage
-				return RootLocalStoragePath / fmt::format("{}/cache/mods/{}/logos/", CurrentGameID, ModID);
+				return MakeMediaCachePath() / fmt::format("mods/{}/logos/", ModID);
 			}
 
 			Modio::filesystem::path MakeGalleryFolderPath(Modio::ModID ModID,
 														  Modio::GalleryIndex ImageIndex) const override
 			{
 				// @todonow: Change this to temporary storage
-				return RootLocalStoragePath /
-					   fmt::format("{}/cache/mods/{}/gallery/{}/", CurrentGameID, ModID, ImageIndex);
+				return MakeMediaCachePath() / fmt::format("mods/{}/gallery/{}/", ModID, ImageIndex);
 			}
 
 			Modio::filesystem::path MakeUserMediaFilePath(Modio::UserID UserId, Modio::AvatarSize Size,
@@ -245,7 +249,7 @@ namespace Modio
 			Modio::filesystem::path MakeAvatarFolderPath(Modio::UserID UserId) const override
 			{
 				// @todonow: Change this to temporary storage
-				return RootLocalStoragePath / fmt::format("{}/cache/users/{}/avatars/", CurrentGameID, UserId);
+				return MakeMediaCachePath() / fmt::format("users/{}/avatars/", UserId);
 			}
 
 			bool DirectoryExists(const Modio::filesystem::path& DirectoryPath) const override

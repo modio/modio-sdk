@@ -56,6 +56,8 @@ namespace Modio
 			Link Terms;
 			/// @brief Link to the mod.io Privacy Policy
 			Link Privacy;
+			/// @brief Link to the mod.io Refund Policy
+			Link Refund;
 			/// @brief Link to the mod.io Manage User Account page
 			Link Manage;
 		} Links;
@@ -71,9 +73,10 @@ namespace Modio
 				A.Links.Website.bRequired == B.Links.Website.bRequired && A.Links.Terms.Text == B.Links.Terms.Text &&
 				A.Links.Terms.URL == B.Links.Terms.URL && A.Links.Terms.bRequired == B.Links.Terms.bRequired &&
 				A.Links.Privacy.Text == B.Links.Privacy.Text && A.Links.Privacy.URL == B.Links.Privacy.URL &&
-				A.Links.Privacy.bRequired == B.Links.Privacy.bRequired && A.Links.Manage.Text == B.Links.Manage.Text &&
-				A.Links.Manage.URL == B.Links.Manage.URL && A.Links.Manage.bRequired == B.Links.Manage.bRequired &&
-				A.TermsText == B.TermsText)
+				A.Links.Privacy.bRequired == B.Links.Privacy.bRequired && A.Links.Refund.Text == B.Links.Refund.Text &&
+				A.Links.Refund.URL == B.Links.Refund.URL && A.Links.Refund.bRequired == B.Links.Refund.bRequired &&
+				A.Links.Manage.Text == B.Links.Manage.Text && A.Links.Manage.URL == B.Links.Manage.URL &&
+				A.Links.Manage.bRequired == B.Links.Manage.bRequired &&	A.TermsText == B.TermsText)
 			{
 				return true;
 			}

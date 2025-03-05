@@ -23,6 +23,7 @@
 #include "modio/detail/entities/ModioLogo.h"
 #include <iostream>
 #include <memory>
+#include <queue>
 
 namespace Modio
 {
@@ -162,6 +163,11 @@ namespace Modio
 			Modio::filesystem::path MakeModPath(Modio::ModID ModID) const
 			{
 				return PlatformImplementation->MakeModPath(ModID);
+			}
+
+			Modio::filesystem::path MakeMediaCachePath() const
+			{
+				return PlatformImplementation->MakeMediaCachePath();
 			}
 
 			/// @brief Calculates the path of a mod's logo
@@ -329,9 +335,9 @@ namespace Modio
 				return PlatformImplementation->GetModRootInstallationPath();
 			}
 
-			const Modio::filesystem::path GetTempRootInstallationPath() const
+			const Modio::filesystem::path GetTempModRootInstallationPath() const
 			{
-				return PlatformImplementation->GetTempRootInstallationPath();
+				return PlatformImplementation->GetTempModRootInstallationPath();
 			}
 
 			static Modio::filesystem::path GetDefaultModInstallationDirectory(Modio::GameID GameID)
@@ -351,6 +357,72 @@ namespace Modio
 			{
 				MODIO_PROFILE_SCOPE(GetSpaceAvailable);
 				return PlatformImplementation->GetSpaceAvailable(Destination);
+			}
+
+			/// @brief Recursively searches the media cache to create a queue of image paths and the total
+			/// size of all cached images combined. Note that image paths are added to the queue as they are found
+			/// without additional sorting.
+			/// @param ImagePaths A queue to be populated with paths to images in the media cache.
+			/// @param TotalSize The total combined size in bytes of all the images in the media cache. 
+			/// @return Error code indicating success or failure of the operation.
+			Modio::ErrorCode QueryImageCache(std::queue<Modio::filesystem::path>& ImagePaths,
+											 Modio::FileSize& TotalSize)
+			{
+				uintmax_t OutSize = 0;
+				std::queue<Modio::filesystem::path> OutPaths {};
+
+				Modio::filesystem::path CachePath = MakeMediaCachePath();
+				if (DirectoryExists(CachePath))
+				{
+					Modio::ErrorCode ec;
+					auto Iterator = Modio::filesystem::recursive_directory_iterator(CachePath, ec);
+					auto End = Modio::filesystem::recursive_directory_iterator();
+					const std::vector<std::string> ImageExtensions = {".png", ".jpg", ".jpeg"};
+					while (Iterator != End)
+					{
+						// ensure iterator is created and incremented correctly
+						if (ec)
+						{
+							Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::File,
+														"Recursive directory iterator failed with error {}",
+														ec.message());
+							return Modio::ErrorCode(Modio::make_error_code(Modio::FilesystemError::ReadError));
+						}
+						// ignore directories
+						bool bRegularFile = Iterator->is_regular_file(ec);
+						if (ec || !bRegularFile)
+						{
+							Iterator.increment(ec);
+							continue;
+						}
+						// check the current file is an image, and add its information if so
+						const Modio::filesystem::path& FullPath = Iterator->path();
+						for (const auto& Ext : ImageExtensions)
+						{
+							if (FullPath.extension() == Ext)
+							{
+								uintmax_t ImageSize = Modio::filesystem::file_size(FullPath, ec);
+								if (ec)
+								{
+									Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::File,
+																"Failed to get size of image {} - error message: {}",
+																FullPath.string(), ec.message());
+									return Modio::ErrorCode(Modio::make_error_code(Modio::FilesystemError::ReadError));
+								}
+								OutSize += ImageSize;
+								OutPaths.push(FullPath);
+								break;
+							}
+						}
+						Iterator.increment(ec);
+					}
+				}
+				ImagePaths = OutPaths;
+				TotalSize = Modio::FileSize(OutSize);
+				Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::File,
+											"Media cache contains {} images totalling {} bytes in size",
+											ImagePaths.size(), TotalSize);
+				return {};
 			}
 
 		private:

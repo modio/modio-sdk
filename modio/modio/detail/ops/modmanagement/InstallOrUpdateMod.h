@@ -121,6 +121,57 @@ namespace Modio
 						return;
 					}
 
+					// Check the local mod storage quota.  This quota applies to both regular and temp mods.
+					if (Modio::StorageInfo::GetQuota(Modio::StorageLocation::Local).has_value())
+					{
+						Modio::StorageInfo Storage = Modio::QueryStorageInfo();
+						if (ModInfoData.FileInfo->FilesizeUncompressed >
+							Storage.GetSpace(Modio::StorageLocation::Local, Modio::StorageUsage::Available))
+						{
+							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+														"Installing mod {} would exceed the local mod storage quota",
+														ModInfoData.ModId);
+							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
+							Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
+							return;
+						}
+					}
+
+					if (IsTempMod)
+					{
+						// Temp mod quota is not yet implemented
+						if (Modio::Optional<Modio::FileSize> TempQuota =
+								Modio::Detail::SDKSessionData::GetTempModStorageQuota())
+						{
+							const auto TempModSet = Modio::QueryTempModSet();
+							Modio::FileSize AvailableSpace = TempQuota.value();
+							for (auto& TempMod : TempModSet)
+							{
+								if (TempMod.second.GetSizeOnDisk().has_value())
+								{
+									if (AvailableSpace > TempMod.second.GetSizeOnDisk().value())
+									{
+										AvailableSpace -= TempMod.second.GetSizeOnDisk().value();
+									}
+									else
+									{
+										AvailableSpace = Modio::FileSize(0);
+										break;
+									}
+								}
+							}
+							if (ModInfoData.FileInfo->FilesizeUncompressed > AvailableSpace)
+							{
+								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+															"Installing mod {} would exceed the temp mod storage quota",
+															ModInfoData.ModId);
+								Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
+								Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
+								return;
+							}
+						}
+					}
+
 					// Is there room in the installation path for the extracted files?
 					if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CheckSpaceAvailable(
 							CollectionEntry->GetPath(), Modio::FileSize(ModInfoData.FileInfo->FilesizeUncompressed)))

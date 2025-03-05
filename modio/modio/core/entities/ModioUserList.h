@@ -27,14 +27,14 @@ namespace Modio
 	{
 	public:
 		/// @docpublic
-		/// @brief Insert ModInfoList to the end of this list
+		/// @brief Insert UserList to the end of this list
 		void Append(const UserList& Other)
 		{
 			InternalList.insert(InternalList.end(), std::begin(Other.InternalList), std::end(Other.InternalList));
 		}
 
 		/// @docpublic
-		/// @brief Insert a ModInfo to the end of this list
+		/// @brief Insert a User to the end of this list
 		void Append(const User& UserData)
 		{
 			InternalList.push_back(UserData);

@@ -10,12 +10,12 @@
 
 #pragma once
 #include "modio/core/ModioBuffer.h"
-#include "modio/detail/serialization/ModioModInfoListSerialization.h"
-#include "modio/detail/serialization/ModioPagedResultSerialization.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/serialization/ModioModInfoListSerialization.h"
+#include "modio/detail/serialization/ModioPagedResultSerialization.h"
 
 namespace Modio
 {
@@ -32,18 +32,18 @@ namespace Modio
 				{
 					do
 					{
-
-						CachedResponse = Modio::Detail::SDKSessionData::IsSubscriptionCacheInvalid() ? 
-							Modio::Detail::CachedResponse::Disallow : Modio::Detail::CachedResponse::Allow;
+						CachedResponse = Modio::Detail::SDKSessionData::IsSubscriptionCacheInvalid()
+											 ? Modio::Detail::CachedResponse::Disallow
+											 : Modio::Detail::CachedResponse::Allow;
 
 						// Because we're making a raw request here, manually add the filter to paginate 100 results at a
 						// time We're going to gather all the results together at the end of this anyways so the biggest
 						// pages give the best results because it means fewer REST calls
 						yield Modio::Detail::PerformRequestAndGetResponseAsync(
-							SubscriptionBuffer, Modio::Detail::GetUserSubscriptionsRequest
-							.AddLimitQueryParam()
-							.AddOffsetQueryParam(CurrentResultIndex)
-							.AddCurrentGameIdQueryParam(),
+							SubscriptionBuffer,
+							Modio::Detail::GetUserSubscriptionsRequest.AddLimitQueryParam()
+								.AddOffsetQueryParam(CurrentResultIndex)
+								.AddCurrentGameIdQueryParam(),
 							CachedResponse, std::move(Self));
 
 						Modio::Detail::SDKSessionData::ClearSubscriptionCacheInvalid();
@@ -91,6 +91,20 @@ namespace Modio
 						}
 						CurrentResultIndex += 100;
 					} while (CurrentResultIndex < PageInfo.GetTotalResultCount());
+
+					// If we had any results, initialize our page data to reflect the collated results.
+					if (CollatedResults->Size() > 0)
+					{
+						InitializePageResult(*CollatedResults, 0, std::int32_t(CollatedResults->Size()), 1,
+											 std::int32_t(CollatedResults->Size()),
+											 std::int32_t(CollatedResults->Size()));
+					}
+					else
+					{
+						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+													"User has no subscriptions for game {}",
+													Modio::Detail::SDKSessionData::CurrentGameID());
+					}
 
 					Self.complete({}, std::move(*CollatedResults));
 				}

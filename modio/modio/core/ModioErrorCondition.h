@@ -59,4 +59,5 @@ enum class EModioErrorCondition: uint8
 	ModIsDependency = 46 UMETA(ToolTip="Cannot turn off mod dependencies when the mod is currently a dependency for other mods.") ,
 	ModCannotAllowDependencyMonetized = 47 UMETA(ToolTip="This mod cannot allow dependencies because it is monetized.") ,
 	ModCannotDeleteDependency = 48 UMETA(ToolTip="This mod is a dependency of other mods and cannot be deleted.") ,
+	RequestInProgress = 49 UMETA(ToolTip="The asynchronous operation is already running. Please wait for it to complete before calling it again") ,
 };

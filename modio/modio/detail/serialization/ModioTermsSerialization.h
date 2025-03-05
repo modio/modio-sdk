@@ -28,6 +28,7 @@ namespace Modio
 		Detail::ParseSubobjectSafe(Json, OutTerms.Links.Website, "links", "website");
 		Detail::ParseSubobjectSafe(Json, OutTerms.Links.Terms, "links", "terms");
 		Detail::ParseSubobjectSafe(Json, OutTerms.Links.Privacy, "links", "privacy");
+		Detail::ParseSubobjectSafe(Json, OutTerms.Links.Refund, "links", "refund");
 		Detail::ParseSubobjectSafe(Json, OutTerms.Links.Manage, "links", "manage");
 
 		Detail::ParseSafe(Json, OutTerms.TermsText, "plaintext");

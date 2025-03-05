@@ -126,6 +126,50 @@
         },
         "CMAKE_ANDROID_NDK": {
           "type": "STRING",
+          "value": "%localappdata%/Android/Sdk/ndk/25.2.9519653"
+        },
+        "ANDROID_ABI": {
+          "type": "STRING",
+          "value": "arm64-v8a"
+        },
+        "CMAKE_ANDROID_STL_TYPE": {
+          "type": "STRING",
+          "value": "c++_shared"
+        },
+        "ANDROID_PLATFORM": {
+          "type": "STRING",
+          "value": "android-26"
+        },
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "android-arm64-debug",
+      "inherits": "android-arm64",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    },
+    {
+      "name": "android-arm64-dbginfo",
+      "inherits": "android-arm64",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
+    },
+    {
+      "name": "oculus-arm64",
+      "displayName": "Oculus (Meta Quest) (ARM64)",
+      "description": "Oculus (Meta Quest) Android compilation for ARM64 (using arm64-v8a ABI)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/meta-quest-arm64",
+      "cacheVariables": {
+        "MODIO_PLATFORM": {
+          "type": "STRING",
+          "value": "OCULUS"
+        },
+        "CMAKE_INSTALL_PREFIX": {
+          "type": "STRING",
+          "value": "${sourceDir}/out/install/meta-quest-arm64"
+        },
+        "CMAKE_ANDROID_NDK": {
+          "type": "STRING",
           "value": "C:/Program Files (x86)/Android/AndroidNDK/android-ndk-r23c"
         },
         "ANDROID_ABI": {
@@ -144,13 +188,13 @@
       }
     },
     {
-      "name": "android-arm64-debug",
-      "inherits": "android-arm64",
+      "name": "oculus-arm64-debug",
+      "inherits": "oculus-arm64",
       "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
     },
     {
-      "name": "android-arm64-dbginfo",
-      "inherits": "android-arm64",
+      "name": "oculus-arm64-dbginfo",
+      "inherits": "oculus-arm64",
       "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
     }
   ]

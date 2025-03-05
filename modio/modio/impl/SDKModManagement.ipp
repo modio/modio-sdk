@@ -38,10 +38,10 @@
 #include "modio/detail/serialization/ModioModStatsSerialization.h"
 #include "modio/detail/serialization/ModioProfileMaturitySerialization.h"
 #include "modio/detail/serialization/ModioResponseErrorSerialization.h"
-#include "modio/detail/serialization/ModioImageSerialization.h"
 #include "modio/file/ModioFileService.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 #include "modio/userdata/ModioUserDataService.h"
+#include <queue>
 
 namespace Modio
 {
@@ -92,7 +92,8 @@ namespace Modio
 			if (Modio::Detail::RequireSDKIsInitialized(OnFetchDone) &&
 				Modio::Detail::RequireNotRateLimited(OnFetchDone) &&
 				Modio::Detail::RequireUserIsAuthenticated(OnFetchDone) &&
-				Modio::Detail::RequireModManagementEnabled(OnFetchDone))
+				Modio::Detail::RequireModManagementEnabled(OnFetchDone) &&
+				Modio::Detail::RequireFetchExternalUpdatesNOTRunning(OnFetchDone))
 			{
 				Modio::Detail::FetchExternalUpdatesAsync(OnFetchDone);
 			}
@@ -351,28 +352,90 @@ namespace Modio
 
 	Modio::StorageInfo QueryStorageInfo()
 	{
-		Modio::Detail::FileService& FileService =
-			Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>();
-
 		Modio::StorageInfo Info;
 
-		// Get the total available storage from the file system
-		const auto AvailableLocalSpace = FileService.GetSpaceAvailable(FileService.GetRootLocalStoragePath());
-		SetSpace(Info, Modio::StorageLocation::Local, Modio::StorageUsage::Available, AvailableLocalSpace);
+		/* Mod Storage Info */
 
-		// Calculate the total consumption from system installations
-		const auto SystemInstallations = QuerySystemInstallations();
-		Modio::FileSize ConsumedLocalSpace;
-		for (auto& Mod : SystemInstallations)
+		// Calculate consumed local space
+		std::map<Modio::ModID, Modio::ModCollectionEntry> LocalMods = QuerySystemInstallations();
+		const std::map<Modio::ModID, Modio::ModCollectionEntry> TempModSet = QueryTempModSet();
+		// merge maps together and remove duplicates
+		LocalMods.insert(TempModSet.begin(), TempModSet.end());
+		Modio::FileSize ConsumedLocalSpace {Modio::FileSize(0)};
+		for (auto& Mod : LocalMods)
 		{
-			if (Mod.second.GetSizeOnDisk().has_value() == false)
+			if (Mod.second.GetSizeOnDisk().has_value())
 			{
-				continue;
+				ConsumedLocalSpace += Mod.second.GetSizeOnDisk().value();
 			}
-			ConsumedLocalSpace += Mod.second.GetSizeOnDisk().value();
 		}
 		SetSpace(Info, Modio::StorageLocation::Local, Modio::StorageUsage::Consumed, ConsumedLocalSpace);
 
+		// Calculate available local space
+		Modio::Detail::FileService& FileService =
+			Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>();
+		Modio::FileSize AvailableLocalSpace = FileService.GetSpaceAvailable(FileService.GetRootLocalStoragePath());
+		if (Modio::Optional<Modio::FileSize> ModStorageQuota = Modio::Detail::SDKSessionData::GetModStorageQuota())
+		{
+			if (ModStorageQuota.value() > ConsumedLocalSpace)
+			{
+				Modio::FileSize RemainingLocalQuota = ModStorageQuota.value();
+				RemainingLocalQuota -= ConsumedLocalSpace;
+				if (RemainingLocalQuota < AvailableLocalSpace)
+				{
+					// Some quota remains
+					SetSpace(Info, Modio::StorageLocation::Local, Modio::StorageUsage::Available, RemainingLocalQuota);
+				}
+				else
+				{
+					// Remaining quota exceeds actual available space
+					SetSpace(Info, Modio::StorageLocation::Local, Modio::StorageUsage::Available, AvailableLocalSpace);
+				}
+			}
+			else
+			{
+				// Quota has been met or exceeded
+				SetSpace(Info, Modio::StorageLocation::Local, Modio::StorageUsage::Available, Modio::FileSize(0));
+			}
+		}
+		else
+		{
+			// No quota set
+			SetSpace(Info, Modio::StorageLocation::Local, Modio::StorageUsage::Available, AvailableLocalSpace);
+		}
+
+		/* Cache Storage Info */
+
+		if (Modio::Optional<Modio::FileSize> CacheStorageQuota = Modio::Detail::SDKSessionData::GetCacheStorageQuota())
+		{
+			Modio::FileSize ConsumedCacheSpace = Modio::Detail::SDKSessionData::GetTotalImageCacheSize();
+			Modio::FileSize AvailableCacheSpace = CacheStorageQuota.value();
+			if (AvailableCacheSpace > ConsumedCacheSpace)
+			{
+				AvailableCacheSpace -= ConsumedCacheSpace;
+			}
+			else
+			{
+				AvailableCacheSpace = Modio::FileSize(0);
+			}
+			SetSpace(Info, Modio::StorageLocation::Cache, Modio::StorageUsage::Available, AvailableCacheSpace);
+			SetSpace(Info, Modio::StorageLocation::Cache, Modio::StorageUsage::Consumed, ConsumedCacheSpace);
+		}
+		else
+		{
+			Modio::FileSize ConsumedCacheSpace;
+			std::queue<Modio::filesystem::path> Paths;
+			// without a quota, the cache data won't be initialized or updated, so we have to query it directly
+			Modio::ErrorCode ec = FileService.QueryImageCache(Paths, ConsumedCacheSpace);
+			if (ec)
+			{
+				Modio::Detail::Logger().Log(
+					LogLevel::Error, LogCategory::File,
+					"QueryImageCache failed. StorageInfo for the image cache is inaccurate. Error: {}", ec.message());
+			}
+			SetSpace(Info, Modio::StorageLocation::Cache, Modio::StorageUsage::Consumed, ConsumedCacheSpace);
+			SetSpace(Info, Modio::StorageLocation::Cache, Modio::StorageUsage::Available, AvailableLocalSpace);
+		}
 		return Info;
 	}
 
@@ -380,6 +443,19 @@ namespace Modio
 							 Modio::FileSize Space)
 	{
 		Info.StorageData[{Location, Usage}] = Space;
+	}
+
+	Modio::Optional<Modio::FileSize> Modio::StorageInfo::GetQuota(Modio::StorageLocation Location)
+	{
+		switch (Location)
+		{
+			case Modio::StorageLocation::Local:
+				return Modio::Detail::SDKSessionData::GetModStorageQuota();
+			case Modio::StorageLocation::Cache:
+				return Modio::Detail::SDKSessionData::GetCacheStorageQuota();
+			default:
+				return {};
+		}
 	}
 
 	void ForceUninstallModAsync(Modio::ModID ModToRemove, std::function<void(Modio::ErrorCode)> Callback)

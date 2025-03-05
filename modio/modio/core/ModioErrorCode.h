@@ -416,8 +416,9 @@ namespace Modio
 		OperationCanceled = 21766,
 		OperationError = 21767,
 		QueueClosed = 21768,
-		SDKAlreadyInitialized = 21769,
-		SDKNotInitialized = 21770
+		RequestInProgress = 21769,
+		SDKAlreadyInitialized = 21770,
+		SDKNotInitialized = 21771
 	};
 
 	/// @docnone
@@ -451,6 +452,9 @@ namespace Modio
 					break;
 				case GenericError::QueueClosed:
 						return "Operation could not be started as the service queue was missing or destroyed";
+					break;
+				case GenericError::RequestInProgress:
+						return "The asynchronous operation is already running. Please wait for it to complete before calling it again";
 					break;
 				case GenericError::SDKAlreadyInitialized:
 						return "mod.io SDK was already initialized";
@@ -1633,7 +1637,9 @@ namespace Modio
 		/// @brief This mod cannot allow dependencies because it is monetized.
 		ModCannotAllowDependencyMonetized = 47,
 		/// @brief This mod is a dependency of other mods and cannot be deleted.
-		ModCannotDeleteDependency = 48
+		ModCannotDeleteDependency = 48,
+		/// @brief The asynchronous operation is already running. Please wait for it to complete before calling it again
+		RequestInProgress = 49
 	};
 
 	/// @docnone
@@ -1787,6 +1793,9 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::ModCannotDeleteDependency:
 					return "This mod is a dependency of other mods and cannot be deleted.";
+				break;
+				case ErrorConditionTypes::RequestInProgress:
+					return "The asynchronous operation is already running. Please wait for it to complete before calling it again";
 				break;
 				default:
 					return "Unknown error condition";
@@ -3376,6 +3385,14 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::ModCannotDeleteDependency:
 					if (ec == Modio::ApiError::ModCannotDeleteDependency)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::RequestInProgress:
+					if (ec == Modio::GenericError::RequestInProgress)
 					{
 						return true;
 					}

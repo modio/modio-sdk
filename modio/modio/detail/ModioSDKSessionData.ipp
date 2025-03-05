@@ -18,9 +18,10 @@
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioTemporaryModSet.h"
 #include "modio/detail/HedleyWrapper.h"
+#include "modio/detail/serialization/ModioAvatarSerialization.h"
 #include "modio/detail/serialization/ModioTokenSerialization.h"
 #include "modio/detail/serialization/ModioUserDataContainerSerialization.h"
-#include "modio/detail/serialization/ModioAvatarSerialization.h"
+#include "modio/file/ModioFileService.h"
 
 MODIO_DIAGNOSTIC_PUSH
 
@@ -426,7 +427,6 @@ namespace Modio
 			return false;
 		}
 
-
 		std::weak_ptr<Modio::ModProgressInfo> SDKSessionData::StartModDownloadOrUpdate(Modio::ModID ID)
 		{
 			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
@@ -578,6 +578,123 @@ namespace Modio
 			return std::string();
 		}
 
+		void SDKSessionData::SetModStorageQuota(Modio::FileSize ModStorageQuota)
+		{
+			Get().ModStorageQuota = ModStorageQuota;
+			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::File,
+										"Mod storage quota set to {} bytes", Get().ModStorageQuota.value());
+		}
+
+		Modio::Optional<Modio::FileSize> SDKSessionData::GetModStorageQuota()
+		{
+			return Get().ModStorageQuota;
+		}
+
+		Modio::Optional<Modio::FileSize> SDKSessionData::GetTempModStorageQuota()
+		{
+			return {};
+		}
+
+		Modio::ErrorCode SDKSessionData::SetCacheStorageQuota(Modio::FileSize CacheStorageQuota)
+		{
+			Get().CacheStorageQuota = CacheStorageQuota;
+			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::File,
+										"Cache storage quota set to {} bytes", Get().CacheStorageQuota.value());
+			Modio::ErrorCode ec =
+				Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().QueryImageCache(
+					Get().CacheImagePaths, Get().TotalImageCacheSize);
+			if (ec)
+			{
+				return ec;
+			}
+			return Modio::Detail::SDKSessionData::CheckCacheQuotaAndClearSpace();
+		}
+
+		Modio::Optional<Modio::FileSize> SDKSessionData::GetCacheStorageQuota()
+		{
+			return Get().CacheStorageQuota;
+		}
+
+		Modio::ErrorCode SDKSessionData::CheckCacheQuotaAndClearSpace()
+		{
+			if (!Get().CacheStorageQuota.has_value() || Get().CacheImagePaths.empty() || Get().TotalImageCacheSize == 0)
+			{
+				return {};
+			}
+			// The REST API allows mod logos up to 8MB in size
+			// Ensure we have at least that much space in the image cache
+			Modio::FileSize CacheLimit = Get().CacheStorageQuota.value();
+			Modio::FileSize MaxImageSize = Modio::FileSize(8 * 1024 * 1024);
+			if (CacheLimit < MaxImageSize)
+			{
+				// This should never be hit provided the 25MB minimum cache quota is adhered to
+				return Modio::ErrorCode(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
+			}
+			CacheLimit -= MaxImageSize;
+			if (Get().TotalImageCacheSize < CacheLimit)
+			{
+				return {};
+			}
+			Modio::ErrorCode ec;
+			while (Get().TotalImageCacheSize > CacheLimit)
+			{
+				Modio::filesystem::path ImagePath = Get().CacheImagePaths.front();
+				Modio::FileSize ImageSize = Modio::FileSize(Modio::filesystem::file_size(ImagePath, ec));
+				if (ec || Get().TotalImageCacheSize < ImageSize)
+				{
+					// SDKSessionData cache information is inaccurate. Rebuild it.
+					// Note this disrupts the FIFO queue ordering
+					ec = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().QueryImageCache(
+						Get().CacheImagePaths, Get().TotalImageCacheSize);
+					if (ec)
+					{
+						return ec;
+					}
+					continue;
+				}
+				if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(ImagePath))
+				{
+					break;
+				}
+				Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::File,
+											"Deleted image {} from the cache to free {} bytes of space",
+											ImagePath.string(), ImageSize);
+				Get().TotalImageCacheSize -= ImageSize;
+				Get().CacheImagePaths.pop();
+			}
+			if (Get().TotalImageCacheSize > CacheLimit)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::File,
+											"Error reducing image cache size below specified cache storage quota");
+				return Modio::ErrorCode(Modio::make_error_code(Modio::FilesystemError::ReadError));
+			}
+			Modio::Detail::Logger().Log(LogLevel::Detailed, LogCategory::File,
+										"Image cache total size reduced to {} bytes", Get().TotalImageCacheSize);
+			return {};
+		}
+
+		Modio::ErrorCode SDKSessionData::AddToImageCacheData(Modio::filesystem::path NewImagePath)
+		{
+			Get().CacheImagePaths.push(NewImagePath);
+			Modio::ErrorCode ec;
+			Modio::FileSize ImageSize = Modio::FileSize(Modio::filesystem::file_size(NewImagePath, ec));
+			if (ec)
+			{
+				Modio::Detail::Logger().Log(
+					LogLevel::Error, LogCategory::File,
+					"Failed to update total image cache size after adding file {} - error message: {}",
+					NewImagePath.string(), ec.message());
+				return Modio::make_error_code(Modio::FilesystemError::ReadError);
+			}
+			Get().TotalImageCacheSize += Modio::FileSize(ImageSize);
+			return {};
+		}
+
+		Modio::FileSize SDKSessionData::GetTotalImageCacheSize()
+		{
+			return Get().TotalImageCacheSize;
+		}
+
 		void SDKSessionData::SetLocalLanguage(Modio::Language Local)
 		{
 			Get().LocalLanguage = Local;
@@ -680,6 +797,16 @@ namespace Modio
 				return CacheEntryIterator->second;
 			}
 			return false;
+		}
+
+		bool SDKSessionData::IsFetchExternalUpdatesRunning()
+		{
+			return Get().FetchExternalUpdatesRunning;
+		}
+
+		void SDKSessionData::SetFetchExternalUpdatesRunning(bool IsRunning)
+		{
+			Get().FetchExternalUpdatesRunning = IsRunning;
 		}
 
 		void SDKSessionData::EnqueueTask(fu2::unique_function<void()> Task)

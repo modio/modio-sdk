@@ -465,7 +465,7 @@ namespace Modio
 	struct GuidV4
 	{
 		/// @docinternal
-		GuidV4() 
+		GuidV4()
 		{
 			Raw64[1] = Raw64[0] = 0;
 		}
@@ -474,14 +474,14 @@ namespace Modio
 		GuidV4(const uint8_t UUID[16])
 		{
 			std::memmove(Raw8, UUID, 16);
-			//assert(IsValid());
+			// assert(IsValid());
 		}
 
 		/// @docinternal
 		GuidV4(const GuidV4& UUID)
 		{
 			std::memmove(Raw8, UUID.Raw8, 16);
-			//assert(IsValid());
+			// assert(IsValid());
 		}
 
 		/// @docinternal
@@ -494,7 +494,7 @@ namespace Modio
 		GuidV4& operator=(const GuidV4& UUID)
 		{
 			std::memcpy(Raw8, UUID.Raw8, 16);
-			//assert(IsValid());
+			// assert(IsValid());
 			return *this;
 		}
 
@@ -515,8 +515,8 @@ namespace Modio
 
 		/// @brief Given a GUID of the form: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX,
 		/// convert into the binary representation
-		/// @param Input 
-		/// @return 
+		/// @param Input
+		/// @return
 		bool Parse(const std::string& Input)
 		{
 			FromString(Input);
@@ -537,7 +537,7 @@ namespace Modio
 		}
 
 		/// @docinternal
-		/// @brief Ensure the GUID value conforms to a randomised version 4 GUID. 
+		/// @brief Ensure the GUID value conforms to a randomised version 4 GUID.
 		bool IsValid() const
 		{
 			// ensure we have a valid Version 4 UUID, variant 2.
@@ -579,7 +579,7 @@ namespace Modio
 		/// @return true if this UUID is less than Other
 		bool operator<(const GuidV4& Other) const
 		{
-			if(Raw64[0] == Other.Raw64[0])
+			if (Raw64[0] == Other.Raw64[0])
 				return Raw64[1] < Other.Raw64[1];
 			return Raw64[0] < Other.Raw64[0];
 		}
@@ -615,7 +615,7 @@ namespace Modio
 			uint64_t Raw64[2];
 		};
 	};
-		
+
 	/// @docpublic
 	/// @brief Strong type representing a Guid
 	struct Guid
@@ -827,7 +827,10 @@ namespace Modio
 	/// @brief Where the storage has been written to
 	enum class StorageLocation : uint8_t
 	{
+		// Locally installed mods for this game, including temp mods and those installed by other users on this system
 		Local = 0,
+		// Cached image data such as mod logos and gallery images
+		Cache = 1
 	};
 
 	/// @docpublic
@@ -835,7 +838,7 @@ namespace Modio
 	enum class StorageUsage : uint8_t
 	{
 		Consumed = 0,
-		Available = 1,
+		Available = 1
 	};
 
 	/// @docpublic
@@ -861,6 +864,13 @@ namespace Modio
 		/// @docinternal
 		/// @brief Default constructor
 		StorageInfo() {}
+
+		/// @docpublic
+		/// @brief Get the storage quota for a given `Modio::StorageLocation` if one has been set.
+		/// @param Location The type of storage to get the quota for.
+		/// @return `Modio::Optional<Modio::FileSize>` of the storage quota in bytes for the specified
+		/// `Modio::StorageLocation`. Empty if no quota is set.
+		static MODIO_IMPL Modio::Optional<Modio::FileSize> GetQuota(Modio::StorageLocation Location);
 
 	private:
 		/// @docnone

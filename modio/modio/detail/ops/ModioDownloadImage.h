@@ -1,26 +1,27 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioStdTypes.h"
-#include "modio/detail/ops/DownloadFileOp.h"
 #include "modio/detail/ModioObjectTrack.h"
+#include "modio/detail/ops/DownloadFileOp.h"
 
 #include <asio/yield.hpp>
 namespace Modio
 {
 	namespace Detail
-	{		
-		/// @brief Generic operation which downloads a specific image type from the mod.io REST API. Checks if the image is cached first before downloading.
+	{
+		/// @brief Generic operation which downloads a specific image type from the mod.io REST API. Checks if the image
+		/// is cached first before downloading.
 		/// @tparam ImageType Type of image we're requesting
 		template<typename ImageType>
 		class DownloadImageOp : public Modio::Detail::BaseOperation<DownloadImageOp<ImageType>>
@@ -48,7 +49,7 @@ namespace Modio
 							return;
 						}
 						OpState.DestinationTempPath = OpState.DestinationPath;
-						//OpState.DestinationTempPath += Modio::filesystem::path(".download");
+						// OpState.DestinationTempPath += Modio::filesystem::path(".download");
 
 						// If the Image is already downloaded, then don't fetch it again
 						if (FileService.FileExists(OpState.DestinationPath))
@@ -57,6 +58,17 @@ namespace Modio
 							*Result = std::move(OpState.DestinationPath);
 							Self.complete({});
 							return;
+						}
+
+						if (Modio::StorageInfo::GetQuota(Modio::StorageLocation::Cache).has_value())
+						{
+							// Ensures there is at least 8MB of available space
+							ec = Modio::Detail::SDKSessionData::CheckCacheQuotaAndClearSpace();
+							if (ec)
+							{
+								Self.complete(ec);
+								return;
+							}
 						}
 
 						OpState.DownloadRequestParams =
@@ -92,8 +104,7 @@ namespace Modio
 
 					// Download the file
 					yield Modio::Detail::DownloadFileAsApiRequestAsync(
-						OpState.DownloadRequestParams.value(),
-						OpState.DestinationTempPath, {}, std::move(Self));
+						OpState.DownloadRequestParams.value(), OpState.DestinationTempPath, {}, std::move(Self));
 
 					if (ec)
 					{
@@ -101,12 +112,22 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
-					Modio::filesystem::rename(OpState.DestinationTempPath,
-											  OpState.DestinationPath, ec);
+					Modio::filesystem::rename(OpState.DestinationTempPath, OpState.DestinationPath, ec);
 					if (ec)
 					{
 						Self.complete(ec);
 						return;
+					}
+					if (Modio::StorageInfo::GetQuota(Modio::StorageLocation::Cache).has_value())
+					{
+						// Adds the new image to the end of cache FIFO queue
+						ec = Modio::Detail::SDKSessionData::AddToImageCacheData(OpState.DestinationPath);
+						if (ec)
+						{
+
+							Self.complete(ec);
+							return;
+						}
 					}
 					// Set result buffer
 					*Result = std::move(OpState.DestinationPath);

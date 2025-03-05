@@ -539,5 +539,22 @@ namespace Modio
 					   });
 			return false;
 		}
+
+		template<typename... OtherArgs>
+		bool RequireFetchExternalUpdatesNOTRunning(std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
+		{
+			if (!Modio::Detail::SDKSessionData::IsFetchExternalUpdatesRunning())
+			{
+				Modio::Detail::SDKSessionData::SetFetchExternalUpdatesRunning(true);
+				return true;
+			}
+			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					   [CompletionHandler =
+							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
+						   CompletionHandler(Modio::make_error_code(Modio::GenericError::RequestInProgress),
+											 (OtherArgs {})...);
+					   });
+			return false;
+		}
 	} // namespace Detail
 } // namespace Modio

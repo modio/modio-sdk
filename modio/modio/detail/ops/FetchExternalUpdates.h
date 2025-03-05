@@ -22,6 +22,7 @@
 #include <asio/coroutine.hpp>
 #include <asio/yield.hpp>
 #include <map>
+
 namespace Modio
 {
 	namespace Detail
@@ -36,10 +37,13 @@ namespace Modio
 				Modio::Detail::UserDataService& UserService =
 					Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>();
 
+				Modio::Detail::SDKSessionData::SetFetchExternalUpdatesRunning(true);
+
 				reenter(CoroutineState)
 				{
 					if (!Modio::Detail::SDKSessionData::GetAuthenticatedUser())
 					{
+						Modio::Detail::SDKSessionData::SetFetchExternalUpdatesRunning(false);
 						Self.complete(Modio::make_error_code(Modio::UserDataError::InvalidUser));
 						return;
 					}
@@ -51,6 +55,7 @@ namespace Modio
 						yield Modio::Detail::UnsubscribeFromModAsync(CurrentPendingUnsubscribe, std::move(Self));
 						if (ec)
 						{
+							Modio::Detail::SDKSessionData::SetFetchExternalUpdatesRunning(false);
 							Self.complete(ec);
 							return;
 						}
@@ -63,6 +68,7 @@ namespace Modio
 					yield FetchUserSubscriptionsFromServerAsync(std::move(Self));
 					if (ec)
 					{
+						Modio::Detail::SDKSessionData::SetFetchExternalUpdatesRunning(false);
 						Self.complete(ec);
 						return;
 					}
@@ -72,6 +78,7 @@ namespace Modio
 						std::map<Modio::ModID, Modio::ModInfo> ServerSubsModProfiles;
 						if (!ServerSubscriptionList)
 						{
+							Modio::Detail::SDKSessionData::SetFetchExternalUpdatesRunning(false);
 							Self.complete(ec);
 							return;
 						}
@@ -164,6 +171,7 @@ namespace Modio
 					// Always save the mod collection to storage
 					yield Modio::Detail::SaveModCollectionToStorageAsync(std::move(Self));
 
+					Modio::Detail::SDKSessionData::SetFetchExternalUpdatesRunning(false);
 					Self.complete({});
 					return;
 				}

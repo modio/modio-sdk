@@ -1,0 +1,94 @@
+---
+id: meta-getting-started
+title: Getting Started
+slug: /cppsdk/meta/getting-started
+sidebar_position: 1
+custom_edit_url: https://github.com/modio/modio-sdk-internal/blob/develop/platform/android/doc/meta/getting-started.mdx
+---
+
+## Android SDK/NDK Versions
+
+The mod.io Android SDK is built against NDK version NDK r23c, shipped with Visual Studio 2022's Android workload and supports the arm64-v8a ABI.
+
+## Compiling for Android
+
+Currently, the mod.io SDK can only be used from native Android applications being built with CMake on Windows. There is no support for the AGDE for Visual Studio. mod.io SDK method calls are not available from Java.  You can follow the CMake Integration documentation for how to configure your native CMake project to use the SDK.
+
+## Initializing the Android SDK
+
+Prior to initializing the mod.io SDK via `Modio::InitializeAsync`, you have to pass a few initialization parameters to the SDK for Android specific support.
+
+1. Pass mod.io the JNI VM and an optional reference to the global ClassLoader using `Modio::InitializeAndroidJNI(vm, nullptr);`. Generally you should do this in your `JNI_OnLoad` method. If you don't provide a reference to the native classloader, the SDK will attempt to discover and create one itself.
+
+2. Pass mod.io a reference to your native main Activity using `Modio::SetGlobalActivity(JavaObject);`. You can do this either in a native event from Java, or anytime in your startup process if you have a reference to the native activity cached.
+
+3. Call `Modio::InitializeAndroid();` for mod.io to initialize and setup its JNI bindings.
+
+## Authentication
+
+Authentication on Meta Quest requires three key pieces of information:
+
+* Access Token
+* User Proof (Nonce)
+* User ID
+
+Here's how to obtain these credentials:
+```cpp
+ovr_User_GetAccessToken();
+std::string AccessTokenResponseString;
+
+// Handle messages in your game loop
+{
+    ovrMessageHandle Message = ovr_PopMessage();
+    if (Message && ovr_Message_GetType(Message) == ovrMessage_User_GetAccessToken)
+    {
+        if (!ovr_Message_IsError(Message))
+        {
+            AccessTokenResponseString = ovr_Message_GetString(Message);
+        }
+        else
+        {
+            ovrErrorHandle Error = ovr_Message_GetError(Message);
+            // Handle error
+        }
+    }
+}
+
+ovr_User_GetUserProof();
+std::string UserProofResponseString;
+
+// Handle messages in your game loop
+{
+    ovrMessageHandle Message = ovr_PopMessage();
+    if (Message && ovr_Message_GetType(Message) == ovrMessage_User_GetUserProof)
+    {
+        if (!ovr_Message_IsError(Message))
+        {
+            UserProofResponseString = ovr_Message_GetString(Message);
+        }
+        else
+        {
+            ovrErrorHandle Error = ovr_Message_GetError(Message);
+            // Handle error
+        }
+    }
+}
+
+// Get User ID
+std::string UserIdString = std::to_string(ovr_GetLoggedInUserID());
+```
+
+Once you have these credentials, authenticate with mod.io:
+
+```cpp
+Modio::AuthenticationParams AuthParams;
+AuthParams.AuthToken = AccessTokenResponseString;
+AuthParams.UserEmail = "example@gmail.com";
+AuthParams.ExtendedParameters["device"] = "quest"; // Use "rift" for Oculus Rift
+AuthParams.ExtendedParameters["nonce"] = UserProofResponseString;
+AuthParams.ExtendedParameters["user_id"] = UserIdString;
+
+Modio::AuthenticateUserExternalAsync(AuthParams, Modio::AuthenticationProvider::Oculus, [](Modio::ErrorCode ec) {
+	// Handle authentication result
+});
+```

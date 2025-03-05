@@ -27,6 +27,7 @@
 #include "modio/core/entities/ModioEntitlementConsumptionStatusList.h"
 #include "modio/core/entities/ModioGameInfo.h"
 #include "modio/core/entities/ModioGameInfoList.h"
+#include "modio/core/entities/ModioModCommunityOptions.h"
 #include "modio/core/entities/ModioModDetails.h"
 #include "modio/core/entities/ModioModInfoList.h"
 #include "modio/core/entities/ModioModTagOptions.h"
@@ -34,7 +35,6 @@
 #include "modio/core/entities/ModioTransactionRecord.h"
 #include "modio/core/entities/ModioUser.h"
 #include "modio/core/entities/ModioUserList.h"
-#include "modio/core/entities/ModioModCommunityOptions.h"
 #include "modio/detail/ModioLibraryConfigurationHelpers.h"
 
 namespace Modio
@@ -137,10 +137,12 @@ namespace Modio
 	/// @requires authenticated-user
 	/// @requires no-rate-limiting
 	/// @requires management-enabled
+	/// @requires fetch-external-updates-not-running
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error UserDataError::InvalidUser|No authenticated user
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::RequestInProgress|FetchExternalUpdates operation is already running.
 	MODIOSDK_API void FetchExternalUpdatesAsync(std::function<void(Modio::ErrorCode)> OnFetchDone);
 
 	/// @docpublic
@@ -235,7 +237,7 @@ namespace Modio
 	/// @brief Retrieves a snapshot of current storage related information such as space consumed by mod
 	/// installations and total available space
 	/// @return Structure containing storage information
-	MODIOSDK_API StorageInfo QueryStorageInfo();
+	MODIOSDK_API Modio::StorageInfo QueryStorageInfo();
 
 	/// @docpublic
 	/// @brief Forcibly uninstalls a mod from the system. This is intended for use when a host application requires more
@@ -499,7 +501,6 @@ namespace Modio
 	MODIOSDK_API void GetModDependenciesAsync(
 		Modio::ModID ModID, bool Recursive,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback);
-
 
 	/// @docpublic
 	/// @brief Adds dependencies to a specified mod, linking it with other mods that are required for it to function

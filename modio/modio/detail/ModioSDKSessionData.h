@@ -9,19 +9,20 @@
  */
 
 #pragma once
+#include "function2/function2.hpp"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioCreateModFileParams.h"
 #include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/entities/ModioUser.h"
+#include "modio/detail/ConcurrentQueueWrapper.h"
 #include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/userdata/ModioUserDataContainer.h"
 #include "modio/detail/userdata/ModioUserProfile.h"
-#include "modio/detail/ConcurrentQueueWrapper.h"
-#include "function2/function2.hpp"
 
 #include <chrono>
 #include <map>
 #include <memory>
+#include <queue>
 #include <shared_mutex>
 #include <vector>
 
@@ -116,17 +117,16 @@ namespace Modio
 				return Get().ModIDToPrioritize;
 			}
 
-			MODIO_IMPL static std::weak_ptr<Modio::Detail::TemporaryModSet> InitTempModSet(std::vector<Modio::ModID> ModIds);
+			MODIO_IMPL static std::weak_ptr<Modio::Detail::TemporaryModSet> InitTempModSet(
+				std::vector<Modio::ModID> ModIds);
 
 			MODIO_IMPL static bool CloseTempModSet();
-
 
 			/// @brief Initializes a ModProgressInfo for the specified mod, storing it in the global state. This method
 			/// is only intended for use by InstallOrUpdateModOp
 			/// @param ID Mod ID for the mod to begin reporting progress on
 			/// @return Weak pointer to the ModProgressInfo, or nullptr if a mod is already downloading/updating
 			MODIO_IMPL static std::weak_ptr<Modio::ModProgressInfo> StartModDownloadOrUpdate(Modio::ModID ID);
-
 
 			MODIO_IMPL static bool CancelModDownloadOrUpdate(Modio::ModID ID);
 
@@ -155,6 +155,15 @@ namespace Modio
 			MODIO_IMPL static Modio::Optional<Modio::PlatformStatus> GetPlatformStatusFilter();
 			MODIO_IMPL static std::string GetPlatformStatusFilterString();
 
+			MODIO_IMPL static void SetModStorageQuota(Modio::FileSize ModStorageQuota);
+			MODIO_IMPL static Modio::Optional<Modio::FileSize> GetModStorageQuota();
+			MODIO_IMPL static Modio::Optional<Modio::FileSize> GetTempModStorageQuota();
+			MODIO_IMPL static Modio::ErrorCode SetCacheStorageQuota(Modio::FileSize CacheStorageQuota);
+			MODIO_IMPL static Modio::Optional<Modio::FileSize> GetCacheStorageQuota();
+			MODIO_IMPL static Modio::ErrorCode CheckCacheQuotaAndClearSpace();
+			MODIO_IMPL static Modio::FileSize GetTotalImageCacheSize();
+			MODIO_IMPL static Modio::ErrorCode AddToImageCacheData(Modio::filesystem::path NewImagePath);
+
 			MODIO_IMPL static void SetLocalLanguage(Modio::Language Local);
 			MODIO_IMPL static Modio::Language GetLocalLanguage();
 
@@ -178,6 +187,9 @@ namespace Modio
 			MODIO_IMPL static void InvalidateModCache(Modio::ModID ID);
 			MODIO_IMPL static void ClearModCacheInvalid(Modio::ModID ID);
 			MODIO_IMPL static bool IsModCacheInvalid(Modio::ModID ID);
+
+			MODIO_IMPL static bool IsFetchExternalUpdatesRunning();
+			MODIO_IMPL static void SetFetchExternalUpdatesRunning(bool IsRunning);
 
 			MODIO_IMPL static void EnqueueTask(fu2::unique_function<void()> Task);
 			MODIO_IMPL static void PushQueuedTasksToGlobalContext();
@@ -211,6 +223,8 @@ namespace Modio
 			Modio::Optional<std::string> PlatformOverride;
 			Modio::Optional<std::string> PlatformEnvironment;
 			Modio::Optional<Modio::PlatformStatus> PlatformStatusFilter;
+			Modio::Optional<Modio::FileSize> ModStorageQuota;
+			Modio::Optional<Modio::FileSize> CacheStorageQuota;
 			Modio::Portal PortalInUse = Modio::Portal::None;
 			Modio::Language LocalLanguage = Modio::Language::English;
 			InitializationState CurrentInitializationState = InitializationState::NotInitialized;
@@ -223,7 +237,7 @@ namespace Modio
 			Modio::ModCollection SystemModCollection;
 			Modio::ModCollection TempModCollection;
 			// Could be a vector if we need multiple TempModSet
-			std::shared_ptr <Modio::Detail::TemporaryModSet> TempModSet;
+			std::shared_ptr<Modio::Detail::TemporaryModSet> TempModSet;
 			Modio::Detail::UserDataContainer UserData;
 			// We may need to make this a shared pointer and give a reference to operations so if we shut down they
 			// write into the stale log instead
@@ -237,8 +251,13 @@ namespace Modio
 			bool bTermsOfUseCacheInvalid = false;
 			bool bPurchaseCacheInvalid = false;
 			std::unordered_map<std::int64_t, bool> ModCacheInvalidMap;
-			moodycamel::ConcurrentQueue < fu2::unique_function < void()>> IncomingTaskQueue;
+			moodycamel::ConcurrentQueue<fu2::unique_function<void()>> IncomingTaskQueue;
 			std::map<Modio::ModID, Modio::ModInfo> UserModPurchaseCache;
+			// Only populated if a cache storage quota is set
+			std::queue<Modio::filesystem::path> CacheImagePaths;
+			// Only set if a cache storage quota is set
+			Modio::FileSize TotalImageCacheSize;
+			bool FetchExternalUpdatesRunning = false;
 		};
 	} // namespace Detail
 } // namespace Modio

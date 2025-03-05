@@ -102,20 +102,22 @@ namespace Modio
 						CurrentResultIndex += 100;
 					} while (CurrentResultIndex < PageInfo.GetTotalResultCount());
 
-					// Return an empty optional if we didn't have any dependencies for this mod
-					if (CollatedResults->Size() == 0)
+					// If we had any results, initialize our page data to reflect the collated results.
+					if (CollatedResults->Size() > 0)
+					{
+						Services::GetGlobalService<CacheService>().AddToCache(
+							ModID, CollatedResults->TotalFilesizeUncompressed, Recursive);
+
+						InitializePageResult(*CollatedResults, 0, std::int32_t(CollatedResults->Size()), 1,
+											 std::int32_t(CollatedResults->Size()),
+											 std::int32_t(CollatedResults->Size()));
+					}
+					else
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
 													"Mod {} has no dependencies", ModID);
-						Self.complete(ec, {});
-						return;
 					}
 
-					Services::GetGlobalService<CacheService>().AddToCache(
-						ModID, CollatedResults->TotalFilesizeUncompressed, Recursive);
-
-					InitializePageResult(*CollatedResults, 0, std::int32_t(CollatedResults->Size()), 1, std::int32_t(CollatedResults->Size()),
-										 std::int32_t(CollatedResults->Size()));
 					Self.complete({}, std::move(*CollatedResults));
 				}
 			}

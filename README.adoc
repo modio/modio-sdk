@@ -22,17 +22,18 @@ Welcome to the mod.io SDK repository, built using C++. It allows game developers
 == Platform Support
 
 |===
-|Platform       | Support                       |Compiler             |C++ Standard
-|Windows        | ✔                             | MSVC (VS2019/22)    | C++17     
-|Windows (GDK)  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
-|Nintendo Switch| ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
-|XBox (GDK)     | ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
-|PlayStation®4  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
-|PlayStation®5  | ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
-|Linux          | ✔                             | Clang 10            | C++17
-|macOS          | ✔                             | Clang 10            | C++17
-|iOS            | ✔                             | Clang 10            | C++17
-|Android        | ✔                             | Clang 10            | C++17
+|Platform           | Support                       |Compiler             |C++ Standard
+|Windows            | ✔                             | MSVC (VS2019/22)    | C++17     
+|Windows (GDK)      | ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
+|Nintendo Switch    | ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
+|XBox (GDK)         | ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
+|PlayStation®4      | ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
+|PlayStation®5      | ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
+|Linux              | ✔                             | Clang 10            | C++17
+|macOS              | ✔                             | Clang 10            | C++17
+|iOS                | ✔                             | Clang 10            | C++17
+|Android            | ✔                             | Clang 10            | C++17
+|Oculus (Meta Quest)| ✔                             | Clang 10            | C++17
 |===
 
 
@@ -91,9 +92,19 @@ The minimum deployment target is macOS 12.0. In case of mobile, it is iOS 15.0
 
 === Android Dependencies
 
-The mod.io Android SDK is built against NDK version NDK r23c and supports the arm64-v8a ABI.
+The mod.io Android SDK is built against NDK version r25c and supports the arm64-v8a ABI.
 
-Start by modifying your Visual Studio installation to add the "Mobile development with C++" workload. This will install the Android SDK and NDK. 
+Start by modifying your Visual Studio installation to add the "Mobile development with C++" workload. 
+
+Open Android Studio, go to the SDK Manager and install the following: 
+
+* SDK Platforms
+** Android API 34
+* SDK Tools
+** (tick Show Package Details to see all these)
+** Android SDK Build Tools - 34.0.0
+** NDK - 25.2.9519653
+** Android SDK Command-line Tools - latest
 
 Install a Perl distribution (ie Strawberry Perl) and ensure perl.exe is in your PATH.
 
@@ -143,22 +154,25 @@ When building the mod.io SDK in standalone mode, `Ninja` is used as the default 
 The included `CMakePresets.json` includes the most common configurations as presets and require Ninja to be in your path.
 
 |===
-|Platform | Preset                | Target       | Build System
-|Windows  | win                   | Release      | Ninja or Visual Studio 2022
-|Windows  | win-debug             | Debug        | Ninja or Visual Studio 2022
-|Windows  | win-dbginfo           | Pre-Release  | Ninja or Visual Studio 2022
-|Linux    | linux64               | Release      | Ninja
-|Linux    | linux64-debug         | Debug        | Ninja
-|Linux    | linux64-dbginfo       | Pre-Release  | Ninja
-|macOS    | macOS                 | Release      | Ninja or XCode
-|macOS    | macOS-debug           | Debug        | Ninja or XCode
-|macOS    | macOS-dbginfo         | Pre-Release  | Ninja or XCode
-|iOS      | iOS                   | Release      | Ninja or XCode
-|iOS      | iOS-debug             | Debug        | Ninja or XCode
-|iOS      | iOS-dbginfo           | Pre-Release  | Ninja or XCode
-|Android  | android-arm64         | Release      | Ninja
-|Android  | android-arm64-debug   | Debug        | Ninja
-|Android  | android-arm64-dbginfo | Pre-Release  | Ninja
+|Platform              | Preset                | Target       | Build System
+|Windows               | win                   | Release      | Ninja or Visual Studio 2022
+|Windows               | win-debug             | Debug        | Ninja or Visual Studio 2022
+|Windows               | win-dbginfo           | Pre-Release  | Ninja or Visual Studio 2022
+|Linux                 | linux64               | Release      | Ninja
+|Linux                 | linux64-debug         | Debug        | Ninja
+|Linux                 | linux64-dbginfo       | Pre-Release  | Ninja
+|macOS                 | macOS                 | Release      | Ninja or XCode
+|macOS                 | macOS-debug           | Debug        | Ninja or XCode
+|macOS                 | macOS-dbginfo         | Pre-Release  | Ninja or XCode
+|iOS                   | iOS                   | Release      | Ninja or XCode
+|iOS                   | iOS-debug             | Debug        | Ninja or XCode
+|iOS                   | iOS-dbginfo           | Pre-Release  | Ninja or XCode
+|Android               | android-arm64         | Release      | Ninja
+|Android               | android-arm64-debug   | Debug        | Ninja
+|Android               | android-arm64-dbginfo | Pre-Release  | Ninja
+|Oculus (Meta Quest)   | oculus-arm64          | Release      | Ninja
+|Oculus (Meta Quest)   | oculus-arm64-debug    | Debug        | Ninja
+|Oculus (Meta Quest)   | oculus-arm64-dbginfo  | Pre-Release  | Ninja
 |===
 
 Debug presets have the `-debug` suffix, and Release-with-debug-info is `-dbginfo`. If you want to build the SDK in debug configuration specify the name, for example `win-debug` as the preset name.
