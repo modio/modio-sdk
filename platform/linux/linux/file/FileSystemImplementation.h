@@ -87,7 +87,7 @@ namespace Modio
 				Implementation = std::move(OtherImplementation);
 			}
 
-			void Shutdown()
+			void Shutdown() override
 			{
 				if (SharedState)
 				{

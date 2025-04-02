@@ -94,3 +94,7 @@ namespace Modio
 		}
 	} // namespace Detail
 } // namespace Modio
+
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "modio/detail/serialization/ModioIconSerialization.h"
+#endif

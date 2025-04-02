@@ -26,8 +26,7 @@ set(CPACK_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
 #Enable policy forcing CMake to explicitly tell non-MSVC compilers IPP files are CXX files
 cmake_policy(SET CMP0119 NEW)
-set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS}[
-ipp)
+set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS};ipp)
 
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -48,6 +47,15 @@ project(${MODIO_TARGET_NAME} C CXX )
 
 message(STATUS "CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 
+set (MODIO_FORCE_CXX_20_MODE OFF CACHE BOOL "Force C++20 mode"  )
+
+if(MODIO_FORCE_CXX_20_MODE)
+	set(CMAKE_CXX_STANDARD 20)
+	set(CMAKE_CXX_STANDARD_REQUIRED ON)
+	set(CMAKE_CXX_EXTENSIONS OFF)
+	add_compile_definitions(_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS=1)
+endif()
+
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -66,10 +74,10 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "mod.io SDKv2")
 
 # Capture a version number, result is just discarded
 string(REGEX MATCHALL 
-	"^v([0-9]+)[.([0-9]+)[.([0-9]+).*$" result "${MODIO_VERSION}")
+	"^v([0-9]+)\.([0-9]+)\.([0-9]+).*$" result "${MODIO_VERSION}")
 
 if(NOT "${CMAKE_MATCH_COUNT}" EQUAL "3")
-	message(FATAL_ERROR "MODIO_VERSION has a invalid format ["${MODIO_VERSION}["")
+	message(FATAL_ERROR "MODIO_VERSION has a invalid format \"${MODIO_VERSION}\"")
 endif()
 
 set(CPACK_PACKAGE_VERSION_MAJOR "${CMAKE_MATCH_1}")

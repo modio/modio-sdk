@@ -9,11 +9,11 @@
 # 
 
 function(locate_vs VersionYear InstallationPath)
-	message(STATUS "Locating Visual Studio ${VersionYear}[r[n")
+	message(STATUS "Locating Visual Studio ${VersionYear}\r\n")
 	if (VersionYear STREQUAL "2017")
-	set(Parameters -version [[15,16[))
+	set(Parameters -version \[15,16\))
 	elseif(VersionYear STREQUAL "2019")
-	set(Parameters -version [16.0,17.0[))
+	set(Parameters -version [16.0,17.0\))
 	else()
 	set(Parameters -latest)
 	endif()
@@ -35,11 +35,11 @@ function(locate_vs VersionYear InstallationPath)
 endfunction()
  
 function (locate_asan_dll VersionYear AsanLocation)
-	message(STATUS "Locating Visual Studio ${VersionYear}[r[n")
+	message(STATUS "Locating Visual Studio ${VersionYear}\r\n")
 	if (VersionYear STREQUAL "2017")
-	set(Parameters -version [[15,16[))
+	set(Parameters -version \[15,16\))
 	elseif(VersionYear STREQUAL "2019")
-	set(Parameters -version [16.0,17.0[))
+	set(Parameters -version [16.0,17.0\))
 	else()
 	set(Parameters -latest)
 	endif()
@@ -63,8 +63,7 @@ function (locate_asan_dll VersionYear AsanLocation)
 
 	execute_process(COMMAND "${VsWherePath}" ${Parameters} -sort -requires Microsoft.VisualStudio.Component.VC.ASAN -find **/Hostx64/x64/clang_rt.asan_dynamic-x86_64.dll OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE LOCATED_VS_ASAN_DLL_PATH)
 
-	string(REPLACE "[n" "[
-" LOCATED_VS_ASAN_DLL_PATH_LIST ${LOCATED_VS_ASAN_DLL_PATH})
+	string(REPLACE "\n" ";" LOCATED_VS_ASAN_DLL_PATH_LIST ${LOCATED_VS_ASAN_DLL_PATH})
 
 	list(GET LOCATED_VS_ASAN_DLL_PATH_LIST -1 LOCATED_VS_ASAN_DLL_LOCAL)
 
@@ -76,11 +75,11 @@ function (locate_asan_dll VersionYear AsanLocation)
 endfunction()
 
 function (locate_sanitizer_lib_dir VersionYear LibDirLocation)
-	message(STATUS "Locating Visual Studio ${VersionYear}[r[n")
+	message(STATUS "Locating Visual Studio ${VersionYear}\r\n")
 	if (VersionYear STREQUAL "2017")
-	set(Parameters -version [[15,16[))
+	set(Parameters -version \[15,16\))
 	elseif(VersionYear STREQUAL "2019")
-	set(Parameters -version [16.0,17.0[))
+	set(Parameters -version [16.0,17.0\))
 	else()
 	set(Parameters -latest)
 	endif()
@@ -95,8 +94,7 @@ function (locate_sanitizer_lib_dir VersionYear LibDirLocation)
 	if(NOT VsWherePath)
 		if (MODIO_ENABLE_ASAN)
 			## https://llvm.org/docs/CMake.html
-			set(LLVM_USE_SANITIZER "Address[
-Thread")
+			set(LLVM_USE_SANITIZER "Address;Thread")
 		elseif (MODIO_ENABLE_UBSAN)
 			set(LLVM_USE_SANITIZER "Undefined")
 			set(LLVM_UBSAN_FLAGS " -fsanitize=undefined -fsanitize-recover=undefined")
@@ -123,8 +121,7 @@ Thread")
 			execute_process(COMMAND "${VsWherePath}" ${Parameters} -sort -requires Microsoft.VisualStudio.Component.VC.ASAN -find **/Tools/MSVC/**/clang_rt.asan_dynamic-x86_64.lib OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE LOCATED_VS_ASAN_DLL_PATH)
 		endif()
 
-		string(REPLACE "[n" "[
-" LOCATED_VS_ASAN_DLL_PATH_LIST ${LOCATED_VS_ASAN_DLL_PATH})
+		string(REPLACE "\n" ";" LOCATED_VS_ASAN_DLL_PATH_LIST ${LOCATED_VS_ASAN_DLL_PATH})
 
 		list(GET LOCATED_VS_ASAN_DLL_PATH_LIST -1 LOCATED_VS_ASAN_DLL_LOCAL)
 		set(LOCATED_VS_ASAN_DLL "${LOCATED_VS_ASAN_DLL_LOCAL}")

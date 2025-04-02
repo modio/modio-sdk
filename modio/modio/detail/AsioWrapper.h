@@ -14,6 +14,10 @@
 #include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/ModioDefines.h"
 
+#ifndef ASIO_DISABLE_CO_AWAIT
+#define ASIO_DISABLE_CO_AWAIT 1
+#endif
+
 #ifdef MODIO_PLATFORM_UNREAL
 	#define MODIO_WRAPPING_ASIO
 	#include MODIO_UNREAL_PLATFORM_PREAMBLE
@@ -46,6 +50,11 @@ namespace asio
 	#define ASIO_DONT_USE_PAUSE
 #endif
 
+	#pragma push_macro("ASIO_DISABLE_STD_TO_ADDRESS")
+#ifndef ASIO_DISABLE_STD_TO_ADDRESS
+	#define ASIO_DISABLE_STD_TO_ADDRESS
+#endif
+
 	#include "modio/detail/ModioCompilerMacros.h"
 	MODIO_DISABLE_WARNING_PUSH
 	MODIO_DISABLE_WARNING_64BIT_TO_32BIT_CONVERSION
@@ -73,6 +82,7 @@ namespace asio
 
 	#include <asio.hpp>
 	MODIO_DISABLE_WARNING_POP
+	#pragma pop_macro("ASIO_DISABLE_STD_TO_ADDRESS")
 	#pragma pop_macro("ASIO_DONT_USE_PAUSE")
 	#pragma pop_macro("ASIO_NO_EXCEPTIONS")
 	#pragma pop_macro("ASIO_NO_TYPEID")

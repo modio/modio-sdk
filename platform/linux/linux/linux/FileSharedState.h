@@ -194,7 +194,6 @@ namespace Modio
 			};
 
 			std::map<int, PendingIOOperation> PendingIO;
-			const int MAX_OP_TRIAL = 5;
 
 		public:
 			io_uring UringState;

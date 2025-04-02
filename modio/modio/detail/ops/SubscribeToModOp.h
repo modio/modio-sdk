@@ -82,8 +82,9 @@ namespace Modio
 						Services::GetGlobalService<CacheService>().AddToCache(ProfileData.value());
 						Modio::Detail::SDKSessionData::GetSystemModCollection().AddOrUpdateMod(
 							ProfileData.value(),
-							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MakeModPath(
-								ProfileData->ModId).u8string());
+							Modio::ToModioString(
+								Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+									.MakeModPath(ProfileData->ModId).u8string()));
 						// Returns true if this is a new subscription for the user
 						if (Modio::Detail::SDKSessionData::GetUserSubscriptions().AddMod(ProfileData.value()))
 						{

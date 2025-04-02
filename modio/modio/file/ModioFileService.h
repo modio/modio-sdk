@@ -455,7 +455,7 @@ namespace Modio
 
 					const fs::path& FullPath = Entry->path();
 					fs::path FilenameNoExtension = FullPath.filename().stem();
-					if (Modio::Detail::String::EndsWith(FilenameNoExtension.u8string(), fmt::format("_{}", SizeSuffix)))
+					if (Modio::Detail::String::EndsWith(Modio::ToModioString(FilenameNoExtension.u8string()), fmt::format("_{}", SizeSuffix)))
 					{
 						return FullPath;
 					}

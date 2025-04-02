@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2025 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io SDK.
  *
@@ -8,4 +8,8 @@
  *
  */
 
-#pragma GCC diagnostic pop
+#ifdef MODIO_SEPARATE_COMPILATION
+	#include "modio/core/ModioCoreTypes.h"
+#endif
+
+#include "platform/PlatformUtilImplementation.h"

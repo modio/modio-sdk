@@ -619,7 +619,7 @@ namespace Modio
 			if (Modio::Detail::SDKSessionData::GetTemporaryModSet() != nullptr)
 			{
 				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
-											"Temp Mod Set is not initialize, call InitTempModSet.");
+											"Temp Mod Set is already initialized.");
 				return Modio::make_error_code(Modio::ModManagementError::ModManagementDisabled);
 			}
 

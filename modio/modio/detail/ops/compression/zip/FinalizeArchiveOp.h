@@ -84,7 +84,7 @@ namespace Modio
 								ExtraFieldLength += 8;
 							}
 
-							std::string FileName = CurrentArchiveEntry->FilePath.generic_u8string();
+							std::string FileName = Modio::ToModioString(CurrentArchiveEntry->FilePath.generic_u8string());
 
 							SizeOfCentralDirectory +=
 								(Constants::ZipTag::CentralFileHeaderFixedSize + FileName.size() + ExtraFieldLength);

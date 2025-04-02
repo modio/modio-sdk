@@ -52,7 +52,8 @@ namespace Modio
 			{
 				Destroy();
 			}
-			void Destroy()
+
+			void Destroy() override
 			{
 				if (FileDescriptor != InvalidFileDescriptor)
 				{
@@ -60,6 +61,7 @@ namespace Modio
 					FileDescriptor = InvalidFileDescriptor;
 				}
 			}
+			
 			void Close()
 			{
 				Destroy();

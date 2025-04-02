@@ -126,7 +126,7 @@
         },
         "CMAKE_ANDROID_NDK": {
           "type": "STRING",
-          "value": "%localappdata%/Android/Sdk/ndk/25.2.9519653"
+          "value": "%localappdata%/Android/Sdk/ndk/25.1.8937393"
         },
         "ANDROID_ABI": {
           "type": "STRING",
@@ -170,7 +170,7 @@
         },
         "CMAKE_ANDROID_NDK": {
           "type": "STRING",
-          "value": "C:/Program Files (x86)/Android/AndroidNDK/android-ndk-r23c"
+          "value": "%localappdata%/Android/Sdk/ndk/25.1.8937393"
         },
         "ANDROID_ABI": {
           "type": "STRING",
@@ -182,7 +182,7 @@
         },
         "ANDROID_PLATFORM": {
           "type": "STRING",
-          "value": "latest"
+          "value": "android-26"
         },
         "CMAKE_BUILD_TYPE": "Release"
       }

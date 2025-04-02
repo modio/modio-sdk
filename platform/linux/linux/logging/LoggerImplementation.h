@@ -34,17 +34,17 @@ namespace Modio
 			template<typename... ArgTypes>
 			std::string Log(LogLevel Level, LogCategory Category, std::string Format, ArgTypes... Args)
 			{
-				std::string LogFormatString = "[{:%H:%M:%S}:{}][{}][{}] {}\r\n";
-
+				constexpr const char* LogFormatString = "[{:%H:%M:%S}:{}][{}][{}] {}\r\n";
+				
 				std::string LogUserString = fmt::format(Format, Args...);
 				auto Now = std::chrono::system_clock::now();
 				// @todo: OutputDebugStringA might crash if the string is too big, so it would be nice to split the
 				// string up or make some solution that is reliable when using big strings
 				auto FormattedOutput =
-					fmt::format(LogFormatString, Now,
-								std::chrono::duration_cast<std::chrono::milliseconds>(Now.time_since_epoch()) % 1000,
-								LogLevelToString(Level), LogCategoryToString(Category), LogUserString);
-				asio::post(LogStrand, [FormattedOutput]() { fmt::print(FormattedOutput.c_str()); });
+				fmt::format(LogFormatString, Now,
+							std::chrono::duration_cast<std::chrono::milliseconds>(Now.time_since_epoch()) % 1000,
+							LogLevelToString(Level), LogCategoryToString(Category), LogUserString);
+				asio::post(LogStrand, [FormattedOutput]() { fmt::print(fmt::runtime(FormattedOutput)); });
 				return FormattedOutput;
 			}
 
@@ -53,16 +53,16 @@ namespace Modio
 			template<typename... ArgTypes>
 			std::string LogImmediate(LogLevel Level, LogCategory Category, std::string Format, ArgTypes... Args)
 			{
-				std::string LogFormatString = "[{:%H:%M:%S}:{}][{}][{}] {}\r\n";
-
-				std::string LogUserString = fmt::format(Format, Args...);
+				constexpr const char* LogFormatString = "[{:%H:%M:%S}:{}][{}][{}] {}\r\n";
+				
+				std::string LogUserString = fmt::format(fmt::runtime(Format), Args...);
 				auto Now = std::chrono::system_clock::now();
 				// @todo: OutputDebugStringA might crash if the string is too big, so it would be nice to split the
 				// string up or make some solution that is reliable when using big strings
 				auto FormattedOutput =
-					fmt::format(LogFormatString, Now,
-								std::chrono::duration_cast<std::chrono::milliseconds>(Now.time_since_epoch()) % 1000,
-								LogLevelToString(Level), LogCategoryToString(Category), LogUserString);
+				fmt::format(fmt::runtime(LogFormatString), Now,
+							std::chrono::duration_cast<std::chrono::milliseconds>(Now.time_since_epoch()) % 1000,
+							LogLevelToString(Level), LogCategoryToString(Category), LogUserString);
 				fmt::print("{}", FormattedOutput.c_str());
 				return FormattedOutput;
 			}

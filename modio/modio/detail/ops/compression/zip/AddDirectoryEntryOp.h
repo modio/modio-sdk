@@ -40,7 +40,7 @@ namespace Modio
 			{
 				OutputFile = std::make_unique<Modio::Detail::File>(ArchiveFile->FilePath,
 																   Modio::Detail::FileMode::ReadWrite, false);
-				FileName = DirectoryPath.generic_u8string();
+				FileName = Modio::ToModioString(DirectoryPath.generic_u8string());
 			}
 
 			template<typename CoroType>

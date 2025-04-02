@@ -46,7 +46,7 @@ struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementat
 		return false;
 	}
 
-	std::uint32_t GetResponseCode()
+	std::uint32_t GetResponseCode() override
 	{
 		return ResponseCode;
 	}

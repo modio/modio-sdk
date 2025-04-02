@@ -11,7 +11,6 @@
 #pragma once
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/JsonWrapper.h"
-#include "modio/detail/platform/IPlatformUtilImplementation.h"
 #include <cstdint>
 #include <random>
 #include <sstream>
@@ -524,10 +523,7 @@ namespace Modio
 		}
 
 		/// @docinternal
-		void Generate()
-		{
-			*this = Detail::PlatformUtilService::GuidCreate();
-		}
+		MODIO_IMPL void Generate();
 
 		/// @docinternal
 		/// @brief Static function to generate an invalid Guid
@@ -546,17 +542,11 @@ namespace Modio
 
 		/// @brief converts from a binary UUID to a text string UUID
 		/// @return the UUID as a text string
-		std::string ToString() const
-		{
-			return Detail::PlatformUtilService::GuidToString(*this);
-		}
+		MODIO_IMPL std::string ToString() const;
 
 		/// @brief converts from a text string UUID to a binary UUID
 		/// @param String the UUID as a text string
-		void FromString(const std::string& String)
-		{
-			*this = Detail::PlatformUtilService::GuidFromString(String);
-		}
+		MODIO_IMPL void FromString(const std::string& String);
 
 		/// @brief Test for equality
 		/// @param Other the UUID to compare against
@@ -628,10 +618,7 @@ namespace Modio
 		/// @brief Generates a new Guid.
 		/// NOTE: This is a minimalistic implementation of generating a Guid for metrics, an improved more robust
 		/// per-platform implementation is planned
-		static Guid GenerateGuid()
-		{
-			return Guid(Detail::PlatformUtilService::GuidCreate());
-		}
+		MODIO_IMPL static Guid GenerateGuid();
 
 		/// @docpublic
 		/// @brief Explicit constructor
@@ -641,10 +628,7 @@ namespace Modio
 		/// @docpublic
 		/// @brief Explicit constructor
 		/// @param InGuid raw 128bit Guid
-		explicit Guid(const Modio::GuidV4& InGuid)
-		{
-			InternalGuid = InGuid.ToString();
-		}
+		MODIO_IMPL explicit Guid(const Modio::GuidV4& InGuid);
 
 		/// @docinternal
 		/// @brief Compare the Guid to an empty string
@@ -1002,4 +986,6 @@ namespace Modio
 	} // namespace Detail
 } // namespace Modio
 
-#include "platform/PlatformUtilImplementation.h"
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "modio/core/ModioCoreTypes.ipp"
+#endif

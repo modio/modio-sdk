@@ -65,13 +65,11 @@ function(GetVersionInfo _MainBranchName _MainCommitCount _BranchID _BranchCommit
 		string (LENGTH "${DirtyFileList}" DirtyListLength)
 
 		if (DirtyListLength GREATER 0)
-			string (REPLACE "[
-" "" DirtyFileList "${DirtyFileList}")
+			string (REPLACE ";" "" DirtyFileList "${DirtyFileList}")
 			string (REPLACE ":" "" DirtyFileList "${DirtyFileList}")
 
 			# Turn lines into list by replacing newline with delimiter
-			string (REPLACE "[n" "[
-" DirtyFileList "${DirtyFileList}")
+			string (REPLACE "\n" ";" DirtyFileList "${DirtyFileList}")
 	
 			list (LENGTH DirtyFileList DirtyFileCount)
 			if ("${_CountDirtyChanges}")
@@ -124,13 +122,11 @@ function(GetVersionInfo _MainBranchName _MainCommitCount _BranchID _BranchCommit
 		string (LENGTH "${DirtyFileList}" DirtyListLength)
 
 		if (DirtyListLength GREATER 0)
-			string (REPLACE "[
-" "" DirtyFileList "${DirtyFileList}")
+			string (REPLACE ";" "" DirtyFileList "${DirtyFileList}")
 			string (REPLACE ":" "" DirtyFileList "${DirtyFileList}")
 
 			# Turn lines into list by replacing newline with delimiter
-			string (REPLACE "[n" "[
-" DirtyFileList "${DirtyFileList}")
+			string (REPLACE "\n" ";" DirtyFileList "${DirtyFileList}")
 	
 			list (LENGTH DirtyFileList DirtyFileCount)
 			if ("${_CountDirtyChanges}")

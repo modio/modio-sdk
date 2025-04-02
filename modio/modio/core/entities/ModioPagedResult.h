@@ -72,3 +72,7 @@ namespace Modio
 													std::int32_t TotalResultCount, std::int32_t ResultCount);
 	};
 } // namespace Modio
+
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "modio/detail/serialization/ModioPagedResultSerialization.h"
+#endif

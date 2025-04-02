@@ -18,6 +18,11 @@
 # include <uuid/uuid.h>
 #endif
 
+#if __cplusplus >= 201703L
+#include <string_view>
+#endif
+#include <string>
+
 namespace Modio
 {
 	namespace Detail
@@ -167,4 +172,47 @@ namespace Modio
 			}
 		} // namespace PlatformUtilService
 	} // namespace Detail
+
+	MODIO_IMPL std::string GuidV4::ToString() const
+	{
+		return Modio::Detail::PlatformUtilService::GuidToString(*this);
+	}
+
+	MODIO_IMPL void GuidV4::FromString(const std::string& String)
+	{
+		*this = Modio::Detail::PlatformUtilService::GuidFromString(String);
+	}
+
+	MODIO_IMPL void GuidV4::Generate()
+	{
+		*this = Modio::Detail::PlatformUtilService::GuidCreate();
+	}
+
+	MODIO_IMPL Guid Guid::GenerateGuid()
+	{
+		return Guid(Detail::PlatformUtilService::GuidCreate());
+	}
+
+	MODIO_IMPL Guid::Guid(const Modio::GuidV4& InGuid)
+	{
+		InternalGuid = InGuid.ToString();
+	}
+
+	#if __cplusplus >= 202002L
+	/// @brief converts from a u8string_view to a string
+	/// @param S the u8 string view to convert
+	/// @return the string
+	static inline std::string ToModioString(const std::u8string_view& S)
+	{
+		return std::string(S.begin(), S.end());
+	}
+
+	/// @brief converts from a u8string to a string
+	/// @param S the u8 string to convert
+	/// @return the string
+	static inline std::string ToModioString(const std::u8string& S)
+	{
+		return std::string(S.begin(), S.end());
+	}
+	#endif
 } // namespace Modio

@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -17,7 +17,7 @@ MODIO_DISABLE_WARNING_SPECTRE_MITIGATION
 MODIO_DISABLE_WARNING_STRUCTURE_PADDING
 MODIO_DISABLE_WARNING_UNSAFE_BUFFER_USAGE
 MODIO_DISABLE_WARNING_UNUSED_FUNCTION
-#include "utf8.h"
+#include "utf8/cpp11.h"
 MODIO_DISABLE_WARNING_POP
 #include <string>
 

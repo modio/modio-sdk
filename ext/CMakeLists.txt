@@ -95,12 +95,6 @@ install(
 )
 
 install(
-	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/lua/
-	DESTINATION ${CMAKE_INSTALL_PREFIX}/header_only/ext
-	COMPONENT header_only
-)
-
-install(
 	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/fmt/include/
 	DESTINATION ${CMAKE_INSTALL_PREFIX}/static/inc
 	COMPONENT static_library
@@ -168,15 +162,6 @@ install(
 
 install(
 	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/json/single_include/
-	DESTINATION ${CMAKE_INSTALL_PREFIX}/static/inc
-	COMPONENT static_library
-	FILES_MATCHING
-	PATTERN "*.h"
-	PATTERN "*.hpp"
-)
-
-install(
-	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/lua/
 	DESTINATION ${CMAKE_INSTALL_PREFIX}/static/inc
 	COMPONENT static_library
 	FILES_MATCHING

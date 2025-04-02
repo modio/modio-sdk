@@ -12,6 +12,7 @@
 
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/HedleyWrapper.h"
+#include "modio/core/ModioCoreTypes.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -224,4 +225,21 @@ namespace Modio
 
 		} // namespace String
 	} // namespace Detail
+
+	/// @brief converts from a string_view to a string
+	/// @param S the string view to convert
+	/// @return the string
+	static inline std::string ToModioString(const std::string_view& S)
+	{
+		return std::string(S.begin(), S.end());
+	}
+
+	/// @brief converts from a string to a string (passthrough)
+	/// @param S the string to pass through
+	/// @return the string
+	static inline const std::string& ToModioString(const std::string& S)
+	{
+		return S;
+	}
+
 } // namespace Modio

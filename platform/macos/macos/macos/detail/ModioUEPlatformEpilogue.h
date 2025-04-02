@@ -7,3 +7,5 @@
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
  *
  */
+
+#pragma GCC diagnostic pop

@@ -13,6 +13,9 @@
 #include "modio/detail/AsioWrapper.h"
 #include <atomic>
 
+MODIO_DISABLE_WARNING_PUSH
+MODIO_DISABLE_WARNING_DEPRECATED_DECLARATIONS
+
 namespace Modio
 {
 	namespace Detail
@@ -73,3 +76,5 @@ namespace Modio
 		};
 	} // namespace Detail
 } // namespace Modio
+
+MODIO_DISABLE_WARNING_POP

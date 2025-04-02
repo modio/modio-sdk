@@ -10,6 +10,10 @@
 
 #pragma once
 #include "modio/core/ModioCoreTypes.h"
+#if __cplusplus >= 201703L
+#include <string_view>
+#endif
+#include <string>
 
 namespace Modio
 {
@@ -19,7 +23,7 @@ namespace Modio
 		{
 			/// @brief Generates a random Version 4, variant 2, GUID
 			/// @return the random GUID value
-			inline Modio::GuidV4 GuidCreate()
+			Modio::GuidV4 GuidCreate()
 			{
 				std::random_device Rd;
 				std::mt19937_64 Engine(Rd());
@@ -40,7 +44,7 @@ namespace Modio
 			/// @brief Convert a GUID in binary representation, into a printable string version
 			/// @param InGuid the binary GUID to convert
 			/// @return the GUID as a text string
-			inline std::string GuidToString(const Modio::GuidV4& InGuid)
+			std::string GuidToString(const Modio::GuidV4& InGuid)
 			{
 				char Result[36];
 				auto ByteToHex = [](uint8_t v, char* out) {
@@ -72,7 +76,7 @@ namespace Modio
 			/// GUID value
 			/// @param InString the GUID to parse
 			/// @return the GUID in binary form, or a NULL guid if the parsing failed.
-			inline Modio::GuidV4 GuidFromString(const std::string& InString)
+			Modio::GuidV4 GuidFromString(const std::string& InString)
 			{
 				Modio::GuidV4 Uuid;
 				if (InString.size() != 36)
@@ -132,4 +136,48 @@ namespace Modio
 			}
 		} // namespace PlatformUtilService
 	} // namespace Detail
+
+	MODIO_IMPL std::string GuidV4::ToString() const
+	{
+		return Modio::Detail::PlatformUtilService::GuidToString(*this);
+	}
+
+	MODIO_IMPL void GuidV4::FromString(const std::string& String)
+	{
+		*this = Modio::Detail::PlatformUtilService::GuidFromString(String);
+	}
+
+	MODIO_IMPL void GuidV4::Generate()
+	{
+		*this = Modio::Detail::PlatformUtilService::GuidCreate();
+	}
+
+	MODIO_IMPL Guid Guid::GenerateGuid()
+	{
+		return Guid(Detail::PlatformUtilService::GuidCreate());
+	}
+
+	MODIO_IMPL Guid::Guid(const Modio::GuidV4& InGuid)
+	{
+		InternalGuid = InGuid.ToString();
+	}
+
+	#if __cplusplus >= 202002L
+	/// @brief converts from a u8string_view to a string
+	/// @param S the u8 string view to convert
+	/// @return the string
+	static inline std::string ToModioString(const std::u8string_view& S)
+	{
+		return std::string(S.begin(), S.end());
+	}
+
+	/// @brief converts from a u8string to a string
+	/// @param S the u8 string to convert
+	/// @return the string
+	static inline std::string ToModioString(const std::u8string& S)
+	{
+		return std::string(S.begin(), S.end());
+	}
+	#endif
+
 } // namespace Modio

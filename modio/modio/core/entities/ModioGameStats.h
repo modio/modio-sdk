@@ -38,3 +38,7 @@ namespace Modio
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GameStats& GameStats);
 	};
 } // namespace Modio
+
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "modio/detail/serialization/ModioGameStatsSerialization.h"
+#endif

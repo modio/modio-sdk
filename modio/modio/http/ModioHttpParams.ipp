@@ -14,6 +14,7 @@
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioSDKSessionData.h"
+#include "modio/detail/ModioStringHelpers.h"
 #include "modio/http/ModioHttpService.h"
 
 namespace Modio
@@ -541,7 +542,7 @@ namespace Modio
 					if (ContentElement.second.PType == PayloadContent::PayloadType::File)
 					{
 						PayloadSize += Modio::FileSize(
-							fmt::format("; filename=\"{}\"", ContentElement.second.PathToFile->filename().u8string())
+							Modio::ToModioString(fmt::format("; filename=\"{}\"", ContentElement.second.PathToFile->filename().u8string()))
 								.size());
 						Logger.Log(
 							Modio::LogLevel::Trace, Modio::LogCategory::Http,

@@ -19,8 +19,7 @@ if(MODIO_PLATFORM STREQUAL "ANDROID" OR MODIO_PLATFORM STREQUAL "OCULUS")
 
 	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
     cmake_policy(SET CMP0077 NEW)
-	set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake[
-${CMAKE_MODULE_PATH}")
+	set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake;${CMAKE_MODULE_PATH}")
 
 	if (MODIO_PLATFORM STREQUAL "ANDROID")
 		set (MODIO_PLATFORM_ANDROID ON INTERNAL "building for android")
@@ -56,24 +55,15 @@ ${CMAKE_MODULE_PATH}")
 
 	execute_process(COMMAND ${CMAKE_ANDROID_NDK}/prebuilt/windows-x86_64/bin/make generated_files WORKING_DIRECTORY ${MODIO_ROOT_DIR}/ext/mbedtls)
 	add_subdirectory(${MODIO_ROOT_DIR}/ext/mbedtls mbedtls EXCLUDE_FROM_ALL)
-	
-	include(CheckCXXCompilerFlag)
-
-    check_cxx_compiler_flag("-std=c++0x" "-Wno-documentation" COMPILER_SUPPORTS_DOCUMENTATION_FLAG)
-	if(COMPILER_SUPPORTS_DOCUMENTATION_FLAG)
-		target_compile_options(mbedcrypto PRIVATE 
-				$<$<CXX_COMPILER_ID:Clang>:
-					-Wno-documentation
-				>)
-	endif()
-
-    check_cxx_compiler_flag("-std=c++0x" "-Wno-unused-but-set-variable" COMPILER_SUPPORTS_UNUSED_BUT_SET)
-	if(COMPILER_SUPPORTS_UNUSED_BUT_SET)
-		target_compile_options(mbedcrypto PRIVATE 
-				$<$<CXX_COMPILER_ID:Clang>:
-					-Wno-unused-but-set-variable
-				>)
-	endif()
+	target_compile_options(mbedcrypto PRIVATE 
+		$<$<CXX_COMPILER_ID:Clang>:
+			-Wno-documentation
+			-Wno-unused-but-set-variable
+		>
+		$<$<CXX_COMPILER_ID:GNU>:
+			-Wno-documentation
+		>
+	)
 
 	if (MODIO_BUILD_TESTS)
 		add_subdirectory(tests EXCLUDE_FROM_ALL)

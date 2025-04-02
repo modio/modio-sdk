@@ -52,7 +52,7 @@ namespace Modio
 				OutputFile = std::make_unique<Modio::Detail::File>(ArchiveFile->FilePath,
 																   Modio::Detail::FileMode::ReadWrite, false);
 				CompressionStream = std::make_unique<boost::beast::zlib::deflate_stream>();
-				FileName = PathInsideArchive.generic_u8string();
+				FileName = Modio::ToModioString(PathInsideArchive.generic_u8string());
 				InputFileSize = InputFile->GetFileSize();
 				IsZip64 = InputFileSize >= (UINT32_MAX - 1);
 				RollingFileHash = FileHash;

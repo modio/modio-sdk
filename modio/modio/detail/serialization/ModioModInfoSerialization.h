@@ -15,6 +15,8 @@
 #include "modio/detail/JsonWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
 
+#include "modio/detail/serialization/ModioModCommunityOptionsSerialization.h"
+
 namespace Modio
 {
 	/// @docnone

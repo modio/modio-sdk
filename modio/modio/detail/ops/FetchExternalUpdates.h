@@ -89,9 +89,9 @@ namespace Modio
 								ServerSubscriptionModIDs.AddMod(Profile);
 								ServerSubsModProfiles[Profile.ModId] = Profile;
 								Modio::Detail::SDKSessionData::GetSystemModCollection().AddOrUpdateMod(
-									Profile, Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
-												 .MakeModPath(Profile.ModId)
-												 .u8string());
+									Profile, Modio::ToModioString(Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+																 .MakeModPath(Profile.ModId)
+																 .u8string()));
 							}
 						}
 

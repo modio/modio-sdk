@@ -98,9 +98,9 @@ namespace Modio
 				TempModIdsToInstall.erase(iterModID);
 
 				Modio::Detail::SDKSessionData::GetTempModCollection().AddOrUpdateMod(
-					ModInfoData, Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+					ModInfoData, Modio::ToModioString(Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
 									 .MakeTempModPath(ModInfoData.ModId)
-									 .u8string());
+									 .u8string()));
 			}
 			else
 			{

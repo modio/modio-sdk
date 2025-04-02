@@ -444,9 +444,8 @@ namespace Modio
 			Modio::FileSize GetSpaceAvailable(const Modio::filesystem::path& Destination) override
 			{
 				Modio::ErrorCode ec;
-				const Modio::filesystem::path ValidDestination = Destination.root_path();
 
-				const Modio::filesystem::space_info SpaceInfo = Modio::filesystem::space(ValidDestination, ec);
+				const Modio::filesystem::space_info SpaceInfo = Modio::filesystem::space(Destination, ec);
 				if (!ec)
 				{
 					return FileSize(SpaceInfo.available);

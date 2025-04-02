@@ -12,6 +12,7 @@
 #include "modio/detail/ModioDefines.h"
 
 #include "modio/core/entities/ModioFileMetadata.h"
+#include "modio/core/entities/ModioModCommunityOptions.h"
 #include "modio/core/entities/ModioModStats.h"
 #include "modio/core/entities/ModioProfileMaturity.h"
 #include "modio/core/entities/ModioURLList.h"
@@ -19,8 +20,6 @@
 #include "modio/detail/JsonWrapper.h"
 #include "modio/detail/entities/ModioGalleryList.h"
 #include "modio/detail/entities/ModioLogo.h"
-#include "modio/core/entities/ModioModCommunityOptions.h"
-#include "modio/detail/serialization/ModioModCommunityOptionsSerialization.h"
 #include <string>
 #include <vector>
 
@@ -40,7 +39,7 @@ namespace Modio
 			return (A.Tag == B.Tag);
 		}
 
-			/// @docnone
+		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModTag& ModTag);
 
 		/// @docnone
@@ -147,10 +146,9 @@ namespace Modio
 		friend bool operator==(const Modio::ModInfo& A, const Modio::ModInfo& B)
 		{
 			if ((A.NumGalleryImages == B.NumGalleryImages) && (A.SketchfabURLs == B.SketchfabURLs) &&
-				(A.ProfileMaturityOption == B.ProfileMaturityOption) &&
-				(A.CommunityOptions == B.CommunityOptions) && (A.GalleryImages == B.GalleryImages) &&
-				(A.ModId == B.ModId) && (A.ProfileName == B.ProfileName) && (A.ProfileSummary == B.ProfileSummary) &&
-				(A.ProfileDescription == B.ProfileDescription) &&
+				(A.ProfileMaturityOption == B.ProfileMaturityOption) && (A.CommunityOptions == B.CommunityOptions) &&
+				(A.GalleryImages == B.GalleryImages) && (A.ModId == B.ModId) && (A.ProfileName == B.ProfileName) &&
+				(A.ProfileSummary == B.ProfileSummary) && (A.ProfileDescription == B.ProfileDescription) &&
 				(A.ProfileDescriptionPlaintext == B.ProfileDescriptionPlaintext) && (A.ProfileURL == B.ProfileURL) &&
 				(A.ProfileSubmittedBy == B.ProfileSubmittedBy) && (A.ProfileDateAdded == B.ProfileDateAdded) &&
 				(A.ProfileDateUpdated == B.ProfileDateUpdated) && (A.ProfileDateLive == B.ProfileDateLive) &&

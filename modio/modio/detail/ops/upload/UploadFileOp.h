@@ -134,7 +134,7 @@ namespace Modio
 									{
 										PayloadContentFilename =
 											fmt::format("; filename=\"{}\"",
-														Impl->PayloadElement->second.PathToFile->filename().u8string());
+														Modio::ToModioString(Impl->PayloadElement->second.PathToFile->filename().u8string()));
 									}
 									std::string PayloadContentHeader =
 										fmt::format("\r\n--{}\r\nContent-Disposition: form-data; name=\"{}\"{}\r\n\r\n",

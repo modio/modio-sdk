@@ -8,14 +8,17 @@
  *
  */
 
- // clang-format off
+// clang-format off
 
 #include "Clang/ClangPlatformCompilerPreSetup.h"
+#include "GenericPlatform/GenericPlatformCompilerPreSetup.h"
+#undef PRAGMA_DEFAULT_VISIBILITY_START
+#undef PRAGMA_DEFAULT_VISIBILITY_END
+#include "Mac/MacPlatformCompilerPreSetup.h"
 #include "HAL/PlatformMisc.h"
 #include "Misc/AssertionMacros.h"
 #include "Mac/MacPlatform.h"
 #include "Mac/MacPlatformCompilerSetup.h"
-#include "Mac/MacPlatformCompilerPreSetup.h"
 #include "Mac/MacPlatformAtomics.h"
 
 #pragma GCC diagnostic push

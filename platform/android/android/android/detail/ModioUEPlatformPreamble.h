@@ -11,6 +11,9 @@
  // clang-format off
 
 #include "Clang/ClangPlatformCompilerPreSetup.h"
+#include "GenericPlatform/GenericPlatformCompilerPreSetup.h"
+#undef PRAGMA_DEFAULT_VISIBILITY_START
+#undef PRAGMA_DEFAULT_VISIBILITY_END
 #include "HAL/PlatformMisc.h"
 #include "Misc/AssertionMacros.h"
 #include "Android/AndroidPlatform.h"

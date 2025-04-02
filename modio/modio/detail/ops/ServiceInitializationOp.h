@@ -271,7 +271,7 @@ public:
 			if (Modio::Detail::SDKSessionData::GetUserModDirectoryOverride().has_value())
 			{
 				ConfigurationValues[Modio::Detail::Constants::JSONKeys::RootLocalStoragePath] =
-					Modio::Detail::SDKSessionData::GetUserModDirectoryOverride().value().generic_u8string();
+					Modio::ToModioString(Modio::Detail::SDKSessionData::GetUserModDirectoryOverride().value().generic_u8string());
 				ec = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().ApplyGlobalConfigOverrides(
 					ConfigurationValues);
 				if (ec)

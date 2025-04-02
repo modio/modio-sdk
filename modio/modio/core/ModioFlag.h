@@ -26,41 +26,27 @@ namespace Modio
 		using StorageType = std::underlying_type_t<T>;
 
 		/// @docnone
-		constexpr FlagImpl<T>() : Internal(0)
-		{
-			UpdateValue();
-		}
+		constexpr FlagImpl<T>() : Internal(0) {}
 
 		/// @docnone
-		constexpr FlagImpl<T>(EnumType InitialValue) : Internal(Convert(InitialValue))
-		{
-			UpdateValue();
-		}
+		constexpr FlagImpl<T>(EnumType InitialValue) : Internal(Convert(InitialValue)) {}
 
 		/// @docnone
-		constexpr FlagImpl<T>(StorageType InitialValue) : Internal(InitialValue)
-		{
-			UpdateValue();
-		}
+		constexpr FlagImpl<T>(StorageType InitialValue) : Internal(InitialValue) {}
 
 		/// @docnone
-		constexpr FlagImpl<T>(const FlagImpl<T>& InitialValue) : Internal(InitialValue.Internal)
-		{
-			UpdateValue();
-		}
+		constexpr FlagImpl<T>(const FlagImpl<T>& InitialValue) : Internal(InitialValue.Internal) {}
 
 		/// @docnone
 		constexpr FlagImpl<T>(FlagImpl<T>&& InitialValue) : Internal(InitialValue.Internal)
 		{
 			InitialValue.Internal = 0;
-			InitialValue.UpdateValue();
 		}
 
 		/// @docnone
 		constexpr FlagImpl<T>& operator = (EnumType InitialValue)
 		{
 			Internal = Convert(InitialValue);
-			UpdateValue();
 			return *this;
 		}
 
@@ -68,7 +54,6 @@ namespace Modio
 		constexpr FlagImpl<T>& operator=(StorageType InitialValue)
 		{
 			Internal = InitialValue;
-			UpdateValue();
 			return *this;
 		}
 
@@ -76,7 +61,6 @@ namespace Modio
 		constexpr FlagImpl<T>& operator=(const FlagImpl<T>& InitialValue)
 		{
 			Internal = InitialValue.Internal;
-			UpdateValue();
 			return *this;
 		}
 
@@ -84,9 +68,7 @@ namespace Modio
 		constexpr FlagImpl<T>& operator=(FlagImpl<T>&& InitialValue)
 		{
 			Internal = InitialValue.Internal;
-			UpdateValue();
 			InitialValue.Internal = 0;
-			InitialValue.UpdateValue();
 			return *this;
 		}
 
@@ -120,21 +102,19 @@ namespace Modio
 		constexpr FlagImpl<T> operator|=(const EnumType& EnumValue)
 		{
 			Internal |= Convert(EnumValue);
-			UpdateValue();
 			return *this;
 		}
 
 		/// @docnone
 		constexpr FlagImpl<T> operator|(const FlagImpl<T>& EnumValue) const
 		{
-			return FlagImpl<T>(Internal | Convert(EnumValue));
+			return FlagImpl<T>(Internal | EnumValue.Internal);
 		}
 
 		/// @docnone
 		constexpr FlagImpl<T> operator|=(const FlagImpl<T>& EnumValues)
 		{
 			Internal = Internal | EnumValues.Internal;
-			UpdateValue();
 			return *this;
 		}
 
@@ -153,16 +133,15 @@ namespace Modio
 		}
 
 		/// @docnone
-		constexpr bool operator&(const EnumType& EnumValue) const
+		constexpr FlagImpl<T> operator&(const EnumType& EnumValue) const
 		{
-			return (Internal & Convert(EnumValue)) != 0;
+			return FlagImpl<T>(Internal & Convert(EnumValue));
 		}
 
 		/// @docnone
 		constexpr FlagImpl<T> operator&=(const EnumType& EnumValue)
 		{
 			Internal &= Convert(EnumValue);
-			UpdateValue();
 			return *this;
 		}
 
@@ -176,7 +155,6 @@ namespace Modio
 		constexpr FlagImpl<T> operator&=(const FlagImpl<T>& EnumValues)
 		{
 			Internal &= EnumValues.Internal;
-			UpdateValue();
 			return *this;
 		}
 
@@ -193,13 +171,13 @@ namespace Modio
 		}
 
 		/// @docnone
-		constexpr bool operator^(const EnumType& EnumValue) const
+		constexpr FlagImpl<T> operator^(const EnumType& EnumValue) const
 		{
 			return FlagImpl<T>(Internal ^ Convert(EnumValue));
 		}
 
 		/// @docnone
-		constexpr bool operator^=(const EnumType& EnumValue)
+		constexpr FlagImpl<T>& operator^=(const EnumType& EnumValue)
 		{
 			Internal ^= Convert(EnumValue);
 			return *this;
@@ -208,14 +186,13 @@ namespace Modio
 		/// @docnone
 		constexpr FlagImpl<T> operator^(const FlagImpl<T>& EnumValue) const
 		{
-			return FlagImpl<T>(Internal ^ Convert(EnumValue));
+			return FlagImpl<T>(Internal ^ EnumValue.Internal);
 		}
 
 		/// @docnone
 		constexpr FlagImpl<T> operator^=(const FlagImpl<T>& EnumValues)
 		{
-			Internal &= EnumValues.Internal;
-			UpdateValue();
+			Internal ^= EnumValues.Internal;
 			return *this;
 		}
 
@@ -240,15 +217,14 @@ namespace Modio
 		}
 
 		/// @docinternal
-		constexpr bool ClearFlag(EnumType EnumValue)
+		constexpr FlagImpl<T>& ClearFlag(EnumType EnumValue)
 		{
-			Internal = Internal & ~Convert(EnumValue);
-			UpdateValue();
+			Internal &= ~Convert(EnumValue);
 			return *this;
 		}
 
 		/// @docinternal
-		constexpr bool ClearFlags(const FlagImpl<T>& EnumValues)
+		constexpr FlagImpl<T>& ClearFlags(const FlagImpl<T>& EnumValues)
 		{
 			*this &= ~EnumValues;
 			return *this;
@@ -293,17 +269,7 @@ namespace Modio
 			}
 		}
 
-		MODIO_DEPRECATED(2025.2, "direct access to Value has been deprecated. Migrate existing code to use operators and methods from Modio::FlagImpl<>") 
-		Modio::Optional<StorageType> Value;
-
 	private:
-		constexpr void UpdateValue()
-		{
-			MODIO_DISABLE_WARNING_PUSH
-			MODIO_DISABLE_WARNING_DEPRECATED_DECLARATIONS
-			Value = Internal;
-			MODIO_DISABLE_WARNING_POP
-		}
 		StorageType Internal = 0;
 	}; // class FlagImpl
 

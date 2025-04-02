@@ -19,6 +19,7 @@
 #include "modio/core/ModioTemporaryModSet.h"
 #include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/serialization/ModioAvatarSerialization.h"
+#include "modio/detail/ModioStringHelpers.h"
 #include "modio/detail/serialization/ModioTokenSerialization.h"
 #include "modio/detail/serialization/ModioUserDataContainerSerialization.h"
 #include "modio/file/ModioFileService.h"
@@ -317,7 +318,7 @@ namespace Modio
 					Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
 					"Modfile directory path {} does not end in a path separator. Adding manually",
 					Params.RootDirectory);
-				Params.RootDirectory = ModRoot.u8string();
+				Params.RootDirectory = Modio::ToModioString(ModRoot.u8string());
 			}
 
 			auto ExistingEntry = Get().PendingModUploads.find(ID);
