@@ -16,11 +16,13 @@ import androidx.annotation.Keep;
 @Keep
 public class Modio {
     private final Activity _context;
+    private boolean bUseExternalStorageForMods = true;
 
     @Keep
-    public Modio(Activity context)
+    public Modio(Activity context, boolean bUseExternalStorageForMods)
     {
         _context = context;
+        this.bUseExternalStorageForMods = bUseExternalStorageForMods;
     }
 
     @Keep
@@ -32,9 +34,24 @@ public class Modio {
     }
 
     @Keep
-    public String getStorageDirectory()
+    public String getInternalStorageDirectory()
     {
         return _context.getFilesDir().getAbsolutePath() + "/";
+    }
+
+    @Keep
+    public String getExternalStorageDirectory()
+    {
+        if (!bUseExternalStorageForMods) {
+            return getInternalStorageDirectory();
+        }
+        File externalDir = _context.getExternalFilesDir(null);
+        if (externalDir != null) {
+            return externalDir.getAbsolutePath() + "/";
+        } else {
+            // Fallback to internal if external is unavailable
+            return getInternalStorageDirectory(); 
+        }
     }
 
     @Keep

@@ -35,7 +35,8 @@ namespace Modio
 
 			/// @docinternal
 			/// @brief Initialize the JNI and bindings internally
-			static MODIO_IMPL void InitializeJNI(JavaVM* InJavaVM, jobject InClassLoader);
+			static MODIO_IMPL void InitializeJNI(JavaVM* InJavaVM, jobject InClassLoader,
+												 bool bInUseExternalStorageForMods);
 
 			/// @docinternal
 			///	@brief Get the JNI Environment, attached to the current thread as appropriate
@@ -69,7 +70,8 @@ namespace Modio
 			MODIO_IMPL static AndroidContextService& Get();
 
 		private:
-			MODIO_IMPL void InternalInitializeJNI(JavaVM* InJavaVM, jobject InClassLoader);
+			MODIO_IMPL void InternalInitializeJNI(JavaVM* InJavaVM, jobject InClassLoader,
+												  bool bUseExternalStorageForMods);
 
 			jobject ActivityObject = NULL;
 
@@ -79,6 +81,8 @@ namespace Modio
 			jmethodID FindClassMethod = NULL;
 
 			JavaClassWrapperModio* JavaClassModio = NULL;
+
+			bool bUseExternalStorageForMods = true;
 		};
 	} // namespace Detail
 } // namespace Modio

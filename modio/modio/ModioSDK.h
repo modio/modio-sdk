@@ -27,6 +27,7 @@
 #include "modio/core/entities/ModioEntitlementConsumptionStatusList.h"
 #include "modio/core/entities/ModioGameInfo.h"
 #include "modio/core/entities/ModioGameInfoList.h"
+#include "modio/core/entities/ModioUserRatingList.h"
 #include "modio/core/entities/ModioModCommunityOptions.h"
 #include "modio/core/entities/ModioModDetails.h"
 #include "modio/core/entities/ModioModInfoList.h"
@@ -740,6 +741,18 @@ namespace Modio
 	MODIOSDK_API void ListUserGamesAsync(
 		Modio::FilterParams Filter,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)> Callback);
+
+	/// @docpublic
+	/// @brief Provides a list of mod ratings for the current user
+	/// @param Callback Callback invoked with a status code and an optional UserRatingList providing ratings for each mod
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @requires user-authenticated
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	MODIOSDK_API void GetUserRatingsAsync(
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserRatingList>)> Callback);
 
 	/// @brief Set language to get corresponding data from the server
 	/// Note: Doing this will invalidate you local cache of mods and game info,

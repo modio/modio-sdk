@@ -35,6 +35,7 @@
 #include "modio/detail/ops/auth/ModioGetTermsOfUseOp.h"
 #include "modio/detail/ops/user/GetUserMediaOp.h"
 #include "modio/detail/ops/userdata/ListUserGamesOp.h"
+#include "modio/detail/ops/userdata/GetUserRatingsOp.h"
 #include "modio/detail/ops/userdata/RefreshUserDataOp.h"
 #include "modio/detail/ops/userdata/VerifyUserAuthenticationOp.h"
 #include "modio/detail/serialization/ModioResponseErrorSerialization.h"
@@ -221,6 +222,19 @@ namespace Modio
 									void(Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)>(
 					Modio::Detail::ListUserGamesOp(std::move(Filter)), Callback,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
+			}
+		});
+	}
+
+	void GetUserRatingsAsync(std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserRatingList>)> Callback)
+	{
+		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireUserIsAuthenticated(Callback))
+			{
+				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserRatingList>)>,
+									void(Modio::ErrorCode, Modio::Optional<Modio::UserRatingList>)>(
+					Modio::Detail::GetUserRatingsOp(), Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 		});
 	}

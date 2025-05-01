@@ -10,9 +10,9 @@ namespace Modio
 {
 	namespace Detail
 	{
-		JavaClassWrapperModio::JavaClassWrapperModio(jobject Activity)
-			:
-		JavaClassWrapper("com/modio/modiosdk/Modio", "(Landroid/app/Activity;)V", Activity)
+		JavaClassWrapperModio::JavaClassWrapperModio(jobject Activity, bool bUseExternalStorageForMods)
+			: JavaClassWrapper("com/modio/modiosdk/Modio", "(Landroid/app/Activity;Z)V", Activity,
+							   bUseExternalStorageForMods)
 		{
 			JNIEnv* Env = Modio::Detail::AndroidContextService::Get().GetJavaEnv();
 			if (Env == NULL)
@@ -33,10 +33,16 @@ namespace Modio
 				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to find method getCertificatePath in class Modio");
 				return;
 			}
-			GetStoragePathMethodId = Env->GetMethodID(Class, "getStorageDirectory", "()Ljava/lang/String;");
-			if (Modio::Detail::JavaExceptionHelper::CheckJavaException(Env) || GetStoragePathMethodId == NULL)
+			GetInternalStoragePathMethodId = Env->GetMethodID(Class, "getInternalStorageDirectory", "()Ljava/lang/String;");
+			if (Modio::Detail::JavaExceptionHelper::CheckJavaException(Env) || GetInternalStoragePathMethodId == NULL)
 			{
-				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to find method getStorageDirectory in class Modio");
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to find method getInternalStorageDirectory in class Modio");
+				return;
+			}
+			GetExternalStoragePathMethodId = Env->GetMethodID(Class, "getExternalStorageDirectory", "()Ljava/lang/String;");
+			if (Modio::Detail::JavaExceptionHelper::CheckJavaException(Env) || GetExternalStoragePathMethodId == NULL)
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Failed to find method getExternalStorageDirectory in class Modio");
 				return;
 			}
 		} 
@@ -46,9 +52,14 @@ namespace Modio
 			return CallStringMethod(GetCertificatePathMethodId);
 		}
 
-		std::string JavaClassWrapperModio::GetStoragePath()
+		std::string JavaClassWrapperModio::GetInternalStoragePath()
 		{
-			return CallStringMethod(GetStoragePathMethodId);
+			return CallStringMethod(GetInternalStoragePathMethodId);
+		}
+
+		std::string JavaClassWrapperModio::GetExternalStoragePath()
+		{
+			return CallStringMethod(GetExternalStoragePathMethodId);
 		}
 	}
 }

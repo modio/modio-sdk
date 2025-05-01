@@ -24,7 +24,7 @@ The mod.io Android SDK is built against NDK version r25b and supports the arm64-
 
 ## Compiling for Android
 
-Currently, the mod.io SDK can only be used from native Android applications being built with CMake on Windows. There is no support for the AGDE for Visual Studio. mod.io SDK method calls are not available from Java.  You can follow the CMake Integration documentation for how to configure your native CMake project to use the SDK.
+Currently, the mod.io SDK can only be used from native Android applications being built with CMake on Windows. There is no support for the AGDE for Visual Studio. mod.io SDK method calls are not available from Java. You can follow the CMake Integration documentation for how to configure your native CMake project to use the SDK.
 
 ## Initializing the Android SDK
 
@@ -32,7 +32,9 @@ Prior to initializing the mod.io SDK via `Modio::InitializeAsync`, you have to p
 
 1. `#include "ModioAndroid.h"`. The next three android specific function calls require this header. 
 
-2. Pass mod.io the JNI VM and an optional reference to the global ClassLoader using `Modio::InitializeAndroidJNI(vm, nullptr);`. Generally you should do this in your `JNI_OnLoad` method. If you don't provide a reference to the native classloader, the SDK will attempt to discover and create one itself.
+2. Pass mod.io the JNI VM, an optional reference to the global ClassLoader, and specify whether to use external storage for downloaded mods using `Modio::InitializeAndroidJNI(vm, nullptr, true);`. Generally you should do this in your `JNI_OnLoad` method. 
+   * If you don't provide a reference to the native classloader, the SDK will attempt to discover and create one itself.
+   * The `bUseExternalStorageForMods` parameter (defaults to `true`) determines whether downloaded mods should be stored in external storage. Set this to `false` if you want to use internal storage instead.
 
 3. Pass mod.io a reference to your native main Activity using `Modio::SetGlobalActivity(JavaObject);`. You can do this either in a native event from Java, or anytime in your startup process if you have a reference to the native activity cached.
 

@@ -30,10 +30,12 @@ namespace Modio
 			return Instance;
 		}
 
-		void AndroidContextService::InternalInitializeJNI(JavaVM* InJavaVM, jobject InClassLoader)
+		void AndroidContextService::InternalInitializeJNI(JavaVM* InJavaVM, jobject InClassLoader,
+														  bool bInUseExternalStorageForMods)
 		{
 			JVM = InJavaVM;
 			ClassLoader = InClassLoader;
+			bUseExternalStorageForMods = bInUseExternalStorageForMods;
 
 			JNIEnv* Env = GetJavaEnv();
 			if (Env == NULL)
@@ -71,11 +73,12 @@ namespace Modio
 			}
 		}
 
-		void AndroidContextService::InitializeJNI(JavaVM* InJavaVM, jobject InClassLoader)
+		void AndroidContextService::InitializeJNI(JavaVM* InJavaVM, jobject InClassLoader,
+												  bool bUseExternalStorageForMods)
 		{
 			auto& AndroidContextService = Modio::Detail::AndroidContextService::Get();
 
-			AndroidContextService.InternalInitializeJNI(InJavaVM, InClassLoader);
+			AndroidContextService.InternalInitializeJNI(InJavaVM, InClassLoader, bUseExternalStorageForMods);
 		}
 
 		JNIEnv* AndroidContextService::GetJavaEnv()
@@ -110,7 +113,7 @@ namespace Modio
 
 		void AndroidContextService::InitializeAndroid()
 		{
-			JavaClassModio = new JavaClassWrapperModio(ActivityObject);
+			JavaClassModio = new JavaClassWrapperModio(ActivityObject, bUseExternalStorageForMods);
 		}
 
 	} // namespace Detail

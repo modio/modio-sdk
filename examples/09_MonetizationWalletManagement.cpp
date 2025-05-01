@@ -10,11 +10,14 @@
 
 #include "modio/ModioSDK.h"
 
+#include <atomic>
+#include <future>
 #include <iostream>
 #include <sstream>
+#include <thread>
 #include <utility>
 
-/// This example demonstrates usage of the mod.io wallet management features, including 
+/// This example demonstrates usage of the mod.io wallet management features, including
 /// getting the user's wallet balance.
 /// Once these queries have been performed, the sample initiates an async shutdown of the SDK if necessary and then
 /// terminates.
@@ -22,13 +25,8 @@
 /// @brief Simple struct containing state variables for the example
 struct ModioExampleFlags
 {
-	/// @brief Variable simulating a notification passed from a callback indicating the callback was invoked (ie the
-	/// async SDK function returned a result)
-	bool bDone = false;
-
-	/// @brief Variable simulating a notification passed from a callback indicating whether the SDK function returned a
-	/// success or failure
-	bool bSuccess = false;
+	/// @brief Promise to halt execution of the main thread til this is fulfilled
+	std::promise<void> ExecutionFinished;
 
 	/// @brief Keeps a reference to the last error received
 	Modio::ErrorCode LastError;
@@ -45,57 +43,37 @@ static uint64_t UserWalletBalance;
 /// to deal with asynchronous calls should be designed in your game
 struct ModioExample
 {
-	static bool HasAsyncOperationCompleted()
+	/// @brief Waits for the Example.ExecutionFinished promise to be fulfilled, then resets it
+	static void WaitForExecution()
 	{
-		return std::exchange(Example.bDone, false);
-	}
-
-	static bool DidAsyncOperationSucceed()
-	{
-		return std::exchange(Example.bSuccess, false);
-	}
-
-	static void NotifyApplicationSuccess()
-	{
-		Example.bDone = true;
-		Example.bSuccess = true;
-		Example.LastError = {};
-	}
-
-	static void NotifyApplicationFailure(Modio::ErrorCode ec)
-	{
-		Example.bDone = true;
-		Example.bSuccess = false;
-		Example.LastError = ec;
-		// More information about which error occurred can be retrieved with the message()
-		// function
-		std::cout << ec.message() << std::endl;
+		Example.ExecutionFinished.get_future().wait();
+		Example.ExecutionFinished = std::promise<void>();
 	}
 
 	static void OnInitializeComplete(Modio::ErrorCode ec)
 	{
 		// The ErrorCode value passed back via the callback will be implicitly convertible to
 		// true if an error occurred
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to initialize mod.io SDK: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnVerifyUserAuthenticationAsync(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to authorize user: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	/// @brief User callback invoked by Modio::RunPendingHandlers() when Modio::RequestEmailAuthCodeAsync has completed
@@ -104,14 +82,14 @@ struct ModioExample
 	{
 		// The ErrorCode value passed back via the callback will be implicitly convertible to
 		// true if an error occurred
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to request email auth code: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	/// @brief User callback invoked by Modio::RunPendingHandlers() when Modio::AuthenticateUserEmailAsync has completed
@@ -120,47 +98,51 @@ struct ModioExample
 	{
 		// The ErrorCode value passed back via the callback will be implicitly convertible to
 		// true if an error occurred
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to authenticate user email: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnShutdownComplete(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to shutdown: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnGetWalletBalanceCompleted(Modio::ErrorCode ec, Modio::Optional<uint64_t> WalletBalance)
 	{
+		Example.LastError = ec;
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to get wallet balance: " << ec.message() << std::endl;
 		}
 		else
 		{
 			UserWalletBalance = WalletBalance.value();
 			std::cout << "Users wallet balance is: " << std::to_string(UserWalletBalance) << std::endl;
-			NotifyApplicationSuccess();
 		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
-	static void OnRefreshUserEntitlementsCompleted(Modio::ErrorCode ec, Modio::Optional<Modio::EntitlementConsumptionStatusList> EntitlementConsumptionStatus)
+	static void OnRefreshUserEntitlementsCompleted(
+		Modio::ErrorCode ec, Modio::Optional<Modio::EntitlementConsumptionStatusList> EntitlementConsumptionStatus)
 	{
+		Example.LastError = ec;
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to refresh entitlements: " << ec.message() << std::endl;
 		}
 		else
 		{
@@ -168,15 +150,13 @@ struct ModioExample
 			// Note that if nothing is consumed, then WalletBalance may not exist or be 0.
 			if (EntitlementConsumptionStatus->WalletBalance.has_value())
 			{
-				UserWalletBalance = EntitlementConsumptionStatus.value().WalletBalance.value().Balance;	
+				UserWalletBalance = EntitlementConsumptionStatus.value().WalletBalance.value().Balance;
 			}
 
 			std::cout << "Updated wallet balance is: " << std::to_string(UserWalletBalance) << std::endl;
-
-			// 
-
-			NotifyApplicationSuccess();
 		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	/// @brief Helper method to retrieve input from a user with an string prompt
@@ -207,6 +187,18 @@ struct ModioExample
 
 int main()
 {
+	// A thread-safe atomic boolean to control the execution of Modio::RunPendingHandlers() on the background thread
+	std::atomic<bool> bHaltBackgroundThread {false};
+
+	// Begin new thread for background work
+	std::thread HandlerThread = std::thread([&]() {
+		while (!bHaltBackgroundThread)
+		{
+			Modio::RunPendingHandlers();
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
+	});
+
 	// Ask user for their input and offer default values
 	std::stringstream IntTransformer;
 	std::string UserInput = ModioExample::RetrieveUserInput("Game ID:", "3609");
@@ -235,27 +227,19 @@ int main()
 													Modio::Portal::None, SessionID),
 						   ModioExample::OnInitializeComplete);
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	};
+	ModioExample::WaitForExecution();
 
-	// Modio::InitializeAsync completed, but we now need to check if it resulted in a success or a failure
-	if (!ModioExample::DidAsyncOperationSucceed())
+	if (Example.LastError)
 	{
-		// SDK initialization failed - this simple sample returns immediately, no need to call ShutdownAsync
 		return -1;
 	}
 
 	// Check if the user has already been authenticated and the auth token is still valid
 	Modio::VerifyUserAuthenticationAsync(ModioExample::OnVerifyUserAuthenticationAsync);
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	}
+	ModioExample::WaitForExecution();
 
-	if (!ModioExample::DidAsyncOperationSucceed())
+	if (Example.LastError)
 	{
 		{
 			// Prompt user for input here
@@ -267,12 +251,9 @@ int main()
 											 ModioExample::OnRequestEmailAuthCodeCompleted);
 		}
 
-		while (!ModioExample::HasAsyncOperationCompleted())
-		{
-			Modio::RunPendingHandlers();
-		}
+		ModioExample::WaitForExecution();
 
-		if (!ModioExample::DidAsyncOperationSucceed())
+		if (Example.LastError)
 		{
 			// It is possible to check the error type and identify what next steps to follow
 			if (Modio::ErrorCodeMatches(Example.LastError,
@@ -298,13 +279,15 @@ int main()
 			// We initialized the SDK, but received an error when requesting an email auth code. Begin async shutdown
 			Modio::ShutdownAsync(ModioExample::OnShutdownComplete);
 
-			// Wait for async shutdown to complete
-			while (!ModioExample::HasAsyncOperationCompleted())
+			ModioExample::WaitForExecution();
+
+			// Halt execution of Modio::RunPendingHandlers(), and wait for the background thread to finish
+			bHaltBackgroundThread.store(true);
+			if (HandlerThread.joinable())
 			{
-				Modio::RunPendingHandlers();
+				HandlerThread.join();
 			}
 
-			// Bail without running any other calls
 			return -1;
 		}
 
@@ -320,28 +303,22 @@ int main()
 											  ModioExample::OnAuthenticateUserEmailCompleted);
 		}
 
-		while (!ModioExample::HasAsyncOperationCompleted())
-		{
-			Modio::RunPendingHandlers();
-		}
+		ModioExample::WaitForExecution();
 
-		if (!ModioExample::DidAsyncOperationSucceed())
+		if (Example.LastError)
 		{
 			// Perform any auth error handling here as appropriate.
 		}
 	}
 
-	// Get the user's wallet balance for the current game. Note that if a wallet does not exist for a user, this call will automatically
-	// create the wallet for them.
+	// Get the user's wallet balance for the current game. Note that if a wallet does not exist for a user, this call
+	// will automatically create the wallet for them.
 	{
 		Modio::GetUserWalletBalanceAsync(ModioExample::OnGetWalletBalanceCompleted);
 
-		while (!ModioExample::HasAsyncOperationCompleted())
-		{
-			Modio::RunPendingHandlers();
-		}
+		ModioExample::WaitForExecution();
 
-		if (!ModioExample::DidAsyncOperationSucceed())
+		if (Example.LastError)
 		{
 			// Error handling for GetWalletBalance errors
 		}
@@ -353,13 +330,12 @@ int main()
 	// indicating whether an error occurred.
 	Modio::ShutdownAsync(ModioExample::OnShutdownComplete);
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	};
+	ModioExample::WaitForExecution();
 
-	if (!ModioExample::DidAsyncOperationSucceed())
+	// Halt execution of Modio::RunPendingHandlers(), and wait for the background thread to finish
+	bHaltBackgroundThread.store(true);
+	if (HandlerThread.joinable())
 	{
-		// No need for explicit handling of an error from ShutdownAsync, the application is about to exit
+		HandlerThread.join();
 	}
 }

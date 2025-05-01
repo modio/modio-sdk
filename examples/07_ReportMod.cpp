@@ -10,8 +10,11 @@
 
 #include "modio/ModioSDK.h"
 
+#include <atomic>
+#include <future>
 #include <iostream>
 #include <sstream>
+#include <thread>
 #include <utility>
 
 /// This example extends 01_Initialization.cpp by demonstrating the functionality for
@@ -22,13 +25,8 @@
 /// @brief Simple struct containing state variables for the example
 struct ModioExampleFlags
 {
-	/// @brief Variable simulating a notification passed from a callback indicating the callback was invoked (ie the
-	/// async SDK function returned a result)
-	bool bDone = false;
-
-	/// @brief Variable simulating a notification passed from a callback indicating whether the SDK function returned a
-	/// success or failure
-	bool bSuccess = false;
+	/// @brief Promise to halt execution of the main thread til this is fulfilled
+	std::promise<void> ExecutionFinished;
 
 	/// @brief Keeps a reference to the last error received
 	Modio::ErrorCode LastError;
@@ -42,63 +40,47 @@ static ModioExampleFlags Example;
 /// to deal with asynchronous calls should be designed in your game
 struct ModioExample
 {
-	static bool HasAsyncOperationCompleted()
+	/// @brief Waits for the Example.ExecutionFinished promise to be fulfilled, then resets it
+	static void WaitForExecution()
 	{
-		return std::exchange(Example.bDone, false);
-	}
-
-	static bool DidAsyncOperationSucceed()
-	{
-		return std::exchange(Example.bSuccess, false);
-	}
-
-	static void NotifyApplicationSuccess()
-	{
-		Example.bDone = true;
-		Example.bSuccess = true;
-	}
-
-	static void NotifyApplicationFailure(Modio::ErrorCode ec)
-	{
-		Example.bDone = true;
-		Example.bSuccess = false;
-		std::cout << ec.message() << std::endl;
+		Example.ExecutionFinished.get_future().wait();
+		Example.ExecutionFinished = std::promise<void>();
 	}
 
 	static void OnInitializeComplete(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to initialize mod.io SDK: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnReportSubmitted(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to submit report: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnShutdownComplete(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to shutdown: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	/// @brief Helper method to retrieve input from a user with an string prompt
@@ -129,6 +111,18 @@ struct ModioExample
 
 int main()
 {
+	// A thread-safe atomic boolean to control the execution of Modio::RunPendingHandlers() on the background thread
+	std::atomic<bool> bHaltBackgroundThread {false};
+
+	// Begin new thread for background work
+	std::thread HandlerThread = std::thread([&]() {
+		while (!bHaltBackgroundThread)
+		{
+			Modio::RunPendingHandlers();
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
+	});
+
 	// Ask user for their input and offer default values
 	std::stringstream IntTransformer;
 	std::string UserInput = ModioExample::RetrieveUserInput("Game ID:", "3609");
@@ -157,12 +151,9 @@ int main()
 													Modio::Portal::None, SessionID),
 						   ModioExample::OnInitializeComplete);
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	}
+	ModioExample::WaitForExecution();
 
-	if (!ModioExample::DidAsyncOperationSucceed())
+	if (Example.LastError)
 	{
 		return -1;
 	}
@@ -179,12 +170,9 @@ int main()
 							"ReporterName", "Reporter@Email.com");
 	Modio::ReportContentAsync(Params, ModioExample::OnReportSubmitted);
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	}
+	ModioExample::WaitForExecution();
 
-	if (!ModioExample::DidAsyncOperationSucceed())
+	if (Example.LastError)
 	{
 		std::cout << "Mod report operation did not succeed" << std::endl;
 	}
@@ -195,13 +183,12 @@ int main()
 
 	Modio::ShutdownAsync(ModioExample::OnShutdownComplete);
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	}
+	ModioExample::WaitForExecution();
 
-	if (!ModioExample::DidAsyncOperationSucceed())
+	// Halt execution of Modio::RunPendingHandlers(), and wait for the background thread to finish
+	bHaltBackgroundThread.store(true);
+	if (HandlerThread.joinable())
 	{
-		// No need for explicit handling of an error from ShutdownAsync, the application is about to exit
+		HandlerThread.join();
 	}
 }

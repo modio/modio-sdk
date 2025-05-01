@@ -44,6 +44,7 @@ namespace Modio
 			/// <summary>
 			/// The root path for local persistent storage - all file paths are treated as relative to this root
 			/// </summary>
+			Modio::filesystem::path RootModStoragePath;
 			Modio::filesystem::path RootLocalStoragePath;
 			Modio::filesystem::path UserDataPath;
 			Modio::filesystem::path RootTempPath;
@@ -114,8 +115,8 @@ namespace Modio
 			{
 				CurrentGameID = InitParams.GameID;
 				return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
-					Modio::Detail::InitializeFileSystemOp(InitParams, SharedState, RootLocalStoragePath, UserDataPath,
-														  RootTempPath),
+					Modio::Detail::InitializeFileSystemOp(InitParams, SharedState, RootModStoragePath,
+														  RootLocalStoragePath, UserDataPath, RootTempPath),
 					Token, Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 
@@ -191,12 +192,12 @@ namespace Modio
 
 			Modio::filesystem::path GetModRootInstallationPath() const override
 			{
-				return RootLocalStoragePath / fmt::format("{}/mods/", CurrentGameID);
+				return RootModStoragePath / fmt::format("{}/mods/", CurrentGameID);
 			}
 
 			Modio::filesystem::path MakeModPath(Modio::ModID ModID) const override
 			{
-				return RootLocalStoragePath / fmt::format("{}/mods/{}", CurrentGameID, ModID);
+				return RootModStoragePath / fmt::format("{}/mods/{}", CurrentGameID, ModID);
 			}
 
 			Modio::filesystem::path MakeTempModPath(Modio::ModID ID) const override
@@ -428,7 +429,7 @@ namespace Modio
 			bool CheckSpaceAvailable(const Modio::filesystem::path& Destination, Modio::FileSize DesiredSize) override
 			{
 				Modio::filesystem::path ValidDestination =
-					Modio::Detail::AndroidContextService::Get().GetJavaClassModio()->GetStoragePath();
+					Modio::Detail::AndroidContextService::Get().GetJavaClassModio()->GetExternalStoragePath();
 
 				const Modio::FileSize SpaceAvailable = GetSpaceAvailable(ValidDestination);
 				if (SpaceAvailable >= DesiredSize)

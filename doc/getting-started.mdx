@@ -614,7 +614,7 @@ Note that you do not need to base64 encode the app ticket that you receive from 
 ### Mod management and subscriptions
 
 :::note
-This functionality is demonstrated in example 04_SubscriptionManagement
+This functionality is demonstrated in example 05_SubscriptionManagement
 :::
 
 Now you've shown the user some mods based on a query they've submitted through your UI. The user has picked one that they'd like to install. This section explains how to trigger an installation process and the files downloaded to the filesystem.
@@ -867,7 +867,7 @@ Modio::SubmitModChangesAsync(ModID, EditParams, [](Modio::ErrorCode ec, Modio::O
 ### Content reporting
 
 :::note
-This functionality is demonstrated in example 06_ReportMod
+This functionality is demonstrated in example 07_ReportMod
 :::
 
 The SDK has full support for reporting content that breaches guidelines - this can be entire games, users, or mods themselves. When reporting a mod, users can provide a report type, a reason and their contact details. These reports will appear on your game's moderation dashboard to be actioned. Shipping your title on consoles generally requires moderation and reporting capability being provided in your game.
@@ -1017,7 +1017,7 @@ If you add an already subscribed mod to TempModSet, it will not download be down
 ### Multithreading
 
 :::note
-This functionality is demonstrated in example 07_Threading
+This functionality is demonstrated in example 04_Threading
 :::
 
 As mentioned in [the quick-start section on initialization](#initialization-and-teardown), the SDK supports [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) being run on a secondary thread that already exists or a dedicated background thread you create specifically to peform SDK work.

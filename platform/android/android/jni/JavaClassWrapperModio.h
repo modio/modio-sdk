@@ -14,14 +14,16 @@ namespace Modio
 		class JavaClassWrapperModio : JavaClassWrapper
 		{
 		public:
-			MODIO_IMPL JavaClassWrapperModio(jobject Activity);
+			MODIO_IMPL JavaClassWrapperModio(jobject Activity, bool bUseExternalStorageForMods);
 
 			MODIO_IMPL std::string GetCertificatePath();
-			MODIO_IMPL std::string GetStoragePath();
+			MODIO_IMPL std::string GetInternalStoragePath();
+			MODIO_IMPL std::string GetExternalStoragePath();
 
 		private:
 			jmethodID GetCertificatePathMethodId;
-			jmethodID GetStoragePathMethodId;
+			jmethodID GetInternalStoragePathMethodId;
+			jmethodID GetExternalStoragePathMethodId;
 		};
 	}; // namespace Detail
 

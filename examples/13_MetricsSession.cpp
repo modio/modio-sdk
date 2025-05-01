@@ -10,8 +10,11 @@
 
 #include "modio/ModioSDK.h"
 
+#include <atomic>
+#include <future>
 #include <iostream>
 #include <sstream>
+#include <thread>
 #include <utility>
 
 /// This example demonstrates how to start a new metrics session, perform a heartbeat and shut down the session
@@ -21,13 +24,8 @@
 /// @brief Simple struct containing state variables for the example
 struct ModioExampleFlags
 {
-	/// @brief Variable simulating a notification passed from a callback indicating the callback was invoked (ie the
-	/// async SDK function returned a result)
-	bool bDone = false;
-
-	/// @brief Variable simulating a notification passed from a callback indicating whether the SDK function returned a
-	/// success or failure
-	bool bSuccess = false;
+	/// @brief Promise to halt execution of the main thread til this is fulfilled
+	std::promise<void> ExecutionFinished;
 
 	/// @brief Keeps a reference to the last error received
 	Modio::ErrorCode LastError;
@@ -47,45 +45,25 @@ static ModioExampleFlags Example;
 /// to deal with asynchronous calls should be designed in your game
 struct ModioExample
 {
-	static bool HasAsyncOperationCompleted()
+	/// @brief Waits for the Example.ExecutionFinished promise to be fulfilled, then resets it
+	static void WaitForExecution()
 	{
-		return std::exchange(Example.bDone, false);
-	}
-
-	static bool DidAsyncOperationSucceed()
-	{
-		return std::exchange(Example.bSuccess, false);
-	}
-
-	static void NotifyApplicationSuccess()
-	{
-		Example.bDone = true;
-		Example.bSuccess = true;
-		Example.LastError = {};
-	}
-
-	static void NotifyApplicationFailure(Modio::ErrorCode ec)
-	{
-		Example.bDone = true;
-		Example.bSuccess = false;
-		Example.LastError = ec;
-		// More information about which error occurred can be retrieved with the message()
-		// function
-		std::cout << ec.message() << std::endl;
+		Example.ExecutionFinished.get_future().wait();
+		Example.ExecutionFinished = std::promise<void>();
 	}
 
 	static void OnInitializeComplete(Modio::ErrorCode ec)
 	{
 		// The ErrorCode value passed back via the callback will be implicitly convertible to
 		// true if an error occurred
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to initialize mod.io SDK: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	/// @brief User callback invoked by Modio::RunPendingHandlers() when Modio::RequestEmailAuthCodeAsync has completed
@@ -94,14 +72,14 @@ struct ModioExample
 	{
 		// The ErrorCode value passed back via the callback will be implicitly convertible to
 		// true if an error occurred
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to request email auth code: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	/// @brief User callback invoked by Modio::RunPendingHandlers() when Modio::AuthenticateUserEmailAsync has completed
@@ -110,82 +88,87 @@ struct ModioExample
 	{
 		// The ErrorCode value passed back via the callback will be implicitly convertible to
 		// true if an error occurred
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to authenticate user email: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnShutdownComplete(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to shutdown: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void MetricsSessionStartCallback(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
 			std::cout << "Metrics session failed to start. Error occurred." << std::endl;
-			NotifyApplicationFailure(ec);
 		}
 		else
 		{
 			std::cout << "Metrics session successfully started" << std::endl;
-			NotifyApplicationSuccess();
 		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void MetricsSessionHeartbeatCallback(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
 			std::cout << "Metrics session failed to submit a heartbeat. Error occurred." << std::endl;
-			NotifyApplicationFailure(ec);
 		}
 		else
 		{
 			std::cout << "Metrics session heartbeat successfully submitted" << std::endl;
-			NotifyApplicationSuccess();
 		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void MetricsSessionEndCallback(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
 			std::cout << "Metrics session failed to shutdown. Error occurred." << std::endl;
-			NotifyApplicationFailure(ec);
 		}
 		else
 		{
 			std::cout << "Metrics session successfully shut down" << std::endl;
-			NotifyApplicationSuccess();
 		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnListAllModsComplete(Modio::ErrorCode ec, Modio::Optional<Modio::ModInfoList> ModList)
 	{
+		Example.LastError = ec;
+		Example.LastResults = ModList;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
-		}
-		else
-		{
-			NotifyApplicationSuccess();
+			std::cout << "Failed to list all mods: " << ec.message() << std::endl;
 		}
 
-		Example.LastResults = ModList;
+		Example.ExecutionFinished.set_value();
 	}
 
 	/// @brief Helper method to retrieve input from a user with an string prompt
@@ -216,6 +199,18 @@ struct ModioExample
 
 int main()
 {
+	// A thread-safe atomic boolean to control the execution of Modio::RunPendingHandlers() on the background thread
+	std::atomic<bool> bHaltBackgroundThread {false};
+
+	// Begin new thread for background work
+	std::thread HandlerThread = std::thread([&]() {
+		while (!bHaltBackgroundThread)
+		{
+			Modio::RunPendingHandlers();
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
+	});
+
 	std::cout << "Starting example for Metrics Session" << std::endl;
 	// Ask user for their input and offer default values
 	std::stringstream IntTransformer;
@@ -251,13 +246,10 @@ int main()
 
 	Modio::InitializeAsync(Params, ModioExample::OnInitializeComplete);
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	}
+	ModioExample::WaitForExecution();
 
 	// Modio::InitializeAsync completed, but we now need to check if it resulted in a success or a failure
-	if (!ModioExample::DidAsyncOperationSucceed())
+	if (Example.LastError)
 	{
 		// SDK initialization failed - this simple sample returns immediately, no need to call ShutdownAsync
 		return -1;
@@ -273,12 +265,9 @@ int main()
 										 ModioExample::OnRequestEmailAuthCodeCompleted);
 	}
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	}
+	ModioExample::WaitForExecution();
 
-	if (!ModioExample::DidAsyncOperationSucceed())
+	if (Example.LastError)
 	{
 		// It is possible to check the error type and identify what next steps to follow
 		if (Modio::ErrorCodeMatches(Example.LastError, Modio::ErrorConditionTypes::NetworkError)) // NetworkError group
@@ -304,9 +293,13 @@ int main()
 		Modio::ShutdownAsync(ModioExample::OnShutdownComplete);
 
 		// Wait for async shutdown to complete
-		while (!ModioExample::HasAsyncOperationCompleted())
+		ModioExample::WaitForExecution();
+
+		// Halt execution of Modio::RunPendingHandlers(), and wait for the background thread to finish
+		bHaltBackgroundThread.store(true);
+		if (HandlerThread.joinable())
 		{
-			Modio::RunPendingHandlers();
+			HandlerThread.join();
 		}
 
 		// Bail without running any other calls
@@ -325,12 +318,9 @@ int main()
 										  ModioExample::OnAuthenticateUserEmailCompleted);
 	}
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	}
+	ModioExample::WaitForExecution();
 
-	if (!ModioExample::DidAsyncOperationSucceed())
+	if (Example.LastError)
 	{
 		// Perform any auth error handling here as appropriate.
 	}
@@ -341,12 +331,9 @@ int main()
 	{
 		Modio::ListAllModsAsync({}, ModioExample::OnListAllModsComplete);
 
-		while (!ModioExample::HasAsyncOperationCompleted())
-		{
-			Modio::RunPendingHandlers();
-		}
+		ModioExample::WaitForExecution();
 
-		if (!ModioExample::DidAsyncOperationSucceed())
+		if (Example.LastError)
 		{
 			std::cout << "Call failed" << std::endl;
 		}
@@ -390,12 +377,9 @@ int main()
 
 		Modio::MetricsSessionStartAsync(SessionParams, ModioExample::MetricsSessionStartCallback);
 
-		while (!ModioExample::HasAsyncOperationCompleted())
-		{
-			Modio::RunPendingHandlers();
-		}
+		ModioExample::WaitForExecution();
 
-		if (!ModioExample::DidAsyncOperationSucceed())
+		if (Example.LastError)
 		{
 			// Error handling for MetricsSessionStartAsync errors
 		}
@@ -406,12 +390,9 @@ int main()
 		std::cout << "Sending a metrics session heartbeat once" << std::endl;
 		Modio::MetricsSessionSendHeartbeatOnceAsync(ModioExample::MetricsSessionHeartbeatCallback);
 
-		while (!ModioExample::HasAsyncOperationCompleted())
-		{
-			Modio::RunPendingHandlers();
-		}
+		ModioExample::WaitForExecution();
 
-		if (!ModioExample::DidAsyncOperationSucceed())
+		if (Example.LastError)
 		{
 			// Error handling for MetricsSessionSendHeartbeatOnceAsync errors
 		}
@@ -422,12 +403,9 @@ int main()
 		std::cout << "Shutting down the metrics session" << std::endl;
 		Modio::MetricsSessionEndAsync(ModioExample::MetricsSessionEndCallback);
 
-		while (!ModioExample::HasAsyncOperationCompleted())
-		{
-			Modio::RunPendingHandlers();
-		}
+		ModioExample::WaitForExecution();
 
-		if (!ModioExample::DidAsyncOperationSucceed())
+		if (Example.LastError)
 		{
 			// Error handling for MetricsSessionEndAsync errors
 		}
@@ -439,13 +417,12 @@ int main()
 	// indicating whether an error occurred.
 	Modio::ShutdownAsync(ModioExample::OnShutdownComplete);
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	}
+	ModioExample::WaitForExecution();
 
-	if (!ModioExample::DidAsyncOperationSucceed())
+	// Halt execution of Modio::RunPendingHandlers(), and wait for the background thread to finish
+	bHaltBackgroundThread.store(true);
+	if (HandlerThread.joinable())
 	{
-		// No need for explicit handling of an error from ShutdownAsync, the application is about to exit
+		HandlerThread.join();
 	}
 }

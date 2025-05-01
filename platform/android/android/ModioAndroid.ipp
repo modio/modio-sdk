@@ -9,9 +9,9 @@
 
 namespace Modio
 {
-	void InitializeAndroidJNI(JavaVM* InJavaVM, jobject ClassLoader)
+	void InitializeAndroidJNI(JavaVM* InJavaVM, jobject ClassLoader, bool bUseExternalStorageForMods)
 	{
-		Modio::Detail::AndroidContextService::InitializeJNI(InJavaVM, ClassLoader);
+		Modio::Detail::AndroidContextService::InitializeJNI(InJavaVM, ClassLoader, bUseExternalStorageForMods);
 	}
 
 	void SetGlobalActivity(jobject ActivityObject) 

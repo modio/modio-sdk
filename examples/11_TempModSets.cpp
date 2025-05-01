@@ -10,8 +10,11 @@
 
 #include "modio/ModioSDK.h"
 
+#include <atomic>
+#include <future>
 #include <iostream>
 #include <sstream>
+#include <thread>
 #include <utility>
 
 /// This demonstrates the mod.io SDK's Temporary Mod Set feature.
@@ -25,13 +28,8 @@
 /// @brief Simple struct containing state variables for the example
 struct ModioExampleFlags
 {
-	/// @brief Variable simulating a notification passed from a callback indicating the callback was invoked (ie the
-	/// async SDK function returned a result)
-	bool bDone = false;
-
-	/// @brief Variable simulating a notification passed from a callback indicating whether the SDK function returned a
-	/// success or failure
-	bool bSuccess = false;
+	/// @brief Promise to halt execution of the main thread til this is fulfilled
+	std::promise<void> ExecutionFinished;
 
 	/// @brief Keeps a reference to the last error received
 	Modio::ErrorCode LastError;
@@ -51,103 +49,84 @@ static ModioExampleFlags Example;
 /// to deal with asynchronous calls should be designed in your game
 struct ModioExample
 {
-	static bool HasAsyncOperationCompleted()
+	/// @brief Waits for the Example.ExecutionFinished promise to be fulfilled, then resets it
+	static void WaitForExecution()
 	{
-		return std::exchange(Example.bDone, false);
-	}
-
-	static bool DidAsyncOperationSucceed()
-	{
-		return std::exchange(Example.bSuccess, false);
-	}
-
-	static void NotifyApplicationSuccess()
-	{
-		Example.bDone = true;
-		Example.bSuccess = true;
-		Example.LastError = {};
-	}
-
-	static void NotifyApplicationFailure(Modio::ErrorCode ec)
-	{
-		Example.bDone = true;
-		Example.bSuccess = false;
-		Example.LastError = ec;
-		std::cout << ec.message() << std::endl;
+		Example.ExecutionFinished.get_future().wait();
+		Example.ExecutionFinished = std::promise<void>();
 	}
 
 	static void OnInitializeComplete(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to initialize mod.io SDK: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnRequestEmailAuthCodeCompleted(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to request email auth code: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnAuthenticateUserEmailCompleted(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to authenticate user email: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnListAllModsComplete(Modio::ErrorCode ec, Modio::Optional<Modio::ModInfoList> ModList)
 	{
+		Example.LastError = ec;
+		Example.LastResults = ModList;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
-		}
-		else
-		{
-			NotifyApplicationSuccess();
+			std::cout << "Failed to list all mods: " << ec.message() << std::endl;
 		}
 
-		Example.LastResults = ModList;
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnShutdownComplete(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to shutdown: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnVerifyUserAuthenticationAsync(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to authorize user: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	/// @brief User Callback invoked by the SDK when a mod is installed, updated, uploaded or removed from the local
@@ -197,40 +176,41 @@ struct ModioExample
 			default:
 				break;
 		}
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnFetchExternalUpdatesComplete(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to fetch external updates: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 	static void OnSubscriptionComplete(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to subscribe: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 	static void OnUninstallationComplete(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to unsubscribe: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	/// @brief Helper method to retrieve input from a user with an string prompt
@@ -261,6 +241,18 @@ struct ModioExample
 
 int main()
 {
+	// A thread-safe atomic boolean to control the execution of Modio::RunPendingHandlers() on the background thread
+	std::atomic<bool> bHaltBackgroundThread {false};
+
+	// Begin new thread for background work
+	std::thread HandlerThread = std::thread([&]() {
+		while (!bHaltBackgroundThread)
+		{
+			Modio::RunPendingHandlers();
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
+	});
+
 	// Ask user for their input and offer default values
 	std::stringstream IntTransformer;
 	std::string UserInput = ModioExample::RetrieveUserInput("Game ID:", "3609");
@@ -289,12 +281,9 @@ int main()
 													Modio::Portal::None, SessionID),
 						   ModioExample::OnInitializeComplete);
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	}
+	ModioExample::WaitForExecution();
 
-	if (!ModioExample::DidAsyncOperationSucceed())
+	if (Example.LastError)
 	{
 		return -1;
 	}
@@ -302,12 +291,9 @@ int main()
 	// Check if the user has already been authenticated and the auth token is still valid
 	Modio::VerifyUserAuthenticationAsync(ModioExample::OnVerifyUserAuthenticationAsync);
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	}
+	ModioExample::WaitForExecution();
 
-	if (!ModioExample::DidAsyncOperationSucceed())
+	if (Example.LastError)
 	{
 		// There is no user or the auth token is not valid anymore, therefore it should authenticate again
 		{
@@ -317,21 +303,15 @@ int main()
 											 ModioExample::OnRequestEmailAuthCodeCompleted);
 		}
 
-		while (!ModioExample::HasAsyncOperationCompleted())
-		{
-			Modio::RunPendingHandlers();
-		};
+		ModioExample::WaitForExecution();
 
-		if (!ModioExample::DidAsyncOperationSucceed())
+		if (Example.LastError)
 		{
 			if (!Modio::ErrorCodeMatches(Example.LastError, Modio::ErrorConditionTypes::UserAlreadyAuthenticatedError))
 			{
 				Modio::ShutdownAsync(ModioExample::OnShutdownComplete);
 
-				while (!ModioExample::HasAsyncOperationCompleted())
-				{
-					Modio::RunPendingHandlers();
-				};
+				ModioExample::WaitForExecution();
 
 				return -1;
 			}
@@ -342,12 +322,9 @@ int main()
 
 			Modio::AuthenticateUserEmailAsync(Modio::EmailAuthCode(UserEmailAuthCode),
 											  ModioExample::OnAuthenticateUserEmailCompleted);
-			while (!ModioExample::HasAsyncOperationCompleted())
-			{
-				Modio::RunPendingHandlers();
-			};
+			ModioExample::WaitForExecution();
 
-			if (!ModioExample::DidAsyncOperationSucceed()) {}
+			if (Example.LastError) {}
 		}
 	}
 
@@ -355,12 +332,9 @@ int main()
 	{
 		Modio::ListAllModsAsync({}, ModioExample::OnListAllModsComplete);
 
-		while (!ModioExample::HasAsyncOperationCompleted())
-		{
-			Modio::RunPendingHandlers();
-		}
+		ModioExample::WaitForExecution();
 
-		if (!ModioExample::DidAsyncOperationSucceed())
+		if (Example.LastError)
 		{
 			std::cout << "Call failed" << std::endl;
 		}
@@ -423,12 +397,9 @@ int main()
 		// indicating if the fetch was successful
 		Modio::FetchExternalUpdatesAsync(ModioExample::OnFetchExternalUpdatesComplete);
 
-		while (!ModioExample::HasAsyncOperationCompleted())
-		{
-			Modio::RunPendingHandlers();
-		}
+		ModioExample::WaitForExecution();
 
-		if (!ModioExample::DidAsyncOperationSucceed())
+		if (Example.LastError)
 		{
 			// No need for explicit handling of an error from FetchExternalUpdates in this simple sample
 		}
@@ -440,7 +411,7 @@ int main()
 		// An example ModID: "2281875", named "Sherlock Holmes"
 		std::string UserModString = ModioExample::RetrieveUserInput("Enter the ID of the mod you wish to install:");
 
-		UserModID = std::strtoll(UserModString.c_str(), nullptr,10);
+		UserModID = std::strtoll(UserModString.c_str(), nullptr, 10);
 		if (UserModID <= 0)
 		{
 			std::cout << "Invalid Input" << std::endl;
@@ -513,10 +484,12 @@ int main()
 
 	Modio::ShutdownAsync(ModioExample::OnShutdownComplete);
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	};
+	ModioExample::WaitForExecution();
 
-	if (!ModioExample::DidAsyncOperationSucceed()) {}
+	// Halt execution of Modio::RunPendingHandlers(), and wait for the background thread to finish
+	bHaltBackgroundThread.store(true);
+	if (HandlerThread.joinable())
+	{
+		HandlerThread.join();
+	}
 }

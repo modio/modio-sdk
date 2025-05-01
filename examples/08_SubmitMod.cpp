@@ -24,17 +24,11 @@
 /// You will also need to provide a path to a logo and a folder which
 /// will contain the mod data.
 
-
 /// @brief Simple struct containing state variables for the example
 struct ModioExampleFlags
 {
-	/// @brief Variable simulating a notification passed from a callback indicating the callback was invoked (ie the
-	/// async SDK function returned a result)
-	bool bDone = false;
-
-	/// @brief Variable simulating a notification passed from a callback indicating whether the SDK function returned a
-	/// success or failure
-	bool bSuccess = false;
+	/// @brief Promise to halt execution of the main thread til this is fulfilled
+	std::promise<void> ExecutionFinished;
 
 	/// @brief Keeps a reference to the last error received
 	Modio::ErrorCode LastError;
@@ -48,41 +42,23 @@ static ModioExampleFlags Example;
 /// to deal with asynchronous calls should be designed in your game
 struct ModioExample
 {
-	static bool HasAsyncOperationCompleted()
+	/// @brief Waits for the Example.ExecutionFinished promise to be fulfilled, then resets it
+	static void WaitForExecution()
 	{
-		return std::exchange(Example.bDone, false);
-	}
-
-	static bool DidAsyncOperationSucceed()
-	{
-		return std::exchange(Example.bSuccess, false);
-	}
-
-	static void NotifyApplicationSuccess()
-	{
-		Example.bDone = true;
-		Example.bSuccess = true;
-		Example.LastError = {};
-	}
-
-	static void NotifyApplicationFailure(Modio::ErrorCode ec)
-	{
-		Example.bDone = true;
-		Example.bSuccess = false;
-		Example.LastError = ec;
-		std::cout << ec.message() << std::endl;
+		Example.ExecutionFinished.get_future().wait();
+		Example.ExecutionFinished = std::promise<void>();
 	}
 
 	static void OnAsyncComplete(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	/// @brief Helper method to retrieve input from a user with an string prompt
@@ -113,6 +89,18 @@ struct ModioExample
 
 int main()
 {
+	// A thread-safe atomic boolean to control the execution of Modio::RunPendingHandlers() on the background thread
+	std::atomic<bool> bHaltBackgroundThread {false};
+
+	// Begin new thread for background work
+	std::thread HandlerThread = std::thread([&]() {
+		while (!bHaltBackgroundThread)
+		{
+			Modio::RunPendingHandlers();
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
+	});
+
 	// Ask user for their input and offer default values
 	std::stringstream IntTransformer;
 	std::string UserInput = ModioExample::RetrieveUserInput("Game ID:", "3609");
@@ -141,42 +129,43 @@ int main()
 													Modio::Portal::None, SessionID),
 						   ModioExample::OnAsyncComplete);
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	}
+	ModioExample::WaitForExecution();
 
-	if (!ModioExample::DidAsyncOperationSucceed())
+	if (Example.LastError)
 	{
 		return -1;
 	}
 
+	// Check if the user has already been authenticated and the auth token is still valid
+	Modio::VerifyUserAuthenticationAsync(ModioExample::OnAsyncComplete);
 
-	if (!ModioExample::DidAsyncOperationSucceed())
+	ModioExample::WaitForExecution();
+
+	if (Example.LastError)
 	{
 		// There is no user or the auth token is not valid anymore, therefore it should authenticate again
 		{
 			std::string UserEmailAddress = ModioExample::RetrieveUserInput("Enter email address:");
 
-			Modio::RequestEmailAuthCodeAsync(Modio::EmailAddress(UserEmailAddress),
-											 ModioExample::OnAsyncComplete);
+			Modio::RequestEmailAuthCodeAsync(Modio::EmailAddress(UserEmailAddress), ModioExample::OnAsyncComplete);
 		}
 
-		while (!ModioExample::HasAsyncOperationCompleted())
-		{
-			Modio::RunPendingHandlers();
-		}
+		ModioExample::WaitForExecution();
 
-		if (!ModioExample::DidAsyncOperationSucceed())
+		if (Example.LastError)
 		{
 			if (!Modio::ErrorCodeMatches(Example.LastError, Modio::ErrorConditionTypes::UserAlreadyAuthenticatedError))
 			{
 				Modio::ShutdownAsync(ModioExample::OnAsyncComplete);
 
-				while (!ModioExample::HasAsyncOperationCompleted())
+				ModioExample::WaitForExecution();
+
+				// Halt execution of Modio::RunPendingHandlers(), and wait for the background thread to finish
+				bHaltBackgroundThread.store(true);
+				if (HandlerThread.joinable())
 				{
-					Modio::RunPendingHandlers();
-				};
+					HandlerThread.join();
+				}
 
 				return -1;
 			}
@@ -185,21 +174,17 @@ int main()
 		{
 			std::string UserEmailAuthCode = ModioExample::RetrieveUserInput("Enter email auth code:");
 
-			Modio::AuthenticateUserEmailAsync(Modio::EmailAuthCode(UserEmailAuthCode),
-											  ModioExample::OnAsyncComplete);
-			while (!ModioExample::HasAsyncOperationCompleted())
-			{
-				Modio::RunPendingHandlers();
-			};
+			Modio::AuthenticateUserEmailAsync(Modio::EmailAuthCode(UserEmailAuthCode), ModioExample::OnAsyncComplete);
 
-			if (!ModioExample::DidAsyncOperationSucceed()) {}
+			ModioExample::WaitForExecution();
 		}
 	}
-	
+
 	bool UploadCompleted = false;
 
 	// Enable mod management, providing a function to handle events for install/uninstall/upload
-	// Enabling mod management requires you to be authenticated. Please refer to examples/03_Authentication.cpp for more information
+	// Enabling mod management requires you to be authenticated. Please refer to examples/03_Authentication.cpp for more
+	// information
 	if (Modio::ErrorCode ec = Modio::EnableModManagement([&](Modio::ModManagementEvent ManagementEvent) {
 			// See 04_Subscription_Management.cpp for more information on handling Mod Management Events
 			switch (ManagementEvent.Event)
@@ -259,7 +244,8 @@ int main()
 	NewModParams.PathToLogoFile = "C:/temp/image.png"; // Must be a png or jpeg file of less than 8192 kilobytes.
 	NewModParams.Summary = "Mod for Upload Sample";
 
-	std::cout << "Using Logo File path : " << NewModParams.PathToLogoFile << std::endl; // Change value of PathToLogoFile if necessary
+	std::cout << "Using Logo File path : " << NewModParams.PathToLogoFile
+			  << std::endl; // Change value of PathToLogoFile if necessary
 
 	// Examples of optional fields you can pass when creating a mod
 	NewModParams.Tags = {"SampleMod", "SomeOtherTag"}; // Must match tags configured in game's dashboard
@@ -275,7 +261,7 @@ int main()
 	Modio::SubmitNewModAsync(
 		NewModHandle, NewModParams, [&](Modio::ErrorCode ec, Modio::Optional<Modio::ModID> NewModID) {
 			std::cout << "Mod submission response received\n";
-			
+
 			if (NewModID.has_value())
 			{
 				NewlyCreatedModID = NewModID; // Store the new mod ID the server returned for later use
@@ -283,13 +269,21 @@ int main()
 			ModioExample::OnAsyncComplete(ec);
 		});
 
-	while (!ModioExample::HasAsyncOperationCompleted())
+	ModioExample::WaitForExecution();
+
+	if (Example.LastError)
 	{
-		Modio::RunPendingHandlers();
-	}
-	
-	if (!ModioExample::DidAsyncOperationSucceed())
-	{
+		Modio::ShutdownAsync(ModioExample::OnAsyncComplete);
+
+		ModioExample::WaitForExecution();
+
+		// Halt execution of Modio::RunPendingHandlers(), and wait for the background thread to finish
+		bHaltBackgroundThread.store(true);
+		if (HandlerThread.joinable())
+		{
+			HandlerThread.join();
+		}
+
 		return -1;
 	}
 
@@ -303,11 +297,12 @@ int main()
 		// Mandatory parameters
 		Params.RootDirectory = "C:/temp/mod_folder"; // Must be a folder
 
-		std::cout << "Using Directory for Mod File : " << Params.RootDirectory << std::endl; // Change value of RootDirectory if necessary
+		std::cout << "Using Directory for Mod File : " << Params.RootDirectory
+				  << std::endl; // Change value of RootDirectory if necessary
 
 		// Optional fields
 		Params.bSetAsActive = true; // Sets the new submission as the active modfile, defaults to true
-		Params.Platforms = {Modio::ModfilePlatform::Windows,       
+		Params.Platforms = {Modio::ModfilePlatform::Windows,
 							Modio::ModfilePlatform::XboxSeriesX}; // Specify the platforms this modfile targets
 		// Params.Platforms must match what is enabled in the platform approval dashboard
 		Params.Version = "0.0.1";
@@ -318,9 +313,17 @@ int main()
 		Modio::SubmitNewModFileForMod(NewlyCreatedModID.value(), Params);
 
 		// Waits until the Mod Management loop processes the file upload and it either succeeds or fails
-		while (!UploadCompleted)
+		ModioExample::WaitForExecution();
+
+		Modio::ShutdownAsync(ModioExample::OnAsyncComplete);
+
+		ModioExample::WaitForExecution();
+
+		// Halt execution of Modio::RunPendingHandlers(), and wait for the background thread to finish
+		bHaltBackgroundThread.store(true);
+		if (HandlerThread.joinable())
 		{
-			Modio::RunPendingHandlers();
+			HandlerThread.join();
 		}
 	}
 }

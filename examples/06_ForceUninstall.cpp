@@ -10,34 +10,27 @@
 
 #include "modio/ModioSDK.h"
 
+#include <atomic>
+#include <future>
 #include <iostream>
 #include <sstream>
+#include <thread>
 #include <utility>
 
-/// This example extends 03_Authentication.cpp by demonstrating the mod.io SDK's mod management features.
-/// 
-/// When Mod Management is enabled, the SDK will download and install any subscribed mods, as well as removing any
-/// unsubscribed mods if no other users on this device have a subscription.
-/// Once Mod Management is enabled, the sample prompts the user for a mod ID to install, and adds a subscription for
-/// that mod, causing it to be automatically downloaded and installed. Once installation is successful,  the sample also
-/// unsubscribes from the mod, causing it to be automatically uninstalled from the device.
+/// This example extends 05_SubscriptionManagement.cpp by demonstrating the process for freeing up space in the mod
+/// installation directory by force uninstalling a mod. In order to force uninstall a mod, the current user must not
+/// have a subscription to it. Unsubscribing to a mod will remove it from the system if you were the only local user
+/// with a subscription to it - Force uninstallation is for removing a mod that was installed by another user so that
+/// you have space to install mods without having to switch to that other user.
 
 /// @brief Simple struct containing state variables for the example
 struct ModioExampleFlags
 {
-	/// @brief Variable simulating a notification passed from a callback indicating the callback was invoked (ie the
-	/// async SDK function returned a result)
-	bool bDone = false;
-
-	/// @brief Variable simulating a notification passed from a callback indicating whether the SDK function returned a
-	/// success or failure
-	bool bSuccess = false;
+	/// @brief Promise to halt execution of the main thread til this is fulfilled
+	std::promise<void> ExecutionFinished;
 
 	/// @brief Keeps a reference to the last error received
 	Modio::ErrorCode LastError;
-
-	/// @brief Keeps a reference to the list of mod results
-	Modio::Optional<Modio::ModInfoList> LastResults;
 
 	/// @brief Keeps a reference to the last mod management event
 	Modio::ModManagementEvent LastEvent;
@@ -51,109 +44,84 @@ static ModioExampleFlags Example;
 /// to deal with asynchronous calls should be designed in your game
 struct ModioExample
 {
-	static bool HasAsyncOperationCompleted()
+	/// @brief Waits for the Example.ExecutionFinished promise to be fulfilled, then resets it
+	static void WaitForExecution()
 	{
-		return std::exchange(Example.bDone, false);
-	}
-
-	static bool DidAsyncOperationSucceed()
-	{
-		return std::exchange(Example.bSuccess, false);
-	}
-
-	static void NotifyApplicationSuccess()
-	{
-		Example.bDone = true;
-		Example.bSuccess = true;
-		Example.LastError = {};
-	}
-
-	static void NotifyApplicationFailure(Modio::ErrorCode ec)
-	{
-		Example.bDone = true;
-		Example.bSuccess = false;
-		Example.LastError = ec;
-		std::cout << ec.message() << std::endl;
+		Example.ExecutionFinished.get_future().wait();
+		Example.ExecutionFinished = std::promise<void>();
 	}
 
 	static void OnInitializeComplete(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to initialize mod.io SDK: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
-	}
 
+		Example.ExecutionFinished.set_value();
+	}
 	static void OnRequestEmailAuthCodeCompleted(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to request email auth code: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnAuthenticateUserEmailCompleted(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to authenticate user email: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
-	static void OnListAllModsComplete(Modio::ErrorCode ec, Modio::Optional<Modio::ModInfoList> ModList)
+	static void OnFetchExternalUpdatesComplete(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
-		}
-		else
-		{
-			NotifyApplicationSuccess();
+			std::cout << "Failed to fetch external updates: " << ec.message() << std::endl;
 		}
 
-		Example.LastResults = ModList;
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnShutdownComplete(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to shutdown: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	static void OnVerifyUserAuthenticationAsync(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to authorize user: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
-	/// @brief User Callback invoked by the SDK when a mod is installed, updated, uploaded or removed from the local
-	/// system
-	/// @param ManagementEvent Event object containing information about what type of event occurred, the mod ID, and an
-	/// error code if an error occurred
 	static void OnModManagementEvent(Modio::ModManagementEvent ManagementEvent)
 	{
 		// Register the last event
@@ -176,6 +144,7 @@ struct ModioExample
 					std::cout << "Mod Management event: Mod ID " << ManagementEvent.ID << " install succeeded!"
 							  << std::endl;
 				}
+				Example.ExecutionFinished.set_value();
 				break;
 			}
 			case Modio::ModManagementEvent::EventType::Uninstalled:
@@ -192,6 +161,7 @@ struct ModioExample
 					std::cout << "Mod Management event: Mod ID " << ManagementEvent.ID << " removal succeeded!"
 							  << std::endl;
 				}
+				Example.ExecutionFinished.set_value();
 				break;
 			}
 			default:
@@ -199,38 +169,16 @@ struct ModioExample
 		}
 	}
 
-	static void OnFetchExternalUpdatesComplete(Modio::ErrorCode ec)
-	{
-		if (ec)
-		{
-			NotifyApplicationFailure(ec);
-		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
-	}
-	static void OnSubscriptionComplete(Modio::ErrorCode ec)
-	{
-		if (ec)
-		{
-			NotifyApplicationFailure(ec);
-		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
-	}
 	static void OnUninstallationComplete(Modio::ErrorCode ec)
 	{
+		Example.LastError = ec;
+
 		if (ec)
 		{
-			NotifyApplicationFailure(ec);
+			std::cout << "Failed to uninstall: " << ec.message() << std::endl;
 		}
-		else
-		{
-			NotifyApplicationSuccess();
-		}
+
+		Example.ExecutionFinished.set_value();
 	}
 
 	/// @brief Helper method to retrieve input from a user with an string prompt
@@ -261,6 +209,18 @@ struct ModioExample
 
 int main()
 {
+	// A thread-safe atomic boolean to control the execution of Modio::RunPendingHandlers() on the background thread
+	std::atomic<bool> bHaltBackgroundThread {false};
+
+	// Begin new thread for background work
+	std::thread HandlerThread = std::thread([&]() {
+		while (!bHaltBackgroundThread)
+		{
+			Modio::RunPendingHandlers();
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
+	});
+
 	// Ask user for their input and offer default values
 	std::stringstream IntTransformer;
 	std::string UserInput = ModioExample::RetrieveUserInput("Game ID:", "3609");
@@ -289,12 +249,9 @@ int main()
 													Modio::Portal::None, SessionID),
 						   ModioExample::OnInitializeComplete);
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	}
+	ModioExample::WaitForExecution();
 
-	if (!ModioExample::DidAsyncOperationSucceed())
+	if (Example.LastError)
 	{
 		return -1;
 	}
@@ -302,14 +259,12 @@ int main()
 	// Check if the user has already been authenticated and the auth token is still valid
 	Modio::VerifyUserAuthenticationAsync(ModioExample::OnVerifyUserAuthenticationAsync);
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	}
+	ModioExample::WaitForExecution();
 
-	if (!ModioExample::DidAsyncOperationSucceed())
+	if (Example.LastError)
 	{
 		// There is no user or the auth token is not valid anymore, therefore it should authenticate again
+
 		{
 			std::string UserEmailAddress = ModioExample::RetrieveUserInput("Enter email address:");
 
@@ -317,71 +272,35 @@ int main()
 											 ModioExample::OnRequestEmailAuthCodeCompleted);
 		}
 
-		while (!ModioExample::HasAsyncOperationCompleted())
-		{
-			Modio::RunPendingHandlers();
-		};
+		ModioExample::WaitForExecution();
 
-		if (!ModioExample::DidAsyncOperationSucceed())
+		if (Example.LastError)
 		{
 			if (!Modio::ErrorCodeMatches(Example.LastError, Modio::ErrorConditionTypes::UserAlreadyAuthenticatedError))
 			{
 				Modio::ShutdownAsync(ModioExample::OnShutdownComplete);
 
-				while (!ModioExample::HasAsyncOperationCompleted())
-				{
-					Modio::RunPendingHandlers();
-				};
+				ModioExample::WaitForExecution();
 
+				// Halt execution of Modio::RunPendingHandlers(), and wait for the background thread to finish
+				bHaltBackgroundThread.store(true);
+				if (HandlerThread.joinable())
+				{
+					HandlerThread.join();
+				}
+
+				// Bail without running any other calls
 				return -1;
 			}
 		}
 		else
 		{
+			// Prompt user for input here
 			std::string UserEmailAuthCode = ModioExample::RetrieveUserInput("Enter email auth code:");
 
 			Modio::AuthenticateUserEmailAsync(Modio::EmailAuthCode(UserEmailAuthCode),
 											  ModioExample::OnAuthenticateUserEmailCompleted);
-			while (!ModioExample::HasAsyncOperationCompleted())
-			{
-				Modio::RunPendingHandlers();
-			};
-
-			if (!ModioExample::DidAsyncOperationSucceed()) {}
-		}
-	}
-
-	// Display a list of available mods so the user can select one to install
-	{
-		Modio::ListAllModsAsync({}, ModioExample::OnListAllModsComplete);
-
-		while (!ModioExample::HasAsyncOperationCompleted())
-		{
-			Modio::RunPendingHandlers();
-		}
-
-		if (!ModioExample::DidAsyncOperationSucceed())
-		{
-			std::cout << "Call failed" << std::endl;
-		}
-		else
-		{
-			// The call to ListAllModsAsync completed successfully, so the SDK guarantees that Example.LastResults will
-			// have a value. Performing the check here anyway to demonstrate how to check if a Modio::Optional is empty
-			if (Example.LastResults.has_value())
-			{
-				// Example.LastResults is guaranteed to have a valid ModInfoList, however if a search returned no
-				// results then GetResultCount() will still be 0
-				std::cout << "Result count:" << Example.LastResults->GetResultCount() << std::endl;
-				// Retrieve the value from a Modio::Optional by either dereferencing it or calling `value`
-				// ModInfoList objects support iteration with range-based for
-				for (const Modio::ModInfo& CurrentModInfo : Example.LastResults.value())
-				{
-					// Print a tab-delimited table containing Mod ID, Mod Name, and total downloads
-					std::cout << CurrentModInfo.ModId << "\t" << CurrentModInfo.ProfileName << "\t"
-							  << CurrentModInfo.Stats.DownloadsTotal << std::endl;
-				}
-			}
+			ModioExample::WaitForExecution();
 		}
 	}
 
@@ -411,8 +330,6 @@ int main()
 		return -1;
 	}
 
-	std::cout << "Checking for subscription updates from the mod.io service.." << std::endl;
-
 	{
 		// Request a list of the user's subscriptions from the server and cache them locally
 		// This updates the local view of the users subscriptions, including any that were added from another device or
@@ -423,61 +340,20 @@ int main()
 		// indicating if the fetch was successful
 		Modio::FetchExternalUpdatesAsync(ModioExample::OnFetchExternalUpdatesComplete);
 
-		while (!ModioExample::HasAsyncOperationCompleted())
-		{
-			Modio::RunPendingHandlers();
-		}
-
-		if (!ModioExample::DidAsyncOperationSucceed())
-		{
-			// No need for explicit handling of an error from FetchExternalUpdates in this simple sample
-		}
+		ModioExample::WaitForExecution();
 	}
 
-	// Prompt the user for a Mod ID to install
+	// Using QuerySystemInstallations here to get all mods installed, regardless of whether they are in the current
+	// user's subscriptions or not
+	std::map<Modio::ModID, Modio::ModCollectionEntry> InstalledMods = Modio::QuerySystemInstallations();
+
+	if (InstalledMods.size() <= 0) // Continue when no mods are installed
 	{
-		std::int64_t UserModID = -1;
-		// An example ModID: "2281875", named "Sherlock Holmes"
-		std::string UserModString = ModioExample::RetrieveUserInput("Enter the ID of the mod you wish to install:");
-
-		UserModID = std::stoll(UserModString);
-		if (UserModID < 0)
-		{
-			std::cout << "Invalid Input" << std::endl;
-			return -1;
-		}
-
-		std::cout << "Installing Mod ID:" << UserModID << std::endl;
-		// Request a subscription for a specific mod ID.
-		// Parameters:
-		// ID The mod to subscribe too
-		// Callback The callback to be invoked with the results of the request. Will contain an error code if the
-		// request was not successful.
-		Modio::SubscribeToModAsync(Modio::ModID(UserModID), false, ModioExample::OnSubscriptionComplete);
-
-		while (!ModioExample::HasAsyncOperationCompleted())
-		{
-			Modio::RunPendingHandlers();
-		}
-
-		if (!ModioExample::DidAsyncOperationSucceed())
-		{
-			// No need for explicit handling of an error from SubscribeToModAsync in this simple sample
-		}
-		else
-		{
-			// Wait for the mod management system to finish installing the new mod and anything else which is
-			// pending
-			while (Modio::IsModManagementBusy())
-			{
-				Modio::RunPendingHandlers();
-			}
-		}
+		std::cout << "This example requires multiple mods installed to force an uninstall. Finishing execution."
+				  << std::endl;
 	}
-
-	// Prompt the user for a ModID to uninstall
+	else // Prompt the user for a Mod ID to uninstall
 	{
-		std::map<Modio::ModID, Modio::ModCollectionEntry> InstalledMods = Modio::QueryUserInstallations(true);
 		for (const auto& Mod : InstalledMods)
 		{
 			std::cout << Mod.first << "\t" << Mod.second.GetModProfile().ProfileName << "\t"
@@ -485,7 +361,7 @@ int main()
 		}
 		std::int64_t UserModID = -1;
 		std::string UserModString =
-			ModioExample::RetrieveUserInput("Enter the ID of the mod you wish to unsubscribe from:");
+			ModioExample::RetrieveUserInput("Enter the ID of the mod you wish to force remove:");
 
 		UserModID = std::stoll(UserModString);
 		if (UserModID < 0)
@@ -493,32 +369,35 @@ int main()
 			std::cout << "Invalid Input" << std::endl;
 			return -1;
 		}
+
 		auto IsModContained = InstalledMods.find(Modio::ModID(UserModID));
 		if (IsModContained != InstalledMods.end())
 		{
-			std::cout << "Unsubscribing Mod ID:" << UserModID << std::endl;
-			// Request a subscription for a specific mod ID.
-			// Parameters:
-			// ID The mod to subscribe too
-			// Callback The callback to be invoked with the results of the request. Will contain an error code if the
-			// request was not successful.
-			Modio::UnsubscribeFromModAsync(Modio::ModID(UserModID), ModioExample::OnUninstallationComplete);
+			std::cout << "Force Uninstalling Mod ID:" << UserModID << std::endl;
 
-			while (!ModioExample::HasAsyncOperationCompleted())
-			{
-				Modio::RunPendingHandlers();
-			}
+			/// Forcibly uninstalls a mod from the system. This is intended for use when a host application requires
+			/// more room for a mod that the user wants to install. It returns an error if the current user is
+			/// subscribed to the mod. To remove a mod the current user is subscribed to, use "UnsubscribeFromModAsync"
+			/// @param ModToRemove The ID for the mod to force remove.
+			/// @param Callback Callback invoked when the uninstallation is successful, or if it failed because the
+			/// current user remains subscribed.
+			Modio::ForceUninstallModAsync(Modio::ModID(UserModID), ModioExample::OnUninstallationComplete);
 
-			if (!ModioExample::DidAsyncOperationSucceed())
+			ModioExample::WaitForExecution();
+
+			if (Example.LastError)
 			{
-				// No need for explicit handling of an error from UnsubscribeFromModAsync in this simple sample
+				// Explicit handling of an error from ForceUninstallModAsync in this simple sample
+				// Most likely "ForceUninstallModAsync" could not execute if the user is subscribed to the mod
+				std::cout << "Consider authentication with another user if the operation failed." << std::endl;
 			}
 			else
 			{
-				// Wait for the mod management system to finish removing the mod
-				while (Example.LastEvent.Event != Modio::ModManagementEvent::EventType::Uninstalled)
+				if (Modio::IsModManagementBusy())
 				{
-					Modio::RunPendingHandlers();
+					//  Wait for the mod management system to finish installing the new mod and anything else which is
+					//  pending
+					ModioExample::WaitForExecution();
 				}
 			}
 		}
@@ -530,10 +409,12 @@ int main()
 
 	Modio::ShutdownAsync(ModioExample::OnShutdownComplete);
 
-	while (!ModioExample::HasAsyncOperationCompleted())
-	{
-		Modio::RunPendingHandlers();
-	}
+	ModioExample::WaitForExecution();
 
-	if (!ModioExample::DidAsyncOperationSucceed()) {}
+	// Halt execution of Modio::RunPendingHandlers(), and wait for the background thread to finish
+	bHaltBackgroundThread.store(true);
+	if (HandlerThread.joinable())
+	{
+		HandlerThread.join();
+	}
 }

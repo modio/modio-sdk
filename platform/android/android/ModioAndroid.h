@@ -10,7 +10,9 @@ namespace Modio
 	///	@brief Initializes the JNI environment for the Plugin to be able to set up all of its bindings
 	///	@param InJavaVM Pointer to the JavaVM from the host application
 	///	@param InClassLoader ClassLoader from the host application
-	MODIOSDK_API void InitializeAndroidJNI(JavaVM* InJavaVM, jobject InClassLoader);
+	///	@param bUseExternalStorageForMods Flag to specify whether to use external storage for storing downloaded mods (default is true)
+	MODIOSDK_API void InitializeAndroidJNI(JavaVM* InJavaVM, jobject InClassLoader,
+										   bool bUseExternalStorageForMods = true);
 
 	/// @docpublic
 	///	@brief Sets the global activity object for the Plugin to be able to call Java methods

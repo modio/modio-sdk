@@ -31,10 +31,11 @@ namespace Modio
 		public:
 			InitializeFileSystemOp(Modio::InitializeOptions InitParams,
 								   std::shared_ptr<Modio::Detail::FileSharedState> SharedState,
-								   Modio::filesystem::path& CommonDataPath, Modio::filesystem::path& UserDataPath,
-								   Modio::filesystem::path& TempPath)
+								   Modio::filesystem::path& RootDataPath, Modio::filesystem::path& CommonDataPath,
+								   Modio::filesystem::path& UserDataPath, Modio::filesystem::path& TempPath)
 				: InitParams(InitParams),
 				  SharedState(SharedState),
+				  RootDataPath(RootDataPath),
 				  CommonDataPath(CommonDataPath),
 				  UserDataPath(UserDataPath),
 				  TempPath(TempPath)
@@ -49,6 +50,7 @@ namespace Modio
 					return;
 				}
 
+				Modio::Detail::GetDefaultRootDataPath(RootDataPath);
 				Modio::Detail::GetDefaultCommonDataPath(CommonDataPath);
 				UserDataPath = Modio::filesystem::path(CommonDataPath) / "mod.io" /
 							   fmt::format("{}/{}/", InitParams.GameID, InitParams.User);
@@ -62,6 +64,7 @@ namespace Modio
 		private:
 			Modio::InitializeOptions InitParams;
 			std::shared_ptr<Modio::Detail::FileSharedState> SharedState;
+			Modio::filesystem::path& RootDataPath;
 			Modio::filesystem::path& CommonDataPath;
 			Modio::filesystem::path& UserDataPath;
 			Modio::filesystem::path& TempPath;
