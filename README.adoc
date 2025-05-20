@@ -3,7 +3,7 @@
 ++++
 = mod.io SDK2
 
-image:https://img.shields.io/badge/license-MIT-brightgreen.svg[alt="License", link="https://github.com/modio/modio-sdk/blob/master/LICENSE"]
+image:https://img.shields.io/badge/license-MIT-brightgreen.svg[alt="License", link="https://github.com/modio/modio-sdk/blob/main/LICENSE"]
 image:https://img.shields.io/discord/389039439487434752.svg?label=Discord&logo=discord&color=7289DA&labelColor=2C2F33[alt="Discord", link="https://discord.mod.io"]
 
 Welcome to the mod.io SDK repository, built using C++. It allows game developers to host and automatically install user-generated content in their games. It connects to the https://docs.mod.io[mod.io REST API].
