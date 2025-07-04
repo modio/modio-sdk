@@ -89,9 +89,10 @@ namespace Modio
 								ServerSubscriptionModIDs.AddMod(Profile);
 								ServerSubsModProfiles[Profile.ModId] = Profile;
 								Modio::Detail::SDKSessionData::GetSystemModCollection().AddOrUpdateMod(
-									Profile, Modio::ToModioString(Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
-																 .MakeModPath(Profile.ModId)
-																 .u8string()));
+									Profile, Modio::ToModioString(
+												 Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+													 .MakeModPath(Profile.ModId)
+													 .u8string()));
 							}
 						}
 
@@ -162,6 +163,8 @@ namespace Modio
 
 					if (bDirtyState)
 					{
+						Modio::Detail::SDKSessionData::InvalidateSubscriptionCache();
+
 						// Only save to storage if we actually have any changes to flush
 						yield UserService.SaveUserDataToStorageAsync(std::move(Self));
 
@@ -178,8 +181,8 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
-			Modio::ModID CurrentPendingUnsubscribe;
+			asio::coroutine CoroutineState {};
+			Modio::ModID CurrentPendingUnsubscribe {};
 			bool bDirtyState = false;
 		};
 

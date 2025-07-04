@@ -40,13 +40,13 @@ namespace Modio
 	{
 		class UploadFilePartOp
 		{
-			Modio::StableStorage<Modio::Detail::HttpRequest> Request;
-			asio::coroutine Coroutine;
-			Modio::Detail::DynamicBuffer ResponseBuffer;
-			Modio::Detail::CachedResponse AllowCachedResponse;
-			std::shared_ptr<Modio::Detail::UploadSession> Session;
-			std::unique_ptr<Modio::Detail::File> ArchiveFile;
-			std::unique_ptr<PerformRequestImpl> Impl;
+			Modio::StableStorage<Modio::Detail::HttpRequest> Request {};
+			asio::coroutine Coroutine {};
+			Modio::Detail::DynamicBuffer ResponseBuffer {};
+			Modio::Detail::CachedResponse AllowCachedResponse {};
+			std::shared_ptr<Modio::Detail::UploadSession> Session {};
+			std::unique_ptr<Modio::Detail::File> ArchiveFile {};
+			std::unique_ptr<PerformRequestImpl> Impl {};
 			// Location in the file respective to its origin
 			std::uintmax_t FileOffset = 0;
 			// How large the file is

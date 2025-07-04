@@ -28,21 +28,21 @@ namespace Modio
 	struct GamePlatform
 	{
 		/// @brief Platform that the game supports
-		Modio::ModfilePlatform Platform;
+		Modio::ModfilePlatform Platform {};
 
 		/// @brief Whether or not this platform is Locked from having files submitted to it
-		bool Locked;
+		bool Locked = false;
 
 		/// @brief Whether or not files submitted for this platform are required to go through moderation
-		bool Moderated;
+		bool Moderated = false;
 	};
 
 	/// @docpublic
 	/// @brief Contains media URLs to the preview header image for the game
 	struct HeaderImage
 	{
-		std::string Filename;
-		std::string Original;
+		std::string Filename {};
+		std::string Original {};
 
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::HeaderImage& HeaderImage);
@@ -89,11 +89,11 @@ namespace Modio
 		/// @brief Word used to describe user-generated content (mods, items, addons etc)
 		std::string UgcName;
 		/// @brief Contains media URLs to the icon for the game
-		Modio::Detail::Icon Icon = {};
+		Modio::Detail::Icon Icon {};
 		/// @brief Contains media URLs to the logo for the game
-		Modio::Detail::Logo Logo = {};
+		Modio::Detail::Logo Logo {};
 		/// @brief Contains media URLs to the preview header image for the game
-		Modio::HeaderImage HeaderImage = {};
+		Modio::HeaderImage HeaderImage {};
 		/// @brief Name of the game
 		std::string Name;
 		/// @brief Summary of the game's mod support
@@ -106,13 +106,13 @@ namespace Modio
 		/// @brief URL to the game
 		std::string ProfileUrl;
 		/// @brief Theme color values for the game
-		Modio::Theme Theme = {};
+		Modio::Theme Theme {};
 		/// @brief Numerous aggregate stats for the game
-		Modio::GameStats Stats = {};
+		Modio::GameStats Stats {};
 		/// @brief Creator defined URLs to share
-		std::vector<Modio::OtherUrl> OtherUrls = {};
+		std::vector<Modio::OtherUrl> OtherUrls {};
 		/// @brief Platforms supported by this title
-		std::vector<Modio::GamePlatform> PlatformSupport = {};
+		std::vector<Modio::GamePlatform> PlatformSupport {};
 		/// @brief Community options for the game
 		Modio::GameCommunityOptionsFlags	CommunityOptions;
 		/// @brief Monetization options for the game

@@ -21,13 +21,13 @@ namespace Modio
 		struct Avatar
 		{
 			/** Avatar filename including extension. */
-			std::string Filename;
+			std::string Filename {};
 			/** URL to the full-sized avatar. */
-			std::string Original;
+			std::string Original {};
 			/** URL to the small avatar thumbnail. */
-			std::string Thumb50x50;
+			std::string Thumb50x50 {};
 			/** URL to the medium avatar thumbnail. */
-			std::string Thumb100x100;
+			std::string Thumb100x100 {};
 
 			/// @docnone
 			friend bool operator==(const Modio::Detail::Avatar& A, const Modio::Detail::Avatar& B)

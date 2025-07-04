@@ -32,6 +32,8 @@
 #include "modio/detail/ops/monetization/RefreshUserEntitlementsSteam.h"
 #include "modio/detail/ops/monetization/RefreshUserEntitlementsXboxLive.h"
 #include "modio/detail/ops/monetization/RefreshUserEntitlementsPSN.h"
+#include "modio/detail/ops/monetization/RefreshUserEntitlementsGoogle.h"
+#include "modio/detail/ops/monetization/RefreshUserEntitlementsMeta.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 
 // Implementation header - do not include directly
@@ -88,6 +90,26 @@ namespace Modio
 
 					Modio::Detail::RefreshUserEntitlementsPSNAsync(Params, Callback);
 					break;
+
+					case Modio::Portal::Google:
+						if (Modio::Detail::RequireValidGoogleRefreshEntitlementsExtendedParameters(Params, Callback) ==
+							false)
+						{
+							return;
+						}
+
+						Modio::Detail::RefreshUserEntitlementsGoogleAsync(Params, Callback);
+						break;
+
+					case Modio::Portal::Meta:
+						if (Modio::Detail::RequireValidMetaRefreshEntitlementsExtendedParameters(Params, Callback) ==
+							false)
+						{
+							return;
+						}
+
+						Modio::Detail::RefreshUserEntitlementsMetaAsync(Params, Callback);
+						break;
 
 					default:
 					Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::ModManagement,

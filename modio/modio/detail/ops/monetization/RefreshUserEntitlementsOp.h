@@ -76,12 +76,12 @@ namespace Modio
 		private:
 			struct Impl
 			{
-				Modio::Detail::DynamicBuffer ResponseBuffer;
-				Modio::Detail::HttpRequestParams Params;
-				asio::coroutine CoroutineState;
+				Modio::Detail::DynamicBuffer ResponseBuffer {};
+				Modio::Detail::HttpRequestParams Params {};
+				asio::coroutine CoroutineState {};
 			};
 
-			Modio::StableStorage<Impl> LocalState;
+			Modio::StableStorage<Impl> LocalState {};
 		};
 	} // namespace Detail
 } // namespace Modio

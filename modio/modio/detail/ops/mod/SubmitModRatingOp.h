@@ -76,10 +76,10 @@ namespace Modio
 			}
 
 		private:
-			Modio::ModID Mod;
-			std::string RawRating;
-			asio::coroutine CoroutineState;
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
+			Modio::ModID Mod {};
+			std::string RawRating {};
+			asio::coroutine CoroutineState {};
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 		};
 	} // namespace Detail
 } // namespace Modio

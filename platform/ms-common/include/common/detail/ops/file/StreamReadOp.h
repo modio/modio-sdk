@@ -21,13 +21,13 @@
 class StreamReadOp
 {
 	Modio::Detail::Buffer Buffer;
-	std::shared_ptr<Modio::Detail::FileObjectImplementation> FileImpl;
-	std::uintmax_t Length;
-	Modio::StableStorage<OVERLAPPED> ReadOpParams;
-	asio::coroutine Coroutine;
-	Modio::Detail::Timer StatusTimer;
-	Modio::StableStorage<DWORD> NumberOfBytesRead;
-	Modio::Detail::DynamicBuffer Destination;
+	std::shared_ptr<Modio::Detail::FileObjectImplementation> FileImpl {};
+	std::uintmax_t Length = 0;
+	Modio::StableStorage<OVERLAPPED> ReadOpParams {};
+	asio::coroutine Coroutine {};
+	Modio::Detail::Timer StatusTimer {};
+	Modio::StableStorage<DWORD> NumberOfBytesRead {};
+	Modio::Detail::DynamicBuffer Destination {};
 
 public:
 	StreamReadOp(std::shared_ptr<Modio::Detail::FileObjectImplementation> IOObject, std::uintmax_t MaxBytesToRead,

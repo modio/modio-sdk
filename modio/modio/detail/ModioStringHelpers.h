@@ -10,11 +10,12 @@
 
 #pragma once
 
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/HedleyWrapper.h"
-#include "modio/core/ModioCoreTypes.h"
 
 #include <algorithm>
+#include <cctype>
 #include <iomanip>
 #include <map>
 #include <sstream>
@@ -101,7 +102,7 @@ namespace Modio
 					return Seconds;
 				}
 
-				std::tm Time = {};
+				std::tm Time {};
 				std::stringstream DateStream(Value);
 				// As an example: Fri, 1 Feb 2030 07:28:00 GMT
 				DateStream >> std::get_time(&Time, "%a, %d %b %Y %H:%M:%S %Z");
@@ -116,7 +117,7 @@ namespace Modio
 
 				if (SecondsToWait > 0)
 				{
-					return static_cast <std::uint32_t>(SecondsToWait);
+					return static_cast<std::uint32_t>(SecondsToWait);
 				}
 
 				return {};
@@ -218,6 +219,17 @@ namespace Modio
 				}
 
 				return URL.substr(LastPos + 1);
+			}
+
+			/// @brief Converts a string to all lowercase
+			/// @param str The string to convert to lowercase
+			/// @return an all lowercase string
+			static const std::string ToLowercase(const std::string& str)
+			{
+				std::string lower;
+				std::transform(str.begin(), str.end(), std::back_inserter(lower),
+							   [](char c) { return static_cast<char>(std::tolower(static_cast<unsigned char>(c))); });
+				return lower;
 			}
 
 			// Re-allow "unused function" warnings

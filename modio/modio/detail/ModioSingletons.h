@@ -20,7 +20,7 @@ namespace Modio
 		protected:
 			/// <summary>
 			/// </summary>
-			static T Instance;
+			static T Instance {};
 
 		public:
 			static T& GetInstance()
@@ -40,7 +40,7 @@ namespace Modio
 			/// We don't own the instance of ourselves here, as we don't want the singleton to extend its own
 			/// lifetime. Lifetime of the shared state should be effectively managed by the HttpImplementation
 			/// </summary>
-			static std::weak_ptr<T> Instance;
+			static std::weak_ptr<T> Instance {};
 
 		public:
 			static std::shared_ptr<T> GetInstance()

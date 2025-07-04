@@ -24,15 +24,15 @@ namespace Modio
 		struct Logo
 		{
 			/** Logo filename including extension. */
-			std::string Filename;
+			std::string Filename {};
 			/*URL to the full - sized logo. */
-			std::string Original;
+			std::string Original {};
 			/** URL to the small logo thumbnail. */
-			std::string Thumb320x180;
+			std::string Thumb320x180 {};
 			/** URL to the medium logo thumbnail. */
-			std::string Thumb640x360;
+			std::string Thumb640x360 {};
 			/** URL to the large logo thumbnail. */
-			std::string Thumb1280x720;
+			std::string Thumb1280x720 {};
 
 			/// @docnone
 			friend bool operator==(const Modio::Detail::Logo& A, const Modio::Detail::Logo& B)

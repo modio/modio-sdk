@@ -79,11 +79,11 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
+			asio::coroutine CoroutineState {};
 			struct
 			{
-				Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-				Modio::User AuthenticatedUser;
+				Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+				Modio::User AuthenticatedUser {};
 			} Local;
 		};
 #include <asio/unyield.hpp>

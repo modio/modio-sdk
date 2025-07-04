@@ -119,8 +119,8 @@ namespace Modio
 				FilePortion
 			};
 
-			Modio::Optional<Modio::Detail::Buffer> RawBuffer;
-			Modio::Optional<Modio::filesystem::path> PathToFile;
+			Modio::Optional<Modio::Detail::Buffer> RawBuffer {};
+			Modio::Optional<Modio::filesystem::path> PathToFile {};
 			PayloadType PType = PayloadType::Buffer;
 			// This is the amount of bytes the file occupies in the system
 			Modio::FileSize FileSize = Modio::FileSize(0);
@@ -383,47 +383,47 @@ namespace Modio
 			// Whether this request should suppress the X-Modio-Platform header
 			bool bSuppressPlatformHeader = false;
 
-			std::string FileDownloadServer;
+			std::string FileDownloadServer {};
 
-			std::string ResourcePath;
+			std::string ResourcePath {};
 
-			ContentType CurrentContentType;
+			ContentType CurrentContentType {};
 
-			std::uint64_t GameID;
-			std::uint64_t ModID;
-			std::uint64_t UserID;
+			std::uint64_t GameID {};
+			std::uint64_t ModID {};
+			std::uint64_t UserID {};
 
 			// This should most likely be a ID into a separate payload store or
 			// let it be put as a different parameter
-			Modio::Optional<std::string> Payload;
+			Modio::Optional<std::string> Payload {};
 
-			std::map<std::string, PayloadContent> PayloadMembers;
+			std::map<std::string, PayloadContent> PayloadMembers {};
 
-			Modio::Optional<std::string> AuthTokenOverride;
+			Modio::Optional<std::string> AuthTokenOverride {};
 
-			std::string APIKey;
+			std::string APIKey {};
 
 			// current API key
 			// URL
-			Verb CurrentOperationType;
+			Verb CurrentOperationType {};
 			// other headers
 			// payload data
 			// a lot of this data can be constexpr
 			// api version
-			APIVersion CurrentAPIVersion;
+			APIVersion CurrentAPIVersion {};
 
-			Modio::Optional<Modio::FileOffset> StartOffset;
-			Modio::Optional<Modio::FileOffset> EndOffset;
+			Modio::Optional<Modio::FileOffset> StartOffset {};
+			Modio::Optional<Modio::FileOffset> EndOffset {};
 
 			// Three variables needed to create the header Content-Range
 			// {Start, End, Total}
-			Modio::Optional<std::tuple<Modio::FileOffset, Modio::FileOffset, Modio::FileOffset>> ContentRangeOffsets;
+			Modio::Optional<std::tuple<Modio::FileOffset, Modio::FileOffset, Modio::FileOffset>> ContentRangeOffsets {};
 
-			Modio::Optional<std::string> UserAgentOverride;
+			Modio::Optional<std::string> UserAgentOverride {};
 
-			std::map<std::string, std::string> QueryParameters;
+			std::map<std::string, std::string> QueryParameters {};
 
-			std::map<std::string, std::string> AdditionalHeaders;
+			std::map<std::string, std::string> AdditionalHeaders {};
 		};
 
 // TODO: @Modio-core implement comparison operator for HttpRequestParams and maybe IsValid()?

@@ -43,11 +43,11 @@
 
 class ServiceInitializationOp
 {
-	asio::coroutine CoroutineState;
-	Modio::InitializeOptions InitParams;
-	Modio::filesystem::path GlobalOverridePath;
-	Modio::Detail::DynamicBuffer GlobalConfigFileReadBuffer;
-	std::map<std::string, std::string> ConfigurationValues;
+	asio::coroutine CoroutineState {};
+	Modio::InitializeOptions InitParams {};
+	Modio::filesystem::path GlobalOverridePath {};
+	Modio::Detail::DynamicBuffer GlobalConfigFileReadBuffer {};
+	std::map<std::string, std::string> ConfigurationValues {};
 
 public:
 	ServiceInitializationOp(Modio::InitializeOptions InitParams) : InitParams(InitParams) {}

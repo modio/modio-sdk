@@ -102,11 +102,11 @@ namespace Modio
 			}
 
 		private:
-			Modio::ModID ModId;
-			Modio::Detail::CachedResponse CachedResponse;
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			asio::coroutine CoroutineState;
-			Modio::Optional<Modio::ModInfo> ModInfoData;
+			Modio::ModID ModId {};
+			Modio::Detail::CachedResponse CachedResponse {};
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			asio::coroutine CoroutineState {};
+			Modio::Optional<Modio::ModInfo> ModInfoData {};
 		};
 
 		template<typename ProcessNextCallback>

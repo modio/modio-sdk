@@ -24,13 +24,13 @@ namespace Modio
 		struct Image
 		{
 			/** Image filename including extension. */
-			std::string Filename;
+			std::string Filename {};
 			/** URL to the full-sized image. */
-			std::string Original;
+			std::string Original {};
 			/** URL to the image thumbnail (320x180) */
-			std::string Thumb320x180;
+			std::string Thumb320x180 {};
 			/** URL to the image thumbnail (1280x720) */
-			std::string Thumb1280x720;
+			std::string Thumb1280x720 {};
 
 			/// @docnone
 			friend bool operator==(const Modio::Detail::Image& A, const Modio::Detail::Image& B)

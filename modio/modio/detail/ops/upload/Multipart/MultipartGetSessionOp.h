@@ -22,11 +22,11 @@ namespace Modio
 	{
 		class MultipartGetSessionOp
 		{
-			Modio::Detail::HttpRequestParams GetSessionsRequest;
-			Modio::Detail::DynamicBuffer ResponseBuffer;
-			std::shared_ptr<Modio::Detail::UploadSession> UploadSession;
-			Modio::ModID ModID;
-			asio::coroutine Coroutine;
+			Modio::Detail::HttpRequestParams GetSessionsRequest {};
+			Modio::Detail::DynamicBuffer ResponseBuffer {};
+			std::shared_ptr<Modio::Detail::UploadSession> UploadSession {};
+			Modio::ModID ModID {};
+			asio::coroutine Coroutine {};
 
 		public:
 			MultipartGetSessionOp(std::shared_ptr<Modio::Detail::UploadSession> ResponseSession,

@@ -23,50 +23,54 @@ namespace Modio
 		/// @docpublic
 		/// @brief Path to the logo for the mod. Must point to a valid file on disk or the mod will not be created on
 		/// the server.
-		std::string PathToLogoFile;
+		std::string PathToLogoFile {};
 		
 		/// @docpublic
 		/// @brief The name of the mod
-		std::string Name;
+		std::string Name {};
 		
 		/// @docpublic
 		/// @brief A brief summary of what the mod is
-		std::string Summary;
+		std::string Summary {};
 		
 		/// @docpublic
 		/// @brief Optional override for the name 'slug' in the mod's URL
-		Modio::Optional<std::string> NamePath;
+		Modio::Optional<std::string> NamePath {};
 		
 		/// @docpublic
 		/// @brief Optional override for the mod's visibility status. Defaults to Public (1)
-		Modio::Optional<Modio::ObjectVisibility> Visibility;
+		Modio::Optional<Modio::ObjectVisibility> Visibility {};
 
 		/// @docpublic
 		/// @brief Optional long description of the mod
-		Modio::Optional<std::string> Description;
+		Modio::Optional<std::string> Description {};
 		
 		/// @docpublic
 		/// @brief Optional URL to the mod's homepage. Must be a valid URL
-		Modio::Optional<std::string> HomepageURL;
+		Modio::Optional<std::string> HomepageURL {};
 		
 		/// @docpublic
 		/// @brief Optional quantity limit on the mod
-		Modio::Optional<std::size_t> Stock;
+		Modio::Optional<std::size_t> Stock {};
 		
 		/// @docpublic
 		/// @brief Bitwise mask of flags indicating mature content
-		Modio::Optional<Modio::MaturityOption> MaturityRating;
+		Modio::Optional<Modio::MaturityOption> MaturityRating {};
 
 		/// @docpublic
 		/// @brief Community options for the mod
-		Modio::Optional<Modio::ModCommunityOptionsFlags> CommunityOptions;
-		
+		Modio::Optional<Modio::ModCommunityOptionsFlags> CommunityOptions {};
+
 		/// @docpublic
 		/// @brief Optional metadata blob for this mod
-		Modio::Optional<std::string> MetadataBlob;
-		
+		Modio::Optional<std::string> MetadataBlob {};
+
+		/// @docpublic
+		/// @brief Optional key-value-pair metadata for this mod
+		Modio::Optional<std::vector<Modio::Metadata>> MetadataKvp {};
+
 		/// @docpublic
 		/// @brief Optional list of mod tags. All tags must be supported by the parent game to be applied
-		Modio::Optional<std::vector<std::string>> Tags;
+		Modio::Optional<std::vector<std::string>> Tags {};
 	};
 } // namespace Modio

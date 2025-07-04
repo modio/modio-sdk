@@ -15,7 +15,7 @@
 #include <asio/yield.hpp>
 class InitializeTimerServiceOp
 {
-	std::weak_ptr<class TimerSharedState> SharedState;
+	std::weak_ptr<class TimerSharedState> SharedState {};
 
 public:
 	InitializeTimerServiceOp(std::weak_ptr<TimerSharedState> SharedState) : SharedState(SharedState) {};
@@ -33,7 +33,7 @@ public:
 	}
 
 private:
-	asio::coroutine CoroState;
+	asio::coroutine CoroState {};
 };
 
 #include <asio/unyield.hpp>

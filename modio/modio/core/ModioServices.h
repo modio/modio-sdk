@@ -70,7 +70,7 @@ namespace Modio
 						Context = std::make_shared<asio::io_context>(1);
 					}
 				};
-				static ContextHolder InternalContext;
+				static ContextHolder InternalContext {};
 				return InternalContext.Context;
 			}
 		};

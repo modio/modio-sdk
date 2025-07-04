@@ -37,22 +37,22 @@ namespace Modio
 			struct ExtractEntryImpl
 			{
 				Modio::Detail::File ArchiveFile;
-				std::shared_ptr<ArchiveFileImplementation> ArchiveFileImpl;
-				ArchiveFileImplementation::ArchiveEntry EntryToExtract;
-				Modio::filesystem::path RootDirectoryToExtractTo;
-				Modio::Detail::DynamicBuffer FileData;
-				std::uintmax_t BytesProcessed;
+				std::shared_ptr<ArchiveFileImplementation> ArchiveFileImpl {};
+				ArchiveFileImplementation::ArchiveEntry EntryToExtract {};
+				Modio::filesystem::path RootDirectoryToExtractTo {};
+				Modio::Detail::DynamicBuffer FileData {};
+				std::uintmax_t BytesProcessed {};
 				Modio::Detail::File DestinationFile;
-				Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo;
+				Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo {};
 
-				boost::beast::zlib::inflate_stream ZStream;
-				boost::beast::zlib::z_params ZState;
-				Modio::ErrorCode DeflateStatus;
-				Modio::Optional<Modio::Detail::Buffer> DecompressedData;
+				boost::beast::zlib::inflate_stream ZStream {};
+				boost::beast::zlib::z_params ZState {};
+				Modio::ErrorCode DeflateStatus {};
+				Modio::Optional<Modio::Detail::Buffer> DecompressedData {};
 			};
 
-			Modio::StableStorage<ExtractEntryImpl> Impl;
-			asio::coroutine CoroutineState;
+			Modio::StableStorage<ExtractEntryImpl> Impl {};
+			asio::coroutine CoroutineState {};
 
 		public:
 			ExtractEntryDeflateOp(std::shared_ptr<ArchiveFileImplementation> ArchiveFileImpl,

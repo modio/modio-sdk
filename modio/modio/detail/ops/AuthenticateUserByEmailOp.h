@@ -103,13 +103,13 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
+			asio::coroutine CoroutineState {};
 			Modio::EmailAuthCode EmailCode;
 			struct
 			{
-				Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-				Modio::Detail::AccessTokenObject AuthResponse;
-				Modio::User NewlyAuthenticatedUser;
+				Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+				Modio::Detail::AccessTokenObject AuthResponse {};
+				Modio::User NewlyAuthenticatedUser {};
 			} Local;
 		};
 	} // namespace Detail

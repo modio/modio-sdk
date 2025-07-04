@@ -57,15 +57,15 @@ namespace Modio
 		/// @brief Size of the uncompressed file in bytes.
 		std::uint64_t FilesizeUncompressed = 0;
 		/// @brief Filename including extension.
-		std::string Filename;
+		std::string Filename {};
 		/// @brief Release version this file represents.
-		std::string Version;
+		std::string Version {};
 		/// @brief Changelog for the file.
-		std::string Changelog;
+		std::string Changelog {};
 		/// @brief Metadata stored by the game developer for this file.
-		std::string MetadataBlob;
+		std::string MetadataBlob {};
 		/// @brief Modfile download URL
-		std::string DownloadBinaryURL;
+		std::string DownloadBinaryURL {};
 		/// @brief Modfile download expiry date
 		std::int64_t DownloadExpiryDate = 0;
 

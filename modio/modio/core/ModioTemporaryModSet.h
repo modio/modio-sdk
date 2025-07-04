@@ -25,10 +25,10 @@ namespace Modio
 		{
 		private:
 			/// @brief vector of ModIds who are in the Temp/System Collection
-			std::vector<ModID> ModIds;
+			std::vector<ModID> ModIds {};
 
 			/// @brief vector of ModIds to collect ModInfo data before adding it to the TempModCollection
-			std::vector<ModID> TempModIdsToInstall;
+			std::vector<ModID> TempModIdsToInstall {};
 
 		public:
 			/// @docinternal

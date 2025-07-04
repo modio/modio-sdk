@@ -20,7 +20,7 @@ namespace Modio
 		class CompressionService : public asio::detail::service_base<CompressionService>
 		{
 			// TODO: @Modio-Core Better name for Compression/Compressor Implementation?
-			std::shared_ptr<CompressionImplementation> PlatformImplementation;
+			std::shared_ptr<CompressionImplementation> PlatformImplementation {};
 
 		public:
 			explicit CompressionService(asio::io_context& IOService)

@@ -153,7 +153,7 @@ namespace Modio
 
 			MODIO_IMPL static void SetPlatformStatusFilter(std::string PendingOnlyResults);
 			MODIO_IMPL static Modio::Optional<Modio::PlatformStatus> GetPlatformStatusFilter();
-			MODIO_IMPL static std::string GetPlatformStatusFilterString();
+			MODIO_IMPL static std::string GetAcceptanceFilterStringForRequestedPlatformStatus();
 
 			MODIO_IMPL static void SetModStorageQuota(Modio::FileSize ModStorageQuota);
 			MODIO_IMPL static Modio::Optional<Modio::FileSize> GetModStorageQuota();
@@ -216,47 +216,47 @@ namespace Modio
 			// This may not need to be public, can probably just expose static accessors that call it
 			MODIO_IMPL static SDKSessionData& Get();
 
-			Modio::GameID GameID;
-			Modio::ApiKey APIKey;
+			Modio::GameID GameID {};
+			Modio::ApiKey APIKey {};
 			Modio::Environment Environment = Modio::Environment::Live;
-			Modio::Optional<std::string> EnvironmentOverrideUrl;
-			Modio::Optional<std::string> PlatformOverride;
-			Modio::Optional<std::string> PlatformEnvironment;
-			Modio::Optional<Modio::PlatformStatus> PlatformStatusFilter;
-			Modio::Optional<Modio::FileSize> ModStorageQuota;
-			Modio::Optional<Modio::FileSize> CacheStorageQuota;
+			Modio::Optional<std::string> EnvironmentOverrideUrl {};
+			Modio::Optional<std::string> PlatformOverride {};
+			Modio::Optional<std::string> PlatformEnvironment {};
+			Modio::Optional<Modio::PlatformStatus> PlatformStatusFilter {};
+			Modio::Optional<Modio::FileSize> ModStorageQuota {};
+			Modio::Optional<Modio::FileSize> CacheStorageQuota {};
 			Modio::Portal PortalInUse = Modio::Portal::None;
 			Modio::Language LocalLanguage = Modio::Language::English;
 			InitializationState CurrentInitializationState = InitializationState::NotInitialized;
 			bool bModManagementEnabled = false;
-			std::vector<struct FieldError> LastValidationError;
+			std::vector<struct FieldError> LastValidationError {};
 			// Implemented as shared_ptr because that way operations that need to alter the state of the entry can get a
 			// cheap reference to the original without the lack of safety from a potentially dangling raw reference
-			std::shared_ptr<Modio::ModProgressInfo> CurrentModInProgress;
-			std::function<void(Modio::ModManagementEvent)> ModManagementEventCallback;
-			Modio::ModCollection SystemModCollection;
-			Modio::ModCollection TempModCollection;
+			std::shared_ptr<Modio::ModProgressInfo> CurrentModInProgress {};
+			std::function<void(Modio::ModManagementEvent)> ModManagementEventCallback {};
+			Modio::ModCollection SystemModCollection {};
+			Modio::ModCollection TempModCollection {};
 			// Could be a vector if we need multiple TempModSet
-			std::shared_ptr<Modio::Detail::TemporaryModSet> TempModSet;
-			Modio::Detail::UserDataContainer UserData;
+			std::shared_ptr<Modio::Detail::TemporaryModSet> TempModSet {};
+			Modio::Detail::UserDataContainer UserData {};
 			// We may need to make this a shared pointer and give a reference to operations so if we shut down they
 			// write into the stale log instead
-			Modio::ModEventLog EventLog;
+			Modio::ModEventLog EventLog {};
 			bool bRateLimited = false;
-			std::chrono::system_clock::time_point RateLimitedStop;
-			std::map<Modio::ModCreationHandle, Modio::Optional<Modio::ModID>> CreationHandles;
-			Modio::Optional<Modio::ModID> ModIDToPrioritize;
-			std::map<Modio::ModID, Modio::CreateModFileParams> PendingModUploads;
+			std::chrono::system_clock::time_point RateLimitedStop {};
+			std::map<Modio::ModCreationHandle, Modio::Optional<Modio::ModID>> CreationHandles {};
+			Modio::Optional<Modio::ModID> ModIDToPrioritize {};
+			std::map<Modio::ModID, Modio::CreateModFileParams> PendingModUploads {};
 			bool bSubscriptionCacheInvalid = false;
 			bool bTermsOfUseCacheInvalid = false;
 			bool bPurchaseCacheInvalid = false;
-			std::unordered_map<std::int64_t, bool> ModCacheInvalidMap;
+			std::unordered_map<std::int64_t, bool> ModCacheInvalidMap {};
 			moodycamel::ConcurrentQueue<fu2::unique_function<void()>> IncomingTaskQueue;
-			std::map<Modio::ModID, Modio::ModInfo> UserModPurchaseCache;
+			std::map<Modio::ModID, Modio::ModInfo> UserModPurchaseCache {};
 			// Only populated if a cache storage quota is set
-			std::queue<Modio::filesystem::path> CacheImagePaths;
+			std::queue<Modio::filesystem::path> CacheImagePaths {};
 			// Only set if a cache storage quota is set
-			Modio::FileSize TotalImageCacheSize;
+			Modio::FileSize TotalImageCacheSize {};
 			bool FetchExternalUpdatesRunning = false;
 		};
 	} // namespace Detail

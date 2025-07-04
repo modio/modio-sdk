@@ -137,13 +137,13 @@ namespace Modio
 			}
 
 		private:
-			Modio::GameID GameID;
-			Modio::ApiKey ApiKey;
-			Modio::ModID ModId;
+			Modio::GameID GameID {};
+			Modio::ApiKey ApiKey {};
+			Modio::ModID ModId {};
 			uint64_t PriceInTokens = 0;
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			asio::coroutine CoroutineState;
-			Modio::Optional<Modio::TransactionRecord> Record;
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			asio::coroutine CoroutineState {};
+			Modio::Optional<Modio::TransactionRecord> Record {};
 		};
 	} // namespace Detail
 } // namespace Modio

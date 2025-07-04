@@ -135,12 +135,12 @@ public:
 	}
 
 private:
-	asio::coroutine CoroutineState;
-	Modio::filesystem::path FolderPath;
-	std::vector<Modio::filesystem::path> Files;
-	std::vector<std::pair<Modio::filesystem::path, int>> Folders;
-	Modio::filesystem::recursive_directory_iterator DirectoryIterator;
-	std::weak_ptr<Modio::Detail::FileSharedState> SharedState;
+	asio::coroutine CoroutineState {};
+	Modio::filesystem::path FolderPath {};
+	std::vector<Modio::filesystem::path> Files {};
+	std::vector<std::pair<Modio::filesystem::path, int>> Folders {};
+	Modio::filesystem::recursive_directory_iterator DirectoryIterator {};
+	std::weak_ptr<Modio::Detail::FileSharedState> SharedState {};
 	size_t FileIndex = 0;
 	size_t FolderIndex = 0;
 };

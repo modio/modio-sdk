@@ -21,7 +21,7 @@ namespace Modio
 		{
 		protected:
 			// std::chrono::steady_clock::time_point ExpiryTime;
-			std::chrono::steady_clock::duration TimerDuration;
+			std::chrono::steady_clock::duration TimerDuration {};
 
 		public:
 			void ExpiresAfter(std::chrono::steady_clock::duration Duration) override

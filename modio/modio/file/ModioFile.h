@@ -21,9 +21,9 @@ namespace Modio
 	{
 		class File : public asio::basic_io_object<Modio::Detail::FileService>
 		{
-			Modio::filesystem::path FilePath;
+			Modio::filesystem::path FilePath {};
 			asio::strand<asio::io_context::executor_type> FileStrand;
-			Modio::Detail::FileMode Mode;
+			Modio::Detail::FileMode Mode {};
 
 		public:
 			explicit File(Modio::filesystem::path FilePath, Modio::Detail::FileMode Mode,

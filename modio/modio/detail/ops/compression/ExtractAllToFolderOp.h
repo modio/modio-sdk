@@ -31,12 +31,12 @@ namespace Modio
 		{
 			struct ExtractAllImpl
 			{
-				asio::coroutine CoroutineState;
-				Modio::filesystem::path ArchivePath;
-				Modio::filesystem::path RootOutputPath;
+				asio::coroutine CoroutineState {};
+				Modio::filesystem::path ArchivePath {};
+				Modio::filesystem::path RootOutputPath {};
 				Modio::Detail::ArchiveReader ArchiveView;
-				Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo;
-				std::vector<Modio::Detail::ArchiveFileImplementation::ArchiveEntry>::iterator CurrentEntryIterator;
+				Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo {};
+				std::vector<Modio::Detail::ArchiveFileImplementation::ArchiveEntry>::iterator CurrentEntryIterator {};
 				ExtractAllImpl(asio::coroutine CoroutineState, Modio::filesystem::path ArchivePath,
 							   Modio::filesystem::path RootOutputPath, Modio::Detail::ArchiveReader ArchiveView,
 							   Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo)
@@ -46,7 +46,7 @@ namespace Modio
 					  ArchiveView(std::move(ArchiveView)),
 					  ProgressInfo(ProgressInfo) {}
 			};
-			Modio::StableStorage<ExtractAllImpl> Impl;
+			Modio::StableStorage<ExtractAllImpl> Impl {};
 
 		public:
 			ExtractAllToFolderOp(ExtractAllToFolderOp&& Other)

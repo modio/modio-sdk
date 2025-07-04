@@ -25,7 +25,7 @@ class TimerSharedState : public std::enable_shared_from_this<TimerSharedState>
 	using TimerMap = std::map<std::chrono::steady_clock::time_point, fu2::unique_function<void(Modio::ErrorCode)>>;
 
 public:
-	TimerMap PendingTimers;
+	TimerMap PendingTimers {};
 
 	Modio::ErrorCode InitializeTimer(std::shared_ptr<TimerImplementation> MODIO_UNUSED_ARGUMENT(ImplementationToInitialize))
 	{

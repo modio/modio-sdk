@@ -47,17 +47,17 @@ namespace Modio
 			int FilePart = 0;
 			// A calculated number of parts related to the file size
 			int NumParts = 0;
-			Modio::Detail::HttpRequestParams OpenSessionRequest;
-			Modio::StableStorage<Modio::Detail::HttpRequest> CloseSessionRequest;
-			Modio::Detail::DynamicBuffer ResponseBuffer;
-			Modio::Detail::CachedResponse AllowCachedResponse;
-			std::shared_ptr<Modio::Detail::UploadSession> Session;
-			std::shared_ptr<Modio::Detail::UploadSessionPartList> SessionParts;
-			Modio::ModID ModID;
-			Modio::filesystem::path ArchivePath;
+			Modio::Detail::HttpRequestParams OpenSessionRequest {};
+			Modio::StableStorage<Modio::Detail::HttpRequest> CloseSessionRequest {};
+			Modio::Detail::DynamicBuffer ResponseBuffer {};
+			Modio::Detail::CachedResponse AllowCachedResponse {};
+			std::shared_ptr<Modio::Detail::UploadSession> Session {};
+			std::shared_ptr<Modio::Detail::UploadSessionPartList> SessionParts {};
+			Modio::ModID ModID {};
+			Modio::filesystem::path ArchivePath {};
 			Modio::Detail::OperationQueue::Ticket RequestTicket;
-			std::weak_ptr<Modio::ModProgressInfo> ProgressInfo;
-			asio::coroutine Coroutine;
+			std::weak_ptr<Modio::ModProgressInfo> ProgressInfo {};
+			asio::coroutine Coroutine {};
 
 		public:
 			UploadMultipartFileOp(std::shared_ptr<Modio::Detail::UploadSession> ResponseSession,

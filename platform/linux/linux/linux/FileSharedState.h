@@ -25,7 +25,7 @@ namespace Modio
 			// may need to be public but we'll see
 			void UringHandlePendingCompletions()
 			{
-				io_uring_cqe* CompletionInfo;
+				io_uring_cqe* CompletionInfo = nullptr;
 
 				while (io_uring_peek_cqe(&UringState, &CompletionInfo) == 0)
 				{
@@ -172,16 +172,16 @@ namespace Modio
 				};
 
 				Modio::Detail::Buffer Data;
-				int AssociatedDescriptor;
+				int AssociatedDescriptor = 0;
 				bool DidFinish = false;
 				int OpTrials = 0;
 				Modio::FileSize CachedFileSize = Modio::FileSize(0);
-				Modio::Optional<Modio::ErrorCode> Result;
+				Modio::Optional<Modio::ErrorCode> Result {};
 				/// @brief In theory we should be configuring uring to never perform partial writes but we definitely
 				/// need support for partial reads
-				Modio::FileSize NumBytesTransferred;
-				Direction TransferDirection;
-				Modio::FileOffset Offset;
+				Modio::FileSize NumBytesTransferred {};
+				Direction TransferDirection {};
+				Modio::FileOffset Offset {};
 				PendingIOOperation(Modio::Detail::Buffer Data, int AssociatedDescriptor, Direction TransferDirection,
 								   Modio::FileOffset Offset)
 					: Data(std::move(Data)),
@@ -193,10 +193,10 @@ namespace Modio
 				{}
 			};
 
-			std::map<int, PendingIOOperation> PendingIO;
+			std::map<int, PendingIOOperation> PendingIO {};
 
 		public:
-			io_uring UringState;
+			io_uring UringState {};
 			bool bCancelRequested = false;
 
 			Modio::ErrorCode Initialize()

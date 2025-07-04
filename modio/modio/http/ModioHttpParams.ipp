@@ -184,7 +184,7 @@ namespace Modio
 		{
 			if (SDKSessionData::GetPlatformStatusFilter().has_value())
 			{
-				return AddQueryParamRaw("status-in", SDKSessionData::GetPlatformStatusFilterString());
+				return AddQueryParamRaw("status-in", SDKSessionData::GetAcceptanceFilterStringForRequestedPlatformStatus());
 			}
 
 			return HttpRequestParams(*this);
@@ -583,7 +583,7 @@ namespace Modio
 		Modio::Detail::HttpRequestParams::HeaderList HttpRequestParams::GetHeaders() const
 		{
 			MODIO_PROFILE_SCOPE(HttpRequestGetHeaders);
-			HeaderList Headers = {};
+			HeaderList Headers {};
 
 			// Default headers
 			if (bSuppressPlatformHeader == false)

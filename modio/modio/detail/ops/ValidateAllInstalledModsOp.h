@@ -27,9 +27,9 @@ namespace Modio
 		/// ValidateModInstallationAsync
 		class ValidateAllInstalledModsOp
 		{
-			asio::coroutine CoroutineState;
-			std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> UserModCollection;
-			std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>::iterator It;
+			asio::coroutine CoroutineState {};
+			std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> UserModCollection {};
+			std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>::iterator It {};
 
 		public:
 			ValidateAllInstalledModsOp()

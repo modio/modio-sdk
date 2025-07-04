@@ -50,11 +50,11 @@ namespace Modio
 
 			MODIO_IMPL bool IsValid() const;
 
-			Modio::UserSubscriptionList UserSubscriptions;
-			std::vector<Modio::ModID> DeferredUnsubscriptions;
-			Modio::Optional<Modio::Detail::ProfileData> AuthenticatedProfile;
+			Modio::UserSubscriptionList UserSubscriptions {};
+			std::vector<Modio::ModID> DeferredUnsubscriptions {};
+			Modio::Optional<Modio::Detail::ProfileData> AuthenticatedProfile {};
 
-			Modio::Optional<Modio::filesystem::path> UserModDirectoryOverride;
+			Modio::Optional<Modio::filesystem::path> UserModDirectoryOverride {};
 
 			/// @docnone
 			MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::Detail::UserDataContainer& UserData);

@@ -78,21 +78,21 @@ namespace Modio
 								Modio::Optional<std::string> ReporterContact);
 
 	private:
-		Modio::Optional<std::string> ReporterName;
-		Modio::Optional<std::string> ReporterContact;
-		std::string ReportDescription;
+		Modio::Optional<std::string> ReporterName {};
+		Modio::Optional<std::string> ReporterContact {};
+		std::string ReportDescription {};
 		enum class ResourceType : uint8_t
 		{
 			Game,
 			Mod,
 			User
 		};
-		ResourceType ReportedResourceType;
+		ResourceType ReportedResourceType {};
 		/// @brief Type-erased storage for the underlying resource ID. NB if REST API changes ID types this will
 		/// need to be altered to match
-		std::int64_t ResourceID;
+		std::int64_t ResourceID {};
 
-		ReportType Type;
+		ReportType Type {};
 
 		MODIO_IMPL ReportParams(std::int64_t ResourceID, ResourceType ReportedResourceType, Modio::ReportType Type,
 								std::string ReportDescription, Modio::Optional<std::string> ReporterName,

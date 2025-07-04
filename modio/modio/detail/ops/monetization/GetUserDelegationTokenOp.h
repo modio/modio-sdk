@@ -25,11 +25,11 @@ namespace Modio
 	{
 		class GetUserDelegationTokenOp
 		{
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			Modio::GameID GameID;
-			Modio::ApiKey ApiKey;
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			Modio::GameID GameID {};
+			Modio::ApiKey ApiKey {};
 
-			asio::coroutine CoroutineState;
+			asio::coroutine CoroutineState {};
 
 		public:
 			GetUserDelegationTokenOp(Modio::GameID GameID, Modio::ApiKey ApiKey) : GameID(GameID), ApiKey(ApiKey) {}

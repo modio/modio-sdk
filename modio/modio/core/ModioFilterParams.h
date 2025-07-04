@@ -193,30 +193,30 @@ namespace Modio
 			return AppendValue(Vector, args...);
 		}*/
 
-		SortFieldType SortField;
-		SortDirection Direction;
+		SortFieldType SortField = SortFieldType::ID;
+		SortDirection Direction = SortDirection::Ascending;
 
-		std::vector<Modio::UserID> AuthorUserIds;
-		std::vector<std::string> SearchKeywords;
+		std::vector<Modio::UserID> AuthorUserIds {};
+		std::vector<std::string> SearchKeywords {};
 
-		Modio::Optional<std::chrono::system_clock::time_point> DateRangeBegin;
-		Modio::Optional<std::chrono::system_clock::time_point> DateRangeEnd;
+		Modio::Optional<std::chrono::system_clock::time_point> DateRangeBegin {};
+		Modio::Optional<std::chrono::system_clock::time_point> DateRangeEnd {};
 
-		std::vector<std::string> Tags;
-		std::vector<std::string> ExcludedTags;
+		std::vector<std::string> Tags {};
+		std::vector<std::string> ExcludedTags {};
 
-		std::vector<Modio::ModID> IncludedIDs;
-		std::vector<Modio::ModID> ExcludedIDs;
+		std::vector<Modio::ModID> IncludedIDs {};
+		std::vector<Modio::ModID> ExcludedIDs {};
 
-		Modio::Optional<RevenueFilterType> Revenue;
+		Modio::Optional<RevenueFilterType> Revenue {};
 
-		Modio::Optional<MaturityOption> Maturity;
+		Modio::Optional<MaturityOption> Maturity {};
 
-		Modio::Optional<std::string> MetadataBlobSearchString;
+		Modio::Optional<std::string> MetadataBlobSearchString {};
 
-		bool IsPaged;
-		std::size_t Index;
-		std::size_t Count;
+		bool IsPaged = false;
+		std::size_t Index = 0;
+		std::size_t Count = 0;
 	};
 
 } // namespace Modio

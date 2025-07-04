@@ -41,9 +41,9 @@ namespace Modio
 			}
 
 		private:
-			Modio::UserID ID;
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			asio::coroutine CoroutineState;
+			Modio::UserID ID {};
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			asio::coroutine CoroutineState {};
 		};
 	} // namespace Detail
 } // namespace Modio

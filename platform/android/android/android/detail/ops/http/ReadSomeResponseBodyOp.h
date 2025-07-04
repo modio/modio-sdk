@@ -30,10 +30,10 @@ namespace Modio
 #include <asio/yield.hpp>
 		class ReadSomeResponseBodyOp
 		{
-			asio::coroutine CoroutineState;
-			std::shared_ptr<HttpRequestImplementation> Request;
-			std::weak_ptr<HttpSharedState> SharedState;
-			Modio::Detail::DynamicBuffer ResponseBuffer;
+			asio::coroutine CoroutineState {};
+			std::shared_ptr<HttpRequestImplementation> Request {};
+			std::weak_ptr<HttpSharedState> SharedState {};
+			Modio::Detail::DynamicBuffer ResponseBuffer {};
 
 		public:
 			ReadSomeResponseBodyOp(std::shared_ptr<HttpRequestImplementation> Request,

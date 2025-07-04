@@ -34,7 +34,7 @@ namespace Modio
 	{
 		class HttpImplementation : public Modio::Detail::IHttpServiceImplementation
 		{
-			std::shared_ptr<HttpSharedState> HttpState;
+			std::shared_ptr<HttpSharedState> HttpState {};
 
 		public:
 			using IOObjectImplementationType = std::shared_ptr<HttpRequestImplementation>;

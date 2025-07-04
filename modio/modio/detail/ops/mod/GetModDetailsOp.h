@@ -23,12 +23,12 @@ namespace Modio
 	{
 		class GetModDetailsOp
 		{
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			Modio::GameID GameID;
-			Modio::ApiKey ApiKey;
-			Modio::ModID ModId;
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			Modio::GameID GameID {};
+			Modio::ApiKey ApiKey {};
+			Modio::ModID ModId {};
 
-			asio::coroutine CoroutineState;
+			asio::coroutine CoroutineState {};
 
 		public:
 			GetModDetailsOp(Modio::GameID GameID, Modio::ApiKey ApiKey, Modio::ModID ModId)

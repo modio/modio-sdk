@@ -559,8 +559,11 @@ namespace Modio
 			return Get().PlatformStatusFilter;
 		}
 
-		std::string SDKSessionData::GetPlatformStatusFilterString()
+		std::string SDKSessionData::GetAcceptanceFilterStringForRequestedPlatformStatus()
 		{
+			//When trying to filter mods based on their platform status, we need to filter based on the acceptance status of the mod as well
+			// This method ensures that when filtering for mods that have a pending modfile for the current platform, we show mods that have
+			// not yet been approved at all 
 			if (Get().PlatformStatusFilter.has_value())
 			{
 				switch (Get().PlatformStatusFilter.value())

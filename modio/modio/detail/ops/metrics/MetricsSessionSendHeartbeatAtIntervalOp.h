@@ -68,10 +68,10 @@ namespace Modio
 
 		private:
 			Modio::Detail::Timer Timer;
-			uint32_t Interval;
-			nlohmann::json BodyJson;
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			asio::coroutine CoroutineState;
+			uint32_t Interval {};
+			nlohmann::json BodyJson {};
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			asio::coroutine CoroutineState {};
 		};
 
 		template<typename Callback>

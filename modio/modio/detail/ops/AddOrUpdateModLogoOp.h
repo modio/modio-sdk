@@ -25,11 +25,11 @@ namespace Modio
 	{
 		class AddOrUpdateModLogoOp
 		{
-			asio::coroutine CoroState;
-			Modio::GameID GameID;
-			Modio::ModID ModID;
-			Modio::filesystem::path LogoPath;
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
+			asio::coroutine CoroState {};
+			Modio::GameID GameID {};
+			Modio::ModID ModID {};
+			Modio::filesystem::path LogoPath {};
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 
 		public:
 			AddOrUpdateModLogoOp(Modio::GameID GameID, Modio::ModID ModID, Modio::filesystem::path LogoPath)

@@ -26,8 +26,8 @@ namespace Modio
 		/// kind of action (update, installation, uninstallation)
 		class ModManagementLoop
 		{
-			Modio::Detail::Timer IdleTimer;
-			asio::coroutine CoroutineState;
+			Modio::Detail::Timer IdleTimer {};
+			asio::coroutine CoroutineState {};
 			std::uint8_t ExternalUpdateCounter = 0;
 
 		public:

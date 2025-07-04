@@ -20,11 +20,11 @@ namespace Modio
 	/// @brief Base class for all types that represent a page from a set of results
 	class PagedResult
 	{
-		std::int32_t PageIndex;
-		std::int32_t PageSize;
-		std::int32_t PageCount;
-		std::int32_t TotalResultCount;
-		std::int32_t ResultCount;
+		std::int32_t PageIndex = 0;
+		std::int32_t PageSize = 0;
+		std::int32_t PageCount = 0;
+		std::int32_t TotalResultCount = 0;
+		std::int32_t ResultCount = 0;
 
 	public:
 

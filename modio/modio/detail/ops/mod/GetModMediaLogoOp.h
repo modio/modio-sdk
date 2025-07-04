@@ -24,13 +24,13 @@ namespace Modio
 	{
 		class GetModMediaLogoOp
 		{
-			asio::coroutine CoroState;
+			asio::coroutine CoroState {};
 
 			// Parameters
-			Modio::GameID GameID;
-			Modio::ApiKey ApiKey;
-			Modio::ModID ModId;
-			Modio::LogoSize LogoSize;
+			Modio::GameID GameID {};
+			Modio::ApiKey ApiKey {};
+			Modio::ModID ModId {};
+			Modio::LogoSize LogoSize {};
 
 			// State needed to persist during coroutine
 			struct

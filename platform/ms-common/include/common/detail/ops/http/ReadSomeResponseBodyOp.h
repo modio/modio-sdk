@@ -22,14 +22,14 @@
 
 class ReadSomeResponseBodyOp
 {
-	std::shared_ptr<HttpRequestImplementation> Request;
-	Modio::Detail::DynamicBuffer DataBuffer;
-	std::unique_ptr<Modio::Detail::Buffer> ResponseChunkBuffer;
+	std::shared_ptr<HttpRequestImplementation> Request {};
+	Modio::Detail::DynamicBuffer DataBuffer {};
+	std::unique_ptr<Modio::Detail::Buffer> ResponseChunkBuffer {};
 	std::uintmax_t BufferSize = 512 * 1024;
-	std::pair<std::uintptr_t, std::uintmax_t> ExtendedStatus;
-	std::weak_ptr<HttpSharedStateBase> SharedState;
-	asio::coroutine CoroutineState;
-	Modio::Detail::Timer SendTimer;
+	std::pair<std::uintptr_t, std::uintmax_t> ExtendedStatus {};
+	std::weak_ptr<HttpSharedStateBase> SharedState {};
+	asio::coroutine CoroutineState {};
+	Modio::Detail::Timer SendTimer {};
 	bool bReadComplete = false;
 	WinHTTPCallbackStatus Status = WinHTTPCallbackStatus::Waiting;
 

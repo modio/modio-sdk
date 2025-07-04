@@ -94,11 +94,11 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
+			asio::coroutine CoroutineState {};
 
-			std::unique_ptr<Modio::Detail::File> DestinationFile;
-			Modio::Detail::DynamicBuffer DataBuffer;
-			Modio::filesystem::path RootPath;
+			std::unique_ptr<Modio::Detail::File> DestinationFile {};
+			Modio::Detail::DynamicBuffer DataBuffer {};
+			Modio::filesystem::path RootPath {};
 		};
 	} // namespace Detail
 } // namespace Modio

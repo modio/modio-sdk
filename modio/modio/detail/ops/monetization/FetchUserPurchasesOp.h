@@ -27,12 +27,12 @@ namespace Modio
 		/// public-facing data types
 		class FetchUserPurchasesOp
 		{
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			Modio::GameID GameID;
-			Modio::Detail::CachedResponse CachedResponse;
-			Modio::Optional<Modio::ModInfoList> List;
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			Modio::GameID GameID {};
+			Modio::Detail::CachedResponse CachedResponse {};
+			Modio::Optional<Modio::ModInfoList> List {};
 
-			asio::coroutine CoroutineState;
+			asio::coroutine CoroutineState {};
 
 
 		public:

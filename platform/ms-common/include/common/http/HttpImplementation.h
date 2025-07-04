@@ -45,7 +45,7 @@ namespace Modio
 		template<typename Subplatform, typename SharedStateType>
 		class HttpImplementationBase : public Modio::Detail::IHttpServiceImplementation
 		{
-			std::shared_ptr<SharedStateType> HttpState;
+			std::shared_ptr<SharedStateType> HttpState {};
 			asio::io_context::service& OwningService;
 
 		public:

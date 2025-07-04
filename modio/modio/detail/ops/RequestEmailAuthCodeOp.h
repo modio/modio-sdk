@@ -39,8 +39,8 @@ namespace Modio::Detail
 		}
 
 	private:
-		asio::coroutine CoroutineState;
-		Modio::Detail::DynamicBuffer ResponseBuffer;
+		asio::coroutine CoroutineState {};
+		Modio::Detail::DynamicBuffer ResponseBuffer {};
 		Modio::EmailAddress EmailAddress;
 	};
 } // namespace Modio::Detail

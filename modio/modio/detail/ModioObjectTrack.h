@@ -18,9 +18,9 @@ namespace Modio
 	{
 		class OperationTracker
 		{
-			const char* OpName;
+			const char* OpName = nullptr;
 			bool bMovedFrom = false;
-			void* OpPtr;
+			void* OpPtr = nullptr;
 
 			static std::unordered_map<void*, const char*>& OperationMap()
 			{

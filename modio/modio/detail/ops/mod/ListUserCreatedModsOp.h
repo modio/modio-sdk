@@ -27,11 +27,11 @@ namespace Modio
 		/// public-facing data types
 		class ListUserCreatedModsOp
 		{
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			Modio::FilterParams Filter;
-			Modio::GameID GameID;
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			Modio::FilterParams Filter {};
+			Modio::GameID GameID {};
 
-			asio::coroutine CoroutineState;
+			asio::coroutine CoroutineState {};
 
 		public:
 			ListUserCreatedModsOp(Modio::GameID GameID, FilterParams InFilter) : Filter(std::move(InFilter)), GameID(GameID) {}
@@ -57,7 +57,10 @@ namespace Modio
 					
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer,
-						Modio::Detail::GetUserModsRequest.SuppressPlatformHeader().SetGameID(GameID).AddCurrentGameIdQueryParam(),
+						Modio::Detail::GetUserModsRequest.SuppressPlatformHeader()
+							.SetGameID(GameID)
+							.AddCurrentGameIdQueryParam()
+							.AppendQueryParameterMap(Filter.ToQueryParamaters()),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 
 					if (ec)

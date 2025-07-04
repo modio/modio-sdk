@@ -29,10 +29,10 @@ namespace Modio
 		class FileObjectImplementation : public Modio::Detail::IFileObjectImplementation
 		{
 			constexpr static int InvalidFileDescriptor = -1;
-			Modio::filesystem::path FilePath;
-			Modio::Detail::FileMode FileMode;
-			Modio::filesystem::path BasePath;
-			int FileDescriptor;
+			Modio::filesystem::path FilePath {};
+			Modio::Detail::FileMode FileMode {};
+			Modio::filesystem::path BasePath {};
+			int FileDescriptor {};
 			// Strand so that IO ops don't get performed simultaneously
 			asio::strand<asio::io_context::executor_type>* Strand;
 			std::atomic<bool> OperationInProgress {false};

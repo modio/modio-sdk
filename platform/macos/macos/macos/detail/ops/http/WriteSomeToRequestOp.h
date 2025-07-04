@@ -25,11 +25,11 @@ namespace Modio
 	{
 		class WriteSomeToRequestOp
 		{
-			std::shared_ptr<HttpRequestImplementation> Request;
+			std::shared_ptr<HttpRequestImplementation> Request {};
 			Modio::Detail::Buffer DataToWrite;
-			asio::coroutine CoroutineState;
-			Modio::Detail::Timer StatusTimer;
-			std::weak_ptr<HttpSharedState> SharedState;
+			asio::coroutine CoroutineState {};
+			Modio::Detail::Timer StatusTimer {};
+			std::weak_ptr<HttpSharedState> SharedState {};
 
 		public:
 			WriteSomeToRequestOp(std::shared_ptr<HttpRequestImplementation> Request, Modio::Detail::Buffer DataToWrite,

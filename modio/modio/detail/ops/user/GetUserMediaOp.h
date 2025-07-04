@@ -62,18 +62,18 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
+			asio::coroutine CoroutineState {};
 
 			// Parameters
-			Modio::GameID GameID;
-			Modio::ApiKey ApiKey;
-			Modio::AvatarSize AvatarSize;
+			Modio::GameID GameID {};
+			Modio::ApiKey ApiKey {};
+			Modio::AvatarSize AvatarSize {};
 
 			// State that might get mutated during the corutine
 			struct
 			{
-				Modio::Optional<Modio::User> User;
-				Modio::StableStorage<Modio::filesystem::path> DestinationPath;
+				Modio::Optional<Modio::User> User {};
+				Modio::StableStorage<Modio::filesystem::path> DestinationPath {};
 			} OpState;
 		};
 	} // namespace Detail

@@ -96,9 +96,9 @@ namespace Modio
 			// the startup
 			static MODIO_IMPL std::function<void(Modio::LogLevel, const std::string&)> UserCallbackFunction;
 
-			LogLevel CurrentLogLevel;
+			LogLevel CurrentLogLevel = LogLevel::Warning;
 			asio::strand<asio::io_context::executor_type> LogStrand;
-			std::vector<LogMessage> LogBuffer;
+			std::vector<LogMessage> LogBuffer {};
 		};
 	} // namespace Detail
 } // namespace Modio

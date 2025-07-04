@@ -26,11 +26,11 @@ namespace Modio
 		struct Link
 		{
 			/// @brief The user-facing text for the link
-			std::string Text;
+			std::string Text {};
 			/// @brief The actual URL for the link
-			std::string URL;
+			std::string URL {};
 			/// @brief Is displaying this link mandatory?
-			bool bRequired;
+			bool bRequired = false;
 
 			/// @docnone
 			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Terms::Link& OutLink);
@@ -41,9 +41,9 @@ namespace Modio
 		struct TermsButtons
 		{
 			/// @brief Text to display on the affirmative/OK button
-			std::string AgreeText;
+			std::string AgreeText {};
 			/// @brief Text to display on the negative/cancel button
-			std::string DisagreeText;
+			std::string DisagreeText {};
 		} Buttons;
 
 		/// @docpublic
@@ -51,19 +51,19 @@ namespace Modio
 		struct TermsLinks
 		{
 			/// @brief Link to the mod.io website
-			Link Website;
+			Link Website {};
 			/// @brief Link to the mod.io terms of use
-			Link Terms;
+			Link Terms {};
 			/// @brief Link to the mod.io Privacy Policy
-			Link Privacy;
+			Link Privacy {};
 			/// @brief Link to the mod.io Refund Policy
-			Link Refund;
+			Link Refund {};
 			/// @brief Link to the mod.io Manage User Account page
-			Link Manage;
+			Link Manage {};
 		} Links;
 
 		/// @brief The plaintext version of the mod.io terms of use
-		std::string TermsText;
+		std::string TermsText {};
 
 		/// @docnone
 		friend bool operator==(const Modio::Terms& A, const Modio::Terms& B)

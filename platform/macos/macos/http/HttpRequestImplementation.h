@@ -22,15 +22,15 @@ struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementat
 {
 	std::uint32_t ResponseCode = 0;
 	/// @brief Temporary buffer for response body data to enable us to handle chunked encoding transparently
-	Modio::Detail::DynamicBuffer ResponseDataBuffer;
-	httpparser::Response ParsedResponseHeaders;
+	Modio::Detail::DynamicBuffer ResponseDataBuffer {};
+	httpparser::Response ParsedResponseHeaders {};
 	std::size_t ResponseBodyReceivedLength = 0;
 	std::size_t CurrentChunkSizeRemaining = 0;
-	Modio::Detail::HttpRequestParams Parameters;
+	Modio::Detail::HttpRequestParams Parameters {};
 
-	CFReadStreamRef ReadStream;
-	CFWriteStreamRef WriteStream;
-	CFDataRef HTTPRequestData;
+	CFReadStreamRef ReadStream {};
+	CFWriteStreamRef WriteStream {};
+	CFDataRef HTTPRequestData {};
 
 	Modio::Optional<std::size_t> GetContentLength()
 	{

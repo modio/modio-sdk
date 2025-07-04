@@ -28,11 +28,11 @@ namespace Modio
 #include <asio/yield.hpp>
 		class SSLConnectionWriteSomeOp
 		{
-			asio::coroutine CoroutineState;
-			std::shared_ptr<HttpRequestImplementation> Request;
-			std::weak_ptr<HttpSharedState> SharedState;
-			Modio::Detail::Timer StatusTimer;
-			Modio::Detail::DynamicBuffer Payload;
+			asio::coroutine CoroutineState {};
+			std::shared_ptr<HttpRequestImplementation> Request {};
+			std::weak_ptr<HttpSharedState> SharedState {};
+			Modio::Detail::Timer StatusTimer {};
+			Modio::Detail::DynamicBuffer Payload {};
 			int WriteCount = 0;
 
 		public:

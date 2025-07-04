@@ -58,8 +58,8 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
-			Modio::Detail::DynamicBuffer TagResponseBuffer;
+			asio::coroutine CoroutineState {};
+			Modio::Detail::DynamicBuffer TagResponseBuffer {};
 		};
 	} // namespace Detail
 } // namespace Modio

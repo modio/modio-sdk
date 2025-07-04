@@ -22,10 +22,10 @@ namespace Modio
 	{
 		class HttpService : public asio::detail::service_base<HttpService>
 		{
-			std::shared_ptr<HttpImplementation> PlatformImplementation;
+			std::shared_ptr<HttpImplementation> PlatformImplementation {};
 			// Using shared_ptr here because queue tickets observe the queue
-			std::shared_ptr<Modio::Detail::OperationQueue> APIQueue;
-			std::shared_ptr<Modio::Detail::OperationQueue> FileDownloadQueue;
+			std::shared_ptr<Modio::Detail::OperationQueue> APIQueue {};
+			std::shared_ptr<Modio::Detail::OperationQueue> FileDownloadQueue {};
 
 		public:
 			MODIO_IMPL explicit HttpService(asio::io_context& IOService);

@@ -25,7 +25,7 @@ namespace Modio
 	{
 		class TimerServiceImplementation : public Modio::Detail::ITimerServiceImplementation
 		{
-			std::shared_ptr<TimerSharedState> SharedState;
+			std::shared_ptr<TimerSharedState> SharedState {};
 			asio::io_context::service& OwningService;
 
 		public:

@@ -65,8 +65,8 @@ namespace Modio
 			}
 
 		private:
-			Modio::InitializeOptions InitParams;
-			std::shared_ptr<Modio::Detail::FileSharedState> SharedState;
+			Modio::InitializeOptions InitParams {};
+			std::shared_ptr<Modio::Detail::FileSharedState> SharedState {};
 			Modio::filesystem::path& CommonDataPath;
 			Modio::filesystem::path& UserDataPath;
 			Modio::filesystem::path& TempPath;

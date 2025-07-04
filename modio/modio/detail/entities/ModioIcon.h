@@ -24,15 +24,15 @@ namespace Modio
 		struct Icon
 		{
 			/** Icon filename including extension. */
-			std::string Filename;
+			std::string Filename {};
 			/** URL to the full-sized icon. */
-			std::string Original;
+			std::string Original {};
 			/** URL to the small icon thumbnail. */
-			std::string Thumb64x64;
+			std::string Thumb64x64 {};
 			/** URL to the medium icon thumbnail. */
-			std::string Thumb128x128;
+			std::string Thumb128x128 {};
 			/** URL to the large icon thumbnail. */
-			std::string Thumb256x256;
+			std::string Thumb256x256 {};
 
 			/// @docnone
 			friend bool operator==(const Modio::Detail::Icon& A, const Modio::Detail::Icon& B)

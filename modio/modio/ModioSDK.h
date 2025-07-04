@@ -245,6 +245,8 @@ namespace Modio
 	/// room for a mod that the user wants to install, and as such will return an error if the current user is
 	/// subscribed to the mod. To remove a mod the current user is subscribed to, use
 	/// xref:UnsubscribeFromModAsync[Modio::UnsubscribeFromModAsync].
+	/// @note This function reports its outcome (success or failure) exclusively through the provided `Callback`.
+	/// It **does not** emit a separate `Uninstalled` event.
 	/// @param ModToRemove The ID for the mod to force remove.
 	/// @param Callback Callback invoked when the uninstallation is successful, or if it failed because the current user
 	/// remains subscribed.
@@ -636,6 +638,24 @@ namespace Modio
 											  std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
+	/// @brief Add or update images in the gallery for an existing mod. Images must be gif, jpg, or png format and
+	/// cannot exceed 8MB in filesize.
+	/// @param ModID ID of the mod whose gallery images will be added or updated
+	/// @param ImagePaths Vector of paths to the image files to be uploaded
+	/// @param SyncGallery If true, existing gallery images will be replaced; if false, new images will be appended
+	/// @param Callback Callback providing a status code indicating the outcome of the request
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @requires authenticated-user
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
+	MODIOSDK_API void AddOrUpdateModGalleryImagesAsync(Modio::ModID ModID, std::vector<std::string> ImagePaths,
+													   bool SyncGallery,
+													   std::function<void(Modio::ErrorCode)> Callback);
+
+	/// @docpublic
 	/// @brief Archives a mod. This mod will no longer be able to be viewed or retrieved via the SDK, but it will still
 	/// exist should you choose to restore it at a later date. Archiving is restricted to team managers and
 	/// administrators only. Note that restoration and permanent deletion of a mod is possible only via web interface.
@@ -755,9 +775,11 @@ namespace Modio
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserRatingList>)> Callback);
 
 	/// @brief Set language to get corresponding data from the server
-	/// Note: Doing this will invalidate you local cache of mods and game info,
-	///     so that the next time you fetch them you will recieve the correctly localized content.
-	///     This does not call FetchExternalUpdates for you, should you want to call it after changing locale.
+	/// Note: Setting the language invalidates your local mod and game info cache.
+	/// The next time this data is fetched, it will be in the new language.
+	/// To get this localized content immediately, you must call
+	/// 'FetchExternalUpdatesAsync' after changing the langauge.
+	/// Without calling 'FetchExternalUpdatesAsync', mod and game info may be returned in a previous language.
 	/// @param Locale language to set
 	MODIOSDK_API void SetLanguage(Modio::Language Locale);
 

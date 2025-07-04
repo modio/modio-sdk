@@ -48,8 +48,8 @@ public:
 	}
 
 private:
-	asio::coroutine CoroState;
-	Modio::filesystem::path FilePath;
-	std::weak_ptr<Modio::Detail::FileSharedState> SharedState;
+	asio::coroutine CoroState {};
+	Modio::filesystem::path FilePath {};
+	std::weak_ptr<Modio::Detail::FileSharedState> SharedState {};
 };
 #include <asio/unyield.hpp>

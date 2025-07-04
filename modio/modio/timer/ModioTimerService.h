@@ -72,7 +72,7 @@ namespace Modio
 			}
 
 		private:
-			std::shared_ptr<TimerServiceImplementation> PlatformImplementation;
+			std::shared_ptr<TimerServiceImplementation> PlatformImplementation {};
 		};
 
 	} // namespace Detail

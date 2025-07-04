@@ -23,14 +23,14 @@ namespace Modio
 	{
 		class GetModInfoOp
 		{
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			Modio::GameID GameID;
-			Modio::ApiKey ApiKey;
-			Modio::ModID ModId;
-			Modio::Detail::CachedResponse CachedResponse;
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			Modio::GameID GameID {};
+			Modio::ApiKey ApiKey {};
+			Modio::ModID ModId {};
+			Modio::Detail::CachedResponse CachedResponse {};
 
-			asio::coroutine CoroutineState;
-
+			asio::coroutine CoroutineState {};
+			
 		public:
 			GetModInfoOp(Modio::GameID GameID, Modio::ApiKey ApiKey, Modio::ModID ModId)
 				: GameID(GameID),

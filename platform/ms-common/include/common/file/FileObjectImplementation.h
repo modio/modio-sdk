@@ -26,17 +26,17 @@ namespace Modio
 	{
 		class FileObjectImplementation : public Modio::Detail::IFileObjectImplementation
 		{
-			Modio::filesystem::path FilePath;
-			Modio::filesystem::path BasePath;
-			HANDLE FileHandle;
-			Modio::Detail::FileMode FileMode;
+			Modio::filesystem::path FilePath {};
+			Modio::filesystem::path BasePath {};
+			HANDLE FileHandle = nullptr;
+			Modio::Detail::FileMode FileMode {};
 			// Strand so that IO ops don't get performed simultaneously
-			asio::strand<asio::io_context::executor_type>* Strand;
+			asio::strand<asio::io_context::executor_type>* Strand = nullptr;
 			std::atomic<bool> OperationInProgress {false};
 			std::atomic<std::int32_t> NumWaiters {0};
 			// asio::steady_timer OperationQueue;
-			std::shared_ptr<Modio::Detail::OperationQueue> OperationQueue;
-			std::unique_ptr<Modio::Detail::OperationQueue::Ticket> CurrentTicket;
+			std::shared_ptr<Modio::Detail::OperationQueue> OperationQueue {};
+			std::unique_ptr<Modio::Detail::OperationQueue::Ticket> CurrentTicket {};
 			Modio::FileOffset CurrentSeekOffset = Modio::FileOffset(0);
 			bool CancelRequested = false;
 

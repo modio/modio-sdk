@@ -21,10 +21,10 @@ namespace Modio
 	struct UserDelegationToken
 	{
 		/// @brief The type of token we are getting
-		std::string Entity;
+		std::string Entity {};
 
 		/// @brief The token that we got
-		std::string Token;
+		std::string Token {};
 
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::UserDelegationToken& Token);

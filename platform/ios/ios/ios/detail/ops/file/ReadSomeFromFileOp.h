@@ -159,14 +159,14 @@ namespace Modio
 			}
 
 		private:
-			Modio::Optional<Modio::Detail::Buffer> ReadBuffer;
-			asio::coroutine CoroutineState;
-			std::shared_ptr<Modio::Detail::FileObjectImplementation> FileImpl;
-			Modio::FileSize MaxBytesToRead;
-			Modio::Optional<Modio::FileOffset> FileOffset;
-			std::weak_ptr<Modio::Detail::FileSharedState> SharedState;
-			std::pair<bool, Modio::Optional<Modio::ErrorCode>> ReadResult;
-			Modio::Detail::Timer StatusTimer;
+			Modio::Optional<Modio::Detail::Buffer> ReadBuffer {};
+			asio::coroutine CoroutineState {};
+			std::shared_ptr<Modio::Detail::FileObjectImplementation> FileImpl {};
+			Modio::FileSize MaxBytesToRead {};
+			Modio::Optional<Modio::FileOffset> FileOffset {};
+			std::weak_ptr<Modio::Detail::FileSharedState> SharedState {};
+			std::pair<bool, Modio::Optional<Modio::ErrorCode>> ReadResult {};
+			Modio::Detail::Timer StatusTimer {};
 		};
 #include <asio/unyield.hpp>
 	} // namespace Detail

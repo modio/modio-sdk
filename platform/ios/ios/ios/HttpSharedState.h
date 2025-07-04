@@ -29,7 +29,7 @@ namespace Modio
 		struct HttpSharedState
 		{
 			bool bCloseRequested = false;
-			std::string UserAgentString;
+			std::string UserAgentString {};
 
 			Modio::ErrorCode Initialize()
 			{

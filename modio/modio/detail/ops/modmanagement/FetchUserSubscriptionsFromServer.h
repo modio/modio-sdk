@@ -111,12 +111,12 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
-			Modio::Detail::DynamicBuffer SubscriptionBuffer;
-			Modio::PagedResult PageInfo;
-			std::unique_ptr<Modio::ModInfoList> CollatedResults;
+			asio::coroutine CoroutineState {};
+			Modio::Detail::DynamicBuffer SubscriptionBuffer {};
+			Modio::PagedResult PageInfo {};
+			std::unique_ptr<Modio::ModInfoList> CollatedResults{};
 			std::int32_t CurrentResultIndex = 0;
-			Modio::Detail::CachedResponse CachedResponse;
+			Modio::Detail::CachedResponse CachedResponse {};
 		};
 #include <asio/unyield.hpp>
 

@@ -18,6 +18,6 @@
 class TimerImplementation : public Modio::Detail::TimerImplementationBase
 {
 public:
-	std::chrono::steady_clock::time_point CalculatedExpiryTime;
+	std::chrono::steady_clock::time_point CalculatedExpiryTime {};
 
 };

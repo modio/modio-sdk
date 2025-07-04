@@ -30,6 +30,7 @@ namespace Modio
 				constexpr const char* Appdata = "appdata";
 				constexpr const char* EmailAddress = "email";
 				constexpr const char* TermsAgreed = "terms_agreed";
+				constexpr const char* Receipt = "receipt";
 				constexpr const char* ReportResourceType = "resource";
 				constexpr const char* ReportResourceID = "id";
 				constexpr const char* ReportType = "type";

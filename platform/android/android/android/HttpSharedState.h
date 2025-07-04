@@ -23,11 +23,11 @@ namespace Modio
 		{
 			bool bCloseRequested = false;
 
-			mbedtls_ssl_config SSLConfiguration;
-			mbedtls_entropy_context EntropyContext;
-			mbedtls_ctr_drbg_context RandomContext;
-			mbedtls_x509_crt CACertificates;
-			std::string UserAgentString;
+			mbedtls_ssl_config SSLConfiguration {};
+			mbedtls_entropy_context EntropyContext {};
+			mbedtls_ctr_drbg_context RandomContext {};
+			mbedtls_x509_crt CACertificates {};
+			std::string UserAgentString {};
 			Modio::ErrorCode Initialize()
 			{
 				mbedtls_entropy_init(&EntropyContext);

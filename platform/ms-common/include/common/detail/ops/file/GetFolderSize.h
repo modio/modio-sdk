@@ -69,11 +69,11 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
-			Modio::filesystem::path FolderPath;
-			std::vector<std::pair<Modio::filesystem::path, int>> Folders;
-			Modio::filesystem::directory_iterator DirectoryIterator;
-			std::size_t CurrentSize;
+			asio::coroutine CoroutineState {};
+			Modio::filesystem::path FolderPath {};
+			std::vector<std::pair<Modio::filesystem::path, int>> Folders {};
+			Modio::filesystem::directory_iterator DirectoryIterator {};
+			std::size_t CurrentSize = 0;
 		};
 
 #include <asio/unyield.hpp>

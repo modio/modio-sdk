@@ -36,18 +36,18 @@ namespace Modio
 			struct ExtractEntryImpl
 			{
 				Modio::Detail::File ArchiveFile;
-				std::shared_ptr<ArchiveFileImplementation> ArchiveFileImpl;
-				ArchiveFileImplementation::ArchiveEntry EntryToExtract;
-				Modio::filesystem::path RootDirectoryToExtractTo;
-				Modio::Detail::DynamicBuffer FileData;
+				std::shared_ptr<ArchiveFileImplementation> ArchiveFileImpl {};
+				ArchiveFileImplementation::ArchiveEntry EntryToExtract {};
+				Modio::filesystem::path RootDirectoryToExtractTo {};
+				Modio::Detail::DynamicBuffer FileData {};
 				std::uintmax_t BytesProcessed = 0;
 				Modio::Detail::File DestinationFile;
-				Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo;
+				Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo {};
 				std::uintmax_t CurrentBufferSize = 0;
 			};
 
-			Modio::StableStorage<ExtractEntryImpl> Impl;
-			asio::coroutine CoroutineState;
+			Modio::StableStorage<ExtractEntryImpl> Impl {};
+			asio::coroutine CoroutineState {};
 
 		public:
 			ExtractEntryStoreOp(std::shared_ptr<ArchiveFileImplementation> ArchiveFileImpl,

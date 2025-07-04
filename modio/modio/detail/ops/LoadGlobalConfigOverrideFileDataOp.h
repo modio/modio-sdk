@@ -105,11 +105,11 @@ namespace Modio
 					return;
 				}
 			}
-			std::unique_ptr<Modio::Detail::Buffer> DefaultConfigBuffer;
-			std::unique_ptr<nlohmann::json> ConfigJson;
-			std::unique_ptr<Modio::Detail::File> ConfigFile;
-			asio::coroutine CoroutineState;
-			Modio::Detail::DynamicBuffer FileBuffer;
+			std::unique_ptr<Modio::Detail::Buffer> DefaultConfigBuffer {};
+			std::unique_ptr<nlohmann::json> ConfigJson {};
+			std::unique_ptr<Modio::Detail::File> ConfigFile {};
+			asio::coroutine CoroutineState {};
+			Modio::Detail::DynamicBuffer FileBuffer {};
 		};
 
 		template<typename CompletionTokenType>

@@ -19,12 +19,12 @@
 struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementation
 {
 	std::uint32_t ResponseCode = 0;
-	mbedtls_net_context Socket;
-	mbedtls_ssl_context SSLContext;
+	mbedtls_net_context Socket {};
+	mbedtls_ssl_context SSLContext {};
 	/// @brief Temporary buffer for response body data to enable us to handle chunked encoding transparently
-	Modio::Detail::DynamicBuffer ResponseDataBuffer;
+	Modio::Detail::DynamicBuffer ResponseDataBuffer {};
 
-	httpparser::Response ParsedResponseHeaders;
+	httpparser::Response ParsedResponseHeaders {};
 	std::size_t ResponseBodyReceivedLength = 0;
 	std::size_t CurrentChunkSizeRemaining = 0;
 	Modio::Optional<std::size_t> GetContentLength()
@@ -40,7 +40,7 @@ struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementat
 
 	virtual ~HttpRequestImplementation() {}
 	// Common members
-	Modio::Detail::HttpRequestParams Parameters;
+	Modio::Detail::HttpRequestParams Parameters {};
 	bool HasBeenSent()
 	{
 		return false;

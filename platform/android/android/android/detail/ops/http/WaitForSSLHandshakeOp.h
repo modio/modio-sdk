@@ -67,10 +67,10 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
-			Modio::Detail::Timer StatusTimer;
-			std::shared_ptr<HttpRequestImplementation> Request;
-			std::weak_ptr<HttpSharedState> SharedState;
+			asio::coroutine CoroutineState {};
+			Modio::Detail::Timer StatusTimer {};
+			std::shared_ptr<HttpRequestImplementation> Request {};
+			std::weak_ptr<HttpSharedState> SharedState {};
 		};
 
 		template<typename SSLHandshakeCallback>

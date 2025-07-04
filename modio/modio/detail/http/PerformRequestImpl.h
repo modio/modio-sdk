@@ -23,12 +23,12 @@ namespace Modio
 		struct PerformRequestImpl
 		{
 			Modio::Detail::OperationQueue::Ticket RequestTicket;
-			std::unique_ptr<Modio::Detail::File> CurrentPayloadFile;
-			Modio::Detail::DynamicBuffer PayloadFileBuffer;
-			Modio::FileSize CurrentPayloadFileBytesRead;
-			Modio::Optional<std::pair<std::string, Modio::Detail::PayloadContent>> PayloadElement;
-			std::unique_ptr<Modio::Detail::Buffer> HeaderBuf;
-			std::weak_ptr<Modio::ModProgressInfo> ProgressInfo;
+			std::unique_ptr<Modio::Detail::File> CurrentPayloadFile {};
+			Modio::Detail::DynamicBuffer PayloadFileBuffer {};
+			Modio::FileSize CurrentPayloadFileBytesRead {};
+			Modio::Optional<std::pair<std::string, Modio::Detail::PayloadContent>> PayloadElement {};
+			std::unique_ptr<Modio::Detail::Buffer> HeaderBuf {};
+			std::weak_ptr<Modio::ModProgressInfo> ProgressInfo {};
 
 		public:
 			PerformRequestImpl(Modio::Detail::OperationQueue::Ticket RequestTicket)

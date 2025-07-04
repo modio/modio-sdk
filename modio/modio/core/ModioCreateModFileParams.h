@@ -24,26 +24,30 @@ namespace Modio
 		/// @brief Path to a directory to treat as the root of the mod. The SDK will compress all contents of this
 		/// folder into a .zip archive, with a relative path based on this directory. This directory will not be created
 		/// itself, the contents will exist at the top level of the archive.
-		std::string RootDirectory;
+		std::string RootDirectory {};
 
 		/// @docpublic
 		/// @brief Optional version string for this modfile release
-		Modio::Optional<std::string> Version;
+		Modio::Optional<std::string> Version {};
 
 		/// @docpublic
 		/// @brief Optional changelog string for this modfile release
-		Modio::Optional<std::string> Changelog;
+		Modio::Optional<std::string> Changelog {};
 
 		/// @docpublic
 		/// @brief Should this mod be set as active/latest release? Defaults to true if not set.
-		Modio::Optional<bool> bSetAsActive;
+		Modio::Optional<bool> bSetAsActive {};
 
 		/// @docpublic
 		/// @brief Optional metadata blob for this mod
-		Modio::Optional<std::string> MetadataBlob;
+		Modio::Optional<std::string> MetadataBlob {};
+
+		/// @docpublic
+		/// @brief Optional key-value-pair metadata for this mod
+		Modio::Optional<std::vector<Modio::Metadata>> MetadataKvp;
 
 		/// @docpublic
 		/// @brief Optional vector of platforms for this modfile
-		Modio::Optional<std::vector<Modio::ModfilePlatform>> Platforms;
+		Modio::Optional<std::vector<Modio::ModfilePlatform>> Platforms {};
 	};
 } // namespace Modio

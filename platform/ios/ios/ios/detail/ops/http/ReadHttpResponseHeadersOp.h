@@ -39,10 +39,10 @@ namespace Modio
 
 		class ReadHttpResponseHeadersOp
 		{
-			asio::coroutine CoroutineState;
-			std::shared_ptr<HttpRequestImplementation> Request;
-			std::weak_ptr<HttpSharedState> SharedState;
-			Modio::Detail::Timer StatusTimer;
+			asio::coroutine CoroutineState {};
+			std::shared_ptr<HttpRequestImplementation> Request {};
+			std::weak_ptr<HttpSharedState> SharedState {};
+			Modio::Detail::Timer StatusTimer {};
 
 			/**
 			 * https://stackoverflow.com/questions/28860033/convert-from-cfurlref-or-cfstringref-to-stdstring

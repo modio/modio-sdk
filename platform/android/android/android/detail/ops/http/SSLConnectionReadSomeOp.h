@@ -29,12 +29,12 @@ namespace Modio
 #include <asio/yield.hpp>
 		class SSLConnectionReadSomeOp
 		{
-			asio::coroutine CoroutineState;
-			std::shared_ptr<HttpRequestImplementation> Request;
-			std::weak_ptr<HttpSharedState> SharedState;
-			Modio::Detail::Timer StatusTimer;
-			Modio::Detail::DynamicBuffer ReadBuffer;
-			int ReadCount;
+			asio::coroutine CoroutineState {};
+			std::shared_ptr<HttpRequestImplementation> Request {};
+			std::weak_ptr<HttpSharedState> SharedState {};
+			Modio::Detail::Timer StatusTimer {};
+			Modio::Detail::DynamicBuffer ReadBuffer {};
+			int ReadCount = 0;
 			Modio::Detail::Buffer ReadChunk;
 
 		public:

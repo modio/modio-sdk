@@ -29,12 +29,12 @@ namespace Modio
 				};
 
 				Modio::Detail::Buffer Data;
-				int AssocFileDesc;
+				int AssocFileDesc = 0;
 				bool DidFinish = false;
-				Modio::Optional<Modio::ErrorCode> Result;
-				Modio::FileSize NumBytesTransferred;
-				Direction TransferDirection;
-				Modio::FileOffset Offset;
+				Modio::Optional<Modio::ErrorCode> Result {};
+				Modio::FileSize NumBytesTransferred {};
+				Direction TransferDirection {};
+				Modio::FileOffset Offset {};
 
 				PendingIOOperation(Modio::Detail::Buffer Data, int FileDescriptor, Direction TransferDirection,
 								   Modio::FileOffset Offset)

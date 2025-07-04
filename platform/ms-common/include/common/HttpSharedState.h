@@ -52,13 +52,13 @@ class HttpSharedStateBase : public std::enable_shared_from_this<HttpSharedStateB
 	/// This status value is in turn responsible for driving the internal state machine of a WinHTTP HTTPRequest
 	/// operation
 	/// </summary>
-	std::unordered_map<HINTERNET, std::atomic<WinHTTPCallbackStatus>> CallbackStatus;
+	std::unordered_map<HINTERNET, std::atomic<WinHTTPCallbackStatus>> CallbackStatus {};
 
 	/// <summary>
 	/// Maps a WinHTTP Request handle to a buffer of memory containing the extended status information for the last
 	/// callback invocation
 	/// </summary>
-	std::unordered_map<HINTERNET, std::pair<std::uintptr_t, std::intmax_t>> ExtendedStatus;
+	std::unordered_map<HINTERNET, std::pair<std::uintptr_t, std::intmax_t>> ExtendedStatus {};
 
 	/// <summary>
 	/// Maps a WinHTTP Request handle to its corresponding Connection handle
@@ -67,7 +67,7 @@ class HttpSharedStateBase : public std::enable_shared_from_this<HttpSharedStateB
 	/// So this allows us to find the connection handle for a given request
 	/// and close both of them at the same time
 	/// </summary>
-	std::unordered_map<HINTERNET, HINTERNET> ConnectionHandles;
+	std::unordered_map<HINTERNET, HINTERNET> ConnectionHandles {};
 
 protected:
 	/// <summary>

@@ -29,13 +29,13 @@ namespace Modio
 			{
 				EditRequestParams =
 					Modio::Detail::EditModRequest.SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
-						.SetModID(Mod)
-						.AppendPayloadValue("name", Params.Name)
-						.AppendPayloadValue("summary", Params.Summary)
-						.AppendPayloadValue("name_id", Params.NamePath)
-						.AppendPayloadValue("description", Params.Description)
-						.AppendPayloadValue("homepage_url", Params.HomepageURL)
-						.AppendPayloadValue("metadata_blob", Params.MetadataBlob);
+					.SetModID(Mod)
+					.AppendPayloadValue("name", Params.Name)
+					.AppendPayloadValue("summary", Params.Summary)
+					.AppendPayloadValue("name_id", Params.NamePath)
+					.AppendPayloadValue("description", Params.Description)
+					.AppendPayloadValue("homepage_url", Params.HomepageURL)
+					.AppendPayloadValue("metadata_blob", Params.MetadataBlob);
 
 				if (Params.LogoPath.has_value())
 				{
@@ -77,6 +77,14 @@ namespace Modio
 					EditRequestParams = EditRequestParams.AppendPayloadValue(
 						"community_options", fmt::format("{}", Params.CommunityOptions->RawValue()));
 				}
+
+				if (Params.MetadataKvp)
+				{
+					for (const Modio::Metadata& metadata : *Params.MetadataKvp)
+					{
+						EditRequestParams = EditRequestParams.AppendPayloadValue("metadata_kvp[]", fmt::format("{}:{}", metadata.Key, metadata.Value));
+					}
+				}
 			}
 
 			template<typename CoroType>
@@ -85,7 +93,7 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(ResponseBuffer, EditRequestParams,
-																		   CachedResponse::Disallow, std::move(Self));
+						CachedResponse::Disallow, std::move(Self));
 
 					if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))
 					{
@@ -116,9 +124,9 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
-			Modio::Detail::HttpRequestParams EditRequestParams;
-			Modio::Detail::DynamicBuffer ResponseBuffer;
+			asio::coroutine CoroutineState {};
+			Modio::Detail::HttpRequestParams EditRequestParams {};
+			Modio::Detail::DynamicBuffer ResponseBuffer {};
 		};
 #include <asio/unyield.hpp>
 
@@ -143,9 +151,9 @@ namespace Modio
 			if (FileExists == true)
 			{
 				return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>,
-										   void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>(
-					Modio::Detail::SubmitModChangesOp(Mod, Params), Callback,
-					Modio::Detail::Services::GetGlobalContext().get_executor());
+					void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>(
+						Modio::Detail::SubmitModChangesOp(Mod, Params), Callback,
+						Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 		}
 	} // namespace Detail

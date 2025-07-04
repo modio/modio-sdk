@@ -24,12 +24,12 @@ namespace Modio
 	{
 		class ParseArchiveContentsOp
 		{
-			Modio::StableStorage<Modio::Detail::File> ArchiveFileOnDisk;
-			Modio::StableStorage<ArchiveFileImplementation> ArchiveState;
-			asio::coroutine CoroutineState;
+			Modio::StableStorage<Modio::Detail::File> ArchiveFileOnDisk {};
+			Modio::StableStorage<ArchiveFileImplementation> ArchiveState {};
+			asio::coroutine CoroutineState {};
 			std::uintmax_t CurrentSearchOffset = 0;
 			std::uintmax_t CurrentRecordOffset = 0;
-			std::vector<ArchiveFileImplementation::ArchiveEntry> PendingEntries;
+			std::vector<ArchiveFileImplementation::ArchiveEntry> PendingEntries {};
 			std::uintmax_t CurrentFixupEntryIndex = 0;
 			std::uintmax_t BytesToRead = 20;
 

@@ -26,7 +26,7 @@ namespace Modio
 	{
 		class ArchiveReader : public asio::basic_io_object<CompressionService>
 		{
-			Modio::filesystem::path FilePath;
+			Modio::filesystem::path FilePath {};
 
 		public:
 			explicit ArchiveReader(Modio::filesystem::path FilePath)

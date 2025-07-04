@@ -22,10 +22,10 @@ namespace Modio
 	{
 		class ReportContentOp
 		{
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 
-			asio::coroutine CoroutineState;
-			Modio::Detail::HttpRequestParams Request;
+			asio::coroutine CoroutineState {};
+			Modio::Detail::HttpRequestParams Request {};
 
 		public:
 			ReportContentOp(Modio::ReportParams Params)

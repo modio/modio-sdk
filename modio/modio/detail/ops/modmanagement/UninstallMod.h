@@ -68,11 +68,11 @@ namespace Modio
 			}
 
 		private:
-			Modio::filesystem::path InstallPath;
-			Modio::ModID ModId;
-			asio::coroutine CoroutineState;
-			bool bForce;
-			bool bIsTempMod;
+			Modio::filesystem::path InstallPath {};
+			Modio::ModID ModId {};
+			asio::coroutine CoroutineState {};
+			bool bForce {};
+			bool bIsTempMod {};
 		};
 
 		template<typename UninstallDoneCallback>

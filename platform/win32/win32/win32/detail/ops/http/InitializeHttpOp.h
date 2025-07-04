@@ -73,8 +73,8 @@ public:
 	}
 
 private:
-	asio::coroutine CoroutineState;
-	std::shared_ptr<HttpSharedState> SharedState;
-	std::wstring UserAgentString;
+	asio::coroutine CoroutineState {};
+	std::shared_ptr<HttpSharedState> SharedState {};
+	std::wstring UserAgentString {};
 };
 #include <asio/unyield.hpp>

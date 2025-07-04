@@ -32,7 +32,7 @@ namespace Modio
 			};
 
 			/// @brief Multipart upload session string
-			Modio::Optional<std::string> UploadID = {};
+			Modio::Optional<std::string> UploadID {};
 
 			/// @brief Last reported status of the upload session
 			Status UploadStatus = Status::Incomplete;

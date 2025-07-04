@@ -48,7 +48,8 @@ namespace Modio
 		Nintendo,
 		PSN,
 		Steam,
-		XboxLive
+		XboxLive,
+		Meta
 	};
 
 	/// @docnone
@@ -341,7 +342,7 @@ namespace Modio
 		}
 
 	private:
-		std::string InternalApiKey;
+		std::string InternalApiKey {};
 	};
 
 	// Needs to be subclassed rather than type aliased so we don't accidentally provide the wrong type to a function
@@ -698,6 +699,7 @@ namespace Modio
 		Korean,
 		Russian,
 		Spanish,
+		SpanishLatinAmerican,
 		Thai,
 		ChineseSimplified,
 		ChineseTraditional,
@@ -926,6 +928,8 @@ namespace Modio
 					return "ru";
 				case Language::Spanish:
 					return "es";
+				case Language::SpanishLatinAmerican:
+					return "es-419";
 				case Language::Thai:
 					return "th";
 				case Language::ChineseSimplified:

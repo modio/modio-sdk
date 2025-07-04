@@ -63,8 +63,8 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
+			asio::coroutine CoroutineState {};
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 		};
 #include <asio/unyield.hpp>
 

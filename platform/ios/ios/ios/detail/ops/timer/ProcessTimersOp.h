@@ -19,7 +19,7 @@
 #include <asio/yield.hpp>
 class ProcessTimersOp
 {
-	std::weak_ptr<TimerSharedState> SharedState;
+	std::weak_ptr<TimerSharedState> SharedState {};
 
 public:
 	ProcessTimersOp(std::weak_ptr<TimerSharedState> SharedState) : SharedState(SharedState) {};
@@ -56,7 +56,7 @@ public:
 	}
 
 private:
-	asio::coroutine CoroutineState;
+	asio::coroutine CoroutineState {};
 };
 
 template<typename CompletionTokenType>

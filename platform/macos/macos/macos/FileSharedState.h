@@ -29,12 +29,12 @@ namespace Modio
 				};
 
 				Modio::Detail::Buffer Data;
-				int AssocFileDesc;
+				int AssocFileDesc {};
 				bool DidFinish = false;
-				Modio::Optional<Modio::ErrorCode> Result;
-				Modio::FileSize NumBytesTransferred;
-				Direction TransferDirection;
-				Modio::FileOffset Offset;
+				Modio::Optional<Modio::ErrorCode> Result {};
+				Modio::FileSize NumBytesTransferred {};
+				Direction TransferDirection {};
+				Modio::FileOffset Offset {};
 
 				PendingIOOperation(Modio::Detail::Buffer Data, int FileDescriptor, Direction TransferDirection,
 								   Modio::FileOffset Offset)
@@ -153,7 +153,7 @@ namespace Modio
 							  });
 			};
 
-			std::map<int, PendingIOOperation> PendingIO;
+			std::map<int, PendingIOOperation> PendingIO {};
 			const int MAX_BYTES = 1048575; // It operates in 1 MB chunks of data.
 
 		public:
@@ -285,7 +285,7 @@ namespace Modio
 				}
 				else
 				{
-					Modio::Optional<Modio::ErrorCode> empty = {};
+					Modio::Optional<Modio::ErrorCode> empty {};
 					return std::make_pair(true, empty);
 				}
 			}

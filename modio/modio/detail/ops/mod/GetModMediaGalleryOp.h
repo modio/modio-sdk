@@ -114,21 +114,21 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
+			asio::coroutine CoroutineState {};
 
 			// Parameters
-			Modio::GameID GameID;
-			Modio::ApiKey ApiKey;
-			Modio::ModID ModId;
-			Modio::GallerySize GallerySize;
-			Modio::GalleryIndex ImageIndex;
+			Modio::GameID GameID {};
+			Modio::ApiKey ApiKey {};
+			Modio::ModID ModId {};
+			Modio::GallerySize GallerySize {};
+			Modio::GalleryIndex ImageIndex {};
 
 			// State that might get mutated during the coroutine
 			struct
 			{
-				Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-				Modio::StableStorage<Modio::filesystem::path> DestinationPath;
-				Modio::GalleryList GalleryList;
+				Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+				Modio::StableStorage<Modio::filesystem::path> DestinationPath {};
+				Modio::GalleryList GalleryList {};
 			} OpState;
 		};
 	} // namespace Detail

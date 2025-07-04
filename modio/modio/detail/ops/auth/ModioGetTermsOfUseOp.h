@@ -64,9 +64,9 @@ namespace Modio
 			}
 
 		private:
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			Modio::Detail::CachedResponse CachedResponse;
-			asio::coroutine CoroutineState;
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			Modio::Detail::CachedResponse CachedResponse {};
+			asio::coroutine CoroutineState {};
 		};
 	} // namespace Detail
 } // namespace Modio

@@ -115,11 +115,11 @@ public:
 	}
 
 private:
-	asio::coroutine CoroutineState;
-	Modio::filesystem::path FolderPath;
-	std::vector<std::pair<Modio::filesystem::path, int>> Folders;
-	Modio::filesystem::recursive_directory_iterator DirectoryIterator;
-	std::weak_ptr<Modio::Detail::FileSharedState> SharedState;
+	asio::coroutine CoroutineState {};
+	Modio::filesystem::path FolderPath {};
+	std::vector<std::pair<Modio::filesystem::path, int>> Folders {};
+	Modio::filesystem::recursive_directory_iterator DirectoryIterator {};
+	std::weak_ptr<Modio::Detail::FileSharedState> SharedState {};
 };
 
 #include <asio/unyield.hpp>

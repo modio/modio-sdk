@@ -34,16 +34,16 @@ namespace Modio
 		/// @brief Operation which downloads an arbitrary file to an arbitrary filesystem path
 		class DownloadFileOp : public Modio::Detail::BaseOperation<DownloadFileOp>
 		{
-			Modio::StableStorage<Modio::Detail::HttpRequest> Request;
-			asio::coroutine Coroutine;
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			Modio::StableStorage<Modio::Detail::File> File;
+			Modio::StableStorage<Modio::Detail::HttpRequest> Request {};
+			asio::coroutine Coroutine {};
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			Modio::StableStorage<Modio::Detail::File> File {};
 
-			Modio::StableStorage<std::uintmax_t> CurrentFilePosition;
-			Modio::StableStorage<bool> EndOfFileReached;
-			Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo;
+			Modio::StableStorage<std::uintmax_t> CurrentFilePosition {};
+			Modio::StableStorage<bool> EndOfFileReached {};
+			Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo {};
 
-			Modio::Optional<std::uint64_t> ExpectedFilesize;
+			Modio::Optional<std::uint64_t> ExpectedFilesize {};
 
 			struct DownloadFileImpl
 			{
@@ -56,7 +56,7 @@ namespace Modio
 					: DownloadTicket(std::move(DownloadTicket)) {}
 			};
 
-			Modio::StableStorage<DownloadFileImpl> Impl;
+			Modio::StableStorage<DownloadFileImpl> Impl {};
 
 		public:
 			DownloadFileOp(const Modio::Detail::HttpRequestParams RequestParams,

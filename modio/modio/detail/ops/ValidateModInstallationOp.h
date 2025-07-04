@@ -26,8 +26,8 @@ namespace Modio
 		/// directory exists, and contains data.
 		class ValidateModInstallationOp
 		{
-			asio::coroutine CoroutineState;
-			Modio::ModCollectionEntry Entry;
+			asio::coroutine CoroutineState {};
+			Modio::ModCollectionEntry Entry {};
 
 		public:
 			ValidateModInstallationOp(Modio::ModCollectionEntry Entry) : Entry(Entry) {}

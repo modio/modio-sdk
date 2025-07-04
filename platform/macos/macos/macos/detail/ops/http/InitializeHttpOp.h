@@ -48,8 +48,8 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
-			std::shared_ptr<HttpSharedState> SharedState;
+			asio::coroutine CoroutineState {};
+			std::shared_ptr<HttpSharedState> SharedState {};
 		};
 	} // namespace Detail
 } // namespace Modio

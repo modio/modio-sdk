@@ -40,17 +40,17 @@ namespace Modio
 	{
 		class UploadFileOp
 		{
-			Modio::StableStorage<Modio::Detail::HttpRequest> Request;
-			asio::coroutine Coroutine;
-			Modio::Detail::DynamicBuffer ResultBuffer;
-			Modio::Detail::CachedResponse AllowCachedResponse;
+			Modio::StableStorage<Modio::Detail::HttpRequest> Request {};
+			asio::coroutine Coroutine {};
+			Modio::Detail::DynamicBuffer ResultBuffer {};
+			Modio::Detail::CachedResponse AllowCachedResponse {};
 
 			struct
 			{
-				Modio::Detail::DynamicBuffer ResponseBodyBuffer;
+				Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 			} State;
 
-			std::unique_ptr<PerformRequestImpl> Impl;
+			std::unique_ptr<PerformRequestImpl> Impl {};
 
 		public:
 			UploadFileOp(Modio::Detail::DynamicBuffer Response, Modio::Detail::HttpRequestParams RequestParams,

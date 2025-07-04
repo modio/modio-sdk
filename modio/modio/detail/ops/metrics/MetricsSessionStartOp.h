@@ -63,10 +63,10 @@ namespace Modio
 			}
 
 		private:
-			nlohmann::json BodyJson;
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			asio::coroutine CoroutineState;
-			MetricsSessionStartParams RequestParams;
+			nlohmann::json BodyJson {};
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			asio::coroutine CoroutineState {};
+			MetricsSessionStartParams RequestParams {};
 		};
 
 		template<typename Callback>

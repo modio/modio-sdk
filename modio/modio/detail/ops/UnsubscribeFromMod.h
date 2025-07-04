@@ -107,10 +107,10 @@ namespace Modio
 			}
 
 		private:
-			Modio::GameID GameID;
-			Modio::ModID ModId;
-			asio::coroutine CoroutineState;
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
+			Modio::GameID GameID {};
+			Modio::ModID ModId {};
+			asio::coroutine CoroutineState {};
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 		};
 
 		template<typename UnsubscribeCompleteCallback>

@@ -46,8 +46,8 @@ public:
 	}
 
 private:
-	std::shared_ptr<TimerImplementation> Timer;
-	asio::coroutine CoroutineState;
-	std::weak_ptr<TimerSharedState> SharedState;
+	std::shared_ptr<TimerImplementation> Timer {};
+	asio::coroutine CoroutineState {};
+	std::weak_ptr<TimerSharedState> SharedState {};
 };
 #include <asio/unyield.hpp>

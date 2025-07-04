@@ -39,6 +39,8 @@ if (MODIO_BUILD_EXAMPLES)
 	add_example(11_TempModSets)
 	add_example(12_RefreshEntitlements)
 	add_example(13_MetricsSession)
+	add_example(14_MuteUnmuteUser)
+	add_example(15_Dependencies)
 endif()
 
 if (MODIO_BUILD_ADVANCED_EXAMPLES)

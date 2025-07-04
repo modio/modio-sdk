@@ -53,10 +53,10 @@ namespace Modio::Detail
 			return ImageURL;
 		}
 
-		Modio::ModID ModId;
-		Modio::GallerySize GallerySize;
-		Modio::GalleryIndex ImageIndex;
-		std::string ImageURL;
+		Modio::ModID ModId {};
+		Modio::GallerySize GallerySize {};
+		Modio::GalleryIndex ImageIndex {};
+		std::string ImageURL {};
 	};
 
 	// template<typename CallbackType>

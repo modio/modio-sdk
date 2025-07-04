@@ -138,21 +138,21 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
+			asio::coroutine CoroutineState {};
 
 			// Parameters
-			ImageType ImageTypeImp;
+			ImageType ImageTypeImp {};
 
 			// Return
-			Modio::StableStorage<Modio::filesystem::path> Result;
+			Modio::StableStorage<Modio::filesystem::path> Result {};
 
 			// State that might get mutated during the coroutine
 			struct
 			{
-				Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-				Modio::filesystem::path DestinationPath;
-				Modio::filesystem::path DestinationTempPath;
-				Modio::Optional<Modio::Detail::HttpRequestParams> DownloadRequestParams;
+				Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+				Modio::filesystem::path DestinationPath {};
+				Modio::filesystem::path DestinationTempPath {};
+				Modio::Optional<Modio::Detail::HttpRequestParams> DownloadRequestParams {};
 			} OpState;
 		};
 

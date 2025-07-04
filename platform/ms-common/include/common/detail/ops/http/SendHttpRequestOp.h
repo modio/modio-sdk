@@ -23,11 +23,11 @@
 
 class SendHttpRequestOp
 {
-	asio::coroutine CoroutineState;
-	std::shared_ptr<HttpRequestImplementation> Request;
-	std::weak_ptr<HttpSharedStateBase> SharedState;
-	Modio::Detail::Timer SendTimer;
-	std::unique_ptr<std::string> Payload;
+	asio::coroutine CoroutineState {};
+	std::shared_ptr<HttpRequestImplementation> Request {};
+	std::weak_ptr<HttpSharedStateBase> SharedState {};
+	Modio::Detail::Timer SendTimer {};
+	std::unique_ptr<std::string> Payload {};
 
 public:
 	SendHttpRequestOp(std::shared_ptr<HttpRequestImplementation> Request,

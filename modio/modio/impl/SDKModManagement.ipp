@@ -9,9 +9,9 @@
  */
 
 #ifdef MODIO_SEPARATE_COMPILATION
-	#include "modio/ModioSDK.h"
+#include "modio/ModioSDK.h"
 #else
-	#pragma once
+#pragma once
 #endif
 
 #include "modio/core/ModioCoreTypes.h"
@@ -23,6 +23,7 @@
 #include "modio/detail/FilesystemWrapper.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/AddOrUpdateModLogoOp.h"
+#include "modio/detail/ops/AddOrUpdateModGalleryImagesOp.h"
 #include "modio/detail/ops/ModManagementLoop.h"
 #include "modio/detail/ops/SubscribeToModOp.h"
 #include "modio/detail/ops/UnsubscribeFromMod.h"
@@ -55,7 +56,7 @@ namespace Modio
 			if (!Modio::Detail::SDKSessionData::IsInitialized())
 			{
 				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
-											"SDK is not initialized. Cannot Enable Mod Management.");
+					"SDK is not initialized. Cannot Enable Mod Management.");
 				return Modio::make_error_code(Modio::GenericError::SDKNotInitialized);
 			}
 			if (Modio::Detail::SDKSessionData::IsModManagementEnabled())
@@ -72,10 +73,10 @@ namespace Modio
 				if (ec)
 				{
 					Modio::Detail::Logger().Log(LogLevel::Info, Modio::LogCategory::Core,
-												"Mod Management Loop halted: status message {}", ec.message());
+						"Mod Management Loop halted: status message {}", ec.message());
 				}
+				});
 			});
-		});
 		return {};
 	}
 	void DisableModManagement()
@@ -97,12 +98,12 @@ namespace Modio
 			{
 				Modio::Detail::FetchExternalUpdatesAsync(OnFetchDone);
 			}
-		});
+			});
 	}
 
 	void PreviewExternalUpdatesAsync(
 		std::function<void(Modio::ErrorCode, std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType>)>
-			OnPreviewDone)
+		OnPreviewDone)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([OnPreviewDone = std::move(OnPreviewDone)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(OnPreviewDone) &&
@@ -111,11 +112,11 @@ namespace Modio
 			{
 				Modio::Detail::PreviewExternalUpdatesAsync(OnPreviewDone);
 			}
-		});
+			});
 	}
 
 	void SubscribeToModAsync(Modio::ModID ModToSubscribeTo, bool IncludeDependencies,
-							 std::function<void(Modio::ErrorCode)> OnSubscribeComplete)
+		std::function<void(Modio::ErrorCode)> OnSubscribeComplete)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask(
 			[ModToSubscribeTo, IncludeDependencies, OnSubscribeComplete = std::move(OnSubscribeComplete)]() mutable {
@@ -129,15 +130,15 @@ namespace Modio
 				{
 					asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
 						Modio::Detail::SubscribeToModOp(Modio::Detail::SDKSessionData::CurrentGameID(),
-														Modio::Detail::SDKSessionData::CurrentAPIKey(),
-														ModToSubscribeTo, IncludeDependencies),
+							Modio::Detail::SDKSessionData::CurrentAPIKey(),
+							ModToSubscribeTo, IncludeDependencies),
 						OnSubscribeComplete, Modio::Detail::Services::GetGlobalContext().get_executor());
 				}
 			});
 	}
 
 	void UnsubscribeFromModAsync(Modio::ModID ModToUnsubscribeFrom,
-								 std::function<void(Modio::ErrorCode)> OnUnsubscribeComplete)
+		std::function<void(Modio::ErrorCode)> OnUnsubscribeComplete)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask(
 			[ModToUnsubscribeFrom, OnUnsubscribeComplete = std::move(OnUnsubscribeComplete)]() mutable {
@@ -214,7 +215,7 @@ namespace Modio
 
 		// Check if priority ID is currently being processed
 		if (Modio::Optional<Modio::ModProgressInfo> CurrentOperationInfo =
-				Modio::Detail::SDKSessionData::GetModProgress())
+			Modio::Detail::SDKSessionData::GetModProgress())
 		{
 			if (CurrentOperationInfo->ID == IDToPrioritize)
 			{
@@ -283,8 +284,8 @@ namespace Modio
 		auto Lock = Modio::Detail::SDKSessionData::GetReadLock();
 
 		auto RootInstallationDirectory = Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
-											 .GetModRootInstallationPath()
-											 .string();
+			.GetModRootInstallationPath()
+			.string();
 
 		std::vector<std::string> Paths;
 
@@ -361,7 +362,7 @@ namespace Modio
 		const std::map<Modio::ModID, Modio::ModCollectionEntry> TempModSet = QueryTempModSet();
 		// merge maps together and remove duplicates
 		LocalMods.insert(TempModSet.begin(), TempModSet.end());
-		Modio::FileSize ConsumedLocalSpace {Modio::FileSize(0)};
+		Modio::FileSize ConsumedLocalSpace{ Modio::FileSize(0) };
 		for (auto& Mod : LocalMods)
 		{
 			if (Mod.second.GetSizeOnDisk().has_value())
@@ -440,7 +441,7 @@ namespace Modio
 	}
 
 	MODIO_IMPL void SetSpace(Modio::StorageInfo& Info, Modio::StorageLocation Location, Modio::StorageUsage Usage,
-							 Modio::FileSize Space)
+		Modio::FileSize Space)
 	{
 		Info.StorageData[{Location, Usage}] = Space;
 	}
@@ -449,12 +450,12 @@ namespace Modio
 	{
 		switch (Location)
 		{
-			case Modio::StorageLocation::Local:
-				return Modio::Detail::SDKSessionData::GetModStorageQuota();
-			case Modio::StorageLocation::Cache:
-				return Modio::Detail::SDKSessionData::GetCacheStorageQuota();
-			default:
-				return {};
+		case Modio::StorageLocation::Local:
+			return Modio::Detail::SDKSessionData::GetModStorageQuota();
+		case Modio::StorageLocation::Cache:
+			return Modio::Detail::SDKSessionData::GetCacheStorageQuota();
+		default:
+			return {};
 		}
 	}
 
@@ -476,28 +477,28 @@ namespace Modio
 	}
 
 	void SubmitNewModAsync(Modio::ModCreationHandle Handle, Modio::CreateModParams Params,
-						   std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModID> CreatedModID)> Callback)
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModID> CreatedModID)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Handle, Params, Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireUserIsAuthenticated(Callback))
 			{
 				if (Modio::Optional<Modio::ModID> ResolvedID =
-						Modio::Detail::SDKSessionData::ResolveModCreationHandle(Handle))
+					Modio::Detail::SDKSessionData::ResolveModCreationHandle(Handle))
 				{
 					Modio::Detail::Logger().Log(
 						Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
 						"Attempted to call SubmitNewModAsync with an already-used handle. Returning existing Mod ID");
 					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
-							   [ID = ResolvedID.value(), Callback]() { Callback({}, ID); });
+						[ID = ResolvedID.value(), Callback]() { Callback({}, ID); });
 					return;
 				}
 				return Modio::Detail::SubmitNewModAsync(Handle, Params, Callback);
 			}
-		});
+			});
 	}
 
 	void SubmitModChangesAsync(Modio::ModID Mod, Modio::EditModParams Params,
-							   std::function<void(Modio::ErrorCode ec, Modio::Optional<Modio::ModInfo>)> Callback)
+		std::function<void(Modio::ErrorCode ec, Modio::Optional<Modio::ModInfo>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Mod, Params, Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) &&
@@ -507,7 +508,7 @@ namespace Modio
 			{
 				Modio::Detail::SubmitModChangesAsync(Mod, Params, Callback);
 			}
-		});
+			});
 	}
 
 	Modio::ModCreationHandle GetModCreationHandle()
@@ -559,21 +560,21 @@ namespace Modio
 			if (Mod == Modio::ModID::InvalidModID())
 			{
 				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
-											"Attempted to call SubmitNewModFileForMod with an invalid mod ID.");
+					"Attempted to call SubmitNewModFileForMod with an invalid mod ID.");
 
 				return;
 			}
 			// TODO: @modio-core we should return the error code from this function so we can do our precondition checks
 			Modio::Detail::SDKSessionData::AddPendingModfileUpload(Mod, Params);
-		});
+			});
 	}
 
 	void AddOrUpdateModLogoAsync(Modio::ModID ModID, std::string LogoPath,
-								 std::function<void(Modio::ErrorCode)> Callback)
+		std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask(
 			[ModID = std::move(ModID), LogoPath = std::move(LogoPath), Callback = std::move(Callback),
-			 TRACKED = Modio::Detail::OperationTracker("AddOrUpdateModLogoWrapper", &Callback)]() mutable {
+			TRACKED = Modio::Detail::OperationTracker("AddOrUpdateModLogoWrapper", &Callback)]() mutable {
 				if (Modio::Detail::RequireSDKIsInitialized(Callback) &&
 					Modio::Detail::RequireNotRateLimited(Callback) &&
 					Modio::Detail::RequireUserIsAuthenticated(Callback) &&
@@ -582,25 +583,52 @@ namespace Modio
 				{
 					asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
 						Modio::Detail::AddOrUpdateModLogoOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID,
-															LogoPath),
+							LogoPath),
 						Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
 				}
 			});
 	}
 
-	void ArchiveModAsync(Modio::ModID ModID, std::function<void(Modio::ErrorCode)> Callback)
+	void AddOrUpdateModGalleryImagesAsync(Modio::ModID ModID, std::vector<std::string> ImagePaths, bool SyncGallery,
+										  std::function<void(Modio::ErrorCode)> Callback)
 	{
-		Modio::Detail::SDKSessionData::EnqueueTask([ModID = std::move(ModID),
+		Modio::Detail::SDKSessionData::EnqueueTask([ModID = std::move(ModID), ImagePaths = std::move(ImagePaths),
+													SyncGallery,
 													Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
 				Modio::Detail::RequireUserIsAuthenticated(Callback) &&
 				Modio::Detail::RequireValidModID(ModID, Callback))
 			{
+				// Verify all files exist
+				for (const std::string& ImagePath : ImagePaths)
+				{
+					if (!Modio::Detail::RequireFileExists(ImagePath, Callback))
+					{
+						return;
+					}
+				}
+
 				asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-					Modio::Detail::ArchiveModOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID), Callback,
-					Modio::Detail::Services::GetGlobalContext().get_executor());
+					Modio::Detail::AddOrUpdateModGalleryImagesOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID,
+																 std::move(ImagePaths), SyncGallery),
+					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 		});
+	}
+
+	void ArchiveModAsync(Modio::ModID ModID, std::function<void(Modio::ErrorCode)> Callback)
+	{
+		Modio::Detail::SDKSessionData::EnqueueTask([ModID = std::move(ModID),
+			Callback = std::move(Callback)]() mutable {
+				if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+					Modio::Detail::RequireUserIsAuthenticated(Callback) &&
+					Modio::Detail::RequireValidModID(ModID, Callback))
+				{
+					asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
+						Modio::Detail::ArchiveModOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID), Callback,
+						Modio::Detail::Services::GetGlobalContext().get_executor());
+				}
+			});
 	}
 
 	Modio::ErrorCode InitTempModSet(std::vector<Modio::ModID> ModIds)
@@ -619,7 +647,7 @@ namespace Modio
 			if (Modio::Detail::SDKSessionData::GetTemporaryModSet() != nullptr)
 			{
 				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
-											"Temp Mod Set is already initialized.");
+					"Temp Mod Set is already initialized.");
 				return Modio::make_error_code(Modio::ModManagementError::ModManagementDisabled);
 			}
 
@@ -646,7 +674,7 @@ namespace Modio
 			if (Modio::Detail::SDKSessionData::GetTemporaryModSet() == nullptr)
 			{
 				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
-											"Temp Mod Set is not initialize, call InitTempModSet.");
+					"Temp Mod Set is not initialize, call InitTempModSet.");
 				return Modio::make_error_code(Modio::ModManagementError::TempModSetNotInitialized);
 			}
 
@@ -673,7 +701,7 @@ namespace Modio
 			if (Modio::Detail::SDKSessionData::GetTemporaryModSet() == nullptr)
 			{
 				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
-											"Temp Mod Set is not initialize, call InitTempModSet.");
+					"Temp Mod Set is not initialize, call InitTempModSet.");
 				return Modio::make_error_code(Modio::ModManagementError::TempModSetNotInitialized);
 			}
 
@@ -698,7 +726,7 @@ namespace Modio
 			if (Modio::Detail::SDKSessionData::GetTemporaryModSet() == nullptr)
 			{
 				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
-											"Temp Mod Set is not initialize, call InitTempModSet.");
+					"Temp Mod Set is not initialize, call InitTempModSet.");
 				return Modio::make_error_code(Modio::ModManagementError::TempModSetNotInitialized);
 			}
 
@@ -741,8 +769,8 @@ namespace Modio
 				else
 				{
 					Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
-												"ModID {} from TempModSet should in System or Temp Mod Collection",
-												modId);
+						"ModID {} from TempModSet should in System or Temp Mod Collection",
+						modId);
 				}
 			}
 

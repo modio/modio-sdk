@@ -29,25 +29,25 @@ class WriteSomeToFileOp
 	/// <summary>
 	/// Reference to the platform-specific implementation of the file object
 	/// </summary>
-	std::shared_ptr<Modio::Detail::FileObjectImplementation> FileImpl;
+	std::shared_ptr<Modio::Detail::FileObjectImplementation> FileImpl {};
 	/// <summary>
 	/// Offset within the file to write the data
 	/// </summary>
-	std::uintmax_t FileOffset;
+	std::uintmax_t FileOffset = 0;
 	/// <summary>
 	/// Win32 control structure for an async file IO operation
 	/// </summary>
-	Modio::StableStorage<OVERLAPPED> WriteOpParams;
+	Modio::StableStorage<OVERLAPPED> WriteOpParams {};
 	/// <summary>
 	/// State container for the coroutine invoked in the function call operator overload
 	/// </summary>
-	asio::coroutine Coroutine;
+	asio::coroutine Coroutine {};
 	/// <summary>
 	/// Timer to allow the polling interval to be set for the waiting state of the operation
 	/// </summary>
-	Modio::Detail::Timer StatusTimer;
+	Modio::Detail::Timer StatusTimer {};
 
-	std::weak_ptr<Modio::Detail::FileSharedState> SharedState;
+	std::weak_ptr<Modio::Detail::FileSharedState> SharedState {};
 
 public:
 	WriteSomeToFileOp(std::shared_ptr<Modio::Detail::FileObjectImplementation> IOObject,

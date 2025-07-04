@@ -25,7 +25,7 @@ namespace Modio
 	{
 		class TimerServiceImplementation : public Modio::Detail::ITimerServiceImplementation
 		{
-			std::shared_ptr<TimerSharedState> SharedState;
+			std::shared_ptr<TimerSharedState> SharedState {};
 
 		public:
 			using IOObjectImplementationType = std::shared_ptr<TimerImplementation>;

@@ -300,15 +300,15 @@ namespace Modio
 			}
 
 		private:
-			Modio::ModID Mod;
-			asio::coroutine CoroutineState;
-			Modio::Detail::DynamicBuffer ModInfoBuffer;
-			Modio::filesystem::path DownloadPath;
-			bool IsTempMod;
-			std::shared_ptr<Modio::ModCollectionEntry> CollectionEntry;
-			Modio::ModInfo ModInfoData;
-			Modio::Detail::Transaction<Modio::ModCollectionEntry> Transaction;
-			std::weak_ptr<Modio::ModProgressInfo> ModProgress;
+			Modio::ModID Mod {};
+			asio::coroutine CoroutineState {};
+			Modio::Detail::DynamicBuffer ModInfoBuffer {};
+			Modio::filesystem::path DownloadPath {};
+			bool IsTempMod {};
+			std::shared_ptr<Modio::ModCollectionEntry> CollectionEntry {};
+			Modio::ModInfo ModInfoData {};
+			Modio::Detail::Transaction<Modio::ModCollectionEntry> Transaction {};
+			std::weak_ptr<Modio::ModProgressInfo> ModProgress {};
 			bool bFileDownloadComplete = false;
 		};
 

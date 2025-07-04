@@ -23,14 +23,14 @@
 class ReadSomeFromFileBufferedOp
 {
 	Modio::Detail::Buffer Buffer;
-	std::shared_ptr<Modio::Detail::FileObjectImplementation> FileImpl;
-	Modio::FileOffset Offset;
-	std::uintmax_t Length;
-	Modio::StableStorage<OVERLAPPED> ReadOpParams;
-	asio::coroutine Coroutine;
-	Modio::Detail::Timer StatusTimer;
-	Modio::StableStorage<DWORD> NumberOfBytesRead;
-	Modio::Detail::DynamicBuffer Destination;
+	std::shared_ptr<Modio::Detail::FileObjectImplementation> FileImpl {};
+	Modio::FileOffset Offset {};
+	std::uintmax_t Length = 0;
+	Modio::StableStorage<OVERLAPPED> ReadOpParams {};
+	asio::coroutine Coroutine {};
+	Modio::Detail::Timer StatusTimer {};
+	Modio::StableStorage<DWORD> NumberOfBytesRead {};
+	Modio::Detail::DynamicBuffer Destination {};
 
 public:
 	ReadSomeFromFileBufferedOp(std::shared_ptr<Modio::Detail::FileObjectImplementation> IOObject,

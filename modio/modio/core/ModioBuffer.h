@@ -24,9 +24,9 @@ namespace Modio
 		/// swap to unbuffered IO on Windows/ERA platforms if we need additional performance
 		class Buffer
 		{
-			std::unique_ptr<unsigned char[]> InternalData;
-			std::size_t Alignment;
-			std::size_t AlignmentOffset;
+			std::unique_ptr<unsigned char[]> InternalData {};
+			std::size_t Alignment = 0;
+			std::size_t AlignmentOffset = 0;
 			std::size_t Size = 0;
 
 		public:

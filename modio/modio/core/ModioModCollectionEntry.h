@@ -48,28 +48,28 @@ namespace Modio
 		/// @brief The status of the mod, is it pending installation, is it installed but needing an update, etc
 		std::atomic<Modio::ModState> CurrentState {Modio::ModState::InstallationPending};
 
-		Modio::Optional<Modio::ModState> RollbackState;
+		Modio::Optional<Modio::ModState> RollbackState {};
 
 		/// @brief Mod descriptor from the REST API
-		ModInfo ModProfile;
+		ModInfo ModProfile {};
 
 		/// @brief Reference counting to allow automatic uninstallation of unused local mods
 		std::atomic<uint8_t> LocalUserSubscriptionCount {};
-		std::set<Modio::UserID> LocalUserSubscriptions;
+		std::set<Modio::UserID> LocalUserSubscriptions {};
 
-		std::string PathOnDisk;
-		Modio::FileSize SizeOnDisk;
+		std::string PathOnDisk {};
+		Modio::FileSize SizeOnDisk {};
 
 		/// @docinternal
 		/// @brief flag if this mod should not be processed because it encountered an unrecoverable error during
 		/// installation/update. This should not be saved to disk as we will more than likely want to retry next session
 		std::atomic<bool> ShouldNotRetry {};
 
-		Modio::ErrorCode NeverRetryReason;
+		Modio::ErrorCode NeverRetryReason {};
 
-		Modio::ErrorCode LastErrorCode;
+		Modio::ErrorCode LastErrorCode {};
 
-		uint8_t RetriesRemainingThisSession;
+		uint8_t RetriesRemainingThisSession {};
 
 		/// @docnone
 		friend bool operator==(const Modio::ModCollectionEntry& A, const Modio::ModCollectionEntry& B)
@@ -295,23 +295,23 @@ namespace Modio
 
 	private:
 		/// @docnone
-		Modio::FileSize DownloadCurrent;
+		Modio::FileSize DownloadCurrent {};
 		/// @docnone
-		Modio::FileSize DownloadTotal;
+		Modio::FileSize DownloadTotal {};
 		/// @docnone
-		Modio::FileSize ExtractCurrent;
+		Modio::FileSize ExtractCurrent {};
 		/// @docnone
-		Modio::FileSize ExtractTotal;
+		Modio::FileSize ExtractTotal {};
 		/// @docnone
-		Modio::FileSize CompressCurrent;
+		Modio::FileSize CompressCurrent {};
 		/// @docnone
-		Modio::FileSize CompressTotal;
+		Modio::FileSize CompressTotal {};
 		/// @docnone
-		Modio::FileSize UploadCurrent;
+		Modio::FileSize UploadCurrent {};
 		/// @docnone
-		Modio::FileSize UploadTotal;
+		Modio::FileSize UploadTotal {};
 		/// @docnone
-		EModProgressState CurrentState;
+		EModProgressState CurrentState {};
 
 		/// @docnone
 		friend MODIO_IMPL void SetState(Modio::ModProgressInfo& Info, Modio::ModProgressInfo::EModProgressState State);
@@ -373,7 +373,7 @@ namespace Modio
 		}
 
 	protected:
-		std::set<Modio::ModID> InternalList;
+		std::set<Modio::ModID> InternalList {};
 	};
 
 	/// @docpublic
@@ -470,13 +470,13 @@ namespace Modio
 		}
 
 		/// @brief ID for the mod that the event occurred on
-		Modio::ModID ID;
+		Modio::ModID ID {};
 
 		/// @brief What type of event occurred
-		EventType Event;
+		EventType Event {};
 
 		/// @brief Empty if operation completed successfully, truthy/contains error code if operation failed
-		Modio::ErrorCode Status;
+		Modio::ErrorCode Status {};
 	};
 
 	/// @docpublic
@@ -600,7 +600,7 @@ namespace Modio
 		}
 
 	private:
-		std::vector<Modio::ModManagementEvent> InternalData;
+		std::vector<Modio::ModManagementEvent> InternalData {};
 	};
 
 } // namespace Modio

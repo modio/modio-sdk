@@ -109,19 +109,19 @@ namespace Modio
 
 			MODIO_IMPL void AddMods(const std::vector<ModID>& Ids);
 
-			std::string SecretKey;
-			Modio::Optional<Modio::Guid> SessionId;
+			std::string SecretKey {};
+			Modio::Optional<Modio::Guid> SessionId {};
 			// The format of the ModID list for hashing purposes is a comma separated list of
 			// all ModIDs for this session all ModIDs for this session
-			std::string ModIdsString;
-			std::vector<ModID> ModIds;
-			time_t SessionStartTime;
-			uint64_t CurrentSessionOrderId;
+			std::string ModIdsString {};
+			std::vector<ModID> ModIds {};
+			time_t SessionStartTime = 0;
+			uint64_t CurrentSessionOrderId = 0;
 
-			time_t LastHeartbeatPerformed;
+			time_t LastHeartbeatPerformed = 0;
 
-			bool bIsSessionActive;
-			bool bIsInitialized;
+			bool bIsSessionActive = false;
+			bool bIsInitialized = false;
 		};
 
 	} // namespace Detail

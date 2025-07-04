@@ -25,12 +25,12 @@ namespace Modio
 	{
 		class OperationQueue : public std::enable_shared_from_this<OperationQueue>
 		{
-			std::atomic<bool> OperationInProgress;
-			std::atomic<std::int32_t> NumWaiters;
+			std::atomic<bool> OperationInProgress {};
+			std::atomic<std::int32_t> NumWaiters {};
 			// asio::steady_timer QueueImpl;
-			std::deque<fu2::unique_function<void()>> QueueImpl;
+			std::deque<fu2::unique_function<void()>> QueueImpl {};
 			std::atomic<bool> bWasCancelled {};
-			std::string QueueName;
+			std::string QueueName {};
 
 		public:
 			OperationQueue(asio::io_context& MODIO_UNUSED_ARGUMENT(OwningContext), const char* QueueName)

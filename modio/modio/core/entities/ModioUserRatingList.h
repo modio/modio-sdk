@@ -21,9 +21,9 @@ namespace Modio
 {
 	struct UserRating
 	{
-		Modio::GameID GameId;
-		Modio::ModID ModId;
-		Modio::Rating ModRating;
+		Modio::GameID GameId {};
+		Modio::ModID ModId {};
+		Modio::Rating ModRating {};
 
 		friend bool operator==(const Modio::UserRating& A, const Modio::UserRating& B) 
 		{

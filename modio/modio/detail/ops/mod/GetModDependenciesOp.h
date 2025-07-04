@@ -35,6 +35,22 @@ namespace Modio
 			{
 				reenter(CoroutineState)
 				{
+					{
+						// Check if this mod has dependencies first
+						// Return an empty set if it doesn't
+						Modio::Optional<Modio::ModInfo> CachedResponse =
+							Services::GetGlobalService<CacheService>().FetchFromCache(ModID);
+
+						if (CachedResponse.has_value() && !CachedResponse.value().Dependencies)
+						{
+							Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Http,
+														"Mod has no dependencies {}", ModID);
+
+							Self.complete({}, {});
+							return;
+						}
+					}
+
 					do
 					{
 						// Because we're making a raw request here, manually add the filter to paginate 100 results at a
@@ -123,16 +139,16 @@ namespace Modio
 			}
 
 		private:
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			asio::coroutine CoroutineState;
-			bool Recursive;
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			asio::coroutine CoroutineState {};
+			bool Recursive {};
 			const std::uint16_t MaxResultSafetyLimit = 5000;
-			Modio::ModID ModID;
-			Modio::GameID GameID;
+			Modio::ModID ModID {};
+			Modio::GameID GameID {};
 
 			// Keep track of our results
-			std::unique_ptr<Modio::ModDependencyList> CollatedResults;
-			Modio::PagedResult PageInfo;
+			std::unique_ptr<Modio::ModDependencyList> CollatedResults {};
+			Modio::PagedResult PageInfo {};
 			std::int32_t CurrentResultIndex = 0;
 		};
 	} // namespace Detail

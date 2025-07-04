@@ -91,11 +91,11 @@ namespace Modio
 			}
 
 		private:
-			Modio::Detail::DynamicBuffer CertificateBuffer;
-			std::unique_ptr<Modio::Detail::File> CertificateFile;
-			asio::coroutine CoroutineState;
-			std::shared_ptr<HttpSharedState> SharedState;
-			Modio::filesystem::path CertificatesFolder;
+			Modio::Detail::DynamicBuffer CertificateBuffer {};
+			std::unique_ptr<Modio::Detail::File> CertificateFile {};
+			asio::coroutine CoroutineState {};
+			std::shared_ptr<HttpSharedState> SharedState {};
+			Modio::filesystem::path CertificatesFolder {};
 		};
 	} // namespace Detail
 } // namespace Modio

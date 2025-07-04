@@ -23,7 +23,7 @@ namespace Modio
 	{
 		class ArchiveWriter : public asio::basic_io_object<CompressionService>
 		{
-			Modio::filesystem::path FilePath;
+			Modio::filesystem::path FilePath {};
 
 		public:
 			explicit ArchiveWriter(Modio::filesystem::path FilePath)

@@ -23,7 +23,7 @@ namespace Modio
 	{
 	protected:
 		using ListType = ContainerType<ValueType>;
-		ListType InternalList;
+		ListType InternalList {};
 
 		// operator==() Written for Test_JsonToAndFrom.cpp and Server Side tests, re-check functionality before using in actual code.
 		/// @docnone

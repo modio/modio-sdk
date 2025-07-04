@@ -230,7 +230,7 @@ namespace Modio
 				return {};
 			}
 
-			Modio::ModInfoList ModElems = {};
+			Modio::ModInfoList ModElems {};
 
 			for (Modio::ModID ModIDDetail : CacheEntryIterator->second)
 			{

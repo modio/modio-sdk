@@ -21,46 +21,50 @@ namespace Modio
 	public:
 		/// @docpublic
 		/// @brief The name of the mod
-		Modio::Optional<std::string> Name;
+		Modio::Optional<std::string> Name {};
 
 		/// @docpublic
 		/// @brief A brief summary of what the mod is
-		Modio::Optional<std::string> Summary;
+		Modio::Optional<std::string> Summary {};
 
 		/// @docpublic
 		/// @brief Optional override for the name 'slug' in the mod's URL
-		Modio::Optional<std::string> NamePath;
+		Modio::Optional<std::string> NamePath {};
 
 		/// @docpublic
 		/// @brief Optional override for the mod's visibility status. Defaults to Public (1)
-		Modio::Optional<Modio::ObjectVisibility> Visibility;
+		Modio::Optional<Modio::ObjectVisibility> Visibility {};
 
 		/// @docpublic
 		/// @brief Optional long description of the mod
-		Modio::Optional<std::string> Description;
+		Modio::Optional<std::string> Description {};
 
 		/// @docpublic
 		/// @brief Optional URL to the mod's homepage. Must be a valid URL
-		Modio::Optional<std::string> HomepageURL;
+		Modio::Optional<std::string> HomepageURL {};
 
 		/// @docpublic
 		/// @brief Bitwise mask of flags indicating mature content
-		Modio::Optional<Modio::MaturityOption> MaturityRating;
+		Modio::Optional<Modio::MaturityOption> MaturityRating {};
 
 		/// @docpublic
 		/// @brief Community options for the mod
-		Modio::Optional<Modio::ModCommunityOptionsFlags> CommunityOptions;
+		Modio::Optional<Modio::ModCommunityOptionsFlags> CommunityOptions {};
 
 		/// @docpublic
 		/// @brief Optional metadata blob for this mod
-		Modio::Optional<std::string> MetadataBlob;
+		Modio::Optional<std::string> MetadataBlob {};
+
+		/// @docpublic
+		/// @brief Optional key-value-pair metadata for this mod
+		Modio::Optional<std::vector<Modio::Metadata>> MetadataKvp;
 
 		/// @docpublic
 		/// @brief Optional path to a new logo image
-		Modio::Optional<std::string> LogoPath;
+		Modio::Optional<std::string> LogoPath {};
 
 		/// @docpublic
 		/// @brief Optional tags vector for this mod
-		Modio::Optional<std::vector<std::string>> Tags;
+		Modio::Optional<std::vector<std::string>> Tags {};
 	};
 } // namespace Modio

@@ -177,15 +177,15 @@ namespace Modio
 			}
 
 		private:
-			std::unique_ptr<Modio::Detail::ArchiveWriter> DestinationArchive;
-			asio::coroutine CoroutineState;
-			Modio::filesystem::path SourceDirectoryRootPath;
-			Modio::filesystem::recursive_directory_iterator EntriesInFolder;
-			Modio::filesystem::recursive_directory_iterator CurrentEntry;
-			Modio::filesystem::path CurrentRelativePath;
-			std::weak_ptr<Modio::ModProgressInfo> ProgressInfo;
-			Modio::FileSize CurrentTotalFileSize;
-			std::shared_ptr<uint64_t> RollingFileHash;
+			std::unique_ptr<Modio::Detail::ArchiveWriter> DestinationArchive {};
+			asio::coroutine CoroutineState {};
+			Modio::filesystem::path SourceDirectoryRootPath {};
+			Modio::filesystem::recursive_directory_iterator EntriesInFolder {};
+			Modio::filesystem::recursive_directory_iterator CurrentEntry {};
+			Modio::filesystem::path CurrentRelativePath {};
+			std::weak_ptr<Modio::ModProgressInfo> ProgressInfo {};
+			Modio::FileSize CurrentTotalFileSize {};
+			std::shared_ptr<uint64_t> RollingFileHash {};
 		};
 #include <asio/unyield.hpp>
 

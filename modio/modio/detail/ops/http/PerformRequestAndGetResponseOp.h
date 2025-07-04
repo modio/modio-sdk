@@ -36,15 +36,15 @@ namespace Modio
 #include <asio/yield.hpp>
 		class PerformRequestAndGetResponseOp : public Modio::Detail::BaseOperation<PerformRequestAndGetResponseOp>
 		{
-			Modio::StableStorage<Modio::Detail::HttpRequest> Request;
-			asio::coroutine Coroutine;
-			Modio::Detail::DynamicBuffer ResultBuffer;
-			Modio::Detail::CachedResponse AllowCachedResponse;
-			std::unique_ptr<PerformRequestImpl> Impl;
+			Modio::StableStorage<Modio::Detail::HttpRequest> Request {};
+			asio::coroutine Coroutine {};
+			Modio::Detail::DynamicBuffer ResultBuffer {};
+			Modio::Detail::CachedResponse AllowCachedResponse {};
+			std::unique_ptr<PerformRequestImpl> Impl {};
 
 			struct
 			{
-				Modio::Detail::DynamicBuffer ResponseBodyBuffer;
+				Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 			} State;
 
 		public:

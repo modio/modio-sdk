@@ -24,22 +24,22 @@ namespace Modio
 	{
 	public:
 		/// @brief A unique Guid to identify the starting session
-		Modio::Guid SessionId;
+		Modio::Guid SessionId {};
 
 		/// @brief Milliseconds since UNIX when this request was made
-		int64_t SessionTimestamp;
+		int64_t SessionTimestamp = 0;
 
 		/// @brief Hashed value of the session timestamp, Id, nonce and the secret metrics key
-		std::string SessionHash;
+		std::string SessionHash {};
 
 		/// @brief A unique Guid to identify this request
-		Modio::Guid SessionNonce;
+		Modio::Guid SessionNonce {};
 
 		/// @brief The list of mods being tracked in this session
-		std::vector<Modio::ModID> ModIds;
+		std::vector<Modio::ModID> ModIds {};
 
 		/// @brief An incremental order Id for each request sent to the server.
-		uint64_t SessionOrderId;
+		uint64_t SessionOrderId = 0;
 
 		/// @docnone
 		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::MetricsSessionStartParams& Params);

@@ -14,7 +14,7 @@
 /// @brief Internal buffer of the most recent log messages
 class LogBuffer
 {
-	std::deque<std::string> elements;
+	std::deque<std::string> elements {};
 
 public:
 	void Insert(std::string Item)

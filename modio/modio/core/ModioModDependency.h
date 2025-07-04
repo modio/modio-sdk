@@ -21,9 +21,9 @@ namespace Modio
 	struct ModDependency
 	{
 		/// @brief Unique mod id.
-		Modio::ModID ModID;
+		Modio::ModID ModID {};
 		/// @brief Name of the mod
-		std::string ModName;
+		std::string ModName {};
 		/// @brief Unix timestamp of the date the mod was registered
 		std::int64_t DateAdded = 0;
 		/// @brief Unix timestamp of the date the mod was updated
@@ -32,10 +32,10 @@ namespace Modio
 		/// relies on additional dependencies.
 		std::uint8_t DependencyDepth = 0;
 		/// @brief Media data related to the mod logo
-		Modio::Detail::Logo Logo;
+		Modio::Detail::Logo Logo {};
 
 		/// @brief Information about the mod's most recent public release
-		Modio::Optional<Modio::FileMetadata> FileInfo = {};
+		Modio::Optional<Modio::FileMetadata> FileInfo {};
 
 		/// @brief The current ModStatus on the server: Accepted, NotAccepted, or Deleted.
 		Modio::ModServerSideStatus Status = Modio::ModServerSideStatus::NotAccepted;
@@ -63,6 +63,11 @@ namespace Modio
 	class ModDependencyList : public PagedResult, public List<std::vector, ModDependency>
 	{
 	public:
+		
+		ModDependencyList() : PagedResult(), List<std::vector, ModDependency>()
+		{
+		}
+		
 		/// @docpublic
 		/// @brief Insert the unique contents of a ModDependencyList to the end of this list
 		void AppendUnique(const ModDependencyList& Other)

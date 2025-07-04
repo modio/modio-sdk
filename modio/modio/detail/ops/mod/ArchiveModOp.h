@@ -25,10 +25,10 @@ namespace Modio
 	{
 		class ArchiveModOp
 		{
-			asio::coroutine CoroState;
-			Modio::GameID GameID;
-			Modio::ModID ModID;
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
+			asio::coroutine CoroState {};
+			Modio::GameID GameID {};
+			Modio::ModID ModID {};
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 
 		public:
 			ArchiveModOp(Modio::GameID GameID, Modio::ModID ModID) : GameID(GameID), ModID(ModID) {}

@@ -21,9 +21,9 @@ namespace Modio
 			MODIO_IMPL std::string GetExternalStoragePath();
 
 		private:
-			jmethodID GetCertificatePathMethodId;
-			jmethodID GetInternalStoragePathMethodId;
-			jmethodID GetExternalStoragePathMethodId;
+			jmethodID GetCertificatePathMethodId {};
+			jmethodID GetInternalStoragePathMethodId {};
+			jmethodID GetExternalStoragePathMethodId {};
 		};
 	}; // namespace Detail
 

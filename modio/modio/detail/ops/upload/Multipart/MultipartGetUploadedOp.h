@@ -25,10 +25,10 @@ namespace Modio
 	{
 		class MultipartGetUploadedOp
 		{
-			Modio::Detail::HttpRequestParams GetPartsRequest;
-			Modio::Detail::DynamicBuffer ResponseBuffer;
-			std::shared_ptr<Modio::Detail::UploadSessionPartList> ResponseParts;
-			asio::coroutine Coroutine;
+			Modio::Detail::HttpRequestParams GetPartsRequest {};
+			Modio::Detail::DynamicBuffer ResponseBuffer {};
+			std::shared_ptr<Modio::Detail::UploadSessionPartList> ResponseParts {};
+			asio::coroutine Coroutine {};
 
 		public:
 			MultipartGetUploadedOp(std::shared_ptr<Modio::Detail::UploadSessionPartList> Response,

@@ -38,11 +38,11 @@ namespace Modio
 			/// <summary>
 			/// The root path for local persistent storage - all file paths are treated as relative to this root
 			/// </summary>
-			Modio::filesystem::path RootLocalStoragePath;
-			Modio::filesystem::path UserDataPath;
-			Modio::filesystem::path RootTempPath;
-			Modio::GameID CurrentGameID;
-			std::shared_ptr<Modio::Detail::FileSharedState> SharedState;
+			Modio::filesystem::path RootLocalStoragePath {};
+			Modio::filesystem::path UserDataPath {};
+			Modio::filesystem::path RootTempPath {};
+			Modio::GameID CurrentGameID {};
+			std::shared_ptr<Modio::Detail::FileSharedState> SharedState {};
 
 		public:
 			/// <summary>

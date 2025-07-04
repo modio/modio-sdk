@@ -29,10 +29,10 @@ namespace Modio
 #include <asio/yield.hpp>
 		class ReadSomeResponseBodyOp
 		{
-			asio::coroutine CoroutineState;
-			std::shared_ptr<HttpRequestImplementation> Request;
-			std::weak_ptr<HttpSharedState> SharedState;
-			Modio::Detail::DynamicBuffer ResponseBuffer;
+			asio::coroutine CoroutineState {};
+			std::shared_ptr<HttpRequestImplementation> Request {};
+			std::weak_ptr<HttpSharedState> SharedState {};
+			Modio::Detail::DynamicBuffer ResponseBuffer {};
 			// The max size of the temp buffer "ReadChunk"
 			constexpr static signed long ReadChunkSize = 512 * 1024;
 			// A temporal buffer that reads from the CFStream

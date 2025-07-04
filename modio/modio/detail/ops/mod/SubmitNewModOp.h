@@ -11,10 +11,10 @@
 #pragma once
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCreateModParams.h"
-#include "modio/detail/serialization/ModioModInfoSerialization.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/serialization/ModioModInfoSerialization.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 
 namespace Modio
@@ -28,17 +28,18 @@ namespace Modio
 			SubmitNewModOp(Modio::ModCreationHandle Handle, Modio::CreateModParams Params) : Handle(Handle)
 			{
 				SubmitParams = Modio::Detail::AddModRequest.SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
-								   .AppendPayloadFile("logo", Params.PathToLogoFile)
-								   .AppendPayloadValue("name", Params.Name)
-								   .AppendPayloadValue("summary", Params.Summary)
-								   .AppendPayloadValue("description", Params.Description)
-								   .AppendPayloadValue("name_id", Params.NamePath)
-								   .AppendPayloadValue("homepage_url", Params.HomepageURL)
-								   .AppendPayloadValue("metadata_blob", Params.MetadataBlob);
+					.AppendPayloadFile("logo", Params.PathToLogoFile)
+					.AppendPayloadValue("name", Params.Name)
+					.AppendPayloadValue("summary", Params.Summary)
+					.AppendPayloadValue("description", Params.Description)
+					.AppendPayloadValue("name_id", Params.NamePath)
+					.AppendPayloadValue("homepage_url", Params.HomepageURL)
+					.AppendPayloadValue("metadata_blob", Params.MetadataBlob);
 
 				if (Params.Visibility.has_value())
 				{
-					SubmitParams = SubmitParams.AppendPayloadValue("visible", fmt::format("{}", static_cast<std::uint8_t>(Params.Visibility.value())));
+					SubmitParams = SubmitParams.AppendPayloadValue(
+						"visible", fmt::format("{}", static_cast<std::uint8_t>(Params.Visibility.value())));
 				}
 
 				if (Params.Stock)
@@ -67,6 +68,14 @@ namespace Modio
 					SubmitParams = SubmitParams.AppendPayloadValue(
 						"community_options", fmt::format("{}", Params.CommunityOptions->RawValue()));
 				}
+
+				if (Params.MetadataKvp)
+				{
+					for (const Modio::Metadata& metadata : *Params.MetadataKvp)
+					{
+						SubmitParams = SubmitParams.AppendPayloadValue("metadata_kvp[]", fmt::format("{}:{}", metadata.Key, metadata.Value));
+					}
+				}
 			}
 
 			template<typename CoroType>
@@ -75,7 +84,7 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(ResponseBuffer, SubmitParams,
-																		   CachedResponse::Disallow, std::move(Self));
+						CachedResponse::Disallow, std::move(Self));
 
 					if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))
 					{
@@ -105,22 +114,22 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
-			Modio::Detail::HttpRequestParams SubmitParams;
-			Modio::Detail::DynamicBuffer ResponseBuffer;
-			Modio::ModCreationHandle Handle;
+			asio::coroutine CoroutineState {};
+			Modio::Detail::HttpRequestParams SubmitParams {};
+			Modio::Detail::DynamicBuffer ResponseBuffer {};
+			Modio::ModCreationHandle Handle {};
 		};
 #include <asio/unyield.hpp>
 
 		inline void SubmitNewModAsync(Modio::ModCreationHandle Handle, Modio::CreateModParams Params,
-									  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModID>)> Callback)
+			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModID>)> Callback)
 		{
 			if (Modio::Detail::RequireFileExists(Params.PathToLogoFile, Callback))
 			{
 				return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModID>)>,
-										   void(Modio::ErrorCode, Modio::Optional<Modio::ModID>)>(
-					Modio::Detail::SubmitNewModOp(Handle, Params), Callback,
-					Modio::Detail::Services::GetGlobalContext().get_executor());
+					void(Modio::ErrorCode, Modio::Optional<Modio::ModID>)>(
+						Modio::Detail::SubmitNewModOp(Handle, Params), Callback,
+						Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 		}
 	} // namespace Detail

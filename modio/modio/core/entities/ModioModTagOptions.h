@@ -25,10 +25,10 @@ namespace Modio
 		/// @brief Localization data for an individual tag value
 		 
 		/// @brief The original raw unlocalized tag value used by the REST API
-		std::string Tag;
+		std::string Tag {};
 
 		/// @brief Culture code -> Localized tag value string mapping for all configured languages.
-		std::map<std::string, std::string> Translations;
+		std::map<std::string, std::string> Translations {};
 
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModTagLocalizationData& TagLocalization);
@@ -39,10 +39,10 @@ namespace Modio
 	struct LocalizedTagCategory
 	{
 		/// @brief Localized display string for this tag category's name
-		std::string GroupName;
+		std::string GroupName {};
 
 		/// @brief Localized display strings for all valid values in this tag category
-		std::vector<std::string> Tags;
+		std::vector<std::string> Tags {};
 	};
 
 	/// @docpublic
@@ -50,30 +50,30 @@ namespace Modio
 	struct ModTagInfo
 	{
 		/// @brief Raw unlocalized tag group name
-		std::string TagGroupName;
+		std::string TagGroupName {};
 
 		/// @brief Valid raw unlocalized tag values this group contains
-		std::vector<std::string> TagGroupValues;
+		std::vector<std::string> TagGroupValues {};
 
 		/// @brief Culture code -> localized tag category name mapping for all configured languages
-		std::map<std::string, std::string> TagGroupNameLocData;
+		std::map<std::string, std::string> TagGroupNameLocData {};
 
 		/// @brief Localization data for this tag category's values in all configured languages
-		std::vector<ModTagLocalizationData> TagGroupValueLocData;
+		std::vector<ModTagLocalizationData> TagGroupValueLocData {};
 
 		/// @brief True if multiple tags from the group can be used simultaneously
-		bool bAllowMultipleSelection;
+		bool bAllowMultipleSelection = false;
 
 		/// @brief True if only visible by admins
-		bool bHidden;
+		bool bHidden = false;
 
 		/// @brief True if only editable by admins
-		bool bLocked;
+		bool bLocked = false;
 
 	private:
 
 		/// @brief the culture code for the mod.io locale at the time the mod.io API returned this data
-		std::string Locale;
+		std::string Locale {};
 
 	public:
 

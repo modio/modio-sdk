@@ -19,7 +19,7 @@ namespace Modio
 		class Transaction
 		{
 			bool bCommitted = false;
-			std::weak_ptr<TargetType> TargetObject;
+			std::weak_ptr<TargetType> TargetObject {};
 			bool bMovedFrom = false;
 
 		public:

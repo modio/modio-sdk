@@ -48,13 +48,13 @@ namespace Modio
 			MODIO_IMPL void AddEntry(ArchiveEntry Entry);
 
 			/// @brief Path to the underlying archive file
-			Modio::filesystem::path FilePath;
+			Modio::filesystem::path FilePath {};
 			
-			std::uintmax_t ZipMagicOffset;
-			std::uint64_t NumberOfRecords;
-			std::uint64_t CentralDirectorySize;
-			std::uint64_t CentralDirectoryOffset;
-			Modio::FileSize TotalExtractedSize;
+			std::uintmax_t ZipMagicOffset = 0;
+			std::uint64_t NumberOfRecords = 0;
+			std::uint64_t CentralDirectorySize = 0;
+			std::uint64_t CentralDirectoryOffset = 0;
+			Modio::FileSize TotalExtractedSize {};
             bool bIsZip64 = false;
             
 			MODIO_IMPL std::uintmax_t GetNumberOfEntries();

@@ -44,8 +44,8 @@ namespace Modio
 			}
 
 		private:
-			Modio::ModID ModToRemove;
-			asio::coroutine CoroutineState;
+			Modio::ModID ModToRemove {};
+			asio::coroutine CoroutineState {};
 		};
 	}
 }

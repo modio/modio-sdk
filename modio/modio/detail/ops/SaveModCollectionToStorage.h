@@ -84,11 +84,11 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
-			Modio::filesystem::path DestinationFilePath;
-			Modio::filesystem::path TempFilePath;
-			std::unique_ptr<Modio::Detail::File> TempFile;
-			std::unique_ptr<Modio::Detail::Buffer> DataBuffer;
+			asio::coroutine CoroutineState {};
+			Modio::filesystem::path DestinationFilePath {};
+			Modio::filesystem::path TempFilePath {};
+			std::unique_ptr<Modio::Detail::File> TempFile {};
+			std::unique_ptr<Modio::Detail::Buffer> DataBuffer {};
 		};
 
 		template<typename SaveModCollectionCallback>

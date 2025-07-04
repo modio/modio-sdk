@@ -59,14 +59,14 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
+			asio::coroutine CoroutineState {};
 			struct Impl
 			{
-				std::unique_ptr<Modio::Detail::File> UserDataFile;
-				std::unique_ptr<Modio::Detail::Buffer> UserDataBuffer;
+				std::unique_ptr<Modio::Detail::File> UserDataFile {};
+				std::unique_ptr<Modio::Detail::Buffer> UserDataBuffer {};
 			};
 
-			Modio::StableStorage<Impl> LocalState;
+			Modio::StableStorage<Impl> LocalState {};
 		};
 #include <asio/unyield.hpp>
 

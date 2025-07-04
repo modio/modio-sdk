@@ -23,8 +23,8 @@ namespace Modio
 		class GetUserRatingsOp
 		{
 
-			asio::coroutine CoroutineState;
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
+			asio::coroutine CoroutineState {};
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 
 		public:
 			GetUserRatingsOp() {}

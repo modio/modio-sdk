@@ -23,13 +23,13 @@ namespace Modio
 		struct AccessTokenObject
 		{
 			/// @brief The default constructor
-			std::int32_t HttpResponseCode;
+			std::int32_t HttpResponseCode {};
 
 			/// @brief The access token
-			std::string AccessToken;
+			std::string AccessToken {};
 
 			/// @brief The date the token expires
-			Modio::Timestamp DateExpires;
+			Modio::Timestamp DateExpires {};
 
 			/// @docnone
 			MODIO_IMPL friend void from_json(const nlohmann::json& Json, AccessTokenObject& AccessToken);
@@ -117,11 +117,11 @@ namespace Modio
 		private:
 			/// @docinternal
 			/// @brief Optional here so that the accessors can return references to avoid memcpy, will always be set
-			Modio::Optional<std::string> Token;
+			Modio::Optional<std::string> Token {};
 
 			/// @docinternal
 			/// @brief The date the token expires
-			Modio::Timestamp ExpireDate;
+			Modio::Timestamp ExpireDate {};
 
 		private:
 			/// @docinternal

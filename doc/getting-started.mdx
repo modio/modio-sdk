@@ -219,6 +219,15 @@ Simply set the value before passing your initialization parameters in to [Initia
 Options.ExtendedParameters["SomeParameterName"] = "SomeParameterValue";
 ```
 
+#### General
+
+The SDK supports the following general use parameters that can be set through `ExtendedParameters`:
+
+| Parameter | Description |
+| --- | --- |
+| `PendingOnlyResults` | Only include mods in search results that are pending moderation. For moderation and testing purposes. Set to "true" to enable. Warning: Should only be enabled when the user is a moderator or admin of the game, setting in shipping builds is not recommended. |
+| `PlatformOverride` | Set the platform to be used when making requests to show mods for that platform instead. For moderation and testing purposes. This parameter will soon be deprecated. |
+
 #### Storage Quota
 
 The SDK supports the following storage quota parameters that can be set through `ExtendedParameters`:
@@ -239,6 +248,14 @@ Options.ExtendedParameters["CacheStorageQuotaMB"] = "250";
 ```
 
 By setting these values, the SDK will actively enforce the specified storage limits.
+
+#### Metrics
+
+The SDK supports the following metric parameters that can be set through `ExtendedParameters`:
+
+| Parameter | Description |
+| --- | --- |
+| `MetricsSecretKey` | Set the secret key used by the metrics feature. |
 
 #### Shutting Down
 
@@ -453,6 +470,12 @@ Changing users via AuthenticateUserExternalAsync (ie performing an authenticatio
 
 :::important
 The `bUserHasAcceptedTerms` parameter should only be set to true for the specific authentication request made immediately after the user accepts the terms dialog. For all subsequent authentication attempts, this parameter should be set to false. If the user has already accepted the latest terms, they will be authenticated automatically. If the terms have been updated since their last acceptance, setting this parameter to false will trigger the appropriate error (403 Forbidden, error_ref 11074) allowing you to show the updated terms.
+:::
+
+:::important
+The `Modio::AuthenticationProvider` is different to the `PortalInUse` initialization parameter (`Modio::Portal`). For example, the user may authenticate through Google, while using the Steam portal.
+`DisplayNamePortal` will be null if a portal is not defined, and it will reflect changes in the username of the corresponding portal that were set using the initialization step.
+For example, if the users Steam username is changed - `DisplayNamePortal` will return the new username once the SDK is reauthenticated.
 :::
 
 #### Epic Games Authentication Example
@@ -908,6 +931,10 @@ To perform any of these actions, the muting user must be authenticated.
 :::
 
 #### Mute a user
+
+:::note
+This functionality is demonstrated in example 14_MuteUnmuteUser
+:::
 
 To mute a user, call [MuteUserAsync](/cppsdk/refdocs/#muteuserasync) with the corresponding `Modio::UserID` and a callback, given the asynchronous nature of the function
 

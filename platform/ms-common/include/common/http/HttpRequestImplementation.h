@@ -18,12 +18,12 @@ class HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementati
 public:
 	MODIO_IMPL ~HttpRequestImplementation() override;
 
-	HINTERNET ConnectionHandle;
-	HINTERNET RequestHandle;
-	std::uint32_t ResponseCode;
-	Modio::Optional<std::uint32_t> RetryAfter;
-	Modio::Detail::HttpRequestParams Parameters;
-	std::map<std::string, std::string> ResponseHeaders;
+	HINTERNET ConnectionHandle = nullptr;
+	HINTERNET RequestHandle = nullptr;
+	std::uint32_t ResponseCode = 0;
+	Modio::Optional<std::uint32_t> RetryAfter {};
+	Modio::Detail::HttpRequestParams Parameters {};
+	std::map<std::string, std::string> ResponseHeaders {};
 
 	MODIO_IMPL bool HasBeenSent();
 

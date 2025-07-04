@@ -53,9 +53,9 @@ namespace Modio
 				return LogoURL;
 			}
 
-			Modio::ModID ModID;
-			Modio::LogoSize LogoSize;
-			std::string LogoURL;
+			Modio::ModID ModID {};
+			Modio::LogoSize LogoSize {};
+			std::string LogoURL {};
 		};
 
 		// template<typename CallbackType>

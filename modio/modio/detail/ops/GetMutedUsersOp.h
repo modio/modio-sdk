@@ -96,13 +96,13 @@ namespace Modio
 			}
 
 		private:
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			asio::coroutine CoroutineState;
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			asio::coroutine CoroutineState {};
 
 			// Keep track of our results
 			std::int32_t CurrentResultIndex = 0;
-			std::unique_ptr<Modio::UserList> CollatedResults;
-			Modio::PagedResult PageInfo;
+			std::unique_ptr<Modio::UserList> CollatedResults {};
+			Modio::PagedResult PageInfo {};
 		};
 	} // namespace Detail
 } // namespace Modio

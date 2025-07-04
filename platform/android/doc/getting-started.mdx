@@ -1,7 +1,7 @@
 ---
 id: android-getting-started
 title: Getting Started
-slug: /cppsdk/android/getting-started
+slug: /cppsdk/android/getting-started/
 sidebar_position: 1
 custom_edit_url: https://github.com/modio/modio-sdk-internal/blob/develop/platform/android/doc/getting-started.mdx
 ---
@@ -40,11 +40,11 @@ Prior to initializing the mod.io SDK via `Modio::InitializeAsync`, you have to p
 
 4. Call `Modio::InitializeAndroid();` for mod.io to initialize and setup its JNI bindings.
 
-### Authentication
+## Authentication
 
 There are two ways that you can perform Google SSO, either via a server-side auth code which the mod.io service will exchange for an ID Token, or directly using an ID token.
 
-#### Sever Auth Code
+### Sever Auth Code
 
 Obtain a Server Auth Code from Google Play Games Services (v1 only) or the Google Sign-In Client library, ensuring you request Email access and the Profile scope.
 
@@ -81,8 +81,84 @@ Ensure that you have configured your OAuth client ID and secret on your games au
 
 You can read more about Google Play Services sign-in at https://developers.google.com/games/services/common/concepts/v1/sign-in
 
-#### ID Token
+### ID Token
 
 You can also directly request an ID Token using Google Credential Manager, and use this to authenticate.
 
 Once you receive the ID Token, you can authenticate using `Modio::AuthenticateUserExternalAsync`, passing `Modio::AuthenticationProvider::GoogleIDToken` as the authentication provider. This indicates to mod.io that this is is an ID token that can be directly used.
+
+## Marketplace
+
+You can set up your Android game so users can purchase creator credits through the Google Play Store, and the mod.io platform will verify those purchases and grant associated entitlements to the user. To enable this, first [follow these steps to configure entitlements for your game](/platforms/google/marketplace). 
+
+Next, [integrate the Google Play Billing Library into your game](https://developer.android.com/google/play/billing/integrate) to query for your In-App Products (IAPs) and make purchases. 
+
+With the above points completed, you can now call the Mod.io SDK's `RefreshEntitlementsAsync` function, which will initiate a backend request to Google to verify a purchase and grant the associated entitlements (virtual currency) to the user's account. Note that the user must be signed in via Google's SSO (see previous section Authentication). 
+
+The `RefreshEntitlementsAsync` function must be called after a successful Google Play purchase, as you must pass through the json receipt from the purchase. As the Google Play Billing Library is implemented in Java, you will need to pass this json receipt from Java to C++ via a JNI call. Then you can call `RefreshEntitlementsAsync`, adding the json receipt to the `EntitlementParams` object. 
+
+The following is an example of how to implement this. See the GUITest sample in the SDK for a complete working example. 
+
+Java:
+```java
+@Override
+public void onPurchasesUpdated(BillingResult billingResult, List<Purchase> purchases) {
+    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && purchases != null) {
+        // Successful purchase
+        for (Purchase purchase : purchases) {
+            // Get the json receipt
+            String jsonReceipt = purchase.getOriginalJson();
+
+            // Pass it to C++
+            nativeOnPurchaseSuccess(jsonReceipt);
+        }
+    } else {
+        // Handle failed purchase
+    }
+}
+
+// Native callback
+private native void nativeOnPurchaseSuccess(String jsonReceipt);
+```
+
+C++:
+```cpp
+extern "C"
+{
+  JNIEXPORT void Java_com_modio_gui_1test_BillingHelper_nativeOnPurchaseSuccess(JNIEnv* env, jclass clazz, jstring jsonReceipt) 
+  {
+    const char* receipt = env->GetStringUTFChars(jsonReceipt, nullptr);
+
+    Modio::EntitlementParams EntitlementParams;
+    EntitlementParams.ExtendedParameters.emplace(Modio::Detail::Constants::APIStrings::Receipt, receipt);
+    Modio::RefreshUserEntitlementsAsync(
+      EntitlementParams,
+      [](Modio::ErrorCode ec, Modio::Optional<Modio::EntitlementConsumptionStatusList> entitlementList) {
+        if (ec)
+        {
+          // Handle error
+        }
+        else
+        {
+          // Get the number of entitlements
+          int entitlementCount = entitlementList.value().GetTotalResultCount();
+          Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Test,
+                        "Number of entitlements returned: {}", entitlementCount);
+
+          // Get information about each entitlement
+          for (int index = 0; index < entitlementCount; index++)
+          {
+            size_t i = static_cast<size_t>(index);
+            Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Test,
+                          "Entitelement Id : {} , Consumed : {} , ProductId : {} ",
+                          entitlementList.value()[i].TransactionId,
+                          entitlementList.value()[i].EntitlementConsumed,
+                          entitlementList.value()[i].SkuId);
+          }
+        }
+      });
+
+      env->ReleaseStringUTFChars(jsonReceipt, receipt);
+  }
+}
+```

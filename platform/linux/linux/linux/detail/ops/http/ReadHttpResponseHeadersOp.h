@@ -33,9 +33,9 @@ namespace Modio
 #include <asio/yield.hpp>
 		class ReadHttpResponseHeadersOp
 		{
-			asio::coroutine CoroutineState;
-			std::shared_ptr<HttpRequestImplementation> Request;
-			std::weak_ptr<HttpSharedState> SharedState;
+			asio::coroutine CoroutineState {};
+			std::shared_ptr<HttpRequestImplementation> Request {};
+			std::weak_ptr<HttpSharedState> SharedState {};
 
 		public:
 			ReadHttpResponseHeadersOp(std::shared_ptr<HttpRequestImplementation> Request,

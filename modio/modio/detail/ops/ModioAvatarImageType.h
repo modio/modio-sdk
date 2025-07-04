@@ -62,9 +62,9 @@ namespace Modio
 				return AvatarURL;
 			}
 
-			Modio::UserID UserId;
-			Modio::AvatarSize AvatarSize;
-			std::string AvatarURL;
+			Modio::UserID UserId {};
+			Modio::AvatarSize AvatarSize {};
+			std::string AvatarURL {};
 		};
 
 		//template<typename CallbackType>

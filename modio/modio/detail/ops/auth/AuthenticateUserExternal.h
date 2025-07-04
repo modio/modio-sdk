@@ -141,13 +141,13 @@ namespace Modio
 		private:
 			struct Impl
 			{
-				asio::coroutine CoroutineState;
-				Modio::Detail::DynamicBuffer ResponseBuffer;
-				Modio::Detail::HttpRequestParams AuthenticationParams;
-				Modio::Detail::AccessTokenObject AuthResponse;
-				Modio::User AuthUser;
+				asio::coroutine CoroutineState {};
+				Modio::Detail::DynamicBuffer ResponseBuffer {};
+				Modio::Detail::HttpRequestParams AuthenticationParams {};
+				Modio::Detail::AccessTokenObject AuthResponse {};
+				Modio::User AuthUser {};
 			};
-			Modio::StableStorage<Impl> LocalState;
+			Modio::StableStorage<Impl> LocalState {};
 		};
 #include <asio/unyield.hpp>
 	} // namespace Detail

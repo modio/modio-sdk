@@ -76,11 +76,11 @@ namespace Modio
 			}
 
 		private:
-			std::shared_ptr<HttpRequestImplementation> Request;
+			std::shared_ptr<HttpRequestImplementation> Request {};
 			Modio::Detail::Buffer DataToWrite;
-			asio::coroutine CoroutineState;
-			Modio::Detail::Timer Timer;
-			std::weak_ptr<HttpSharedStateBase> SharedState;
+			asio::coroutine CoroutineState {};
+			Modio::Detail::Timer Timer {};
+			std::weak_ptr<HttpSharedStateBase> SharedState {};
 		};
 	} // namespace Detail
 } // namespace Modio

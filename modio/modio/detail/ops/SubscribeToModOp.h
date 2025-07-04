@@ -125,12 +125,12 @@ namespace Modio
 			}
 
 		private:
-			Modio::GameID GameID;
-			Modio::ApiKey ApiKey;
-			Modio::ModID ModId;
-			bool IncludeDependencies;
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			asio::coroutine CoroutineState;
+			Modio::GameID GameID {};
+			Modio::ApiKey ApiKey {};
+			Modio::ModID ModId {};
+			bool IncludeDependencies = false;
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			asio::coroutine CoroutineState {};
 		};
 	} // namespace Detail
 } // namespace Modio

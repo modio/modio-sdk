@@ -39,7 +39,7 @@ namespace Modio
 		/// @brief The mod.io-provided API key for your application or game.
 		Modio::ApiKey APIKey = Modio::ApiKey::InvalidAPIKey();
 		/// @brief Unique identifier for the local session, which will optionally contain user data for an authenticated mod.io user (once authentication is completed).
-		Modio::UserHandleType User;
+		Modio::UserHandleType User {};
 		/// @brief The storefront or distribution method to use. The API uses this parameter to serve
 		/// platform-compliant user names. Use `Modio::Portal::None` if your title does not require this.
 		Modio::Portal PortalInUse = Modio::Portal::None;
@@ -47,7 +47,7 @@ namespace Modio
 		Modio::Environment GameEnvironment = Modio::Environment::Test;
 		/// @brief Platform-specific extended initialization parameters. See xref:Platform-specific Notes[] for more
 		/// information regarding any special values your platform requires or supports.
-		std::map<std::string, std::string> ExtendedParameters;
+		std::map<std::string, std::string> ExtendedParameters {};
 	};
 } // namespace Modio
 

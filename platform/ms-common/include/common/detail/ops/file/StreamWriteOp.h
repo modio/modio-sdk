@@ -27,23 +27,23 @@ class StreamWriteOp : public Modio::Detail::BaseOperation<StreamWriteOp>
 	/// <summary>
 	/// Reference to the platform-specific implementation of the file object
 	/// </summary>
-	std::shared_ptr<Modio::Detail::FileObjectImplementation> FileImpl;
+	std::shared_ptr<Modio::Detail::FileObjectImplementation> FileImpl {};
 	/// <summary>
 	/// Win32 control structure for an async file IO operation
 	/// </summary>
-	Modio::StableStorage<OVERLAPPED> WriteOpParams;
+	Modio::StableStorage<OVERLAPPED> WriteOpParams {};
 	/// <summary>
 	/// State container for the coroutine invoked in the function call operator overload
 	/// </summary>
-	asio::coroutine Coroutine;
+	asio::coroutine Coroutine {};
 	/// <summary>
 	/// Timer to allow the polling interval to be set for the waiting state of the operation
 	/// </summary>
-	Modio::Detail::Timer StatusTimer;
+	Modio::Detail::Timer StatusTimer {};
 
 	bool bMovedFrom = false;
 
-	std::weak_ptr<Modio::Detail::FileSharedState> SharedState;
+	std::weak_ptr<Modio::Detail::FileSharedState> SharedState {};
 
 public:
 	StreamWriteOp(std::shared_ptr<Modio::Detail::FileObjectImplementation> IOObject, std::weak_ptr<Modio::Detail::FileSharedState> SharedState, Modio::Detail::Buffer Buffer)

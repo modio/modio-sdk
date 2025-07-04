@@ -59,10 +59,10 @@ namespace Modio
 
 		private:
 			/// @brief The user data
-			Modio::User User;
+			Modio::User User {};
 
 			/// @brief The OAuth token
-			Modio::Detail::OAuthToken Token;
+			Modio::Detail::OAuthToken Token {};
 
 			/// @docnone
 			friend bool operator==(const Modio::Detail::ProfileData& A, const Modio::Detail::ProfileData& B)

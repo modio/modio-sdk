@@ -28,11 +28,11 @@ namespace Modio
 		/// public-facing data types
 		class ListAllModsOp
 		{
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
-			Modio::FilterParams Filter;
-			Modio::GameID GameID;
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			Modio::FilterParams Filter {};
+			Modio::GameID GameID {};
 
-			asio::coroutine CoroutineState;
+			asio::coroutine CoroutineState {};
 
 		public:
 			ListAllModsOp(Modio::GameID GameID, FilterParams InFilter) : Filter(std::move(InFilter)), GameID(GameID) {}

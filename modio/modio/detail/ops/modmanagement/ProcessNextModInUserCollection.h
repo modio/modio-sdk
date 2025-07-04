@@ -224,11 +224,11 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
-			std::shared_ptr<Modio::ModCollectionEntry> EntryToProcess;
-			Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>> PendingUpload;
-			Modio::Optional<Modio::ModState> PendingModState;
-			bool IsTempModSelected;
+			asio::coroutine CoroutineState {};
+			std::shared_ptr<Modio::ModCollectionEntry> EntryToProcess {};
+			Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>> PendingUpload {};
+			Modio::Optional<Modio::ModState> PendingModState {};
+			bool IsTempModSelected {};
 		};
 
 		template<typename ProcessNextCallback>

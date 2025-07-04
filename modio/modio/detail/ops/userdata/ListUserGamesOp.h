@@ -28,10 +28,10 @@ namespace Modio
 		/// public-facing data types
 		class ListUserGamesOp
 		{
-			Modio::FilterParams Filter;
-			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
+			Modio::FilterParams Filter {};
+			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 
-			asio::coroutine CoroutineState;
+			asio::coroutine CoroutineState {};
 
 		public:
 			ListUserGamesOp(FilterParams InFilter) : Filter(std::move(InFilter)) {}
