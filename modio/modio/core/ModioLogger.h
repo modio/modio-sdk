@@ -25,6 +25,7 @@ namespace Modio
 		/// temporary
 		class Logger : public asio::basic_io_object<Modio::Detail::LogService>
 		{
+			Logger(Logger&&) = delete;
 		protected:
 			template<typename... ArgTypes>
 			void LogImmediate(LogLevel Level, LogCategory Category, std::string Format, ArgTypes... Args)

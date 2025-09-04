@@ -37,6 +37,7 @@ namespace Modio
 				  bIsSessionActive(false),
 				  bIsInitialized(false)
 			{}
+			MetricsService(MetricsService&&) = delete;
 
 			MODIO_IMPL void Shutdown() {}
 

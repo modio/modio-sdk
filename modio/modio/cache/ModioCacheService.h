@@ -14,6 +14,7 @@
 #include "modio/core/entities/ModioGameInfo.h"
 #include "modio/core/entities/ModioModInfo.h"
 #include "modio/core/entities/ModioModInfoList.h"
+#include "modio/core/entities/ModioModCollection.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/timer/ModioTimer.h"
 #include <chrono>
@@ -34,6 +35,7 @@ namespace Modio
 		{
 		public:
 			MODIO_IMPL explicit CacheService(asio::io_context& IOService);
+			CacheService(CacheService&&) = delete;
 
 			MODIO_IMPL void Shutdown();
 
@@ -49,9 +51,13 @@ namespace Modio
 
 			MODIO_IMPL void AddToCache(Modio::ModInfo ModInfoDetail);
 
+			MODIO_IMPL void AddToCache(Modio::ModCollectionInfo ModCollectionInfoDetail);
+
 			MODIO_IMPL void AddToCache(Modio::GameInfo GameInfoDetails);
 
 			MODIO_IMPL void AddToCache(Modio::GameID GameIDDetail, Modio::ModInfoList ModInfoDetails);
+
+			MODIO_IMPL void AddToCache(Modio::GameID GameIDDetail, Modio::ModCollectionInfoList ModCollectionInfoDetails);
 
 			MODIO_IMPL void AddToCache(Modio::ModID ModId, std::uint64_t Filesize, bool recursive);
 
@@ -60,6 +66,8 @@ namespace Modio
 			MODIO_IMPL Modio::Optional<Modio::Detail::DynamicBuffer> FetchFromCache(std::string ResourceURL) const;
 
 			MODIO_IMPL Modio::Optional<Modio::ModInfo> FetchFromCache(Modio::ModID ModIDDetail) const;
+
+			MODIO_IMPL Modio::Optional<Modio::ModCollectionInfo> FetchFromCache(Modio::ModCollectionID ModCollectionIDDetail) const;
 
 			MODIO_IMPL Modio::Optional<Modio::GameInfo> FetchGameInfoFromCache(Modio::GameID GameIDDetail) const;
 
@@ -90,8 +98,10 @@ namespace Modio
 			{
 				std::unordered_map<std::uint32_t, CacheEntry> CacheEntries;
 				std::unordered_map<std::int64_t, Modio::ModInfo> ModInfoCache;
+				std::unordered_map<std::int64_t, Modio::ModCollectionInfo> ModCollectionInfoCache;
 				std::unordered_map<std::int64_t, Modio::GameInfo> GameInfoCache;
 				std::unordered_map<std::int64_t, std::vector<Modio::ModID>> ModInfoListCache;
+				std::unordered_map<std::int64_t, std::vector<Modio::ModCollectionID>> ModCollectionInfoListCache;
 				std::unordered_map<std::int64_t, ModDependencyFilesizeEntry> ModDependenciesFilesize;
 			};
 

@@ -101,14 +101,18 @@ namespace Modio
 		/// @docpublic
 		/// @brief Only include mods that were marked live (i.e released) after the specified date
 		/// @param LiveAfter Minimum date
+		/// @param If LiveAfter should be rounded to the nearest hour (for cacheability on the backend)
 		/// @return *this
-		MODIO_IMPL FilterParams& MarkedLiveAfter(std::chrono::system_clock::time_point LiveAfter);
+		MODIO_IMPL FilterParams& MarkedLiveAfter(std::chrono::system_clock::time_point LiveAfter,
+												 bool RoundToHour = true);
 
 		/// @docpublic
 		/// @brief Only include mods that were marked live (i.e released) before the specified date
 		/// @param LiveBefore Maximum date
+		/// @param If LiveBefore should be rounded to the nearest hour (for cacheability on the backend)
 		/// @return *this
-		MODIO_IMPL FilterParams& MarkedLiveBefore(std::chrono::system_clock::time_point LiveBefore);
+		MODIO_IMPL FilterParams& MarkedLiveBefore(std::chrono::system_clock::time_point LiveBefore,
+												  bool RoundToHour = true);
 
 		/// @docpublic
 		/// @brief Only include mods that have the specified tag

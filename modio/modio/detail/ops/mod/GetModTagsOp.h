@@ -18,11 +18,11 @@
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/http/ModioHttpParams.h"
 
-#include <asio/yield.hpp>
 namespace Modio
 {
 	namespace Detail
 	{
+#include <asio/yield.hpp>
 		class GetModTagsOp
 		{
 		public:
@@ -61,6 +61,15 @@ namespace Modio
 			asio::coroutine CoroutineState {};
 			Modio::Detail::DynamicBuffer TagResponseBuffer {};
 		};
+#include <asio/unyield.hpp>
+
+		template<typename GetTagsCompleteCallback>
+		void GetModTagsAsync(GetTagsCompleteCallback&& OnGetTagsComplete)
+		{
+			return asio::async_compose<GetTagsCompleteCallback,
+									   void(Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)>(
+				Modio::Detail::GetModTagsOp(), OnGetTagsComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
-#include <asio/unyield.hpp>

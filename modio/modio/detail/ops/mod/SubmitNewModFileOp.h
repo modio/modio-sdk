@@ -276,6 +276,14 @@ namespace Modio
 							RequestParams = RequestParams.AppendPayloadValue(
 								fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::Source);
 							break;
+						case (Modio::ModfilePlatform::WindowsServer):
+							RequestParams = RequestParams.AppendPayloadValue(
+								fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::WindowsServer);
+							break;
+						case (Modio::ModfilePlatform::LinuxServer):
+							RequestParams = RequestParams.AppendPayloadValue(
+								fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::LinuxServer);
+							break;
 						default:
 							Modio::Detail::Logger().Log(
 								LogLevel::Warning, LogCategory::File,

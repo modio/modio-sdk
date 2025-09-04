@@ -112,6 +112,15 @@ namespace Modio
 				Modio::User NewlyAuthenticatedUser {};
 			} Local;
 		};
+
+		template<typename AuthenticateUserByEmailCompleteCallback>
+		void AuthenticateUserByEmailAsync(Modio::EmailAuthCode EmailCode,
+										  AuthenticateUserByEmailCompleteCallback&& OnAuthenticateComplete)
+		{
+			return asio::async_compose<AuthenticateUserByEmailCompleteCallback, void(Modio::ErrorCode)>(
+				Modio::Detail::AuthenticateUserByEmailOp(EmailCode), OnAuthenticateComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
 #include <asio/unyield.hpp>

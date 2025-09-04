@@ -13,11 +13,11 @@
 #include "modio/detail/ops/SaveModCollectionToStorage.h"
 #include "modio/detail/AsioWrapper.h"
 
-#include <asio/yield.hpp>
 namespace Modio
 {
 	namespace Detail
 	{
+#include <asio/yield.hpp>
 		class ForceUninstallModOp
 		{
 		public:
@@ -47,6 +47,14 @@ namespace Modio
 			Modio::ModID ModToRemove {};
 			asio::coroutine CoroutineState {};
 		};
+#include <asio/unyield.hpp>
+
+		template<typename UninstallCompleteCallback>
+		void ForceUninstallModAsync(Modio::ModID ModToRemove, UninstallCompleteCallback&& OnUninstallComplete)
+		{
+			return asio::async_compose<UninstallCompleteCallback, void(Modio::ErrorCode)>(
+				Modio::Detail::ForceUninstallModOp(ModToRemove), OnUninstallComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	}
 }
-#include <asio/unyield.hpp>

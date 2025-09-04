@@ -138,7 +138,7 @@ namespace Modio
 					}
 
 					Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Http,
-												"Beginning download of file {}", File->GetPath().u8string());
+												"Beginning download of file {}", Modio::ToModioString(File->GetPath().u8string()));
 					do
 					{
 						yield Request->SendAsync(std::move(Self));
@@ -187,7 +187,7 @@ namespace Modio
 									Modio::Detail::Logger().Log(
 										Modio::LogLevel::Error, Modio::LogCategory::Http,
 										"download of file {} redirected to URL outside whitelist to: {}",
-										File->GetPath().u8string(), RedirectedURL.value());
+										Modio::ToModioString(File->GetPath().u8string()), RedirectedURL.value());
 									Self.complete(Modio::make_error_code(Modio::HttpError::ResourceNotAvailable));
 									return;
 								}
@@ -207,7 +207,7 @@ namespace Modio
 						{
 							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
 														"download of file {} got response {}",
-														File->GetPath().u8string(), Request->GetResponseCode());
+														Modio::ToModioString(File->GetPath().u8string()), Request->GetResponseCode());
 							Self.complete(Modio::make_error_code(Modio::HttpError::ResourceNotAvailable));
 							return;
 						}
@@ -266,7 +266,7 @@ namespace Modio
 							{
 								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
 															"Could not rename downloaded file to {}",
-															Destination.u8string());
+															Modio::ToModioString(Destination.u8string()));
 								File.reset();
 
 								Self.complete(RenameResult);
@@ -276,7 +276,7 @@ namespace Modio
 							{
 								Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Http,
 															"Download of {} completed with size: {}; expected filesize was {}",
-															File->GetPath().u8string(), File->GetFileSize(), ExpectedFilesize.has_value() ? ExpectedFilesize.value() : 0);
+															Modio::ToModioString(File->GetPath().u8string()), File->GetFileSize(), ExpectedFilesize.has_value() ? ExpectedFilesize.value() : 0);
 
 								if (ExpectedFilesize.has_value() && (File->GetFileSize() != ExpectedFilesize))
 								{

@@ -21,6 +21,7 @@ namespace Modio
 		{
 		public:
 			MODIO_IMPL explicit TimerService(asio::io_context& IOService);
+			TimerService(TimerService&&) = delete;
 
 			using implementation_type = TimerServiceImplementation::IOObjectImplementationType;
 

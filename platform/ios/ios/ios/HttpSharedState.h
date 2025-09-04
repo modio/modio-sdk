@@ -43,19 +43,17 @@ namespace Modio
 															 kCFStringEncodingUTF8);
 
 				// Construct URL for GET requests.
-				// Because GetServerAddress provides the endpoint but not the protocol, URLStdStr stars
+				// Because GetServerAddress provides the endpoint but not the protocol, ServerAddressStdStr starts
 				// with https. Also, this is required by CF-HTTPRequest, not the CF-Socket
-				std::string URLStdStr = "https://";
-				URLStdStr += Request->Parameters.GetServerAddress();
-				URLStdStr += Request->Parameters.GetFormattedResourcePath();
-				CFStringRef URLStr =
-				CFStringCreateWithCString(kCFAllocatorDefault, URLStdStr.c_str(), kCFStringEncodingUTF8);
-
-				// Escape the URL string appropriately	
-				CFStringRef EscapedURLRef = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, URLStr, NULL, NULL, kCFStringEncodingUTF8);
+				std::string ServerAddressStdStr = "https://" + Request->Parameters.GetServerAddress();
+				std::string ResourcePathStdStr = Request->Parameters.GetFormattedResourcePath();
 
 				// Create a request URL string
-				CFURLRef URLRef = CFURLCreateWithString(kCFAllocatorDefault, EscapedURLRef, NULL);
+				CFURLRef BaseURL = CFURLCreateWithBytes(kCFAllocatorDefault, (const UInt8*) ServerAddressStdStr.c_str(),
+														ServerAddressStdStr.length(), kCFStringEncodingUTF8, NULL);
+				CFURLRef URLRef =
+					CFURLCreateAbsoluteURLWithBytes(kCFAllocatorDefault, (const UInt8*) ResourcePathStdStr.c_str(),
+													ResourcePathStdStr.length(), kCFStringEncodingUTF8, BaseURL, true);
                 
 				// Create a HTTP Message Ref
 				CFHTTPMessageRef RequestMessage =
@@ -77,9 +75,8 @@ namespace Modio
 				if (Request->GetParameters().GetTypedVerb() == Verb::POST ||
 					Request->GetParameters().GetTypedVerb() == Verb::PUT)
 				{
-					URLStdStr = Request->Parameters.GetServerAddress();
-					CFStringRef HostURL =
-						CFStringCreateWithCString(kCFAllocatorDefault, URLStdStr.c_str(), kCFStringEncodingUTF8);
+					CFStringRef HostURL = CFStringCreateWithCString(kCFAllocatorDefault, ServerAddressStdStr.c_str(),
+																	kCFStringEncodingUTF8);
 					std::string PayloadStr = std::to_string(Request->GetParameters().GetPayloadSize());
 					CFStringRef PayloadSize =
 						CFStringCreateWithCString(kCFAllocatorDefault, PayloadStr.c_str(), kCFStringEncodingUTF8);
@@ -102,7 +99,6 @@ namespace Modio
 					// Release locally created objects
 					CFRelease(PayloadSize);
 					CFRelease(HostURL);
-					CFRelease(EscapedURLRef);
 				}
 				else
 				{
@@ -119,8 +115,8 @@ namespace Modio
 
 				// Release objects created in this function
 				CFRelease(RequestMessage);
+				CFRelease(BaseURL);
 				CFRelease(URLRef);
-				CFRelease(URLStr);
 				CFRelease(Verb);
 			}
 

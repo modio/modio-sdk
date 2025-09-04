@@ -42,6 +42,12 @@ namespace Modio
 							   Modio::Optional<std::string> ReporterName, Modio::Optional<std::string> ReporterContact)
 		: ReportParams(User, ResourceType::User, Type, ReportDescription, ReporterName, ReporterContact)
 	{}
+
+	ReportParams::ReportParams(Modio::ModCollectionID Mod, Modio::ReportType Type, std::string ReportDescription,
+							   Modio::Optional<std::string> ReporterName, Modio::Optional<std::string> ReporterContact)
+		: ReportParams(Mod, ResourceType::Collection, Type, ReportDescription, ReporterName, ReporterContact)
+	{}
+
 	Modio::Detail::HttpRequestParams ToRequest(const Modio::ReportParams& Params)
 	{
 		std::string ResourceString;
@@ -55,6 +61,9 @@ namespace Modio
 				break;
 			case ReportParams::ResourceType::User:
 				ResourceString = "users";
+				break;
+			case ReportParams::ResourceType::Collection:
+				ResourceString = "collections";
 				break;
 		}
 
@@ -88,8 +97,9 @@ namespace Modio
 				return Modio::ModID::InvalidModID() != Modio::ModID(ResourceID);
 			case ResourceType::User:
 				return Modio::UserID::InvalidUserID() != Modio::UserID(ResourceID);
-			default:
-				return false;
+			case ResourceType::Collection:
+				return Modio::ModCollectionID::InvalidCollectionID() != Modio::ModCollectionID(ResourceID);
 		}
+		return false;
 	}
 } // namespace Modio

@@ -41,6 +41,7 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					Modio::Detail::SDKSessionData::RemoveDeferredUnsubscription(ModId);
+					Modio::Detail::SDKSessionData::DecrementModManagementEventQueued();
 
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer,
@@ -132,6 +133,17 @@ namespace Modio
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 			asio::coroutine CoroutineState {};
 		};
+
+		template<typename SubscribeCompleteCallback>
+		void SubscribeToModAsync(Modio::ModID ModToSubscribeTo, bool IncludeDependencies,
+								 SubscribeCompleteCallback&& OnSubscribeComplete)
+		{
+			return asio::async_compose<SubscribeCompleteCallback, void(Modio::ErrorCode)>(
+				Modio::Detail::SubscribeToModOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+												Modio::Detail::SDKSessionData::CurrentAPIKey(),
+												ModToSubscribeTo, IncludeDependencies),
+				OnSubscribeComplete, Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
 

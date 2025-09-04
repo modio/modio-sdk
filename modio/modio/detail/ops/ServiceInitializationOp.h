@@ -106,7 +106,10 @@ public:
 					*MetricsSecretKey);
 			}
 
-			Modio::Detail::SDKSessionData::SetPlatformStatusFilter(*PendingOnlyResults);
+			if (PendingOnlyResults.has_value()) 
+			{
+				Modio::Detail::SDKSessionData::SetPlatformStatusFilter(*PendingOnlyResults);
+			}
 
 			Modio::Detail::ExtendedInitParamHandler::PostSessionDataInit(InitParams);
 
@@ -309,4 +312,12 @@ public:
 			Self.complete({});
 		}
 	}
+};
+
+template<typename InitDoneCallback>
+auto InitializeServiceAsync(Modio::InitializeOptions InitOptions, InitDoneCallback&& OnInitComplete)
+{
+	return asio::async_compose<InitDoneCallback, void(Modio::ErrorCode)>(
+		ServiceInitializationOp(InitOptions), OnInitComplete,
+		Modio::Detail::Services::GetGlobalContext().get_executor());
 };

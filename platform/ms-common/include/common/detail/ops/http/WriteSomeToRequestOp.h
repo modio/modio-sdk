@@ -68,6 +68,12 @@ namespace Modio
 							// TODO: @modio-core Log the error here?
 							Self.complete(Modio::make_error_code(Modio::HttpError::RequestError));
 							return;
+						case WinHTTPCallbackStatus::Waiting:
+						case WinHTTPCallbackStatus::DataAvailable:
+						case WinHTTPCallbackStatus::ReadComplete:
+						case WinHTTPCallbackStatus::SendRequestComplete:
+						case WinHTTPCallbackStatus::WriteComplete:
+						case WinHTTPCallbackStatus::HeadersAvailable:
 						default:
 							Self.complete(Modio::ErrorCode {});
 							return;

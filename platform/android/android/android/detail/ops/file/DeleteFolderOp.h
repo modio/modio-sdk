@@ -44,7 +44,7 @@ public:
 	void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 	{
 		std::shared_ptr<Modio::Detail::FileSharedState> PinnedState = SharedState.lock();
-		if (PinnedState != nullptr && PinnedState->bCancelRequested)
+		if (PinnedState != nullptr && PinnedState->bCancelRequested == true)
 		{
 			Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
 			return;
@@ -54,8 +54,6 @@ public:
 		{
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Begin delete of {}",
 										FolderPath.string());
-
-			// Collect all files and directories first
 			{
 				DirectoryIterator = Modio::filesystem::recursive_directory_iterator(FolderPath, ec);
 				if (ec)
@@ -63,62 +61,44 @@ public:
 					Self.complete(ec);
 					return;
 				}
-
-				while (DirectoryIterator != Modio::filesystem::recursive_directory_iterator())
-				{
-					if (DirectoryIterator->is_directory(ec))
-					{
-						Folders.emplace_back(DirectoryIterator->path(), DirectoryIterator.depth());
-					}
-					else
-					{
-						Files.push_back(DirectoryIterator->path());
-					}
-
-					DirectoryIterator.increment(ec);
-					if (ec)
-					{
-						Self.complete(ec);
-						return;
-					}
-				}
 			}
-
-			// Delete all files
-			FileIndex = 0;
-			while (FileIndex < Files.size())
+			while (DirectoryIterator != end(DirectoryIterator))
 			{
-				yield DeleteFileOp(Files[FileIndex], PinnedState)(Self);
+				// If entry is a folder, mark it for later deletion
+				if (DirectoryIterator->is_directory(ec))
+				{
+					Folders.push_back(std::make_pair(DirectoryIterator->path(), DirectoryIterator.depth()));
+				}
+				else
+				{
+					yield RecursivelyDeleteFile(DirectoryIterator->path(), PinnedState, std::move(Self));
+				}
+
+				// Give priority to an error in case "RecursivelyDeleteFile" gets one
 				if (ec)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-												"Delete File {} error: {}", Files[FileIndex].string(),
+												"Delete File {} error: {}", DirectoryIterator->path().string(),
 												ec.message());
 					Self.complete(ec);
 					return;
 				}
-				FileIndex++;
-			}
 
+				DirectoryIterator.increment(ec);
+			}
 			// Sort in decreasing order of depth
 			std::sort(Folders.begin(), Folders.end(),
 					  [](const std::pair<Modio::filesystem::path, std::size_t>& A,
 						 const std::pair<Modio::filesystem::path, std::size_t>& B) { return A.second > B.second; });
 
-			// Delete directories
-			FolderIndex = 0;
-			while (FolderIndex < Folders.size())
+			for (auto Folder : Folders)
 			{
-				Modio::filesystem::remove(Folders[FolderIndex].first, ec);
+				Modio::filesystem::remove(Folder.first, ec);
 				if (ec)
 				{
-					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-												"Delete Directory {} error: {}", Folders[FolderIndex].first.string(),
-												ec.message());
 					Self.complete(ec);
 					return;
 				}
-				FolderIndex++;
 			}
 
 			// Make sure to remove the original folder path
@@ -137,12 +117,9 @@ public:
 private:
 	asio::coroutine CoroutineState {};
 	Modio::filesystem::path FolderPath {};
-	std::vector<Modio::filesystem::path> Files {};
 	std::vector<std::pair<Modio::filesystem::path, int>> Folders {};
 	Modio::filesystem::recursive_directory_iterator DirectoryIterator {};
 	std::weak_ptr<Modio::Detail::FileSharedState> SharedState {};
-	size_t FileIndex = 0;
-	size_t FolderIndex = 0;
 };
 
 #include <asio/unyield.hpp>

@@ -76,7 +76,9 @@ namespace Modio
 		PS5,
 		Switch,
 		Oculus,
-		Source
+		Source,
+		WindowsServer,
+		LinuxServer
 	};
 
 	/// @docnone
@@ -400,15 +402,34 @@ namespace Modio
 	};
 
 	/// @docpublic
-	/// @brief Strong type for File Metadata IDs
-	struct FileMetadataID : public StrongInteger<std::int64_t>
+	/// @brief Strong type for Mod Collection IDs
+	struct ModCollectionID : public StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
+
+		/// @docinternal
+		/// @brief Default constructor
+		ModCollectionID() : StrongInteger(-1) {}
+
+		/// @docinternal
+		/// @brief Compare the ModCollectionID to an invalid instance
+		constexpr bool IsValid() const
+		{
+			return *this != InvalidCollectionID();
+		}
+
+		/// @docinternal
+		/// @brief Static function to an invalid ModCollectionID
+		static constexpr ModCollectionID InvalidCollectionID()
+		{
+			constexpr ModCollectionID ID(-1);
+			return ID;
+		}
 	};
 
 	/// @docpublic
-	/// @brief Strong type for Comment ID
-	struct CommentID : public StrongInteger<std::int64_t>
+	/// @brief Strong type for File Metadata IDs
+	struct FileMetadataID : public StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
 	};

@@ -30,11 +30,13 @@
 #include "modio/detail/serialization/ModioGameStatsSerialization.h"
 #include "modio/detail/serialization/ModioModCommunityOptionsSerialization.h"
 #include "modio/detail/serialization/ModioIconSerialization.h"
+#include "modio/detail/serialization/ModioModMonetizationSKUSerialization.h"
 #include "modio/file/ModioFileService.h"
 #include "modio/http/ModioHttpService.h"
 #include "modio/impl/SDKPostAsync.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 #include "modio/userdata/ModioUserDataService.h"
+#include "modio/detail/ModioSDKMultiplayerLibrary.h"
 #include <chrono>
 #include <functional>
 #include <thread>
@@ -50,9 +52,7 @@ namespace Modio
 			{
 				auto WrappedCallback = Modio::Detail::ApplyPostAsyncChecks(OnInitComplete);
 
-				asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-					ServiceInitializationOp(InitOptions), WrappedCallback,
-					Modio::Detail::Services::GetGlobalContext().get_executor());
+				InitializeServiceAsync(InitOptions, WrappedCallback);
 			}
 		});
 	}
@@ -136,6 +136,9 @@ namespace Modio
 			Modio::Detail::Services::GetGlobalService<Modio::Detail::TimerService>().Shutdown();
 			Modio::Detail::SDKSessionData::Deinitialize();
 
+			//Resets the Server Framework State
+			Modio::ModioServer::Shutdown();
+
 			Modio::Detail::SDKSessionData::PushQueuedTasksToGlobalContext();
 			// Steal the old io context (and associated services, and all of the enqueued tasks which we can be sure
 			// we're the only consumer just now because we have the shutdown lock)
@@ -144,10 +147,7 @@ namespace Modio
 			// when it's completed
 			Modio::Detail::SDKSessionData::EnqueueTask(
 				[OldContext = std::move(OldContext), OnShutdownComplete = std::move(OnShutdownComplete)]() mutable {
-					asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-
-						Modio::Detail::ShutdownOp(std::move(OldContext)), OnShutdownComplete,
-						Modio::Detail::Services::GetGlobalContext().get_executor());
+					Modio::Detail::ShutdownAsync(OldContext, OnShutdownComplete);
 				});
 		}
 	}
@@ -180,9 +180,7 @@ namespace Modio
 				if (Modio::Detail::RequireSDKIsInitialized(Callback) &&
 					Modio::Detail::RequireValidReportParams(Report, Callback))
 				{
-					asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-						Modio::Detail::ReportContentOp(Report), Callback,
-						Modio::Detail::Services::GetGlobalContext().get_executor());
+					Modio::Detail::ReportContentAsync(Report, Callback);
 				}
 			});
 	}
@@ -194,9 +192,7 @@ namespace Modio
 				Modio::Detail::RequireUserIsAuthenticated(Callback) &&
 				Modio::Detail::RequireValidUserID(UserID, Callback))
 			{
-				asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-					Modio::Detail::MuteUserOp(UserID), Callback,
-					Modio::Detail::Services::GetGlobalContext().get_executor());
+				Modio::Detail::MuteUserAsync(UserID, Callback);
 			}
 		});
 	}
@@ -208,9 +204,7 @@ namespace Modio
 				Modio::Detail::RequireUserIsAuthenticated(Callback) &&
 				Modio::Detail::RequireValidUserID(UserID, Callback))
 			{
-				asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-					Modio::Detail::UnmuteUserOp(UserID), Callback,
-					Modio::Detail::Services::GetGlobalContext().get_executor());
+				Modio::Detail::UnmuteUserAsync(UserID, Callback);
 			}
 		});
 	}
@@ -221,11 +215,7 @@ namespace Modio
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
 				Modio::Detail::RequireUserIsAuthenticated(Callback))
 			{
-				return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)>,
-										   void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)>(
-					Modio::Detail::GetMutedUsersOp(),
-
-					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+				Modio::Detail::GetMutedUsersAsync(Callback);
 			}
 		});
 	}
@@ -237,10 +227,7 @@ namespace Modio
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
 				Modio::Detail::RequireValidGameID(GameID, Callback))
 			{
-				return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfo>)>,
-										   void(Modio::ErrorCode, Modio::Optional<Modio::GameInfo>)>(
-					Modio::Detail::GetGameInfoOp(GameID, Modio::Detail::SDKSessionData::CurrentAPIKey()), Callback,
-					Modio::Detail::Services::GetGlobalContext().get_executor());
+				Modio::Detail::GetGameInfoAsync(GameID, Callback);
 			}
 		});
 	}

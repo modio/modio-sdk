@@ -211,6 +211,16 @@ namespace Modio
 															   OriginalFilePath.extension().u8string());
 			}
 
+			Modio::filesystem::path MakeModCollectionMediaFilePath(Modio::ModCollectionID CollectionId,
+																   Modio::LogoSize Size,
+																   const std::string& OriginalFilename) const override
+			{
+				const Modio::filesystem::path OriginalFilePath = OriginalFilename;
+				return MakeLogoFolderPath(CollectionId) / fmt::format("{}_{}{}", OriginalFilePath.stem().u8string(),
+																	  Modio::Detail::ToString(Size),
+																	  OriginalFilePath.extension().u8string());
+			}
+
 			Modio::filesystem::path MakeModMediaFilePath(Modio::ModID ModID, Modio::GallerySize Size,
 														 Modio::GalleryIndex ImageIndex,
 														 const std::string& OriginalFileName) const override
@@ -224,6 +234,11 @@ namespace Modio
 			Modio::filesystem::path MakeLogoFolderPath(Modio::ModID ModID) const override
 			{
 				return MakeMediaCachePath() / fmt::format("mods/{}/logos/", ModID);
+			}
+
+			Modio::filesystem::path MakeLogoFolderPath(Modio::ModCollectionID CollectionId) const override
+			{
+				return MakeMediaCachePath() / fmt::format("collections/{}/logos/", CollectionId);
 			}
 
 			Modio::filesystem::path MakeGalleryFolderPath(Modio::ModID ModID,

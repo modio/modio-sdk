@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2025 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io SDK.
  *
@@ -9,7 +9,7 @@
  */
 
 #pragma once
-
+#include "modio/core/ModioCoreTypes.h"
 #include "file/FileSystemImplementation.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioLogEnum.h"
@@ -37,6 +37,7 @@ namespace Modio
 				auto NewImplementation = std::make_shared<FileSystemImplementation>(*this);
 				PlatformImplementation.swap(NewImplementation);
 			}
+			FileService(FileService&&) = delete;
 
 			using implementation_type = FileSystemImplementation::IOObjectImplementationType;
 
@@ -194,12 +195,31 @@ namespace Modio
 				return PlatformImplementation->MakeModMediaFilePath(ModID, Size, ImageIndex, OriginalFileName);
 			}
 
+			/// @brief Calculates the path of a mod's logo
+			/// @param ModID The mod ID for the mod
+			/// @param Size The image size
+			/// @param OriginalFileName The original filename
+			/// @return The fully-qualified path to the logo file
+			Modio::filesystem::path MakeModCollectionMediaFilePath(Modio::ModCollectionID CollectionId, Modio::LogoSize Size,
+														 const std::string& OriginalFileName) const
+			{
+				return PlatformImplementation->MakeModCollectionMediaFilePath(CollectionId, Size, OriginalFileName);
+			}
+
 			/// @brief Calculates the path where cached logos will be stored for a mod
 			/// @param ModID The mod ID for the mod
 			/// @return The fully-qualified path to the logo cache directory
 			Modio::filesystem::path MakeLogoFolderPath(Modio::ModID ModID) const
 			{
 				return PlatformImplementation->MakeLogoFolderPath(ModID);
+			}
+
+			/// @brief Calculates the path where cached logos will be stored for a mod
+			/// @param CollectionId The mod collection ID for the mod collection
+			/// @return The fully-qualified path to the logo cache directory
+			Modio::filesystem::path MakeLogoFolderPath(Modio::ModCollectionID CollectionId) const
+			{
+				return PlatformImplementation->MakeLogoFolderPath(CollectionId);
 			}
 
 			/// @brief Calculates the path where cached gallery images will be stored for a mod
@@ -249,6 +269,16 @@ namespace Modio
 			Modio::Optional<Modio::filesystem::path> GetLogo(Modio::ModID ModID, Modio::LogoSize Size) const
 			{
 				return GetMediaInternal(MakeLogoFolderPath(ModID), Modio::Detail::ToString(Size));
+			}
+
+			/// @brief Gets the path for a mod collection's logo if one exists in the specified size
+			/// @param CollectionId The mod collection ID for the mod
+			/// @param Size the desired size
+			/// @return Optional containing the fully-qualified path to the mod logo if one exists at that size, else
+			/// empty Optional object
+			Modio::Optional<Modio::filesystem::path> GetLogo(Modio::ModCollectionID CollectionId, Modio::LogoSize Size) const
+			{
+				return GetMediaInternal(MakeLogoFolderPath(CollectionId), Modio::Detail::ToString(Size));
 			}
 
 			/// @brief Gets the path for a user avatar image if one exists in the specified size

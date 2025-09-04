@@ -23,7 +23,7 @@ function(add_steamworks_example FileName)
 	set(STEAMWORKS_SDK_PLATFORM win64)
     set(STEAMWORKS_LIB_NAME steam_api64.lib)
     set(STEAMWORKS_APPTICKET_LIB_NAME sdkencryptedappticket64.lib)
-    include("${CMAKE_HOME_DIRECTORY}/ext/steamworks_sdk/SteamworksSetup.cmake")
+    include("${CMAKE_SOURCE_DIR}/ext/steamworks_sdk/SteamworksSetup.cmake")
 
      target_link_libraries(modio_${FileName} SteamworksSDK::SteamworksSDK SteamworksSDK::AppTicket)
 

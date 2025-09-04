@@ -96,5 +96,15 @@ namespace Modio
 				}
 			}
 		};
+
+		template<typename WrappedCallback>
+		auto ListAllModsAsync(FilterParams Filter, WrappedCallback&& Callback)
+		{
+			return asio::async_compose<WrappedCallback, void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>(
+				Modio::Detail::ListAllModsOp(Modio::Detail::SDKSessionData::CurrentGameID(), Filter), Callback,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
+
 	} // namespace Detail
 } // namespace Modio
+#include <asio/unyield.hpp>

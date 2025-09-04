@@ -11,15 +11,19 @@
 #pragma once
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioCompilerMacros.h"
 #include "modio/detail/FilesystemWrapper.h"
 #include "modio/detail/ModioProfiling.h"
 #include <cstdint>
 #include <vector>
 
+
 namespace Modio
 {
 	namespace Detail
 	{
+		MODIO_DISABLE_WARNING_PUSH
+		MODIO_DISABLE_WARNING_UNUSED_CONST_VARIABLE
 		namespace Constants
 		{
 			namespace ZipTag
@@ -76,6 +80,7 @@ namespace Modio
 
 			} // namespace ZipTag
 		} // namespace Constants
+		MODIO_DISABLE_WARNING_POP
 
 		struct ZipStructures
 		{

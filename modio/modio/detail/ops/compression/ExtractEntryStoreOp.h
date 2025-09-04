@@ -33,6 +33,7 @@ namespace Modio
 	{
 		class ExtractEntryStoreOp : public Modio::Detail::BaseOperation<ExtractEntryStoreOp>
 		{
+			ExtractEntryStoreOp& operator=(ExtractEntryStoreOp&& Other) = delete;
 			struct ExtractEntryImpl
 			{
 				Modio::Detail::File ArchiveFile;
@@ -74,7 +75,7 @@ namespace Modio
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Compression,
 												"Extracting entry in Store {}",
-												Impl->EntryToExtract.FilePath.u8string());
+												Modio::ToModioString(Impl->EntryToExtract.FilePath.u8string()));
 
 					if (Impl->EntryToExtract.UncompressedSize == 0)
 					{

@@ -29,6 +29,7 @@ namespace Modio
 
 		public:
 			MODIO_IMPL explicit HttpService(asio::io_context& IOService);
+			HttpService(HttpService&&) = delete;
 
 			using implementation_type = HttpImplementation::IOObjectImplementationType;
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2025 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io SDK.
  *
@@ -30,7 +30,10 @@ namespace Modio
 			virtual Modio::filesystem::path MakeModMediaFilePath(Modio::ModID ModID, Modio::GallerySize Size,
 																 Modio::GalleryIndex ImageIndex,
 																 const std::string& OriginalFileName) const = 0;
+			virtual Modio::filesystem::path MakeModCollectionMediaFilePath(Modio::ModCollectionID ID, Modio::LogoSize Size,
+																 const std::string& OriginalFilename) const = 0;
 			virtual Modio::filesystem::path MakeLogoFolderPath(Modio::ModID ID) const = 0;
+			virtual Modio::filesystem::path MakeLogoFolderPath(Modio::ModCollectionID ID) const = 0;
 			virtual Modio::filesystem::path MakeGalleryFolderPath(Modio::ModID ID,
 																  Modio::GalleryIndex ImageIndex) const = 0;
 			virtual Modio::filesystem::path MakeUserMediaFilePath(Modio::UserID ID, Modio::AvatarSize Size,

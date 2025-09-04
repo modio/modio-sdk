@@ -12,7 +12,8 @@ if(MODIO_PLATFORM STREQUAL "LINUX")
 	# This line is required to force the MBedTLS to use the "-fPIC" compiler option
 	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
     cmake_policy(SET CMP0077 NEW)
-	set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake;${CMAKE_MODULE_PATH}")
+	modio_list_append_unique(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+    set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" CACHE INTERNAL "")
 	set (MODIO_PLATFORM_LINUX ON INTERNAL "building for linux")
 	set (MODIO_MBEDTLS_LINUX_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/mbedtls/library/")
 

@@ -35,6 +35,7 @@ namespace Modio
 					Modio::Detail::SDKSessionData::CancelModDownloadOrUpdate(ModId);
 
 					Modio::Detail::SDKSessionData::GetUserSubscriptions().RemoveMod(ModId);
+					Modio::Detail::SDKSessionData::DecrementModManagementEventQueued();
 
 					{
 						Modio::Optional<Modio::ModCollectionEntry&> ModEntry =

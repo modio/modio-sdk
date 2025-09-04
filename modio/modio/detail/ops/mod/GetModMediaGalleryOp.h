@@ -15,12 +15,12 @@
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ops/ModioGalleryImageType.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
-#include <asio/yield.hpp>
 
 namespace Modio
 {
 	namespace Detail
 	{
+#include <asio/yield.hpp>
 		class GetModMediaGalleryOp
 		{
 		public:
@@ -109,7 +109,7 @@ namespace Modio
 						return;
 					}
 
-					Self.complete({}, OpState.DestinationPath->u8string());
+					Self.complete({}, Modio::ToModioString(OpState.DestinationPath->u8string()));
 				}
 			}
 
@@ -131,7 +131,18 @@ namespace Modio
 				Modio::GalleryList GalleryList {};
 			} OpState;
 		};
+#include <asio/unyield.hpp>
+
+		template<typename GetGalleryCompleteCallback>
+		void GetModMediaGalleryAsync(Modio::ModID ModId, Modio::GallerySize GallerySize, Modio::GalleryIndex ImageIndex,
+									 GetGalleryCompleteCallback&& OnGetGalleryComplete)
+		{
+			return asio::async_compose<GetGalleryCompleteCallback,
+									   void(Modio::ErrorCode, Modio::Optional<std::string>)>(
+				Modio::Detail::GetModMediaGalleryOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+													Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId, GallerySize,
+													ImageIndex),
+				OnGetGalleryComplete, Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
-
-#include <asio/unyield.hpp>

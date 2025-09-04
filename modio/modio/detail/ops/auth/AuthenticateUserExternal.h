@@ -149,6 +149,14 @@ namespace Modio
 			};
 			Modio::StableStorage<Impl> LocalState {};
 		};
-#include <asio/unyield.hpp>
+
+		template<typename AuthDoneCallback>
+		auto AuthenticateUserExternalAsync(Modio::Detail::HttpRequestParams Params, AuthDoneCallback&& OnAuthComplete)
+		{
+			return asio::async_compose<AuthDoneCallback, void(Modio::ErrorCode)>(
+				Modio::Detail::AuthenticateUserExternal(Params), OnAuthComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
+#include <asio/unyield.hpp>

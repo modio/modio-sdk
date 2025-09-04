@@ -21,13 +21,17 @@ namespace Modio
 	///	* 64 = Enable Previews
 	///	* 128 = Enable Preview URLs
 	///	* 1024 = Allow mod dependencies
+	///	* 8192 = Enable Collections
+	///	* 16384 = Enable Collection Comments
 	enum class ModCommunityOptions : uint32_t
 	{
 		None = 0,
 		EnableComments = 1,
 		EnablePreviews = 64,
 		EnablePreviewURLs = 128,
-		AllowDependencies = 1024
+		AllowDependencies = 1024,
+		EnableCollections = 8192,
+		EnableCollectionComments = 16384
 	};
 
 	/// @docpublic

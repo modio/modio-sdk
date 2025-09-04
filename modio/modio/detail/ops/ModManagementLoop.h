@@ -14,6 +14,8 @@
 #include "modio/detail/ops/PreviewExternalUpdatesOp.h"
 #include "modio/detail/ops/modmanagement/ProcessNextModInUserCollection.h"
 #include "modio/detail/ops/modmanagement/ProcessNextModInTempModSet.h"
+#include "modio/detail/ops/modmanagement/ProcessNextModInServerCollection.h"
+#include "modio/detail/ModioSDKMultiplayerLibrary.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/timer/ModioTimer.h"
 #include <asio/yield.hpp>
@@ -59,15 +61,23 @@ namespace Modio
 							return;
 						}
 
+						// For now we are assuming that temp mods are in use on both Servers and "normal" circumstances
 						yield Modio::Detail::ProcessNextModInTempModSetAsync(std::move(Self));
 
-						// This operation gets the user subscriptions, filters the system mod list based on those, then
-						// processes the next mod in that filtered list that requires some kind of management operation
-						// (installation, update, etc).
-						// It flags the mod with any error state that it encounters, so we don't need to handle that
-						// here, just sleep and try to process the next mod
-						yield Modio::Detail::ProcessNextModInUserCollectionAsync(std::move(Self));
-
+						// If we are on a server only process server mods, otherwise process user mods.
+						if (Modio::ModioServer::IsValid())
+						{
+							yield Modio::Detail::ProcessNextModInServerCollectionAsync(std::move(Self));
+						}
+						else
+						{
+							// This operation gets the user subscriptions, filters the system mod list based on those,
+							// then processes the next mod in that filtered list that requires some kind of management
+							// operation (installation, update, etc). It flags the mod with any error state that it
+							// encounters, so we don't need to handle that here, just sleep and try to process the next
+							// mod
+							yield Modio::Detail::ProcessNextModInUserCollectionAsync(std::move(Self));
+						}
 						
 						// Sleep for one second
 						IdleTimer.ExpiresAfter(std::chrono::seconds(1));

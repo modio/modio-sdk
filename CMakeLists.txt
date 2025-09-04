@@ -9,7 +9,11 @@
 
 cmake_minimum_required(VERSION 3.20)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+include(cmake/modio-list-append.cmake)
+
+# list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+modio_list_append_unique(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+set (CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" CACHE INTERNAL "")
 
 if (NOT MODIO_PLATFORM)
     ## The MODIO_PLATFORM variable is required to compile the mod.io SDK
@@ -40,16 +44,21 @@ set (MODIO_VERSION "v2.0.0" CACHE STRING "Version number for the packaged versio
 set (MODIO_TARGET_NAME modio CACHE STRING "")
 
 
+include(cmake/initialise-platform.cmake)
+
 #Injects toolchain file if necessary for the specified platform, downloads NDA dependencies
-set (CMAKE_PROJECT_${MODIO_TARGET_NAME}_INCLUDE_BEFORE ${CMAKE_CURRENT_LIST_DIR}/cmake/initialise-platform.cmake)
+modio_set_toolchain()
 
 project(${MODIO_TARGET_NAME} C CXX )
+
+modio_platform_init()
 
 message(STATUS "CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 
 set (MODIO_FORCE_CXX_20_MODE OFF CACHE BOOL "Force C++20 mode"  )
 
 if(MODIO_FORCE_CXX_20_MODE)
+	set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 	set(CMAKE_CXX_STANDARD 20)
 	set(CMAKE_CXX_STANDARD_REQUIRED ON)
 	set(CMAKE_CXX_EXTENSIONS OFF)

@@ -24,9 +24,7 @@ namespace Modio
 					.EncodeAndAppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed, 
 											User.bUserHasAcceptedTerms ? "true" : "false");
-			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-				Modio::Detail::AuthenticateUserExternal(Params), Callback,
-				Modio::Detail::Services::GetGlobalContext().get_executor());
+			Modio::Detail::AuthenticateUserExternalAsync(Params, Callback);
 		}
 	} // namespace Detail
 } // namespace Modio

@@ -42,9 +42,7 @@ namespace Modio
 			{
 				Params = Params.AppendPayloadValue("env", "256");
 			}
-			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-				Modio::Detail::AuthenticateUserExternal(Params), Callback,
-				Modio::Detail::Services::GetGlobalContext().get_executor());
+			Modio::Detail::AuthenticateUserExternalAsync(Params, Callback);
 		}
 	} // namespace Detail
 } // namespace Modio

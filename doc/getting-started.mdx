@@ -76,21 +76,21 @@ The mod.io SDK uses a "Local Profile" throughout its lifetime. The Local Profile
 These local profiles essentially create a 'scope' for the current user to live in, so that a single system can support multiple authenticated users side-by-side without requiring deauthentication of the previous user. 
 On console platforms, we suggest that this be a string representation of the platform-provided UserID, as this gives the best experience when it comes to things like user switching. 
 
-Internally, the SessionID is used to create a folder containing the authentication information and cached profile of the authenticated user (if any). For example, a game using the GDK on Xbox, using a sanitized string representation of the Xbox live ID as the SessionID, would have a folder structure in the persistent storage like the following:
+Internally, the SessionID is used to create a folder containing the authentication information and cached profile of the authenticated user (if any). For example, a console game using a sanitized string representation of a stable platform-provided User ID as the SessionID, would have a folder structure in the persistent storage like the following:
 
 ```
-<Persistent Storage>/mod.io/<Game ID>/<Xbox Live ID #1>/<Cached Auth>/<Profile data for Xbox Live User #1>
-<Persistent Storage>/mod.io/<Game ID>/<Xbox Live ID #2>/<Cached Auth>/<Profile data for Xbox Live User #2>
+<Persistent Storage>/mod.io/<Game ID>/<String User ID #1>/<Cached Auth and Profile data for platform user #1>
+<Persistent Storage>/mod.io/<Game ID>/<String User ID #2>/<Cached Auth and Profile data for platform user #2>
 ```
 
-When your game starts, you can detect the user associated with the current controller and pass in the stable string representation of their Xbox Live ID as the SessionID. If the user has previously authenticated with mod.io for this game on this device, their authentication status would be maintained.
+When your game starts, you can detect the user associated with the current controller and pass in the stable string representation of their platform ID as the SessionID. If the user has previously authenticated with mod.io for this game on this device, their authentication status would be maintained.
 
 In the case of a PC title with user-provided profile names, the folder structure would be more like the following:
 
 ```
-%USERDATA%/mod.io/<Game ID>/MyProfile1/<Cached Auth>/<Profile data for mod.io account #1>
-%USERDATA%/mod.io/<Game ID>/SomeOtherProfile/<Cached Auth>/<Profile data for mod.io account #2>
-%USERDATA%/mod.io/<Game ID>/ThirdUserSpecifiedProfileName/<Cached Auth>/<Profile data for mod.io account #3>
+%USERDATA%/mod.io/<Game ID>/MyProfile1/<Cached Auth and Profile data for mod.io account #1>
+%USERDATA%/mod.io/<Game ID>/SomeOtherProfile/<Cached Auth and Profile data for mod.io account #2>
+%USERDATA%/mod.io/<Game ID>/ThirdUserSpecifiedProfileName/<Cached Auth and Profile data for mod.io account #3>
 ```
 
 This allows multiple players, such as siblings, to each have their own session that lives in the same Windows account.
@@ -162,7 +162,8 @@ The following guides are provided to help you through the basic functions of the
 * [User mute and unmute functions](#user-mute-and-unmute-functions)
 * [Temporary Mod Sets](#temporary-mod-sets)
 * [Multithreading](#multithreading)
-* [Monetization](#monetization)
+* [Monetization - Virtual Currency](#monetization-virtual-currency)
+* [Monetization - Real Currency](#monetization-real-currency)
 * [Metrics Play Sessions](#metrics-play-sessions)
 * [Error Handling](#error-handling)
 
@@ -226,7 +227,7 @@ The SDK supports the following general use parameters that can be set through `E
 | Parameter | Description |
 | --- | --- |
 | `PendingOnlyResults` | Only include mods in search results that are pending moderation. For moderation and testing purposes. Set to "true" to enable. Warning: Should only be enabled when the user is a moderator or admin of the game, setting in shipping builds is not recommended. |
-| `PlatformOverride` | Set the platform to be used when making requests to show mods for that platform instead. For moderation and testing purposes. This parameter will soon be deprecated. |
+| `PlatformOverride` | Set the platform to be used when making requests to show mods for that platform instead. For moderation and testing purposes. |
 
 #### Storage Quota
 
@@ -1041,13 +1042,451 @@ This call will start a TempModSet and install Mods with IDs 8, 4 and 5.
 If you add an already subscribed mod to TempModSet, it will not download be downloaded as the player will already have that content. If you try to unsubscribe from it while it's in TempModSet, the SDK it will wait for it to be removed from TempModSet before processing the unsubscribe.
 :::
 
+### Collections
+
+A Collection is a list of mods that are grouped together by a mod.io user. They are useful for things like sharing specific mod lists, themed packs, conversions, and the like.
+
+Collections need to be enabled on your game's Content Settings page to allow users to create collections, and you can also choose whether or not to allow comments on Collections, as well as set a maximum number of mods per-collection.
+
+Collections share many of the same actions as Mods, such as subscribing, rating, commenting, etc, but also have the ability to be followed, to attach them to a user's account without subscribing to the mods therein.
+
+:::note
+Currently, Collection Management actions such as creating, editing, and deleting Collections can only be done through the web frontend. These actions will be added to the SDK in a later release.
+:::
+
+#### List Mod Collections
+
+To get a filtered list of mod collections call [`ListModCollectionsAsync`](/cppsdk/refdocs/#listmodcollectionsasync) which will return a `Modio::ModCollectionInfoList` upon success.
+
+```cpp
+void ListModCollections(Modio::FilterParams Filter)
+{
+    Modio::ListModCollectionsAsync(Filter, [](Modio::ErrorCode ec, Modio::Optional<Modio::ModCollectionInfoList> Collections)
+    {
+        if(ec)
+        {
+            // an error occurred
+        }
+        else
+        {
+            for(Modio::ModCollectionInfo& CollectionInfo : Collections.value())
+            {
+                // CollectionInfo contains the Collection info (but not the list of mods!)
+            }
+        }
+    });
+}
+```
+
+#### Get Mod Collection Info
+
+You can also use [`GetModCollectionInfoAsync`](/cppsdk/refdocs/#getmodcollectioninfoasync) to get the `Modio::ModCollectionInfo` about a specific Collection by querying it with the appropriate `Modio::ModCollectionID`.
+
+```cpp
+void GetModCollectionInfo(Modio::ModCollectionID CollectionId)
+{
+    Modio::GetModCollectionInfoAsync(CollectionId, [](Modio::ErrorCode ec, Modio::Options<Modio::ModCollectionInfo> Info)
+    {
+        if(ec)
+        {
+            // an error occurred
+        }
+        else
+        {
+            //Info.value() returns the Collection Info (but not the list of mods!)
+        }
+    });
+}
+```
+
+#### Get Mod Collection Mods
+
+Calling [`GetModCollectionModsAsync`](/cppsdk/refdocs/#getmodcollectionmodsasync) will return a `Modio::ModInfoList` upon success, which will allow you to display the details of all mods within the given collection to your players.
+
+```cpp
+void GetModCollectionMods(Modio::ModCollectionID CollectionId)
+{
+    Modio::GetModCollectionModsAsync(CollectionId, [](Modio::ErrorCode ec, Modio::Optional<Modio::ModInfoList> ModList)
+    {
+        if(ec)
+        {
+            // an error occurred
+        }
+        else
+        {
+            // ModList is the (Modio::Optional) Mod Info List.
+            for(Modio::ModInfo& Mod : ModList.value())
+            {
+                // Mod is a Modio::ModInfo.
+            }
+        }
+    });
+}
+```
+
+#### Follow Mod Collection
+
+Mod Collections can be Followed, distinct from Subscribing, which adds it to the user's list of Followed Collections, allowing them to quickly and easily find it for subscribing/unsubscribing. Following can be performed by calling [`FollowModCollectionAsync`](/cppsdk/refdocs/#followmodcollectionasync) which simply returns a `Modio::ErrorCode` to indicate success/failure.
+
+```cpp
+void FollowModCollections(Modio::ModCollectionID CollectionId)
+{
+    Modio::FollowModCollectionAsync(CollectionId, [](Modio::ErrorCode ec)
+    {
+        if(ec)
+        {
+            // an error occurred.
+        }
+        else
+        {
+            // the Collection was successfully followed
+        }
+    });
+}
+```
+
+#### Unfollow Mod Collection
+
+The inverse of above, call [`UnfollowModCollectionAsync`](/cppsdk/refdocs/#unfollowmodcollectionasync) to Unfollow a Mod Collection.
+
+```cpp
+void UnfollowModCollections(Modio::ModCollectionID CollectionId)
+{
+    Modio::UnfollowModCollectionAsync(CollectionId, [](Modio::ErrorCode ec)
+    {
+        if(ec)
+        {
+            // an error occurred.
+        }
+        else
+        {
+            // the Collection was successfully unfollowed
+        }
+    });
+}
+```
+
+#### List User Followed Mod Collections
+
+A list of all Collections the currently authenticated user is following can be acquired via [`ListUserFollowedModCollectionsAsync`](/cppsdk/refdocs/#listuserfollowedmodcollectionsasync). This query can be filtered if desired.
+
+```cpp
+void GetUserFollowedModCollections(Modio::FilterParams Filter)
+{
+    Modio::ListUserFollowedModCollectionsAsync(Filter, [](Modio::ErrorCode ec, Modio::Optional<Modio::ModCollectionInfoList> FollowedCollections)
+    {
+        if(ec)
+        {
+            // an error occurred.
+        }
+        else
+        {
+            for(Modio::ModCollectionInfo& CollectionInfo : FollowedCollections.value())
+            {
+                // CollectionInfo contains the Collection info (but not the list of mods!)
+            }
+        }
+    });
+}
+```
+#### Subscribe To Mod Collection
+
+A Mod Collection can be subscribed to, which adds all of the Mods within the Collection to the user's subscription list. Do this by calling [`SubscribeToModCollectionAsync`](/cppsdk/refdocs/#subscribetomodcollectionasync) and providing the relevant Collection ID.
+
+:::note
+Subscribing to a Collection *only* subscribes the user to the mods within the collection; currently there is no concept of "subscription" specifically to a collection itself, just the mods within it.
+
+Additionally, calling `SubscribeToModCollectionAsync` does not queue the Mods for download and installation. You will still need to call `FetchExternalUpdatesAsync` to trigger the download, assuming you have called `EnableModManagement` prior to the fetching process.
+:::
+
+```cpp
+void SubscribeToModCollection(Modio::ModCollectionID CollectionId)
+{
+    // We are assuming Mod Management is already enabled.
+    Modio::SubscribeToModCollectionAsync(CollectionId, [](Modio::ErrorCode ec)
+    {
+        if(ec)
+        {
+            // an error occurred.
+        }
+        else
+        {
+            // The Collection was successfully subscribed to.
+            // Now you need to fetch external updates to synchronize the subscription list
+            Modio::FetchExternalUpdatesAsync([](Modio::ErrorCode ec)
+            {
+                if(ec)
+                {
+                    // an error occurred.
+                }
+                else
+                {
+                    // Updates were fetched.
+                    // So long as Mod Management is enabled the new mods will be queued for download and installation.
+                }
+            });
+        }
+    });
+}
+```
+
+#### Unsubscribe From Mod Collection
+
+The inverse of above, [`UsubscribeFromModCollectionAsync`](/cppsdk/refdocs/#unsubscribefrommodcollectionasync) removes all Mods in a Collection from the user's subscription list. As before, you will need to call `FetchExternalUpdatesAsync` and have Mod Management enabled to trigger the uninstallation of the given mods.
+
+:::note
+Directly inverse of `SubscribeToModCollectionAsync`, this unsubscribes the user from the Mods within the Collection regardless of whether they were subscribed to them prior to subscribing to the collection itself. This can be somewhat opaque to the end-user, and should be communicated as such.
+
+And again, calling `UnsubscribeFromModCollectionAsync` does not queue the Mods for uninstallation. You will still need to call `FetchExternalUpdatesAsync` to trigger the uninstallation process, assuming you have called `EnableModManagement` prior to the fetching process.
+:::
+
+```cpp
+void UnsubscribeFromModCollection(Modio::ModCollectionID CollectionId)
+{
+    // We are assuming Mod Management is already enabled.
+    Modio::UnsubscribeFromModCollectionAsync(CollectionId, [](Modio::ErrorCode ec)
+    {
+        if(ec)
+        {
+            // an error occurred.
+        }
+        else
+        {
+            // The Collection was successfully unsubscribed from.
+            // Now you need to fetch external updates to synchronize the subscription list
+            Modio::FetchExternalUpdatesAsync([](Modio::ErrorCode ec)
+            {
+                if(ec)
+                {
+                    // an error occurred.
+                }
+                else
+                {
+                    // Updates were fetched.
+                    // So long as Mod Management is enabled the new mods will be queued for uninstallation.
+                }
+            });
+        }
+    });
+}
+```
+
+#### Submit Mod Collection Rating
+
+A user can submit a rating for a Mod Collection by calling [`SubmitModCollectionRatingAsync`](/cppsdk/refdocs/#submitmodcollectionratingasync) and providing both the `Modio::ModCollectionID` and the `Modio::Rating`.
+
+```cpp
+void SubmitModCollectionRating(Modio::ModCollectionID CollectionId, Modio::Rating Rating)
+{
+    Modio::SubmitModCollectionRatingAsync(CollectionId, Rating, [](Modio::ErrorCode ec)
+    {
+        if(ec)
+        {
+            // an error occurred.
+        }
+        else
+        {
+            // the Collection rating was successfully submitted
+        }
+    });
+}
+```
+
+#### Get Mod Media
+
+We provide a set of functions for downloading Mod Collection Logos and Mod Collection Author Avatars to disk in a similar manner to Mod Media, vias [`GetModCollectionMediaAsync`](/cppsdk/refdocs/#getmodcollectionmediaasync)
+
+##### Get Mod Collection Logo
+
+```cpp
+void GetModCollectionLogo(Modio::ModCollectionID CollectionId)
+{
+    Modio::GetModCollectionMediaAsync(CollectionId, Modio::LogoSize::Thumb640, 
+        [](Modio::ErrorCode ec, Modio::Optional<std::string> PathToFile)
+        {
+            if(ec)
+            {
+                // an error occurred.
+            }
+            else
+            {
+                // success, the file should be at the path in PathToFile.value()
+            }
+        })
+}
+```
+
+##### Get Mod Collection Author Avatar
+
+```cpp
+void GetModCollectionLogo(Modio::ModCollectionID CollectionId)
+{
+    Modio::GetModCollectionMediaAsync(CollectionId, Modio::AvatarSize::Thumb100, 
+        [](Modio::ErrorCode ec, Modio::Optional<std::string> PathToFile)
+        {
+            if(ec)
+            {
+                // an error occurred.
+            }
+            else
+            {
+                // success, the file should be at the path in PathToFile.value()
+            }
+        })
+}
+```
+
+### Multiplayer
+
+:::warning[Experimental Feature]
+This is an experimental feature and is subject to change. 
+:::
+
+The mod.io multiplayer framework is primarily focused on facilitating the initialization and authentication of dedicated servers with the mod.io backend. This allows authentication to occur in a headless environment; without human intervention.
+
+To do this a server operator must create a Server OAuth token on their [mod.io API Settings page](https://mod.io/me/access). In addition to this OAuth token, a server operator will need a list of UGC they want their Server to use, in the form of a list of Mod IDs. How these pieces of information are handed to the mod.io SDK is up to the developer, however they are needed at the time of initialization of the SDK.
+
+A general overview of the framework can be found [here](/cppsdk/multiplayer/), however in brief the dedicated server framework can be thought of as a seperate method of initialization for the mod.io service, with some additional helpers for handling UGC in use by clients. While it does not directly handle any kind of communication or replication between the Server and Clients, it exposes basic functionality to help get you started with creating multiplayer UGC games.
+
+A Server is expected to have its own list of UGC it uses that all joining Clients are expected to download. Similarly, all joining Clients can have their own lists (subscriptions) of UGC that they use, which can be registered with the Server so that it can maintain a persistent list of UGC Clients are using. This list can then be shared to all Clients, along with the Server's own UGC, to be initalized on every client as a [Temporary Mod Set](#temporary-mod-sets).
+
+#### Initialization
+
+Initialization follows much the same process as the standard mod.io initialization process, with a few added parameters.
+
+```cpp
+void InitializeModioServer()
+{
+    Modio::ServerInitializeOptions InitOptions
+    InitOptions.BaseOptions.ApiKey = Modio::ApiKey("YourGameAPIKey");
+    InitOptions.BaseOptions.GameId = Modio::GameID(12345);
+    InitOptions.Token = "YouServerOAuthToken";
+    InitOptions.ModDirectory = "C:\\ServerModDir\\";
+    InitOptions.Mods = {
+        Modio::ModID(12345),
+        Modio::ModID(23456)
+    };
+
+    Modio::InitializeModioServerAsync(InitOptions, [](Modio::ErrorCode ec)
+    {
+        if(ec)
+        {
+            //An Error occurred. See ec.message()
+        }
+        else
+        {
+            // The server framework initialized correctly
+        }
+    });
+}
+```
+
+:::note
+While the `ApiKey` and `GameId` are static, the Server `Token`, `ModDirectory`, and `Mods` list are not (as they will differ between servers), and we recommend you make these configurable in some way, be it via a config file, launch arguments, or other.
+
+`Mods` can be empty (for an un-modded Server) and additional UGC can be requested as part of the UGC Acquisition process below.
+:::
+
+#### UGC Acquisition
+
+To have the Server download the UGC indicated in `Modio::ServerInitializeOptions::Mods` you will need to call `InstallOrUpdateServerModsAsync` manually to download the mods onto your server. This requires that mod management be active prior to calling.
+
+```cpp
+void InstallServerMods(std::vector<Modio::ModID> AdditionalMods)
+{
+    // AdditionalMods will be downloaded, as well as any mods that were passed to InitializeModioServerAsync()
+    Modio::InstallOrUpdateServerModsAsync(AdditionalMods, [](Modio::ErrorCode ec)
+    {
+        if(ec)
+        {
+            //An Error occurred. See ec.message()
+        }
+        else
+        {
+            // The mods were all successfully added to the Server
+            // Mod management will now begin downloading them
+        }
+    });
+}
+```
+
+:::note
+As part of the download process, all ModIDs are checked against the OAuth token given during initialization for the purposes of [Monetization](#monetization), and any UGC that the user who created the OAuth token does not have ownership of will fail to download.
+
+You can pass an empty vector of ModIDs to this function and it will only download the ModIDs indicated during Init. Otherwise any mods listed in `AdditionalMods` above will be installed in addition to the Mods given during initialization.
+:::
+
+#### Querying Server UGC
+
+If you need to query what UGC the Server has downloaded, you can do it via `Modio::QuerySystemInstallations` to return the full list of installed UGC.
+
+```cpp
+std::map<Modio::ModID, Modio::ModCollectionEntry> ServerMods = Modio::QuerySystemInstallations();
+```
+
+#### Joining Client UGC
+
+While the Mod.io Server framework does not perform any network communication or replication itself, it does provide functionality to simplify the process of managing client-side UGC.
+
+When a client joins the Server/Game, it can send a list of `Modio::ModID`s to your server instance. The server then can then call `Modio::RegisterClientModsWithServerAsync` which will internally track the full list of all Client UGC ever passed to it, returning the full list for you to filter/approve based on your own game-specific logic. Your server can then transmit any new mods back to all connected Clients to ensure all UGC is properly propagated.
+
+:::note
+This code should only be called on the Server!
+:::
+
+```cpp
+void OnClientModListReceived(const std::vector<Modio::ModID>& JoiningClientsModList)
+{
+    Modio::RegisterClientModsWithServerAsync(JoiningClientsModList, [](Modio::ErrorCode ec, std::set<Modio::ModID> RegisteredMods)
+    {
+            if(ec)
+            {
+                //An Error occurred. See ec.message()
+            }
+            else
+            {
+                // RegisteredMods contains all ModIDs ever registered.
+                // You must now pass them back to all clients to add into a TempModSet
+            }
+    });
+}
+```
+
+:::note
+While our Server framework maintains a list of the UGC registered with it, it does not automatically download the given UGC for you. It only confirms that the ID given is valid and then returns the up to date list.
+
+We do not recommend that you install Client UGC registered in this way on the Server, as this constitutes a substantial security risk where clients can install and execute arbitrary files on your Server machines.
+
+Should you wish to install Client UGC on the Server, the best place to do so is when `RegisterClientModsWithServerAsync` returns the full list of registered UGC. At this point, you can optionally filter, then initialize the UGC into a [Temporary Mod Set](#temporary-mod-sets).
+:::
+
+#### Querying Client UGC
+
+In the event that you need to query what UGC is currently registered with the Server you can do so by calling `Modio::GetRegisteredClientMods()`.
+
+```cpp
+std::set<Modio::ModID> RegisteredMods = Modio::GetRegisteredClientMods();
+```
+
+#### Clearing Client UGC
+
+While we do not provide a method of removing any given UGC from the registered list directly, you can clear the list entirely by calling `Modio::ClearRegisteredClientMods()`
+
+The reasoning behind this is that it is possible that a modded item or feature is still in use on a server after the client who brought it leaves. Additionally, as the server only tracks the IDs of registered client UGC there is no performance concern on the server, and when a Client leaves they should close their Temp Mod Set which will free up their own resources.
+
+The purpose of `ClearRegisteredClientMods` is for the closing or refreshing of a server, or when all players have exited, in some cases.
+
+#### Listen Servers
+
+The Mod.io Server framework is not intended for use in Listen Servers (or P2P multiplayer). In these cases it is expected that [Temporary Mod Sets](#temporary-mod-sets) will be leveraged for all clients and the host.
+
 ### Multithreading
 
 :::note
 This functionality is demonstrated in example 04_Threading
 :::
 
-As mentioned in [the quick-start section on initialization](#initialization-and-teardown), the SDK supports [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) being run on a secondary thread that already exists or a dedicated background thread you create specifically to peform SDK work.
+As mentioned in [the quick-start section on initialization](#initialization-and-teardown), the SDK supports [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) being run on a secondary thread that already exists or a dedicated background thread you create specifically to perform SDK work.
 
 :::note
 Callbacks you provide to the SDK will run ***on the thread running [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers)*** - if you host [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) on a different thread, it is your responsibility to synchronize with the main thread if you wish to pass results back to it, through callbacks you provide to the SDK.
@@ -1098,8 +1537,37 @@ If this occurs, we recommend you use either a `yield` or high-resolution `sleep`
 If the SDK runs for the lifetime of your application and you do not call [ShutdownAsync](/cppsdk/refdocs/#shutdownasync) this is not necessary.
 :::
 
+### Monetization - Overview
 
-### Monetization
+mod.io provides two different options for supporting monetization within your game - Virtual Currency, and Real Currency. You can toggle between these options on your game's monetization dashboard, but you can only ship with one of them enabled and used in your title.
+For more information about the difference between these two options, head to the Monetization Getting Started Guide.
+
+#### Querying for Monetized Content
+
+Regardless of which monetization model you are using, the regular `<<ListAllModsAsync>>` method includes an additional filter for whether the results include paid content. By default, only free mods are shown, but you can set `RevenueType` on the `<<FilterParams>>` object passed to `<<ListAllModsAsync>>` to include free and paid content, or just paid content. If you are using Virtual Currency, then all mods returned will have a `Price` property, indicating the virtual currency price that must be paid in order to purchase. If you are using USD Marketplace, then each mod will have an associated set of `SKUMappings`, which map to the SKU pack that must be purchased and owned by the player in order to consume it for that piece of content.
+
+```cpp
+Modio::ListAllModsAsync(Modio::FilterParams().RevenueType(Modio::FilterParams::RevenueFilterType::FreeAndPaid), [](Modio::ErrorCode ec, Modio::Optional<Modio::ModInfoList> Results)
+{
+    if (ec)
+    {
+        // Error handling
+    }
+    else
+    {
+        for (Modio::ModInfo& CurrentModProfile : *Results)
+        {
+            std::cout << CurrentModProfile.Price;
+        }
+    }
+});
+```
+
+#### Showing user purchases
+
+Even though all purchased mods are automatically subscribed, the user can still unsubscribe from them and uninstall them; however, they still remain owned and purchased by the user. They must re-subscribe to the mod in order to have it installed. This is facilitated by `<<FetchUserPurchasesAsync>>`, which will fetch a list of a users purchased mods. After a successful call, you can then display them with `<<QueryUserPurchases>>`, allowing re-subscription if necessary.
+
+### Monetization - Virtual Currency
 
 :::note
 This functionality is demonstrated in example 09_MonetizationWalletManagement (for initialization and wallet management) and 10_MonetizationPurchase (for purchase functionality).
@@ -1187,30 +1655,9 @@ The `WalletBalance` returned in `Modio::EntitlementConsumptionStatusList` will b
 
 Generally speaking, you should do this on startup in case the user has made a purchase outside of the game, and after a user has made a purchase on a platform - most platforms will have some callback or indicator that this has occurred. Check that the `Modio::Optional<Modio::EntitlementConsumptionStatusList>` is valid and its size is greater than 0. 
 
-### Querying & Purchasing Mods
-
-As part `<<ListAllModsAsync>>`, you can include an additional filter for whether you list paid mods. By default, only free mods are shown, but you can set `RevenueType` on the `<<FilterParams>>` object passed to `<<ListAllModsAsync>>` to include free and paid content, or just paid content. All mods returned will have a `Price` property, indicating the virtual currency price that must be paid in order to purchase.
-
-```cpp
-Modio::ListAllModsAsync(Modio::FilterParams().RevenueType(Modio::FilterParams::RevenueFilterType::FreeAndPaid), [](Modio::ErrorCode ec, Modio::Optional<Modio::ModInfoList> Results)
-{
-    if (ec)
-    {
-        // Error handling
-    }
-    else
-    {
-        for (Modio::ModInfo& CurrentModProfile : *Results)
-        {
-            std::cout << CurrentModProfile.Price;
-        }
-    }
-});
-```
-
 #### Purchasing Mods
 
-You can call `<<PurchaseModAsync>>` to purchase a given mod. PurchaseModAsync takes two parameters = the ModID of the mod to purchase, and the ExpectedPrice, which is the price displayed to the user from `<<ListAllModsAsync>>`. You must include this parameter for safety, so the user is not charged more or less than the price displayed to them in case the price of the mod has changed between the call to ListAllModsAsync and purchase time.
+You can call `<<PurchaseModAsync>>` to purchase a given mod. PurchaseModAsync takes two parameters = the ModID of the mod to purchase, and the ExpectedVirtualCurrencyPrice, which is the price displayed to the user from `<<ListAllModsAsync>>`. You must include this parameter for safety, so the user is not charged more or less than the price displayed to them in case the price of the mod has changed between the call to ListAllModsAsync and purchase time.
 Once a mod is purchased, it is automatically subscribed to for the user.
 
 You should validate that the user has enough virtual currency to make the purchase by comparing it to the balance you received from `GetUserWalletBalanceAsync`. Note this is purely for user experience (ie for graying out the purchase button in the UI, or upselling the user a virtual currenct pack), and `PurchaseModAsync` will return an error if the user does not have enough in their wallet.
@@ -1234,13 +1681,92 @@ Modio::PurchaseModAsync(ModId, ModPrice, [](Modio::ErrorCode ec, Modio::Optional
 });
 ```
 
-#### Showing user purchases
+### Monetization - USD Marketplace
 
-Even though all purchased mods are automatically subscribed, the user can still unsubscribe from them and uninstall them; however, they still remain owned and purchased by the user. They must re-subscribe to the mod in order to have it installed. This is facilitated by `<<FetchUserPurchasesAsync>>`, which will fetch a list of a users purchased mods. After a successful call, you can then display them with `<<QueryUserPurchases>>`, allowing re-subscription if necessary.
+:::warning
+USD Marketplace is an experimental feature and is subject to change. If you are interested in using this feature, please contact us.
+:::
 
-#### Getting a User Delegation Token
+:::note
+There are different monetization models available for games using mod.io - Virtual Currency, and Real Currency. You can toggle between these options during development in your game's monetization dashboard, but you can only ship with one option enabled. For more information about the difference between these two options, head to the Monetization Getting Started guide.
+:::
 
-User Delegation Tokens can be used by a backend server for S2S (Server to Server) transactions/functionality. You can get one for the current user by calling `<<GetUserDelegationToken>>`, the callback for which contains the Token as a `std::string`.
+The mod.io SDK supports all of the mod.io monetization features, allowing you to sell mods via USD Marketplace to your players, with a share of the revenue split between creators and your studio. Visit [mod.io monetization system](/monetization/) for an overview.
+
+Every platform requires specific setup for monetization features to work, with regards to the USD Marketplace configuration and API calls, however the following documentation is generically applicable, with only small differences per-platform that are documented within the platform-specific monetization documentation.
+
+:::note
+You can use our sandbox test environment at test.mod.io for testing monetization functionality, which allows for simulating real-world payments using dummy credit cards and credentials. When you initialize the SDK, use ``Modio::Environment::Test`` as the environment parameter, along with your test.mod.io title's GameID and APIKey.
+:::
+
+#### Initialization
+
+The mod.io monetization features are enabled as part of the onboarding process on your game profile. Once that is setup, ensure that you have enabled USD Marketplace in your game's profile. Once that is done, there is nothing further you need to do for initialization in the SDK.
+
+Ensure that you have set the appropriate Portal when initializing the SDK for the portal you are using for purchasing - for instance, on Steam, you must initialize with Modio::Portal::Steam in order to perform appropriate platform SKU lookups.
+
+#### Looking Up Platform SKUs
+
+The first step for USD Marketplace is to look up and cache the SKUs for the platform that you are on. These SKU IDs are used for two purposes:
+1. Localized Price Display for the mod that is going to be purchased
+2. Opening the platform store for purchase of this SKU before exchanging it for a mod.
+
+##### Steam SKUs
+
+Steam SKU packs utilize the Steam Inventory Service for its purchase information.
+
+To start, you have to call `SteamInventory()->RequestPrices()` to request all current prices for all applicable item definitions, with your Steam Callback as appropriate.
+
+```
+if (SteamInventory()) 
+{
+    SteamAPICall_t requestPriceCallbackHandle = SteamInventory()->RequestPrices();
+
+    ModioTest::SteamAuthHelper::instance().m_SteamCallResultInventoryPrices.Set(
+        requestPriceCallbackHandle, &ModioTest::SteamAuthHelper::instance(),
+        &ModioTest::SteamAuthHelper::OnRequestPricesResponse);
+}
+```
+
+Within this callback, you can then get the users localized currency for display purposes, and then get all item definitions with their associated localized prices.
+
+```
+void SteamAuthHelper::OnRequestPricesResponse(SteamInventoryRequestPricesResult_t* result, bool )
+{
+    GlobalSDKState.CurrencyCode = result->m_rgchCurrency;
+
+    uint32_t len = SteamInventory()->GetNumItemsWithPrices();
+    
+    std::vector<SteamItemDef_t> itemDefs(len);
+    std::vector<uint64> prices(len);
+    std::vector<uint64> basePrices(len);
+
+    SteamInventory()->GetItemsWithPrices(itemDefs.data(), prices.data(), basePrices.data(), len);
+
+    if (!itemDefs.empty())
+    {
+        for (uint32_t i = 0; i < itemDefs.size(); i++)
+        {
+            PlatformSKUMapping skuMapping;
+            skuMapping.Price = prices[i];
+            skuMapping.SkuId = std::to_string(itemDefs[i]);
+            GlobalSDKState.PlatformSKUMappings.push_back(skuMapping);
+        }    
+    }
+}
+```
+
+You now have a mapping of SKU ID to Price that you can use for display and purchasing.
+
+#### Displaying localized pricing
+
+Inside of your UI, for each mod that you want to make available for purchase, you must display the localized price for the SKU that the mod is mapped to. When you are filtering for paid mods, any monetized mods will have a `SkuMappings` property which contains a list of all platform SKU Mappings.
+
+To display the appropriate price, simply find the SKU Mapping for the current Portal that you are going to request the purchase on (ie Steam, PSN, XBoxLive) and look up that SKU ID from your Platform SKUs from the previous step.
+
+#### Purchasing Mods
+
+To perform a purchase, you can use the existing `<<PurchaseModAsync>>` method, however you must omit the `ExpectedVirtualCurrencyPrice` parameter, as this is not applicable for USD Marketplace. mod.io will then attempt to consume the applicable platform SKU for the mod if the user owns one. If they own one and the consumption is successful, the mod will be automatically subscribed to for the user. Otherwise, an error will be returned indicating that the user does not own the SKU, and you should prompt the user to purchase the SKU on the platform store.
 
 ### Metrics Play Sessions
 
@@ -1352,6 +1878,11 @@ Modio::MetricsSessionEndAsync([](Modio::ErrorCode ec)
 	}
 });
 ```
+
+### User Delegation Tokens
+
+User Delegation Tokens can be used by a backend server for S2S (Server to Server) transactions/functionality. You can get one for the current user by calling `<<GetUserDelegationToken>>`, the callback for which contains the Token as a `std::string`.
+
 
 ### Error Handling
 

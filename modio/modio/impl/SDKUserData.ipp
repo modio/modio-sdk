@@ -51,9 +51,7 @@ namespace Modio
 		Modio::Detail::SDKSessionData::EnqueueTask([EmailAddress, Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
 			{
-				asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-					Modio::Detail::RequestEmailAuthCodeOp(EmailAddress), Callback,
-					Modio::Detail::Services::GetGlobalContext().get_executor());
+				Modio::Detail::RequestEmailAuthCodeAsync(EmailAddress, Callback);
 			}
 		});
 	}
@@ -63,10 +61,7 @@ namespace Modio
 		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback))
 			{
-				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)>,
-									void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)>(
-					Modio::Detail::GetTermsOfUseOp(), Callback,
-					Modio::Detail::Services::GetGlobalContext().get_executor());
+				Modio::Detail::GetTermsOfUseAsync(Callback);
 			}
 		});
 	}
@@ -143,9 +138,7 @@ namespace Modio
 		Modio::Detail::SDKSessionData::EnqueueTask([AuthenticationCode, Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
 			{
-				return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
-					Modio::Detail::AuthenticateUserByEmailOp(AuthenticationCode), Callback,
-					Modio::Detail::Services::GetGlobalContext().get_executor());
+				Modio::Detail::AuthenticateUserByEmailAsync(AuthenticationCode, Callback);
 			}
 		});
 	}
@@ -201,11 +194,7 @@ namespace Modio
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
 				Modio::Detail::RequireUserIsAuthenticated(Callback))
 			{
-				return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)>,
-										   void(Modio::ErrorCode, Modio::Optional<std::string>)>(
-					Modio::Detail::GetUserMediaOp(Modio::Detail::SDKSessionData::CurrentGameID(),
-												  Modio::Detail::SDKSessionData::CurrentAPIKey(), AvatarSize),
-					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+				return Modio::Detail::GetUserMediaAsync(AvatarSize, Callback);
 			}
 		});
 	}
@@ -218,10 +207,7 @@ namespace Modio
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
 				Modio::Detail::RequireUserIsAuthenticated(Callback))
 			{
-				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)>,
-									void(Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)>(
-					Modio::Detail::ListUserGamesOp(std::move(Filter)), Callback,
-					Modio::Detail::Services::GetGlobalContext().get_executor());
+				Modio::Detail::ListUserGamesAsync(Filter, Callback);
 			}
 		});
 	}
@@ -232,9 +218,7 @@ namespace Modio
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
 				Modio::Detail::RequireUserIsAuthenticated(Callback))
 			{
-				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserRatingList>)>,
-									void(Modio::ErrorCode, Modio::Optional<Modio::UserRatingList>)>(
-					Modio::Detail::GetUserRatingsOp(), Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+				Modio::Detail::GetUserRatingsAsync(Callback);
 			}
 		});
 	}

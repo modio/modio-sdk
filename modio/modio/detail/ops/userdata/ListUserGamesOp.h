@@ -79,5 +79,13 @@ namespace Modio
 				}
 			}
 		};
+
+		template<typename ListUserGamesCompleteCallback>
+		void ListUserGamesAsync(FilterParams InFilter, ListUserGamesCompleteCallback&& OnListUserGamesComplete)
+		{
+			return asio::async_compose<ListUserGamesCompleteCallback, void(Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)>(
+				Modio::Detail::ListUserGamesOp(std::move(InFilter)), OnListUserGamesComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio

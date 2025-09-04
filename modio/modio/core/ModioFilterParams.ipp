@@ -73,15 +73,21 @@ namespace Modio
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::MarkedLiveAfter(std::chrono::system_clock::time_point LiveAfter)
+	Modio::FilterParams& FilterParams::MarkedLiveAfter(std::chrono::system_clock::time_point LiveAfter,
+													   bool RoundToHour)
 	{
-		DateRangeBegin = LiveAfter;
+		DateRangeBegin = RoundToHour
+			? std::chrono::round<std::chrono::hours>(LiveAfter)
+			: LiveAfter;
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::MarkedLiveBefore(std::chrono::system_clock::time_point LiveBefore)
+	Modio::FilterParams& FilterParams::MarkedLiveBefore(std::chrono::system_clock::time_point LiveBefore,
+														bool RoundToHour)
 	{
-		DateRangeEnd = LiveBefore;
+		DateRangeEnd = RoundToHour 
+			? std::chrono::round<std::chrono::hours>(LiveBefore) 
+			: LiveBefore;
 		return *this;
 	}
 

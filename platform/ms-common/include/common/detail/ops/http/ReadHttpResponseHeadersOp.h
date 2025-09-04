@@ -70,6 +70,12 @@ public:
 				case WinHTTPCallbackStatus::RequestError:
 					Self.complete(Modio::make_error_code(Modio::HttpError::RequestError));
 					return;
+				case WinHTTPCallbackStatus::Waiting:
+				case WinHTTPCallbackStatus::HeadersAvailable:
+				case WinHTTPCallbackStatus::DataAvailable:
+				case WinHTTPCallbackStatus::ReadComplete:
+				case WinHTTPCallbackStatus::SendRequestComplete:
+				case WinHTTPCallbackStatus::WriteComplete:
 				default:
 
 				{

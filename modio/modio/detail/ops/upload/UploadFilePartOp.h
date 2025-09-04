@@ -58,16 +58,16 @@ namespace Modio
 
 		public:
 			UploadFilePartOp(Modio::Detail::DynamicBuffer Response, Modio::Detail::HttpRequestParams BasicParams,
-							 Modio::filesystem::path FilePath, int FilePart,
-							 std::shared_ptr<Modio::Detail::UploadSession> UploadSession,
-							 Modio::Detail::OperationQueue::Ticket RequestTicket,
-							 std::weak_ptr<Modio::ModProgressInfo> ProgressInfo)
+				Modio::filesystem::path FilePath, int FilePart,
+				std::shared_ptr<Modio::Detail::UploadSession> UploadSession,
+				Modio::Detail::OperationQueue::Ticket RequestTicket,
+				std::weak_ptr<Modio::ModProgressInfo> ProgressInfo)
 				: Session(UploadSession)
 			{
 				if (UploadSession->UploadID.has_value() == false)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
-												"Multipart upload requires a valud upload_id");
+						"Multipart upload requires a valud upload_id");
 					return;
 				}
 
@@ -88,22 +88,22 @@ namespace Modio
 				// This needs to append the amount of bytes to send over the wire
 				Modio::Detail::HttpRequestParams RequestParams =
 					BasicParams
-						.AppendPayloadFile("uploadMultipart-binarydata", ArchiveFile->GetPath(),
-										   Modio::FileOffset(FileOffset), Modio::FileSize(BytesToSend))
-						// For all request, append the UploadID
-						.AppendPayloadValue("upload_id", UploadSession->UploadID.value());
+					.AppendPayloadFile("uploadMultipart-binarydata", ArchiveFile->GetPath(),
+						Modio::FileOffset(FileOffset), Modio::FileSize(BytesToSend))
+					// For all request, append the UploadID
+					.AppendPayloadValue("upload_id", UploadSession->UploadID.value());
 
 				// It has "BytesToRead - 1" because the server counts the "0" byte
 				RequestParams.SetContentRange(Modio::FileOffset(FileOffset),
-											  Modio::FileOffset(FileOffset + BytesToSend - 1),
-											  Modio::FileOffset(FileSize));
+					Modio::FileOffset(FileOffset + BytesToSend - 1),
+					Modio::FileOffset(FileSize));
 
 				Request = std::make_shared<Modio::Detail::HttpRequest>(RequestParams);
 			}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {},
-							Modio::Optional<Modio::Detail::Buffer> FileChunk = {})
+				Modio::Optional<Modio::Detail::Buffer> FileChunk = {})
 			{
 				// Only read as many as "ChunkOfBytes" from the file, then send to the request.
 				constexpr std::size_t ChunkOfBytes = 64 * 1024;
@@ -135,8 +135,8 @@ namespace Modio
 					if (FileOffset > FileSize)
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
-													"Multipart part upload with offset: {} exceeds file size: {}",
-													FileOffset, FileSize);
+							"Multipart part upload with offset: {} exceeds file size: {}",
+							FileOffset, FileSize);
 						Self.complete(make_error_code(Modio::GenericError::EndOfFile));
 						return;
 					}
@@ -167,6 +167,9 @@ namespace Modio
 							return;
 						}
 
+						BytesProcessed += FileChunk.value().GetSize();
+						FileOffset += FileChunk.value().GetSize();
+
 						yield Request->WriteSomeAsync(std::move(FileChunk.value()), std::move(Self));
 
 						if (ec)
@@ -175,15 +178,12 @@ namespace Modio
 							return;
 						}
 
-						BytesProcessed += ChunkOfBytes;
-						FileOffset += ChunkOfBytes;
-
 						std::shared_ptr<Modio::ModProgressInfo> Progress = Impl->ProgressInfo.lock();
 						if (Progress)
 						{
 							Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
-														"Multipart upload bytes uploaded {} of {} total bytes",
-														FileOffset, FileSize);
+								"Multipart upload bytes uploaded {} of {} total bytes",
+								FileOffset, FileSize);
 							SetCurrentProgress(*Progress.get(), Modio::FileSize(FileOffset));
 						}
 					}
@@ -214,7 +214,7 @@ namespace Modio
 						if (Request->GetResponseCode() == 502)
 						{
 							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
-														"mod.io servers overloaded, please try again later");
+								"mod.io servers overloaded, please try again later");
 
 							Self.complete(Modio::make_error_code(Modio::HttpError::ServersOverloaded));
 							return;
@@ -239,8 +239,11 @@ namespace Modio
 								Modio::Detail::BufferCopy(ResultBuffer, ResponseBuffer);
 
 								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
-															"Non 200-204 response received: {}",
-															std::string(ResultBuffer.begin(), ResultBuffer.end()));
+									"Error: {}", Request->GetResponseCode());
+
+								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+									"Non 200-204 response received: {}",
+									std::string(ResultBuffer.begin(), ResultBuffer.end()));
 							}
 							// Return the error-ref regardless, defer upwards to Subscribe/Unsubscribe etc to handle as
 							// success
@@ -259,8 +262,8 @@ namespace Modio
 					}
 
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
-												"Multipart upload_id {} bytes sent: {}", Session->UploadID.value(),
-												FileOffset);
+						"Multipart upload_id {} bytes sent: {}", Session->UploadID.value(),
+						FileOffset);
 
 					// We only need to read the response when debugging with the server
 					yield Request->ReadSomeFromResponseBodyAsync(ResponseBuffer, std::move(Self));
@@ -285,9 +288,9 @@ namespace Modio
 
 		template<typename CompletionTokenType>
 		auto UploadFilePartAsync(Modio::Detail::DynamicBuffer Response,
-								 Modio::Detail::HttpRequestParams RequestParameters, Modio::filesystem::path FilePath,
-								 int FilePart, std::shared_ptr<Modio::Detail::UploadSession> Session,
-								 std::weak_ptr<Modio::ModProgressInfo> ProgressInfo, CompletionTokenType&& Token)
+			Modio::Detail::HttpRequestParams RequestParameters, Modio::filesystem::path FilePath,
+			int FilePart, std::shared_ptr<Modio::Detail::UploadSession> Session,
+			std::weak_ptr<Modio::ModProgressInfo> ProgressInfo, CompletionTokenType&& Token)
 		{
 			return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
 				UploadFilePartOp(

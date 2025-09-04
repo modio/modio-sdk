@@ -77,6 +77,18 @@ namespace Modio
 								Modio::Optional<std::string> ReporterName,
 								Modio::Optional<std::string> ReporterContact);
 
+		/// @docpublic
+		/// @brief Creates a content report for a game.
+		/// @param Mod The ID of the content being reported
+		/// @param Type The nature of the content report
+		/// @param ReportDescription A description of why the content is being reported
+		/// @param ReporterName Name of the submitting user. Recommended for DMCA reports, but may be empty
+		/// @param ReporterContact Contact details of the submitting user. Recommended for DMCA reports, but may be
+		/// empty
+		MODIO_IMPL ReportParams(Modio::ModCollectionID Mod, Modio::ReportType Type, std::string ReportDescription,
+								Modio::Optional<std::string> ReporterName,
+								Modio::Optional<std::string> ReporterContact);
+
 	private:
 		Modio::Optional<std::string> ReporterName {};
 		Modio::Optional<std::string> ReporterContact {};
@@ -85,7 +97,8 @@ namespace Modio
 		{
 			Game,
 			Mod,
-			User
+			User,
+			Collection
 		};
 		ResourceType ReportedResourceType {};
 		/// @brief Type-erased storage for the underlying resource ID. NB if REST API changes ID types this will

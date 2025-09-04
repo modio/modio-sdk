@@ -36,7 +36,8 @@ namespace Modio
 		  ModProfile(ProfileData),
 		  LocalUserSubscriptions(),
 		  PathOnDisk(CalculatedModPath),
-		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries) {}
+		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries)
+	{}
 
 	ModCollectionEntry::ModCollectionEntry(const ModCollectionEntry& Other)
 		: ID(Other.ID),
@@ -47,7 +48,8 @@ namespace Modio
 		  PathOnDisk(Other.PathOnDisk),
 		  SizeOnDisk(Other.SizeOnDisk),
 		  LastErrorCode(Other.LastErrorCode),
-		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries) {}
+		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries)
+	{}
 
 	uint8_t ModCollectionEntry::GetRetriesRemaining()
 	{
@@ -498,7 +500,7 @@ namespace Modio
 		}
 	}
 
-	bool ModCollection::UpdateMod(Modio::ModInfo ModToUpdate, std::string CalculatedModPath)
+	bool ModCollection::UpdateMod(Modio::ModInfo ModToUpdate, std::string /*CalculatedModPath*/)
 	{
 		auto ModEntry = ModEntries.find(ModToUpdate.ModId);
 		if (ModEntry == ModEntries.end())
@@ -592,7 +594,8 @@ namespace Modio
 	{
 		Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::ModManagement,
 									"Adding ModManagementEvent {} with status {} to ModEventLog for ModID {}",
-									ModManagementEvent::ModManagementEventToString(Entry.Event), Entry.Status.value(), Entry.ID);
+									ModManagementEvent::ModManagementEventToString(Entry.Event), Entry.Status.value(),
+									Entry.ID);
 		//									static_cast<std::uint8_t>(Entry.Event), Entry.Status.value(), Entry.ID);
 		InternalData.push_back(std::move(Entry));
 	}

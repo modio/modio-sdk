@@ -16,11 +16,11 @@
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/serialization/ModioModInfoSerialization.h"
 
-#include <asio/yield.hpp>
 namespace Modio
 {
 	namespace Detail
 	{
+#include <asio/yield.hpp>
 		class GetModInfoOp
 		{
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
@@ -94,6 +94,17 @@ namespace Modio
 				}
 			}
 		};
+#include <asio/unyield.hpp>
+
+		template<typename GetModInfoCompleteCallback>
+		void GetModInfoAsync(Modio::ModID ModId, GetModInfoCompleteCallback&& OnGetModInfoComplete)
+		{
+			return asio::async_compose<GetModInfoCompleteCallback,
+									   void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>(
+				Modio::Detail::GetModInfoOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+											Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId),
+				OnGetModInfoComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
-#include <asio/unyield.hpp>

@@ -16,12 +16,12 @@
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/serialization/ModioLogoSerialization.h"
 #include <asio/coroutine.hpp>
-#include <asio/yield.hpp>
 
 namespace Modio
 {
 	namespace Detail
 	{
+#include <asio/yield.hpp>
 		class GetModMediaLogoOp
 		{
 			asio::coroutine CoroState {};
@@ -104,11 +104,21 @@ namespace Modio
 						return;
 					}
 
-					Self.complete({}, OpState.DestinationPath->u8string());
+					Self.complete({}, Modio::ToModioString(OpState.DestinationPath->u8string()));
 				}
 			}
 		};
+#include <asio/unyield.hpp>
+
+		template<typename GetLogoCompleteCallback>
+		void GetModMediaLogoAsync(Modio::ModID ModId, Modio::LogoSize LogoSize,
+								  GetLogoCompleteCallback&& OnGetLogoComplete)
+		{
+			return asio::async_compose<GetLogoCompleteCallback, void(Modio::ErrorCode, Modio::Optional<std::string>)>(
+				Modio::Detail::GetModMediaLogoOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+												 Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId, LogoSize),
+				OnGetLogoComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
-
-#include <asio/unyield.hpp>

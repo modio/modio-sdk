@@ -35,7 +35,9 @@ namespace Modio
 						// time. We're going to gather all the results together at the end of this anyway so the biggest
 						// pages give the best results because it means fewer REST calls
 						yield Modio::Detail::PerformRequestAndGetResponseAsync(
-							ResponseBodyBuffer, Modio::Detail::GetUsersMutedRequest,
+							ResponseBodyBuffer,
+							Modio::Detail::GetUsersMutedRequest.AddLimitQueryParam().AddOffsetQueryParam(
+								CurrentResultIndex),
 							Modio::Detail::CachedResponse::Disallow, std::move(Self));
 
 						if (ec)
@@ -104,6 +106,15 @@ namespace Modio
 			std::unique_ptr<Modio::UserList> CollatedResults {};
 			Modio::PagedResult PageInfo {};
 		};
+
+		template<typename GetMutedUsersCompleteCallback>
+		void GetMutedUsersAsync(GetMutedUsersCompleteCallback&& OnGetMutedUsersComplete)
+		{
+			return asio::async_compose<GetMutedUsersCompleteCallback,
+									   void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)>(
+				Modio::Detail::GetMutedUsersOp(), OnGetMutedUsersComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
 #include <asio/unyield.hpp>

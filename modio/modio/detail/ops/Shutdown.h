@@ -75,6 +75,14 @@ namespace Modio
 			std::shared_ptr<asio::io_context> ContextToFlush;
 		};
 
+		template<typename ShutdownCompleteCallback>
+		auto ShutdownAsync(std::shared_ptr<asio::io_context> Context, ShutdownCompleteCallback&& OnShutdownComplete)
+		{
+			return asio::async_compose<ShutdownCompleteCallback, void(Modio::ErrorCode)>(
+				Modio::Detail::ShutdownOp(std::move(Context)), OnShutdownComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		};
+
 	} // namespace Detail
 } // namespace Modio
 #include <asio/unyield.hpp>

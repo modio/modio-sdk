@@ -17,6 +17,7 @@
 #include "modio/core/entities/ModioProfileMaturity.h"
 #include "modio/core/entities/ModioURLList.h"
 #include "modio/core/entities/ModioUser.h"
+#include "modio/core/entities/ModioModMonetizationSKU.h"
 #include "modio/detail/JsonWrapper.h"
 #include "modio/detail/entities/ModioGalleryList.h"
 #include "modio/detail/entities/ModioLogo.h"
@@ -138,6 +139,10 @@ namespace Modio
 
 		/// @brief Price of this mod
 		uint64_t Price = 0;
+
+		/// @brief SKU Mappings for this mod for monetization purposes
+		/// @experimental
+		std::vector<Modio::ModMonetizationSKU> SKUMappings {};
 
 		/// @brief If this mod has any direct dependencies
 		bool Dependencies = false;

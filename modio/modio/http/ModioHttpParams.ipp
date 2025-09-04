@@ -99,6 +99,19 @@ namespace Modio
 			return *this;
 		}
 
+		Modio::Detail::HttpRequestParams HttpRequestParams::SetModCollectionID(Modio::ModCollectionID ID) const
+		{
+			HttpRequestParams NewParamsInstance(*this);
+			NewParamsInstance.CollectionID = std::uint64_t(ID);
+			return NewParamsInstance;
+		}
+
+		Modio::Detail::HttpRequestParams& HttpRequestParams::SetModCollectionID(Modio::ModCollectionID ID)
+		{
+			this->CollectionID = std::uint64_t(ID);
+			return *this;
+		}
+
 		Modio::Detail::HttpRequestParams HttpRequestParams::AddQueryParamRaw(const std::string& Key,
 																			 const std::string& Value) const
 		{
@@ -331,8 +344,8 @@ namespace Modio
 		Modio::Detail::HttpRequestParams& HttpRequestParams::SetRange(Modio::FileOffset Start,
 																	  Modio::Optional<Modio::FileOffset> End)
 		{
-			StartOffset = Start;
-			EndOffset = End;
+			StartFileOffset = Start;
+			EndFileOffset = End;
 			return *this;
 		}
 
@@ -340,8 +353,8 @@ namespace Modio
 																	 Modio::Optional<Modio::FileOffset> End) const
 		{
 			HttpRequestParams NewParamsInstance(*this);
-			NewParamsInstance.StartOffset = Start;
-			NewParamsInstance.EndOffset = End;
+			NewParamsInstance.StartFileOffset = Start;
+			NewParamsInstance.EndFileOffset = End;
 			return NewParamsInstance;
 		}
 
@@ -373,7 +386,7 @@ namespace Modio
 					case Environment::Live:
 						return fmt::format("g-{}.modapi.io", SDKSessionData::CurrentGameID());
 					case Environment::Test:
-						return "api.test.mod.io";
+						return fmt::format("g-{}.test.mod.io", SDKSessionData::CurrentGameID());
 				}
 				return std::string();
 			}
@@ -441,13 +454,11 @@ namespace Modio
 			{
 				return {};
 			}
-
 			// We're handling Json so we just want to send this as the raw body
 			if (CurrentContentType == ContentType::ApplicationJson)
 			{
 				return Payload;
 			}
-
 			if (CurrentContentType != ContentType::ApplicationXWwwFormUrlEncoded)
 			{
 				return {};
@@ -476,7 +487,7 @@ namespace Modio
 					Modio::Detail::Logger().Log(
 						Modio::LogLevel::Error, Modio::LogCategory::Http,
 						"Rejecting request for URLencoded payload because at least one payload parameter is a file {}",
-						Entry.second.PathToFile.value_or("").u8string());
+						Modio::ToModioString(Entry.second.PathToFile.value_or("").u8string()));
 
 					return {};
 				}
@@ -542,12 +553,12 @@ namespace Modio
 					if (ContentElement.second.PType == PayloadContent::PayloadType::File)
 					{
 						PayloadSize += Modio::FileSize(
-							Modio::ToModioString(fmt::format("; filename=\"{}\"", ContentElement.second.PathToFile->filename().u8string()))
+							fmt::format("; filename=\"{}\"", Modio::ToModioString(ContentElement.second.PathToFile->filename().u8string()))
 								.size());
 						Logger.Log(
 							Modio::LogLevel::Trace, Modio::LogCategory::Http,
 							"Payload element is file, extra string size is {}",
-							fmt::format("; filename=\"{}\"", ContentElement.second.PathToFile->filename().u8string())
+							fmt::format("; filename=\"{}\"", Modio::ToModioString(ContentElement.second.PathToFile->filename().u8string()))
 								.size());
 					}
 					// Length of the boundary string
@@ -672,11 +683,11 @@ namespace Modio
 			}
 
 			// Header Range
-			if (StartOffset.has_value() == true)
+			if (StartFileOffset.has_value() == true)
 			{
-				std::uintmax_t StartValue = StartOffset ? StartOffset.value() : static_cast<uintmax_t>(0);
-				// In case EndOffset does not have a value, return an empty string
-				std::string EndValue = EndOffset ? std::to_string(EndOffset.value()) : std::string();
+				std::uintmax_t StartValue = StartFileOffset ? StartFileOffset.value() : static_cast<uintmax_t>(0);
+				// In case EndFileOffset does not have a value, return an empty string
+				std::string EndValue = EndFileOffset ? std::to_string(EndFileOffset.value()) : std::string();
 
 				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
 				Headers.emplace_back("Range", fmt::format("bytes={}-{}", StartValue, EndValue));
@@ -721,6 +732,7 @@ namespace Modio
 			  GameID(0),
 			  ModID(0),
 			  UserID(0),
+			  CollectionID(0),
 			  CurrentOperationType(Modio::Detail::Verb::GET),
 			  CurrentAPIVersion(Modio::Detail::APIVersion::V1)
 		{}
@@ -823,6 +835,7 @@ namespace Modio
 			String::ReplaceAll(TempResourcePath, "{game-id}", std::to_string(GameID));
 			String::ReplaceAll(TempResourcePath, "{mod-id}", std::to_string(ModID));
 			String::ReplaceAll(TempResourcePath, "{user-id}", std::to_string(UserID));
+			String::ReplaceAll(TempResourcePath, "{collection-id}", std::to_string(CollectionID));
 
 			return TempResourcePath;
 		}

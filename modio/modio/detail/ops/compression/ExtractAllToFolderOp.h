@@ -29,6 +29,7 @@ namespace Modio
 #include <asio/yield.hpp>
 		class ExtractAllToFolderOp
 		{
+			ExtractAllToFolderOp& operator = (ExtractAllToFolderOp&& Other) = delete;
 			struct ExtractAllImpl
 			{
 				asio::coroutine CoroutineState {};
@@ -76,7 +77,7 @@ namespace Modio
 				reenter(Impl->CoroutineState)
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Compression,
-												"Extracting archive {}", Impl->ArchivePath.u8string());
+												"Extracting archive {}", Modio::ToModioString(Impl->ArchivePath.u8string()));
 
 					if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().FileExists(
 							Impl->ArchivePath))

@@ -9,11 +9,15 @@
  */
 
 #pragma once
+#include "modio/detail/ModioCompilerMacros.h"
+
 
 namespace Modio
 {
 	namespace Detail
 	{
+		MODIO_DISABLE_WARNING_PUSH
+		MODIO_DISABLE_WARNING_UNUSED_CONST_VARIABLE
 		namespace Constants
 		{
 			namespace APIStrings
@@ -107,7 +111,11 @@ namespace Modio
 				constexpr const char* Switch = "switch";
 				constexpr const char* Oculus = "oculus";
 				constexpr const char* Source = "source";
+				constexpr const char* WindowsServer = "windowsserver";
+				constexpr const char* LinuxServer = "linuxserver";
 			} // namespace PlatformNames
 		} // namespace Constants
+		MODIO_DISABLE_WARNING_POP
 	} // namespace Detail
 } // namespace Modio
+

@@ -12,9 +12,13 @@
 
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioInitializeOptions.h"
+#include "modio/core/ModioServerInitializeOptions.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioMetricsService.h"
 #include "modio/core/ModioServices.h"
+#include "modio/core/ModioEditModParams.h"
+#include "modio/core/ModioReportParams.h"
+#include "modio/file/ModioFileService.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/serialization/ModioEntitlementConsumptionStatusListSerialization.h"
 
@@ -304,6 +308,38 @@ namespace Modio
 		}
 
 		template<typename... OtherArgs>
+		bool RequireValidServerInitParam(const Modio::ServerInitializeOptions& Options,
+										 std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
+		{
+			bool bInvalidParameter = false;
+			if (Options.ModsDirectory.empty())
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "ModsDirectory is Invalid");
+				bInvalidParameter = true;
+			}
+			else if (Options.Token.empty())
+			{
+				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::Core, "Server Token is Invalid");
+				bInvalidParameter = true;
+			}
+
+			if (bInvalidParameter)
+			{
+				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+						   [CompletionHandler =
+								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
+							   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
+												 (OtherArgs {})...);
+						   });
+				return false;
+			}
+			else
+			{
+				return RequireValidInitParams(Options, Handler);
+			}
+		}
+
+		template<typename... OtherArgs>
 		bool RequireValidEditModParams(const Modio::EditModParams& Params,
 			std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
 		{
@@ -545,6 +581,51 @@ namespace Modio
 				});
 			return false;
 		}
+
+		template<typename... OtherArgs>
+		bool RequireAllModIDsValid(const std::vector<Modio::ModID>& Mods,
+							   std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
+		{
+			bool InvalidMod = false;
+			for (const Modio::ModID& ID : Mods)
+			{
+				if (!ID.IsValid())
+				{
+					InvalidMod = true;
+					break;
+				}
+			}
+			if (InvalidMod)
+			{
+				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					   [CompletionHandler =
+							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
+					CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter), (OtherArgs {})...);
+					});
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		template<typename... OtherArgs>
+		bool RequireValidModCollectionID(const Modio::ModCollectionID& ID, std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
+		{
+			if (ID.IsValid())
+			{
+				return true;
+			}
+			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					   [CompletionHandler =
+							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
+						   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
+											 (OtherArgs {})...);
+					   });
+			return false;
+		}
+
 		template<typename... OtherArgs>
 		bool RequireValidGameID(const Modio::GameID& ID, std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
 		{

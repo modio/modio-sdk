@@ -68,6 +68,16 @@ namespace Modio
 				}
 			}
 		};
+
+		template<typename GetUserDelegationCompleteCallback>
+		void GetUserDelegationTokenAsync(GetUserDelegationCompleteCallback&& OnGetUserDelegationComplete)
+		{
+			return asio::async_compose<GetUserDelegationCompleteCallback, void(Modio::ErrorCode, std::string)>(
+				Modio::Detail::GetUserDelegationTokenOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+														Modio::Detail::SDKSessionData::CurrentAPIKey()),
+				OnGetUserDelegationComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
 #include <asio/unyield.hpp>

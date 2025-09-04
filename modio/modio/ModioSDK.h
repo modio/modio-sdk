@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2025 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io SDK.
  *
@@ -16,6 +16,7 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioCreateModFileParams.h"
 #include "modio/core/ModioCreateModParams.h"
+#include "modio/core/ModioCreateSourceFileParams.h"
 #include "modio/core/ModioEditModParams.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioFilterParams.h"
@@ -28,6 +29,7 @@
 #include "modio/core/entities/ModioGameInfo.h"
 #include "modio/core/entities/ModioGameInfoList.h"
 #include "modio/core/entities/ModioUserRatingList.h"
+#include "modio/core/entities/ModioModCollection.h"
 #include "modio/core/entities/ModioModCommunityOptions.h"
 #include "modio/core/entities/ModioModDetails.h"
 #include "modio/core/entities/ModioModInfoList.h"
@@ -36,7 +38,9 @@
 #include "modio/core/entities/ModioTransactionRecord.h"
 #include "modio/core/entities/ModioUser.h"
 #include "modio/core/entities/ModioUserList.h"
+#include "modio/core/entities/ModioUserRatingList.h"
 #include "modio/detail/ModioLibraryConfigurationHelpers.h"
+#include "modio/core/ModioServerInitializeOptions.h"
 
 namespace Modio
 {
@@ -336,7 +340,7 @@ namespace Modio
 	/// @requires authenticated-user
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
-	/// @errorcategory InvalidArgsError|Some of the information in the ModCreateParams did not pass validation
+	/// @errorcategory InvalidArgsError|Some of the information in the CreateModParams did not pass validation
 	/// @error UserDataError::InvalidUser|No authenticated user
 	MODIOSDK_API void SubmitNewModAsync(
 		Modio::ModCreationHandle Handle, Modio::CreateModParams Params,
@@ -376,6 +380,20 @@ namespace Modio
 	/// @requires management-enabled
 	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void SubmitNewModFileForMod(Modio::ModID Mod, Modio::CreateModFileParams Params);
+
+	/// @docpublic
+	/// @brief Queues the upload of source files for a modfile to defined platforms. This function
+	/// takes a Modio::CreateSourceFileParams struct that defines the options needed to upload the source
+	/// files. The files present in the root folder defined in the params will be compressed to a .zip archive and
+	/// uploaded.
+	/// @param Mod The mod to upload source files for
+	/// @param Params Descriptor containing information regarding the modfile
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @requires authenticated-user
+	/// @requires management-enabled
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
+	MODIOSDK_API void SubmitNewModSourceFile(Modio::ModID Mod, Modio::CreateSourceFileParams Params);
 
 	/// @docpublic
 	/// @brief Provides a list of mods for the current game, that match the parameters specified in the filter
@@ -764,7 +782,8 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Provides a list of mod ratings for the current user
-	/// @param Callback Callback invoked with a status code and an optional UserRatingList providing ratings for each mod
+	/// @param Callback Callback invoked with a status code and an optional UserRatingList providing ratings for each
+	/// mod
 	/// @requires initialized-sdk
 	/// @requires no-rate-limiting
 	/// @requires user-authenticated
@@ -787,7 +806,7 @@ namespace Modio
 	/// @brief Attempts to purchase a specified mod with an expected price. Purchasing a mod will add a subscription to
 	/// it
 	/// @param ModID The ID for the mod the user is trying to purchase
-	/// @param ExpectedPrice The price that was displayed to the user.
+	/// @param ExpectedVirtualCurrencyPrice The price that was displayed to the user, if using the Virtual Currency-based purchasing flow.
 	/// @param Callback Callback providing a status code and optional transaction confirmation if the purchase was
 	/// successful. If the expected price that was displayed to the end user is no longer correct, for example if the
 	/// price was increased or decreased by the mod creator since the price was displayed, an error will be returned. If
@@ -803,7 +822,7 @@ namespace Modio
 	/// @error UserDataError::InvalidUser|No authenticated user
 	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void PurchaseModAsync(
-		Modio::ModID ModID, uint64_t ExpectedPrice,
+		Modio::ModID ModID, Modio::Optional<uint64_t> ExpectedVirtualCurrencyPrice,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)> Callback);
 
 	/// @docpublic
@@ -982,6 +1001,253 @@ namespace Modio
 	///	@experimental
 	MODIOSDK_API void MetricsSessionEndAsync(std::function<void(Modio::ErrorCode)> Callback);
 
+	/// @docpublic
+	/// @brief Initializes the SDK for in the context of a dedicated Server. Optionally gets/updates all mods listed in
+	/// InitOptions.
+	/// @param InitOptions Parameters to the function packed as a struct where all members needs to be
+	/// initialized for the call to succeed
+	/// @param OnInitComplete Callback for completion of the init process
+	/// @errorcategory NetworkError|Couldn't connect to the mod.io servers
+	/// @errorcategory FilesystemError|Couldn't create the user data or common data folders
+	/// @errorcategory ConfigurationError|InitOptions contains an invalid value - inspect ec.value() to
+	/// determine what was incorrect
+	/// @error GenericError::SDKAlreadyInitialized|SDK already initialized
+	/// @experimental
+	MODIOSDK_API void InitializeModioServerAsync(Modio::ServerInitializeOptions InitOptions,
+												 std::function<void(Modio::ErrorCode)> OnInitComplete);
+
+	/// @docpublic
+	/// @brief Gets and/or updates all of the indicated mods for this server, assuming you have provided a
+	/// valid OAuth token
+	/// @param Mods the mods to get or update in addition to those indicated in the initialization options
+	/// @param Callback callback executed upon completion of all mods being validated and installed
+	/// @experimental
+	MODIOSDK_API void InstallOrUpdateServerModsAsync(std::vector<ModID> Mods,
+												  std::function<void(Modio::ErrorCode)> Callback);
+
+	/// @docpublic
+	/// @brief Adds the provided Mods to the Server's list of client mods. Intended to be called on the
+	/// server
+	/// @param ModIDs a list of mods that the joining client has
+	/// @param OnComplete callback upon completion of adding the mods to the Server's list. Contains a set of
+	/// all registered client mods.
+	/// @errorcategory NetworkError|Couldn't connect to the mod.io servers
+	/// @experimental
+	MODIOSDK_API void RegisterClientModsWithServerAsync(
+		std::vector<Modio::ModID> ModIDs, std::function<void(Modio::ErrorCode, std::set<Modio::ModID>)> Callback);
+
+	/// @docpublic
+	/// @brief Clears the server's list of client mods.
+	/// Intended only to be called when the Server safely flush its list of client mods, if you want to minimize
+	/// the number of mods you send to clients/remove mods no longer needed.
+	/// @experimental
+	MODIOSDK_API void ClearRegisteredClientMods();
+
+	/// @docpublic
+	/// @brief Returns the full list of mods that have been registered with the server via AddClientModsToServerAsync
+	/// @return A std::set of ModIDs representing the Mods registered with the server.
+	/// @experimental
+	MODIOSDK_API std::set<Modio::ModID> GetRegisteredClientMods();
+
+	/// @docpublic
+	/// @brief Provides a list of mod collections for the current game, that match the parameters specified in the
+	/// filter
+	/// @param Filter Modio::FilterParams object containing any filters that should be applied to the query
+	/// @param Callback Callback invoked with a status code and an optional ModCollectionInfoList providing mod profiles
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	MODIOSDK_API void ListModCollectionsAsync(
+		Modio::FilterParams Filter, 
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfoList>)> Callback);
+
+	/// @docpublic
+	/// @brief Fetches detailed information about the specified mod collection, including description and file metadata
+	/// for the most recent release
+	/// @param ModCollectionId Mod Collection ID of the mod colection to fetch data
+	/// @param Callback Callback providing a status code and an optional Modio::ModCollectionInfo object with the mod
+	/// collections's extended information
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod collection ID is invalid
+	MODIOSDK_API void GetModCollectionInfoAsync(
+		Modio::ModCollectionID ModCollectionId,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfo>)> Callback);
+
+	/// @docpublic
+	/// @brief Get a list of Mods contained within the specified mod collection
+	/// @param ModCollectionId Mod Collection ID of the mod colection to fetch data
+	/// @param Callback Callback providing a status code and an optional Modio::ModInfoList object with the mods
+	/// contained within the mod collections
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod collection ID is invalid
+	MODIOSDK_API void GetModCollectionModsAsync(
+		Modio::ModCollectionID ModCollectionId,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback);
+
+	/// @docpublic
+	/// @brief Submits a rating for a mod collection on behalf of the currently authenticated user.
+	/// @param ModCollectionId The mod collection to submit a rating for
+	/// @param Rating The rating to submit \r\n NOTE: To clear a rating for a mod collection, submit a rating of
+	/// Rating::Neutral.
+	/// @param Callback Callback providing a status code to indicate the rating was submitted successfully
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @requires authenticated-user
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @errorcategory EntityNotFoundError|Specified mod collection could not be found
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod collection ID is invalid
+	MODIOSDK_API void SubmitModCollectionRatingAsync(Modio::ModCollectionID ModCollectionId, Modio::Rating Rating,
+													 std::function<void(Modio::ErrorCode)> Callback);
+
+	/// @docpublic
+	/// @brief Sends a request to the mod.io server to add the specified mod collection to the user's list of
+	/// subscriptions.
+	/// NOTE: Unlike SubscribeToModAsync, SubscribeToModeCollectionAsync does not automatically trigger installation of
+	/// new subscriptions arising from a successful request. Call FetchExternalUpdatesAsync after this function succeeds
+	/// in order to initiate installation.
+	/// @param ModCollectionToSubscribeTo Mod Collection ID of the mod collection requiring a subscription.
+	/// @param IncludeDependencies If this mod has any dependencies, all of those will also be subscribed to.
+	/// @param OnSubscribeComplete Callback invoked when the subscription request is completed.
+	/// @requires initialized-sdk
+	/// @requires authenticated-user
+	/// @requires no-rate-limiting
+	/// @requires management-enabled
+	/// @requires mod-not-pending-uninstall
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error ModManagementError::ModBeingProcessed|Specified mod is pending uninstall. Wait until the uninstall
+	/// process is complete before subscribing again.
+	/// @error GenericError::BadParameter|The supplied mod collection ID is invalid
+	MODIOSDK_API void SubscribeToModCollectionAsync(Modio::ModCollectionID ModCollectionToSubscribeTo,
+													std::function<void(Modio::ErrorCode)> OnSubscribeComplete);
+
+	/// @docpublic
+	/// @brief Sends a request to the mod.io server to remove the specified mod collection from the user's list of
+	/// subscriptions. If no other local users are subscribed to the mods in the specified collection, this function
+	/// will also mark the mods in the collection for uninstallation by the SDK.
+	/// @param ModCollectionToUnsubscribeFrom Mod Collection ID of the mod collection requiring unsubscription.
+	/// @param OnUnsubscribeComplete Callback invoked when the unsubscription request is completed.
+	/// @requires initialized-sdk
+	/// @requires authenticated-user
+	/// @requires no-rate-limiting
+	/// @requires management-enabled
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod collection ID is invalid
+	/// \todo  Is the local uninstallation comment in brief still valid?
+	MODIOSDK_API void UnsubscribeFromModCollectionAsync(Modio::ModCollectionID ModCollectionToUnsubscribeFrom,
+														std::function<void(Modio::ErrorCode)> OnUnsubscribeComplete);
+
+	/// @docpublic
+	/// @brief Sends a request to the mod.io server to add the specified mod collection to the user's list of
+	/// followed collections.
+	/// @param ModCollectionToFollow Mod Collection ID of the mod collection requiring a subscription.
+	/// @param OnFollowComplete Callback invoked when the follow request is completed.
+	/// @requires initialized-sdk
+	/// @requires authenticated-user
+	/// @requires no-rate-limiting
+	/// @requires management-enabled
+	/// @requires mod-not-pending-uninstall
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error ModManagementError::ModBeingProcessed|Specified mod is pending uninstall. Wait until the uninstall
+	/// process is complete before subscribing again.
+	/// @error GenericError::BadParameter|The supplied mod collection ID is invalid
+	MODIOSDK_API void FollowModCollectionAsync(Modio::ModCollectionID ModCollectionToFollow,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfo>)> OnFollowComplete);
+
+	/// @docpublic
+	/// @brief Sends a request to the mod.io server to remove the specified mod collection from the user's list of
+	/// followed collections.
+	/// @param ModCollectionToUnfollow Mod Collection ID of the mod collection to unfollow.
+	/// @param OnUnsubscribeComplete Callback invoked when the unfollow request is completed.
+	/// @requires initialized-sdk
+	/// @requires authenticated-user
+	/// @requires no-rate-limiting
+	/// @requires management-enabled
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod collection ID is invalid
+	MODIOSDK_API void UnfollowModCollectionAsync(Modio::ModCollectionID ModCollectionToUnfollow,
+												 std::function<void(Modio::ErrorCode)> OnUnfollowComplete);
+	/// @docpublic
+	/// @brief Provides a list of followed mod collections for the current game, that match the parameters specified
+	/// in the filter.
+	/// @param Filter Modio::FilterParams object containing any filters that should be applied to the query
+	/// @param Callback Callback invoked with a status code and an optional ModCollectionInfoList providing mod
+	/// collection profiles
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	MODIOSDK_API void ListUserFollowedModCollectionsAsync(
+		Modio::FilterParams Filter,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfoList>)> Callback);
+
+	/// @docpublic
+	/// @brief Downloads the logo for the specified mod collection. Will use existing file if it is already present on disk
+	/// @param ModId Mod Collection ID for use in logo retrieval
+	/// @param LogoSize Parameter indicating the size of logo that's required
+	/// @param Callback Callback providing a status code and an optional path object pointing to the location of the
+	/// downloaded image
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @errorcategory EntityNotFoundError|Specified mod collection media does not exist or was deleted
+	/// @error FilesystemError::InsufficientSpace|Not enough space for the file
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod collection ID is invalid
+	MODIOSDK_API void GetModCollectionMediaAsync(Modio::ModCollectionID CollectionId, Modio::LogoSize LogoSize,
+									   std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback);
+
+	/// @docpublic
+	/// @brief Downloads the creator avatar for a specified mod collection. Will use existing file if it is already present on disk
+	/// and not outdated
+	/// @param CollectionId ID of the mod collection the creator avatar will be retrieved for
+	/// @param AvatarSize Parameter indicating the size of avatar image that's required
+	/// @param Callback Callback providing a status code and an optional path object pointing to the location of the
+	/// downloaded image
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
+	/// @error FilesystemError::InsufficientSpace|Not enough space for the file
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error GenericError::BadParameter|The supplied mod collection ID is invalid
+	MODIOSDK_API void GetModCollectionMediaAsync(Modio::ModCollectionID CollectionId, Modio::AvatarSize AvatarSize,
+									   std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback);
+
+	/// @docpublic
 } // namespace Modio
 
 // Implementation headers
@@ -989,6 +1255,7 @@ namespace Modio
 #ifndef MODIO_SEPARATE_COMPILATION
 	#include "modio/impl/SDKCore.ipp"
 	#include "modio/impl/SDKMetrics.ipp"
+	#include "modio/impl/SDKModCollections.ipp"
 	#include "modio/impl/SDKModManagement.ipp"
 	#include "modio/impl/SDKModMetadata.ipp"
 	#include "modio/impl/SDKMonetization.ipp"

@@ -30,7 +30,9 @@ namespace Modio
 								  {Modio::ModfilePlatform::PS5, Modio::Detail::Constants::PlatformNames::PS5},
 								  {Modio::ModfilePlatform::Switch, Modio::Detail::Constants::PlatformNames::Switch},
 								  {Modio::ModfilePlatform::Oculus, Modio::Detail::Constants::PlatformNames::Oculus},
-								  {Modio::ModfilePlatform::Source, Modio::Detail::Constants::PlatformNames::Source}});
+								  {Modio::ModfilePlatform::Source, Modio::Detail::Constants::PlatformNames::Source},
+								  {Modio::ModfilePlatform::WindowsServer, Modio::Detail::Constants::PlatformNames::WindowsServer},
+								  {Modio::ModfilePlatform::LinuxServer, Modio::Detail::Constants::PlatformNames::LinuxServer}});
 
 	/// @docnone
 	inline void from_json(const nlohmann::json& Json, Modio::HeaderImage& HeaderImage)

@@ -1,5 +1,5 @@
 # 
-#  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+#  Copyright (C) 2021-2025 mod.io Pty Ltd. <https://mod.io>
 #  
 #  This file is part of the mod.io SDK.
 #  
@@ -18,3 +18,4 @@ add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/userdata/ModioUserDataCo
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/userdata/ModioUserProfile.ipp)
 add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/ModioDefines.h)
 add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/ModioLibraryConfigurationHelpers.h)
+add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/ModioSDKMultiplayerLibrary.h)

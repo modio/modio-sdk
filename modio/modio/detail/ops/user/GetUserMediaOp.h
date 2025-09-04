@@ -57,7 +57,7 @@ namespace Modio
 						return;
 					}
 
-					Self.complete({}, std::move(OpState.DestinationPath->u8string()));
+					Self.complete({}, std::move(Modio::ToModioString(OpState.DestinationPath->u8string())));
 				}
 			}
 
@@ -76,6 +76,17 @@ namespace Modio
 				Modio::StableStorage<Modio::filesystem::path> DestinationPath {};
 			} OpState;
 		};
+
+		template<typename GetUserMediaCompleteCallback>
+		void GetUserMediaAsync(Modio::AvatarSize AvatarSize, GetUserMediaCompleteCallback&& OnGetUserMediaComplete)
+		{
+			return asio::async_compose<GetUserMediaCompleteCallback,
+									   void(Modio::ErrorCode, Modio::Optional<std::string>)>(
+				Modio::Detail::GetUserMediaOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+											  Modio::Detail::SDKSessionData::CurrentAPIKey(), AvatarSize),
+				OnGetUserMediaComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
 

@@ -38,6 +38,8 @@ namespace Modio
 	/// @docnone
 	struct HttpErrorCategoryImpl : std::error_category
 	{
+		HttpErrorCategoryImpl(HttpErrorCategoryImpl&&) = delete;
+		HttpErrorCategoryImpl() = default;
 		inline const char* name() const noexcept override { return "Modio::HttpError"; }
 		inline std::string message(int ErrorValue) const override
 		{
@@ -71,7 +73,7 @@ namespace Modio
 						return "An error occurred making a HTTP request";
 					break;
 				case HttpError::ResourceNotAvailable:
-						return "Invalid endpoint path";
+						return "Resource not available";
 					break;
 				case HttpError::SecurityConfigurationInvalid:
 						return "Invalid platform HTTP security configuration";
@@ -140,6 +142,8 @@ namespace Modio
 	/// @docnone
 	struct FilesystemErrorCategoryImpl : std::error_category
 	{
+		FilesystemErrorCategoryImpl(FilesystemErrorCategoryImpl&&) = delete;
+		FilesystemErrorCategoryImpl() = default;
 		inline const char* name() const noexcept override { return "Modio::FilesystemError"; }
 		inline std::string message(int ErrorValue) const override
 		{
@@ -229,6 +233,8 @@ namespace Modio
 	/// @docnone
 	struct UserAuthErrorCategoryImpl : std::error_category
 	{
+		UserAuthErrorCategoryImpl(UserAuthErrorCategoryImpl&&) = delete;
+		UserAuthErrorCategoryImpl() = default;
 		inline const char* name() const noexcept override { return "Modio::UserAuthError"; }
 		inline std::string message(int ErrorValue) const override
 		{
@@ -301,6 +307,8 @@ namespace Modio
 	/// @docnone
 	struct UserDataErrorCategoryImpl : std::error_category
 	{
+		UserDataErrorCategoryImpl(UserDataErrorCategoryImpl&&) = delete;
+		UserDataErrorCategoryImpl() = default;
 		inline const char* name() const noexcept override { return "Modio::UserDataError"; }
 		inline std::string message(int ErrorValue) const override
 		{
@@ -358,6 +366,8 @@ namespace Modio
 	/// @docnone
 	struct ArchiveErrorCategoryImpl : std::error_category
 	{
+		ArchiveErrorCategoryImpl(ArchiveErrorCategoryImpl&&) = delete;
+		ArchiveErrorCategoryImpl() = default;
 		inline const char* name() const noexcept override { return "Modio::ArchiveError"; }
 		inline std::string message(int ErrorValue) const override
 		{
@@ -424,6 +434,8 @@ namespace Modio
 	/// @docnone
 	struct GenericErrorCategoryImpl : std::error_category
 	{
+		GenericErrorCategoryImpl(GenericErrorCategoryImpl&&) = delete;
+		GenericErrorCategoryImpl() = default;
 		inline const char* name() const noexcept override { return "Modio::GenericError"; }
 		inline std::string message(int ErrorValue) const override
 		{
@@ -507,6 +519,8 @@ namespace Modio
 	/// @docnone
 	struct SystemErrorCategoryImpl : std::error_category
 	{
+		SystemErrorCategoryImpl(SystemErrorCategoryImpl&&) = delete;
+		SystemErrorCategoryImpl() = default;
 		inline const char* name() const noexcept override { return "Modio::SystemError"; }
 		inline std::string message(int ErrorValue) const override
 		{
@@ -573,6 +587,8 @@ namespace Modio
 	/// @docnone
 	struct ZlibErrorCategoryImpl : std::error_category
 	{
+		ZlibErrorCategoryImpl(ZlibErrorCategoryImpl&&) = delete;
+		ZlibErrorCategoryImpl() = default;
 		inline const char* name() const noexcept override { return "Modio::ZlibError"; }
 		inline std::string message(int ErrorValue) const override
 		{
@@ -672,6 +688,8 @@ namespace Modio
 	/// @docnone
 	struct ModManagementErrorCategoryImpl : std::error_category
 	{
+		ModManagementErrorCategoryImpl(ModManagementErrorCategoryImpl&&) = delete;
+		ModManagementErrorCategoryImpl() = default;
 		inline const char* name() const noexcept override { return "Modio::ModManagementError"; }
 		inline std::string message(int ErrorValue) const override
 		{
@@ -747,6 +765,8 @@ namespace Modio
 	/// @docnone
 	struct ModValidationErrorCategoryImpl : std::error_category
 	{
+		ModValidationErrorCategoryImpl(ModValidationErrorCategoryImpl&&) = delete;
+		ModValidationErrorCategoryImpl() = default;
 		inline const char* name() const noexcept override { return "Modio::ModValidationError"; }
 		inline std::string message(int ErrorValue) const override
 		{
@@ -813,6 +833,8 @@ namespace Modio
 	/// @docnone
 	struct MonetizationErrorCategoryImpl : std::error_category
 	{
+		MonetizationErrorCategoryImpl(MonetizationErrorCategoryImpl&&) = delete;
+		MonetizationErrorCategoryImpl() = default;
 		inline const char* name() const noexcept override { return "Modio::MonetizationError"; }
 		inline std::string message(int ErrorValue) const override
 		{
@@ -896,6 +918,8 @@ namespace Modio
 	/// @docnone
 	struct ParentalControlRestrictionCategoryImpl : std::error_category
 	{
+		ParentalControlRestrictionCategoryImpl(ParentalControlRestrictionCategoryImpl&&) = delete;
+		ParentalControlRestrictionCategoryImpl() = default;
 		inline const char* name() const noexcept override { return "Modio::ParentalControlRestriction"; }
 		inline std::string message(int ErrorValue) const override
 		{
@@ -953,6 +977,8 @@ namespace Modio
 	/// @docnone
 	struct MetricsErrorCategoryImpl : std::error_category
 	{
+		MetricsErrorCategoryImpl(MetricsErrorCategoryImpl&&) = delete;
+		MetricsErrorCategoryImpl() = default;
 		inline const char* name() const noexcept override { return "Modio::MetricsError"; }
 		inline std::string message(int ErrorValue) const override
 		{
@@ -1018,6 +1044,8 @@ namespace Modio
 	/// @docnone
 	struct PremiumFeaturesErrorCategoryImpl : std::error_category
 	{
+		PremiumFeaturesErrorCategoryImpl(PremiumFeaturesErrorCategoryImpl&&) = delete;
+		PremiumFeaturesErrorCategoryImpl() = default;
 		inline const char* name() const noexcept override { return "Modio::PremiumFeaturesError"; }
 		inline std::string message(int ErrorValue) const override
 		{
@@ -1089,6 +1117,7 @@ namespace Modio
 		InvalidAPIKey = 11002,
 		InvalidApiVersion = 10003,
 		InvalidJSON = 13004,
+		InvalidZipFile = 28004,
 		MalformedAPIKey = 11001,
 		MatureModsNotAllowed = 15054,
 		MissingAPIKey = 11000,
@@ -1128,6 +1157,8 @@ namespace Modio
 		RequestedModNotFound = 15022,
 		RequestedModfileNotFound = 15010,
 		RequestedResourceNotFound = 14000,
+		RequestedUserBanned = 11130,
+		RequestedUserDeleted = 11131,
 		RequestedUserNotFound = 21000,
 		SubmitReportRightsRevoked = 15029,
 		UnsupportedContentTypeHeader = 13006,
@@ -1144,6 +1175,8 @@ namespace Modio
 	/// @docnone
 	struct ApiErrorCategoryImpl : std::error_category
 	{
+		ApiErrorCategoryImpl(ApiErrorCategoryImpl&&) = delete;
+		ApiErrorCategoryImpl() = default;
 		inline const char* name() const noexcept override { return "Modio::ApiError"; }
 		inline std::string message(int ErrorValue) const override
 		{
@@ -1220,6 +1253,9 @@ namespace Modio
 					break;
 				case ApiError::InvalidJSON:
 						return "You have used the input_json parameter with semantically incorrect JSON.";
+					break;
+				case ApiError::InvalidZipFile:
+						return "The zip file submitted is invalid";
 					break;
 				case ApiError::MalformedAPIKey:
 						return "api_key supplied is malformed.";
@@ -1337,6 +1373,12 @@ namespace Modio
 					break;
 				case ApiError::RequestedResourceNotFound:
 						return "The requested resource does not exist.";
+					break;
+				case ApiError::RequestedUserBanned:
+						return "The requested user has been banned.";
+					break;
+				case ApiError::RequestedUserDeleted:
+						return "The requested user has been deleted.";
 					break;
 				case ApiError::RequestedUserNotFound:
 						return "The requested user could not be found.";
@@ -1639,12 +1681,16 @@ namespace Modio
 		/// @brief This mod is a dependency of other mods and cannot be deleted.
 		ModCannotDeleteDependency = 48,
 		/// @brief The asynchronous operation is already running. Please wait for it to complete before calling it again
-		RequestInProgress = 49
+		RequestInProgress = 49,
+		/// @brief The zip file submitted is invalid.
+		InvalidZipFile = 50
 	};
 
 	/// @docnone
 	struct ErrorConditionCategoryImpl : std::error_category
 	{
+		ErrorConditionCategoryImpl() = default;
+		ErrorConditionCategoryImpl(ErrorConditionCategoryImpl&&) = delete;
 		const char* name() const noexcept override { return "Modio::ErrorConditionCategory"; }
 		std::string message(int ErrorValue) const override
 		{
@@ -1796,6 +1842,9 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::RequestInProgress:
 					return "The asynchronous operation is already running. Please wait for it to complete before calling it again";
+				break;
+				case ErrorConditionTypes::InvalidZipFile:
+					return "The zip file submitted is invalid.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -2029,6 +2078,11 @@ namespace Modio
 					}
 
 					if (ec == Modio::ApiError::MonetizationIncorrectDisplayPrice)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::InvalidZipFile)
 					{
 						return true;
 					}
@@ -2574,6 +2628,21 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::ApiError::RequestedUserNotFound)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::RequestedUserDeleted)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::RequestedUserBanned)
+					{
+						return true;
+					}
+
 
 				break;
 				case ErrorConditionTypes::UserTermsOfUseError:
@@ -2634,6 +2703,11 @@ namespace Modio
 					}
 
 					if (ec == Modio::ApiError::AuthenticatedAccountHasBeenDeleted)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::BannedUserAccount)
 					{
 						return true;
 					}
@@ -3393,6 +3467,14 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::RequestInProgress:
 					if (ec == Modio::GenericError::RequestInProgress)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::InvalidZipFile:
+					if (ec == Modio::ApiError::InvalidZipFile)
 					{
 						return true;
 					}

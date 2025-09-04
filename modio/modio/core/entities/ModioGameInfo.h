@@ -122,7 +122,7 @@ namespace Modio
 		/// @brief Name of the Virtual Tokens for this game
 		std::string VirtualTokenName;
 		/// @brief Tags for this game
-		std::vector<Modio::ModTagInfo> TagOptions;
+		std::vector<Modio::ModTagInfo> TagOptions {};
 
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GameInfo& GameInfo);

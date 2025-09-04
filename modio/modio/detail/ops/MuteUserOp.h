@@ -44,5 +44,13 @@ namespace Modio::Detail
 		Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 		asio::coroutine CoroutineState {};
 	};
+
+	template<typename MuteUserCompleteCallback>
+	void MuteUserAsync(Modio::UserID UserID, MuteUserCompleteCallback&& OnMuteUserComplete)
+	{
+		return asio::async_compose<MuteUserCompleteCallback, void(Modio::ErrorCode)>(
+			Modio::Detail::MuteUserOp(UserID), OnMuteUserComplete,
+			Modio::Detail::Services::GetGlobalContext().get_executor());
+	}
 } // namespace Modio::Detail
 #include <asio/unyield.hpp>

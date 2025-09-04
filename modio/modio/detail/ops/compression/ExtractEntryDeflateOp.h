@@ -34,6 +34,7 @@ namespace Modio
 	{
 		class ExtractEntryDeflateOp : public Modio::Detail::BaseOperation<ExtractEntryDeflateOp>
 		{
+			ExtractEntryDeflateOp& operator=(ExtractEntryDeflateOp&& Other) = delete;
 			struct ExtractEntryImpl
 			{
 				Modio::Detail::File ArchiveFile;
@@ -85,7 +86,7 @@ namespace Modio
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Detailed, Modio::LogCategory::Compression,
 												"Extracting file {}",
-												Impl->EntryToExtract.FilePath.u8string());
+												Modio::ToModioString(Impl->EntryToExtract.FilePath.u8string()));
 
 					if (Impl->EntryToExtract.UncompressedSize == 0)
 					{

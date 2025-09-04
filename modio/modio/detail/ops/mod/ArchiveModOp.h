@@ -84,5 +84,13 @@ namespace Modio
 				}
 			}
 		};
+
+		template<typename ArchiveModCompleteCallback>
+		void ArchiveModAsync(Modio::ModID ModID, ArchiveModCompleteCallback&& OnArchiveComplete)
+		{
+			return asio::async_compose<ArchiveModCompleteCallback, void(Modio::ErrorCode)>(
+				Modio::Detail::ArchiveModOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID), OnArchiveComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio

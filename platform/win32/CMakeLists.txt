@@ -9,7 +9,8 @@
 
 if(MODIO_PLATFORM STREQUAL "WIN")
 	message("Initializing modio-WIN")
-	set (CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake;${CMAKE_MODULE_PATH}")
+	modio_list_append_unique(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+    set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" CACHE INTERNAL "")
 	set (MODIO_PLATFORM_WIN ON INTERNAL "building windows")
 
 	enable_language(C)

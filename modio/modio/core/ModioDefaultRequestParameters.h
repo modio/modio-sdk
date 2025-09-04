@@ -1,5 +1,5 @@
 /* 
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2025 mod.io Pty Ltd. <https://mod.io>
  *  
  *  This file is part of the mod.io SDK.
  *  
@@ -40,7 +40,8 @@ namespace Modio
         static const HttpRequestParams AuthenticateViaXboxLiveRequest { Modio::Detail::Verb::POST, "/external/xboxauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetGamesRequest { Modio::Detail::Verb::GET, "/games" }; 
         static const HttpRequestParams GetGameRequest { Modio::Detail::Verb::GET, "/games/{game-id}" }; 
-        static const HttpRequestParams CloudCookingWebhookRequest { Modio::Detail::Verb::POST, "/games/{game-id}/cloud-cooking/webhook" , GetContentTypeEnum("application/json") }; 
+        static const HttpRequestParams FinalizeCloudCookingRequest { Modio::Detail::Verb::POST, "/games/{game-id}/cloud-cooking/finalization" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
+        static const HttpRequestParams CloudCookingWebhookRequest { Modio::Detail::Verb::POST, "/games/{game-id}/cloud-cooking/webhook" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetModCollectionsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/collections" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AddCollectionRequest { Modio::Detail::Verb::POST, "/games/{game-id}/collections" , GetContentTypeEnum("multipart/form-data") }; 
         static const HttpRequestParams DeleteCollectionRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/collections/{collection-id}" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
@@ -67,8 +68,8 @@ namespace Modio
         static const HttpRequestParams EditGuideRequest { Modio::Detail::Verb::POST, "/games/{game-id}/guides/{guide-id}" , GetContentTypeEnum("multipart/form-data") }; 
         static const HttpRequestParams GetGuideCommentsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/guides/{guide-id}/comments" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AddGuideCommentRequest { Modio::Detail::Verb::POST, "/games/{game-id}/guides/{guide-id}/comments" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
-        static const HttpRequestParams DeleteGuideCommentRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/guides/{guide-id}/comments/{comment-id}" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
-        static const HttpRequestParams GetGuideCommentRequest { Modio::Detail::Verb::GET, "/games/{game-id}/guides/{guide-id}/comments/{comment-id}" }; 
+        static const HttpRequestParams DeleteGuideCommentRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/guides/{guide-id}/comments/{comment-id}" }; 
+        static const HttpRequestParams GetGuideCommentRequest { Modio::Detail::Verb::GET, "/games/{game-id}/guides/{guide-id}/comments/{comment-id}" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams UpdateGuideCommentRequest { Modio::Detail::Verb::PUT, "/games/{game-id}/guides/{guide-id}/comments/{comment-id}" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AddGuideCommentKarmaRequest { Modio::Detail::Verb::POST, "/games/{game-id}/guides/{guide-id}/comments/{comment-id}/karma" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AddGameMediaRequest { Modio::Detail::Verb::POST, "/games/{game-id}/media" , GetContentTypeEnum("multipart/form-data") }; 
@@ -83,12 +84,12 @@ namespace Modio
         static const HttpRequestParams GetModCollectionsListRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/collections" }; 
         static const HttpRequestParams GetModCommentsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/comments" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AddModCommentRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/comments" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
-        static const HttpRequestParams DeleteModCommentRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}/comments/{comment-id}" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
-        static const HttpRequestParams GetModCommentRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/comments/{comment-id}" }; 
+        static const HttpRequestParams DeleteModCommentRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}/comments/{comment-id}" }; 
+        static const HttpRequestParams GetModCommentRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/comments/{comment-id}" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams UpdateModCommentRequest { Modio::Detail::Verb::PUT, "/games/{game-id}/mods/{mod-id}/comments/{comment-id}" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AddModCommentKarmaRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/comments/{comment-id}/karma" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
-        static const HttpRequestParams BrowseModfileCooksRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/cooks" , GetContentTypeEnum("application/json") }; 
-        static const HttpRequestParams UpsertModfileCooksRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/cooks" , GetContentTypeEnum("application/json; charset=utf-8") }; 
+        static const HttpRequestParams BrowseModfileCooksRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/cooks" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
+        static const HttpRequestParams UpsertModfileCooksRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/cooks" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetModDependantsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/dependants" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams DeleteModDependenciesRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}/dependencies" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetModDependenciesRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/dependencies" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
@@ -112,10 +113,10 @@ namespace Modio
         static const HttpRequestParams DeleteModKvpMetadataRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}/metadatakvp" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetModKvpMetadataRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/metadatakvp" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AddModKvpMetadataRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/metadatakvp" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
-        static const HttpRequestParams GetUsersInModMonetizationTeamRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/monetization/team" , GetContentTypeEnum("multipart/form-data") }; 
+        static const HttpRequestParams GetUsersInModMonetizationTeamRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/monetization/team" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams CreateModMonetizationTeamRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/monetization/team" , GetContentTypeEnum("multipart/form-data") }; 
         static const HttpRequestParams AddModRatingRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/ratings" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
-        static const HttpRequestParams BrowseSourceModfilesRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/sources" , GetContentTypeEnum("application/json") }; 
+        static const HttpRequestParams BrowseSourceModfilesRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/sources" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AddSourceModfileRequest { Modio::Detail::Verb::POST, "/games/{game-id}/mods/{mod-id}/sources" , GetContentTypeEnum("multipart/form-data") }; 
         static const HttpRequestParams GetModStatsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/mods/{mod-id}/stats" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams UnsubscribeFromModRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/mods/{mod-id}/subscribe" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
@@ -133,6 +134,7 @@ namespace Modio
         static const HttpRequestParams GetResourceOwnerRequest { Modio::Detail::Verb::POST, "/general/ownership" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetAuthenticatedUserRequest { Modio::Detail::Verb::GET, "/me" }; 
         static const HttpRequestParams GetMeCollectionsRequest { Modio::Detail::Verb::GET, "/me/collections" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
+        static const HttpRequestParams GetUserEntitlementsRequest { Modio::Detail::Verb::GET, "/me/entitlements" }; 
         static const HttpRequestParams GetUserEventsRequest { Modio::Detail::Verb::GET, "/me/events" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetUserModfilesRequest { Modio::Detail::Verb::GET, "/me/files" }; 
         static const HttpRequestParams MeGetFollowersRequest { Modio::Detail::Verb::GET, "/me/followers" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
@@ -161,7 +163,7 @@ namespace Modio
         static const HttpRequestParams PingRequest { Modio::Detail::Verb::GET, "/ping" }; 
         static const HttpRequestParams SubmitReportRequest { Modio::Detail::Verb::POST, "/report" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams S2sDisconnectUserRequest { Modio::Detail::Verb::DELETE, "/s2s/connections/{portal-id}" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
-        static const HttpRequestParams GetMonetizationTransactionsRequest { Modio::Detail::Verb::GET, "/s2s/monetization-teams/{monetization-team-id}/transactions" }; 
+        static const HttpRequestParams GetMonetizationTransactionsRequest { Modio::Detail::Verb::GET, "/s2s/monetization-teams/{monetization-team-id}/transactions" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetMonetizationTransactionRequest { Modio::Detail::Verb::GET, "/s2s/monetization-teams/{monetization-team-id}/transactions/{transaction-id}" }; 
         static const HttpRequestParams S2sTransactionClawbackRequest { Modio::Detail::Verb::POST, "/s2s/transactions/clawback" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams S2sTransactionCommitRequest { Modio::Detail::Verb::POST, "/s2s/transactions/commit" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 

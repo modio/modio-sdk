@@ -287,7 +287,7 @@ namespace Modio
 
 // Additional if guarding as this logging is extra slow, so don't want to incur any overhead if someone
 // don't include this trace data
-#if MODIO_TRACE_DUMP_RESPONSE
+#if defined(MODIO_TRACE_DUMP_RESPONSE) && MODIO_TRACE_DUMP_RESPONSE
 					if (Services::GetGlobalService<Modio::Detail::LogService>().GetLogLevel() <= Modio::LogLevel::Trace)
 					{
 						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,

@@ -14,11 +14,11 @@
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 
-#include <asio/yield.hpp>
 namespace Modio
 {
 	namespace Detail
 	{
+#include <asio/yield.hpp>
 		class SubmitModRatingOp
 		{
 		public:
@@ -81,7 +81,14 @@ namespace Modio
 			asio::coroutine CoroutineState {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 		};
+#include <asio/unyield.hpp>
+
+		template<typename SubmitCompleteCallback>
+		void SubmitModRatingAsync(Modio::ModID ModId, Modio::Rating Rating, SubmitCompleteCallback&& OnSubmitComplete)
+		{
+			return asio::async_compose<SubmitCompleteCallback, void(Modio::ErrorCode)>(
+				Modio::Detail::SubmitModRatingOp(ModId, Rating), OnSubmitComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
-
-#include <asio/unyield.hpp>

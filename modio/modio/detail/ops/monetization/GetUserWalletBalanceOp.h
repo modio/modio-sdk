@@ -65,6 +65,16 @@ namespace Modio
 				}
 			}
 		};
+
+		template<typename GetBalanceCompleteCallback>
+		void GetUserWalletBalanceAsync(GetBalanceCompleteCallback&& OnGetBalanceComplete)
+		{
+			return asio::async_compose<GetBalanceCompleteCallback, void(Modio::ErrorCode, Modio::Optional<uint64_t>)>(
+				Modio::Detail::GetUserWalletBalanceOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+													  Modio::Detail::SDKSessionData::CurrentAPIKey()),
+				OnGetBalanceComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
 #include <asio/unyield.hpp>

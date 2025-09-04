@@ -9,8 +9,6 @@
  */
 
 #pragma once
-
-#pragma once
 #include "modio/core/ModioCoreTypes.h"
 
 #pragma comment(lib, "rpcrt4.lib")
@@ -125,22 +123,4 @@ namespace Modio
 	{
 		InternalGuid = InGuid.ToString();
 	}
-
-	#if __cplusplus >= 202002L
-	/// @brief converts from a u8string_view to a string
-	/// @param S the u8 string view to convert
-	/// @return the string
-	static inline std::string ToModioString(const std::u8string_view& S)
-	{
-		return std::string(S.begin(), S.end());
-	}
-
-	/// @brief converts from a u8string to a string
-	/// @param S the u8 string to convert
-	/// @return the string
-	static inline std::string ToModioString(const std::u8string& S)
-	{
-		return std::string(S.begin(), S.end());
-	}
-	#endif
 } // namespace Modio

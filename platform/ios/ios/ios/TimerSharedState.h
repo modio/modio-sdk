@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "function2/function2.hpp"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
+#include "modio/detail/Function2Wrapper.h"
 #include "modio/detail/ModioProfiling.h"
 #include "timer/TimerImplementation.h"
 #include <cstdio>

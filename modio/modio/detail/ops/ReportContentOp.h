@@ -45,6 +45,14 @@ namespace Modio
 				}
 			}
 		};
+
+		template<typename ReportContentCompleteCallback>
+		void ReportContentAsync(Modio::ReportParams Params, ReportContentCompleteCallback&& OnReportContentComplete)
+		{
+			return asio::async_compose<ReportContentCompleteCallback, void(Modio::ErrorCode)>(
+				Modio::Detail::ReportContentOp(Params), OnReportContentComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
 #include <asio/unyield.hpp>

@@ -73,6 +73,15 @@ namespace Modio
 			
 
 		};
+
+		template<typename GetUserRatingsCompleteCallback>
+		void GetUserRatingsAsync(GetUserRatingsCompleteCallback&& OnGetUserRatingsComplete)
+		{
+			return asio::async_compose<GetUserRatingsCompleteCallback,
+									   void(Modio::ErrorCode, Modio::Optional<Modio::UserRatingList>)>(
+				Modio::Detail::GetUserRatingsOp(), OnGetUserRatingsComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
 

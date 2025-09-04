@@ -128,6 +128,8 @@ public:
 // Only attempt to lock/dereference the shared state pointer if the session ID matches
 struct SharedStateHolder
 {
+	SharedStateHolder(SharedStateHolder&&) = delete;
+	SharedStateHolder() = default;
 	std::weak_ptr<HttpSharedStateBase> SharedStatePtr;
 	std::atomic<uint64_t> CurrentSessionId {0};
 	static SharedStateHolder& Get()

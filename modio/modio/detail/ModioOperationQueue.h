@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "function2/function2.hpp"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/Function2Wrapper.h"
 #include "modio/detail/ModioProfiling.h"
 #include <atomic>
 #include <deque>

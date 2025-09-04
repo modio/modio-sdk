@@ -9,12 +9,14 @@
  */
 
 #pragma once
-#include "function2/function2.hpp"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioCreateModFileParams.h"
+#include "modio/core/ModioCreateSourceFileParams.h"
 #include "modio/core/ModioModCollectionEntry.h"
+#include "modio/core/entities/ModioModCollection.h"
 #include "modio/core/entities/ModioUser.h"
 #include "modio/detail/ConcurrentQueueWrapper.h"
+#include "modio/detail/Function2Wrapper.h"
 #include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/userdata/ModioUserDataContainer.h"
 #include "modio/detail/userdata/ModioUserProfile.h"
@@ -103,6 +105,10 @@ namespace Modio
 
 			MODIO_IMPL static void AddPendingModfileUpload(Modio::ModID ID, Modio::CreateModFileParams Params);
 
+			MODIO_IMPL static void AddPendingSourceFileUpload(Modio::ModID ID, Modio::CreateSourceFileParams Params);
+			MODIO_IMPL static Modio::Optional<std::pair<Modio::ModID, Modio::CreateSourceFileParams>>
+				GetNextPendingSourceFileUpload();
+
 			/// @brief Retrieves the next pending modfile upload from the queue. *Removes the element from the queue*.
 			/// @return The pending upload information, or empty Optional if nothing pending
 			MODIO_IMPL static Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>>
@@ -188,6 +194,10 @@ namespace Modio
 			MODIO_IMPL static void ClearModCacheInvalid(Modio::ModID ID);
 			MODIO_IMPL static bool IsModCacheInvalid(Modio::ModID ID);
 
+			MODIO_IMPL static void InvalidateModCollectionCache(Modio::ModCollectionID ID);
+			MODIO_IMPL static void ClearModCollectionCacheInvalid(Modio::ModCollectionID ID);
+			MODIO_IMPL static bool IsModCollectionCacheInvalid(Modio::ModCollectionID ID);
+
 			MODIO_IMPL static bool IsFetchExternalUpdatesRunning();
 			MODIO_IMPL static void SetFetchExternalUpdatesRunning(bool IsRunning);
 
@@ -201,6 +211,10 @@ namespace Modio
 			MODIO_NODISCARD MODIO_IMPL static std::unique_lock<std::shared_timed_mutex> GetWriteLock();
 			MODIO_NODISCARD MODIO_IMPL static std::unique_lock<std::shared_timed_mutex> GetShutdownLock();
 			MODIO_NODISCARD MODIO_IMPL static std::unique_lock<std::shared_timed_mutex> TryGetShutdownLock();
+
+			MODIO_IMPL static bool HasModManagementEventQueued();
+			MODIO_IMPL static void IncrementModManagementEventQueued();
+			MODIO_IMPL static void DecrementModManagementEventQueued();
 
 		private:
 			enum class InitializationState
@@ -229,6 +243,7 @@ namespace Modio
 			Modio::Language LocalLanguage = Modio::Language::English;
 			InitializationState CurrentInitializationState = InitializationState::NotInitialized;
 			bool bModManagementEnabled = false;
+			uint32_t ModManagementEventQueued = 0;
 			std::vector<struct FieldError> LastValidationError {};
 			// Implemented as shared_ptr because that way operations that need to alter the state of the entry can get a
 			// cheap reference to the original without the lack of safety from a potentially dangling raw reference
@@ -247,6 +262,7 @@ namespace Modio
 			std::map<Modio::ModCreationHandle, Modio::Optional<Modio::ModID>> CreationHandles {};
 			Modio::Optional<Modio::ModID> ModIDToPrioritize {};
 			std::map<Modio::ModID, Modio::CreateModFileParams> PendingModUploads {};
+			std::map<Modio::ModID, Modio::CreateSourceFileParams> PendingSourceUploads {};
 			bool bSubscriptionCacheInvalid = false;
 			bool bTermsOfUseCacheInvalid = false;
 			bool bPurchaseCacheInvalid = false;
@@ -258,6 +274,7 @@ namespace Modio
 			// Only set if a cache storage quota is set
 			Modio::FileSize TotalImageCacheSize {};
 			bool FetchExternalUpdatesRunning = false;
+			std::unordered_map<std::int64_t, bool> CollectionCacheInvalidMap;
 		};
 	} // namespace Detail
 } // namespace Modio

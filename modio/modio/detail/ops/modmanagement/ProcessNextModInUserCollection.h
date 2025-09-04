@@ -16,6 +16,7 @@
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/SaveModCollectionToStorage.h"
 #include "modio/detail/ops/mod/SubmitNewModFileOp.h"
+#include "modio/detail/ops/mod/SubmitNewModSourceFileOp.h"
 #include "modio/detail/ops/modmanagement/InstallOrUpdateMod.h"
 #include "modio/detail/ops/modmanagement/UninstallMod.h"
 #include "modio/userdata/ModioUserDataService.h"
@@ -76,7 +77,7 @@ namespace Modio
 							{
 								if (ModEntry->GetModState() == Modio::ModState::UninstallPending ||
 									ModEntry->GetModState() == Modio::ModState::InstallationPending ||
-									ModEntry->GetModState() == Modio::ModState::UpdatePending )
+									ModEntry->GetModState() == Modio::ModState::UpdatePending)
 								{
 									if (ModEntry->ShouldRetry())
 									{
@@ -122,7 +123,8 @@ namespace Modio
 									}
 								}
 							}
-							// If we haven't found an EntryToProcess based on PriorityID, continue to normal uploads and installations
+							// If we haven't found an EntryToProcess based on PriorityID, continue to normal uploads and
+							// installations
 							if (EntryToProcess == nullptr)
 							{
 								// if we have a pending upload, process that immediately before bothering with iterating
@@ -131,6 +133,16 @@ namespace Modio
 								{
 									yield SubmitNewModFileAsync(PendingUpload->first, PendingUpload->second,
 																std::move(Self));
+									Self.complete(ec);
+									return;
+								}
+
+								// If we don't have a pending mod upload, check for pending source uploads
+								if ((PendingSourceUpload =
+										 Modio::Detail::SDKSessionData::GetNextPendingSourceFileUpload()))
+								{
+									yield SubmitNewModSourceFileAsync(PendingSourceUpload->first,
+																	  PendingSourceUpload->second, std::move(Self));
 									Self.complete(ec);
 									return;
 								}
@@ -173,7 +185,8 @@ namespace Modio
 													   {}});
 						// Does this need to be a separate operation or could we provide a parameter to specify
 						// we only want to update if it's already installed or something?
-						yield Modio::Detail::InstallOrUpdateModAsync(EntryToProcess->GetID(), IsTempModSelected, std::move(Self));
+						yield Modio::Detail::InstallOrUpdateModAsync(EntryToProcess->GetID(), IsTempModSelected,
+																	 std::move(Self));
 						Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(
 							Modio::ModManagementEvent {EntryToProcess->GetID(),
 													   PendingModState.value() == Modio::ModState::InstallationPending
@@ -227,6 +240,7 @@ namespace Modio
 			asio::coroutine CoroutineState {};
 			std::shared_ptr<Modio::ModCollectionEntry> EntryToProcess {};
 			Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>> PendingUpload {};
+			Modio::Optional<std::pair<Modio::ModID, Modio::CreateSourceFileParams>> PendingSourceUpload {};
 			Modio::Optional<Modio::ModState> PendingModState {};
 			bool IsTempModSelected {};
 		};

@@ -83,6 +83,16 @@ namespace Modio
 				}
 			}
 		};
+
+		template<typename LogoActionCompleteCallback>
+		void AddOrUpdateModLogoAsync(Modio::ModID ModID, Modio::filesystem::path LogoPath,
+									 LogoActionCompleteCallback&& OnLogoActionComplete)
+		{
+			return asio::async_compose<LogoActionCompleteCallback, void(Modio::ErrorCode)>(
+				Modio::Detail::AddOrUpdateModLogoOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID, LogoPath),
+				OnLogoActionComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
 #include <asio/unyield.hpp>

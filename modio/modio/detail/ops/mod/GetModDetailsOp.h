@@ -71,5 +71,16 @@ namespace Modio
 				}
 			}
 		};
+
+		template<typename GetModDetailsCompleteCallback>
+		void GetModDetailsAsync(Modio::ModID ModId, GetModDetailsCompleteCallback&& OnGetModDetailsComplete)
+		{
+			return asio::async_compose<GetModDetailsCompleteCallback,
+									   void(Modio::ErrorCode, Modio::Optional<Modio::ModDetails>)>(
+				Modio::Detail::GetModDetailsOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+											   Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId),
+				OnGetModDetailsComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio

@@ -88,6 +88,7 @@ namespace Modio
 					return "multipart/form-data";
 				case ContentType::ApplicationXWwwFormUrlEncoded:
 					return "application/x-www-form-urlencoded";
+				case ContentType::None:
 				default:
 					return std::string_view();
 			}
@@ -165,6 +166,10 @@ namespace Modio
 			MODIO_IMPL HttpRequestParams SetUserID(Modio::UserID ID) const;
 
 			MODIO_IMPL HttpRequestParams& SetUserID(Modio::UserID ID);
+
+			MODIO_IMPL HttpRequestParams SetModCollectionID(Modio::ModCollectionID ID) const;
+
+			MODIO_IMPL HttpRequestParams& SetModCollectionID(Modio::ModCollectionID ID);
 
 			MODIO_IMPL HttpRequestParams AddQueryParamRaw(const std::string& Key, const std::string& Value) const;
 			MODIO_IMPL HttpRequestParams& AddQueryParamRaw(const std::string& Key, const std::string& Value);
@@ -331,6 +336,7 @@ namespace Modio
 				  GameID(0),
 				  ModID(0),
 				  UserID(0),
+				  CollectionID(0),
 				  CurrentOperationType(CurrentOperationType),
 				  CurrentAPIVersion(Modio::Detail::APIVersion::V1)
 			{}
@@ -341,6 +347,7 @@ namespace Modio
 				  GameID(0),
 				  ModID(0),
 				  UserID(0),
+				  CollectionID(0),
 				  CurrentOperationType(CurrentOperationType),
 				  CurrentAPIVersion(Modio::Detail::APIVersion::V1)
 			{}
@@ -351,6 +358,7 @@ namespace Modio
 				  GameID(0),
 				  ModID(0),
 				  UserID(0),
+				  CollectionID(0),
 				  CurrentOperationType(Modio::Detail::Verb::GET),
 				  CurrentAPIVersion(Modio::Detail::APIVersion::V1)
 			{}
@@ -392,6 +400,7 @@ namespace Modio
 			std::uint64_t GameID {};
 			std::uint64_t ModID {};
 			std::uint64_t UserID {};
+			std::uint64_t CollectionID {};
 
 			// This should most likely be a ID into a separate payload store or
 			// let it be put as a different parameter
@@ -412,8 +421,8 @@ namespace Modio
 			// api version
 			APIVersion CurrentAPIVersion {};
 
-			Modio::Optional<Modio::FileOffset> StartOffset {};
-			Modio::Optional<Modio::FileOffset> EndOffset {};
+			Modio::Optional<Modio::FileOffset> StartFileOffset {};
+			Modio::Optional<Modio::FileOffset> EndFileOffset {};
 
 			// Three variables needed to create the header Content-Range
 			// {Start, End, Total}

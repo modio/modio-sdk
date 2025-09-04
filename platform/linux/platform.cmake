@@ -9,5 +9,7 @@
 # 
 
 if(MODIO_PLATFORM STREQUAL "LINUX")
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR})
+	if (MODIO_LOAD_PLATFORM_MODULES)
+		add_subdirectory(${CMAKE_CURRENT_LIST_DIR})
+	endif()
 endif()

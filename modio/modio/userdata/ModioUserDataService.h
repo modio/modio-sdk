@@ -32,6 +32,7 @@ namespace Modio
 			{
 				
 			}
+			UserDataService(UserDataService&&) = delete;
 
 			void Shutdown()
 			{

@@ -15,12 +15,11 @@
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/serialization/ModioModDependencySerialization.h"
 
-#include <asio/yield.hpp>
-
 namespace Modio
 {
 	namespace Detail
 	{
+#include <asio/yield.hpp>
 		class DeleteModDependenciesOp
 		{
 		public:
@@ -62,7 +61,15 @@ namespace Modio
 			asio::coroutine CoroutineState {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 		};
+#include <asio/unyield.hpp>
+
+		template<typename DeleteCompleteCallback>
+		void DeleteModDependenciesAsync(Modio::ModID ModID, const std::vector<Modio::ModID>& Dependencies,
+										DeleteCompleteCallback&& OnDeleteComplete)
+		{
+			return asio::async_compose<DeleteCompleteCallback, void(Modio::ErrorCode)>(
+				Modio::Detail::DeleteModDependenciesOp(ModID, Dependencies), OnDeleteComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
-
-#include <asio/unyield.hpp>

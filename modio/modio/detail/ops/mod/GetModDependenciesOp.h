@@ -17,11 +17,11 @@
 #include "modio/detail/serialization/ModioModDependencySerialization.h"
 #include "modio/http/ModioHttpParams.h"
 
-#include "asio/yield.hpp"
 namespace Modio
 {
 	namespace Detail
 	{
+#include "asio/yield.hpp"
 		class GetModDependenciesOp
 		{
 		public:
@@ -151,6 +151,17 @@ namespace Modio
 			Modio::PagedResult PageInfo {};
 			std::int32_t CurrentResultIndex = 0;
 		};
+#include "asio/unyield.hpp"
+
+		template<typename GetDependenciesCompleteCallback>
+		void GetModDependenciesAsync(Modio::ModID ModID, bool Recursive,
+									 GetDependenciesCompleteCallback&& OnGetDependenciesComplete)
+		{
+			return asio::async_compose<GetDependenciesCompleteCallback,
+									   void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList>)>(
+				Modio::Detail::GetModDependenciesOp(ModID, Modio::Detail::SDKSessionData::CurrentGameID(), Recursive),
+				OnGetDependenciesComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
-#include "asio/unyield.hpp"

@@ -74,6 +74,17 @@ namespace Modio
 				}
 			}
 		};
+
+		template<typename GetGameInfoCompleteCallback>
+		void GetGameInfoAsync(Modio::GameID GameID,
+							  GetGameInfoCompleteCallback&& OnGetGameInfoComplete)
+		{
+			return asio::async_compose<GetGameInfoCompleteCallback,
+									   void(Modio::ErrorCode, Modio::Optional<Modio::GameInfo>)>(
+				Modio::Detail::GetGameInfoOp(GameID, Modio::Detail::SDKSessionData::CurrentAPIKey()),
+				OnGetGameInfoComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
 #include <asio/unyield.hpp>

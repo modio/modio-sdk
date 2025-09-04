@@ -90,6 +90,15 @@ namespace Modio
 			CacheInstance->ModInfoCache.insert_or_assign(ModInfoDetails.ModId, ModInfoDetails);
 		}
 
+		void CacheService::AddToCache(Modio::ModCollectionInfo ModModCollectionInfoDetails)
+		{
+			Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Adding ModCollectionID {} to cache",
+										int64_t(ModModCollectionInfoDetails.Id));
+			// The ModInfoCache would clean only when the mod.io SDK session ends. For that reason there is no
+			// timer for this case. Another way to remove this is by calling "ClearCache"
+			CacheInstance->ModCollectionInfoCache.insert_or_assign(ModModCollectionInfoDetails.Id, ModModCollectionInfoDetails);
+		}
+
 		void CacheService::AddToCache(Modio::GameInfo GameInfoDetails)
 		{
 			Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Adding GameID {} to cache",
@@ -100,7 +109,7 @@ namespace Modio
 
 		void CacheService::AddToCache(Modio::GameID GameIDDetail, Modio::ModInfoList ModInfoDetails)
 		{
-			Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Adding ModIDList to cache with GameID: {}",
+			Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Adding ModIdList to cache with GameID: {}",
 										GameIDDetail);
 			std::vector<Modio::ModID> ModIDVec;
 
@@ -112,6 +121,23 @@ namespace Modio
 			});
 
 			CacheInstance->ModInfoListCache.emplace(GameIDDetail, ModIDVec);
+		}
+
+		void CacheService::AddToCache(Modio::GameID GameIDDetail, Modio::ModCollectionInfoList ModCollectionInfoDetails)
+		{
+			Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Adding ModCollectionIdList to cache with GameID: {}",
+										GameIDDetail);
+			std::vector<Modio::ModCollectionID> ModCollectionIDVec;
+
+			// Instead of keeping the whole list (with possible data replications), it adds single elements to the
+			// cache.
+			for_each(ModCollectionInfoDetails.begin(), ModCollectionInfoDetails.end(),
+					 [this, &ModCollectionIDVec](Modio::ModCollectionInfo ModInfoData) {
+				this->AddToCache(ModInfoData);
+				ModCollectionIDVec.push_back(ModInfoData.Id);
+			});
+
+			CacheInstance->ModCollectionInfoListCache.emplace(GameIDDetail, ModCollectionIDVec);
 		}
 
 		void CacheService::AddToCache(Modio::ModID ModId, std::uint64_t Filesize, bool recursive)
@@ -206,6 +232,25 @@ namespace Modio
 				return CachedModInfo->GetModProfile();
 			}
 
+			return {};
+		}
+
+		Modio::Optional<Modio::ModCollectionInfo> CacheService::FetchFromCache(Modio::ModCollectionID ModCollectionIDDetail) const
+		{
+			MODIO_PROFILE_SCOPE(CacheFetchMod);
+			auto CacheEntryIterator = CacheInstance->ModCollectionInfoCache.find(ModCollectionIDDetail);
+			if (CacheEntryIterator != CacheInstance->ModCollectionInfoCache.end())
+			{
+				Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Retrieving mod {} from primary cache",
+											int64_t(ModCollectionIDDetail));
+
+				if (Modio::Detail::SDKSessionData::IsModCollectionCacheInvalid(ModCollectionIDDetail) == true)
+				{
+					return {};
+				}
+
+				return CacheEntryIterator->second;
+			}
 			return {};
 		}
 

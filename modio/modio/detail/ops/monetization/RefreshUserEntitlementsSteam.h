@@ -15,7 +15,8 @@ namespace Modio
 {
 	namespace Detail
 	{
-		inline void RefreshUserEntitlementsSteamAsync(Modio::EntitlementParams Params,
+		inline void RefreshUserEntitlementsSteamAsync(
+			Modio::EntitlementParams /*Params*/,
 			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)> Callback)
 		{
 			const Modio::Detail::HttpRequestParams RequestParams = Modio::Detail::SyncSteamEntitlementRequest;

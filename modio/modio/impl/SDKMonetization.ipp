@@ -40,18 +40,14 @@
 
 namespace Modio
 {
-	void PurchaseModAsync(Modio::ModID ModID, uint64_t ExpectedPrice,
+	void PurchaseModAsync(Modio::ModID ModID, Modio::Optional<uint64_t> ExpectedVirtualCurrencyPrice,
 						  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)> Callback)
 	{
-		Modio::Detail::SDKSessionData::EnqueueTask([ModID, ExpectedPrice, Callback = std::move(Callback)]() mutable {
+		Modio::Detail::SDKSessionData::EnqueueTask([ModID, ExpectedVirtualCurrencyPrice, Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireValidModID(ModID, Callback) && Modio::Detail::RequireSDKIsInitialized(Callback) &&
 				Modio::Detail::RequireUserIsAuthenticated(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
 			{
-				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)>,
-									void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)>(
-					Modio::Detail::PurchaseModOp(Modio::Detail::SDKSessionData::CurrentGameID(),
-												 Modio::Detail::SDKSessionData::CurrentAPIKey(), ModID, ExpectedPrice),
-					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+				Modio::Detail::PurchaseModAsync(ModID, ExpectedVirtualCurrencyPrice, Callback);
 			}
 		});
 	}
@@ -111,6 +107,12 @@ namespace Modio
 						Modio::Detail::RefreshUserEntitlementsMetaAsync(Params, Callback);
 						break;
 
+					case Modio::Portal::None:
+					case Modio::Portal::Apple:
+					case Modio::Portal::EpicGamesStore:
+					case Modio::Portal::GOG:
+					case Modio::Portal::Itchio:
+					case Modio::Portal::Nintendo:
 					default:
 					Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::ModManagement,
 												"Called RefreshEntitlements with an unsupported Portal of {}",
@@ -133,11 +135,7 @@ namespace Modio
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) &&
 				Modio::Detail::RequireUserIsAuthenticated(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
 			{
-				asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<uint64_t>)>,
-									void(Modio::ErrorCode, Modio::Optional<uint64_t>)>(
-					Modio::Detail::GetUserWalletBalanceOp(Modio::Detail::SDKSessionData::CurrentGameID(),
-														  Modio::Detail::SDKSessionData::CurrentAPIKey()),
-					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+				Modio::Detail::GetUserWalletBalanceAsync(Callback);
 			}
 		});
 	}
@@ -175,11 +173,7 @@ namespace Modio
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) &&
 				Modio::Detail::RequireUserIsAuthenticated(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
 			{
-				asio::async_compose<std::function<void(Modio::ErrorCode, std::string)>,
-									void(Modio::ErrorCode, std::string)>(
-					Modio::Detail::GetUserDelegationTokenOp(Modio::Detail::SDKSessionData::CurrentGameID(),
-															Modio::Detail::SDKSessionData::CurrentAPIKey()),
-					Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
+				Modio::Detail::GetUserDelegationTokenAsync(Callback);
 			}
 		});
 	}

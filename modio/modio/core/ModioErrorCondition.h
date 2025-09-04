@@ -60,4 +60,5 @@ enum class EModioErrorCondition: uint8
 	ModCannotAllowDependencyMonetized = 47 UMETA(ToolTip="This mod cannot allow dependencies because it is monetized.") ,
 	ModCannotDeleteDependency = 48 UMETA(ToolTip="This mod is a dependency of other mods and cannot be deleted.") ,
 	RequestInProgress = 49 UMETA(ToolTip="The asynchronous operation is already running. Please wait for it to complete before calling it again") ,
+	InvalidZipFile = 50 UMETA(ToolTip="The zip file submitted is invalid.") ,
 };

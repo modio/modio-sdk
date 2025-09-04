@@ -1,5 +1,5 @@
 # 
-#  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+#  Copyright (C) 2021-2025 mod.io Pty Ltd. <https://mod.io>
 #  
 #  This file is part of the mod.io SDK.
 #  
@@ -19,6 +19,7 @@ add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioTemporaryModSet.ipp
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioLogService.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioReportParams.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioModDependency.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioServerInitializeOptions.ipp)
 
 add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/ModioFilterParams.h)
 add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/ModioMetricsService.h)
@@ -30,5 +31,6 @@ add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/entities/ModioM
 add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/entities/ModioUser.h)
 add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/entities/ModioModInfoList.h)
 add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/ModioReportParams.h)
+add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/ModioServerInitializeOptions.h)
 
 

@@ -18,8 +18,8 @@
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioTemporaryModSet.h"
 #include "modio/detail/HedleyWrapper.h"
-#include "modio/detail/serialization/ModioAvatarSerialization.h"
 #include "modio/detail/ModioStringHelpers.h"
+#include "modio/detail/serialization/ModioAvatarSerialization.h"
 #include "modio/detail/serialization/ModioTokenSerialization.h"
 #include "modio/detail/serialization/ModioUserDataContainerSerialization.h"
 #include "modio/file/ModioFileService.h"
@@ -333,6 +333,31 @@ namespace Modio
 			Get().PendingModUploads.insert({ID, Params});
 		}
 
+		void SDKSessionData::AddPendingSourceFileUpload(Modio::ModID ID, Modio::CreateSourceFileParams Params)
+		{
+			Modio::filesystem::path ModRoot = Params.RootDirectory;
+			if (ModRoot.has_filename())
+			{
+				ModRoot /= "";
+				Modio::Detail::Logger().Log(
+					Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
+					"Modfile directory path {} does not end in a path separator. Adding manually",
+					Params.RootDirectory);
+				Params.RootDirectory = Modio::ToModioString(ModRoot.u8string());
+			}
+
+			auto ExistingEntry = Get().PendingSourceUploads.find(ID);
+			if (ExistingEntry != Get().PendingSourceUploads.end())
+			{
+				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
+											"New source upload queued for mod {} which already had a pending upload. "
+											"Dropping previous source upload request.",
+											ID);
+				Get().PendingSourceUploads.erase(ID);
+			}
+			Get().PendingSourceUploads.insert({ID, Params});
+		}
+
 		Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>> SDKSessionData::GetPriorityModfileUpload()
 		{
 			if (Get().ModIDToPrioritize.has_value())
@@ -358,6 +383,22 @@ namespace Modio
 			{
 				std::pair<Modio::ModID, Modio::CreateModFileParams> PendingUpload = *Get().PendingModUploads.begin();
 				Get().PendingModUploads.erase(Get().PendingModUploads.begin());
+				return PendingUpload;
+			}
+			else
+			{
+				return {};
+			}
+		}
+
+		Modio::Optional<std::pair<Modio::ModID, Modio::CreateSourceFileParams>> SDKSessionData::
+			GetNextPendingSourceFileUpload()
+		{
+			if (Get().PendingSourceUploads.size())
+			{
+				std::pair<Modio::ModID, Modio::CreateSourceFileParams> PendingUpload =
+					*Get().PendingSourceUploads.begin();
+				Get().PendingSourceUploads.erase(Get().PendingSourceUploads.begin());
 				return PendingUpload;
 			}
 			else
@@ -561,9 +602,10 @@ namespace Modio
 
 		std::string SDKSessionData::GetAcceptanceFilterStringForRequestedPlatformStatus()
 		{
-			//When trying to filter mods based on their platform status, we need to filter based on the acceptance status of the mod as well
-			// This method ensures that when filtering for mods that have a pending modfile for the current platform, we show mods that have
-			// not yet been approved at all 
+			// When trying to filter mods based on their platform status, we need to filter based on the acceptance
+			// status of the mod as well
+			//  This method ensures that when filtering for mods that have a pending modfile for the current platform,
+			//  we show mods that have not yet been approved at all
 			if (Get().PlatformStatusFilter.has_value())
 			{
 				switch (Get().PlatformStatusFilter.value())
@@ -767,6 +809,21 @@ namespace Modio
 			return Get().bPurchaseCacheInvalid;
 		}
 
+		bool SDKSessionData::HasModManagementEventQueued()
+		{
+			return Get().ModManagementEventQueued > 0;
+		}
+		
+		void SDKSessionData::IncrementModManagementEventQueued()
+		{
+			Get().ModManagementEventQueued++;
+		}
+		
+		void SDKSessionData::DecrementModManagementEventQueued()
+		{
+			Get().ModManagementEventQueued--;
+		}
+
 		void SDKSessionData::InvalidateModCache(Modio::ModID ID)
 		{
 			auto CacheEntryIterator = Get().ModCacheInvalidMap.find(ID);
@@ -797,6 +854,42 @@ namespace Modio
 		{
 			auto CacheEntryIterator = Get().ModCacheInvalidMap.find(ID);
 			if (CacheEntryIterator != Get().ModCacheInvalidMap.end())
+			{
+				return CacheEntryIterator->second;
+			}
+			return false;
+		}
+
+		void SDKSessionData::InvalidateModCollectionCache(Modio::ModCollectionID ID)
+		{
+			auto CacheEntryIterator = Get().CollectionCacheInvalidMap.find(ID);
+			if (CacheEntryIterator != Get().CollectionCacheInvalidMap.end())
+			{
+				CacheEntryIterator->second = true;
+			}
+			else
+			{
+				Get().CollectionCacheInvalidMap.emplace(ID, true);
+			}
+		}
+
+		void SDKSessionData::ClearModCollectionCacheInvalid(Modio::ModCollectionID ID)
+		{
+			auto CacheEntryIterator = Get().CollectionCacheInvalidMap.find(ID);
+			if (CacheEntryIterator != Get().CollectionCacheInvalidMap.end())
+			{
+				CacheEntryIterator->second = false;
+			}
+			else
+			{
+				Get().CollectionCacheInvalidMap.emplace(ID, false);
+			}
+		}
+
+		bool SDKSessionData::IsModCollectionCacheInvalid(Modio::ModCollectionID ID)
+		{
+			auto CacheEntryIterator = Get().CollectionCacheInvalidMap.find(ID);
+			if (CacheEntryIterator != Get().CollectionCacheInvalidMap.end())
 			{
 				return CacheEntryIterator->second;
 			}
@@ -868,6 +961,7 @@ namespace Modio
 			  LocalLanguage(InLocalLanguage),
 			  CurrentInitializationState(InitializationState::NotInitialized)
 		{}
+
 	} // namespace Detail
 
 } // namespace Modio

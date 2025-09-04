@@ -18,11 +18,11 @@
 
 #include "modio/detail/AsioWrapper.h"
 
-#include <asio/yield.hpp>
 namespace Modio
 {
 	namespace Detail
 	{
+#include <asio/yield.hpp>
 		class GetTermsOfUseOp
 		{
 		public:
@@ -68,6 +68,14 @@ namespace Modio
 			Modio::Detail::CachedResponse CachedResponse {};
 			asio::coroutine CoroutineState {};
 		};
+#include <asio/unyield.hpp>
+
+		template<typename GetTermsCompleteCallback>
+		void GetTermsOfUseAsync(GetTermsCompleteCallback&& OnGetTermsComplete)
+		{
+			return asio::async_compose<GetTermsCompleteCallback, void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)>(
+				Modio::Detail::GetTermsOfUseOp(), OnGetTermsComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
-#include <asio/unyield.hpp>

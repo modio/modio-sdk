@@ -22,18 +22,47 @@ macro(list_subdirs result curdir)
   SET(${result} ${dirlist})
 endmacro()
 
-message("Fetching platform dependencies...")
+function (modio_set_toolchain)
+    set(MODIO_SET_TOOLCHAIN TRUE)
 
-#iterate through all the currently installed platform directories
-list_subdirs(modio_platform_dirs ${MODIO_ROOT_DIR}/platform )
+    message("Fetching platform dependencies...")
 
-#add_subdirectory will only populate targets for the currently valid MODIO_PLATFORM
-foreach (platform_dir ${modio_platform_dirs})
-    set(full_platform_dir ${MODIO_ROOT_DIR}/platform/${platform_dir})
-    if (EXISTS ${full_platform_dir}/platform.cmake)
-        include(${full_platform_dir}/platform.cmake)
-    endif()
-endforeach()
+    #iterate through all the currently installed platform directories
+    list_subdirs(modio_platform_dirs ${MODIO_ROOT_DIR}/platform )
+
+    set(MODIO_PLATFORM_CMAKE_FILES "")
+    set(MODIO_PLATFORM_CI_DIRS "")
+
+    #add_subdirectory will only populate targets for the currently valid MODIO_PLATFORM
+    foreach (platform_dir ${modio_platform_dirs})
+        set(full_platform_dir ${MODIO_ROOT_DIR}/platform/${platform_dir})
+        if (EXISTS ${full_platform_dir}/platform.cmake)
+            include(${full_platform_dir}/platform.cmake)
+            list(APPEND MODIO_PLATFORM_CMAKE_FILES "${full_platform_dir}/platform.cmake")
+        endif()
+    endforeach()
+
+    set(MODIO_PLATFORM_CMAKE_FILES "${MODIO_PLATFORM_CMAKE_FILES}" PARENT_SCOPE)
+    set(MODIO_PLATFORM_CI_DIRS "${MODIO_PLATFORM_CI_DIRS}" PARENT_SCOPE)
+
+    set(MODIO_SET_TOOLCHAIN FALSE)
+endfunction()
+
+function (modio_platform_init)
+    set(MODIO_LOAD_PLATFORM_MODULES TRUE)
+
+    message("Loading platform modules...")
+
+    foreach(file ${MODIO_PLATFORM_CMAKE_FILES})
+        include(${file})
+    endforeach()
+
+    foreach(dir ${MODIO_PLATFORM_CI_DIRS})
+        add_subdirectory(${dir})
+    endforeach()
 
 
-add_generated_defines_to_platform()
+    add_generated_defines_to_platform()
+
+    set(MODIO_LOAD_PLATFORM_MODULES FALSE)
+endfunction()

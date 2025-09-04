@@ -86,9 +86,10 @@ namespace Modio
 							for (const Modio::ModInfo& Mod : *List)
 							{
 								Modio::Detail::SDKSessionData::GetSystemModCollection().UpdateMod(
-									Mod, Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+									Mod, Modio::ToModioString(
+											 Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
 											 .MakeModPath(Mod.ModId)
-											 .u8string());
+											 .u8string()));
 							}
 							Self.complete(ec, std::move(List));
 						}
@@ -102,5 +103,15 @@ namespace Modio
 				}
 			}
 		};
+
+		template<typename ListCompleteCallback>
+		void ListUserCreatedModsAsync(FilterParams InFilter, ListCompleteCallback&& OnListComplete)
+		{
+			return asio::async_compose<ListCompleteCallback,
+									   void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>(
+				Modio::Detail::ListUserCreatedModsOp(Modio::Detail::SDKSessionData::CurrentGameID(), InFilter),
+				OnListComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio

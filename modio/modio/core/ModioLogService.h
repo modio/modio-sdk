@@ -36,6 +36,7 @@ namespace Modio
 			/// @docinternal
 			/// @brief Default constructor
 			MODIO_IMPL explicit LogService(asio::io_context& IOService);
+			LogService(LogService&&) = delete;
 
 			using implementation_type = std::shared_ptr<Modio::Detail::LoggerImplementation>;
 

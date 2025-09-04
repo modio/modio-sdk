@@ -16,12 +16,12 @@
 #include "modio/detail/ops/ModioDownloadImage.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/serialization/ModioUserSerialization.h"
-#include <asio/yield.hpp>
 
 namespace Modio
 {
 	namespace Detail
 	{
+#include <asio/yield.hpp>
 		class GetModMediaAvatarOp
 		{
 		public:
@@ -89,7 +89,7 @@ namespace Modio
 						return;
 					}
 
-					Self.complete({}, std::move(OpState.DestinationPath->u8string()));
+					Self.complete({}, Modio::ToModioString(std::move(OpState.DestinationPath->u8string())));
 				}
 			}
 
@@ -110,7 +110,17 @@ namespace Modio
 				Modio::User User {};
 			} OpState;
 		};
+#include <asio/unyield.hpp>
+
+		template<typename GetAvatarCompleteCallback>
+		void GetModMediaAvatarAsync(Modio::ModID ModId, Modio::AvatarSize AvatarSize,
+									GetAvatarCompleteCallback&& OnGetAvatarComplete)
+		{
+			return asio::async_compose<GetAvatarCompleteCallback, void(Modio::ErrorCode, Modio::Optional<std::string>)>(
+				Modio::Detail::GetModMediaAvatarOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+												   Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId, AvatarSize),
+				OnGetAvatarComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
-
-#include <asio/unyield.hpp>

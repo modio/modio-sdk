@@ -99,6 +99,15 @@ namespace Modio
 				}
 			}
 		};
+
+		template<typename GalleryActionCompleteCallback>
+		void AddOrUpdateModGalleryImagesAsync(Modio::ModID ModID, std::vector<std::string> InImagePaths, bool SyncGallery, GalleryActionCompleteCallback&& OnGalleryActionComplete)
+		{
+			return asio::async_compose<GalleryActionCompleteCallback, void(Modio::ErrorCode)>(
+				Modio::Detail::AddOrUpdateModGalleryImagesOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID, InImagePaths, SyncGallery),
+				OnGalleryActionComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
 #include <asio/unyield.hpp>

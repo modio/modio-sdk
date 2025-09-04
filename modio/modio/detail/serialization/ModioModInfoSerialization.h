@@ -16,6 +16,11 @@
 #include "modio/detail/ModioJsonHelpers.h"
 
 #include "modio/detail/serialization/ModioModCommunityOptionsSerialization.h"
+#include "modio/detail/serialization/ModioGalleryListSerialization.h"
+#include "modio/detail/serialization/ModioModMonetizationSKUSerialization.h"
+#include "modio/detail/serialization/ModioProfileMaturitySerialization.h"
+#include "modio/detail/serialization/ModioImageSerialization.h"
+#include "modio/detail/serialization/ModioLogoSerialization.h"
 
 namespace Modio
 {
@@ -88,6 +93,7 @@ namespace Modio
 			Detail::ParseSafe(Json, ModInfo.Visibility, "visible");
 			Detail::ParseSafe(Json, ModInfo.Price, "price");
 			Detail::ParseSafe(Json, ModInfo.Dependencies, "dependencies");
+			Detail::ParseSafe(Json, ModInfo.SKUMappings, "skus");
 		}
 
 		{

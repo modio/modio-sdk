@@ -19,15 +19,15 @@
 #include "modio/detail/serialization/ModioTransactionRecordSerialization.h"
 #include "modio/userdata/ModioUserDataService.h"
 
-#include <asio/yield.hpp>
 namespace Modio
 {
 	namespace Detail
 	{
+#include <asio/yield.hpp>
 		class PurchaseModOp
 		{
 		public:
-			PurchaseModOp(Modio::GameID GameID, Modio::ApiKey ApiKey, Modio::ModID ModID, uint64_t PriceInTokens)
+			PurchaseModOp(Modio::GameID GameID, Modio::ApiKey ApiKey, Modio::ModID ModID, Modio::Optional<uint64_t> PriceInTokens)
 				: GameID(GameID),
 				  ApiKey(ApiKey),
 				  ModId(ModID),
@@ -37,16 +37,21 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
+				Modio::Detail::HttpRequestParams RequestParameters =
+					Modio::Detail::PurchaseRequest.SetGameID(GameID)
+						.SetModID(ModId)
+						.AddQueryParamRaw("idempotent_key", fmt::format("{}", ModId))
+						.AddHeaderRaw("X-Modio-Idempotent-Key", fmt::format("{}", ModId));
+
+				if (PriceInTokens.has_value())
+				{
+					RequestParameters.AddQueryParamRaw("display_amount", fmt::format("{}", PriceInTokens.value()));
+				}
+
 				reenter(CoroutineState)
 				{
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
-						ResponseBodyBuffer,
-						Modio::Detail::PurchaseRequest.SetGameID(GameID)
-							.SetModID(ModId)
-							.AddQueryParamRaw("display_amount", fmt::format("{}", PriceInTokens))
-							.AddQueryParamRaw("idempotent_key", fmt::format("{}", ModId))
-							.AddHeaderRaw("X-Modio-Idempotent-Key", fmt::format("{}", ModId)),
-						Modio::Detail::CachedResponse::Disallow, std::move(Self));
+						ResponseBodyBuffer, RequestParameters, Modio::Detail::CachedResponse::Disallow, std::move(Self));
 
 					if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))
 					{
@@ -82,9 +87,9 @@ namespace Modio
 							Services::GetGlobalService<CacheService>().AddToCache(Record.value().Mod);
 							Modio::Detail::SDKSessionData::GetSystemModCollection().AddOrUpdateMod(
 								Record.value().Mod,
-								Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+								Modio::ToModioString(Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
 									.MakeModPath(Record.value().Mod.ModId)
-									.u8string());
+									.u8string()));
 
 							if (Modio::Detail::SDKSessionData::GetModPurchases().count(Record.value().Mod.ModId) > 0)
 							{
@@ -140,12 +145,24 @@ namespace Modio
 			Modio::GameID GameID {};
 			Modio::ApiKey ApiKey {};
 			Modio::ModID ModId {};
-			uint64_t PriceInTokens = 0;
+			Modio::Optional<uint64_t> PriceInTokens {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 			asio::coroutine CoroutineState {};
 			Modio::Optional<Modio::TransactionRecord> Record {};
 		};
+#include <asio/unyield.hpp>
+
+		template<typename PurchaseCompleteCallback>
+		void PurchaseModAsync(Modio::ModID ModID, Modio::Optional<uint64_t> ExpectedVirtualCurrencyPrice,
+							  PurchaseCompleteCallback&& OnPurchaseComplete)
+		{
+			return asio::async_compose<PurchaseCompleteCallback,
+									   void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)>(
+				Modio::Detail::PurchaseModOp(Modio::Detail::SDKSessionData::CurrentGameID(),
+											 Modio::Detail::SDKSessionData::CurrentAPIKey(), ModID,
+											 ExpectedVirtualCurrencyPrice),
+				OnPurchaseComplete,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	} // namespace Detail
 } // namespace Modio
-
-#include <asio/unyield.hpp>

@@ -43,6 +43,16 @@ namespace Modio::Detail
 		Modio::Detail::DynamicBuffer ResponseBuffer {};
 		Modio::EmailAddress EmailAddress;
 	};
+
+	template<typename RequestEmailAuthCodeCompleteCallback>
+	void RequestEmailAuthCodeAsync(Modio::EmailAddress EmailAddress,
+								   RequestEmailAuthCodeCompleteCallback&& OnRequestComplete)
+	{
+		return asio::async_compose<RequestEmailAuthCodeCompleteCallback, void(Modio::ErrorCode)>(
+			Modio::Detail::RequestEmailAuthCodeOp(EmailAddress), OnRequestComplete,
+			Modio::Detail::Services::GetGlobalContext().get_executor());
+	}
+
 } // namespace Modio::Detail
 
 #include <asio/unyield.hpp>
