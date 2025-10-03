@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/entities/ModioModStats.h"
 #include "modio/detail/JsonWrapper.h"
 #include <string>
@@ -21,16 +22,9 @@ namespace Modio
 	enum class EntitlementConsumptionState
 	{
 		Failed = 0,
-		Pending = 1, 
+		Pending = 1,
 		Fulfilled = 2,
 		ConsumeLimitExceeded = 3
-	};
-
-	/// @docpublic
-	///	@brief Type of entitlement that was consumed
-	enum class EntitlementType
-	{
-		VirtualCurrency = 0
 	};
 
 	/// @docpublic
@@ -68,7 +62,7 @@ namespace Modio
 		/// @brief Type of Entitlement that was consumed
 		Modio::EntitlementType EntitlementType = Modio::EntitlementType::VirtualCurrency;
 
-		/// @brief Details about 
+		/// @brief Details about
 		Modio::EntitlementConsumptionVirtualCurrencyDetails VirtualCurrencyDetails;
 
 		/// @docpublic
@@ -96,4 +90,4 @@ namespace Modio
 		MODIO_IMPL friend void to_json(nlohmann::json& Json,
 									   const Modio::EntitlementConsumptionStatus& EntitlementTransaction);
 	};
-}
+} // namespace Modio

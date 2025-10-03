@@ -819,8 +819,16 @@ namespace Modio
 	};
 
 	/// @docpublic
+	///	@brief Type of entitlement
+	enum class EntitlementType
+	{
+		VirtualCurrency = 0,
+		SKU = 1
+	};
+
+	/// @docpublic
 	/// @brief Simple struct to store metric session specific parameters for use in
-	/// xref:Modio::MetricsSessionStartAsync[]
+	/// [`Modio::MetricsSessionStartAsync`](#metricssessionstartasync)
 	struct MetricsSessionParams
 	{
 		/// @brief Set a custom Session Id to be used in the metrics service for your session

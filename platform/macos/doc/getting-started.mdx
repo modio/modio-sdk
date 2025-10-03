@@ -1,19 +1,23 @@
 ---
 id: mac-getting-started
-title: Getting Started
-slug: /cppsdk/macos/getting-started/
+title: MacOS Setup
+slug: /cppsdk/macos/getting-started
 sidebar_position: 0
 custom_edit_url: https://github.com/modio/modio-sdk-internal/blob/develop/platform/macos/doc/getting-started.mdx
 ---
 
-# Getting Started
+# MacOS Setup
 
-## mod.io MacOS SDK Integration
+## mod.io MacOS SDK integration
 
 The use of MacOS with the mod.io SDK is ready by default. You can find the `macos` directory in the platform subdirectory of your SDK installation.
 You can then target `MACOS` to compile the mod.io SDK for MacOS SDK.
 
-## MacOS SDK Versions
+:::important[Find your guide]
+This setup guide is intended for those building for Mac. If that's not you, check out our other [Platform Installation Guides](/cppsdk/installation/#platform-installation-guides) or continue to work through the [C++ SDK Getting Started Guides](/cppsdk/#getting-started) to implement mod.io's core functionality.
+:::
+
+## MacOS SDK versions
 
 The mod.io SDK is built and tested against MacOS using XCode v14 & v15.1. Using different versions of the MacOS SDK may result in compilation issues.
 
@@ -23,10 +27,12 @@ In MacOS, the default way to compile the mod.io SDK requires CMake, which you ca
 brew install cmake ninja
 ```
 
-NOTE: You can use Ninja or XCode as project generators. The former works like any other C++ project. The later will create a `.xcodeproj` file in the designated output folder.
+:::note 
+You can use Ninja or XCode as project generators. The former works like any other C++ project. The later will create a `.xcodeproj` file in the designated output folder.
+:::
 
 
-## macOS Dependencies
+## MacOS dependencies
 
 The mod.io SDK for development on macOS / iOS requires Clang 10 or GCC 10 or later, which come included in the XCode installation. XCode 14 or later is recommended. To install CMake 3.20 or Ninja 1.10, it is recommended to use [brew](https://brew.sh) as follows:
 

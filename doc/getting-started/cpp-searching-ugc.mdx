@@ -1,0 +1,59 @@
+---
+id: cpp-searching-ugc
+title: Searching for UGC
+slug: /cppsdk/searching-ugc
+---
+
+# Searching for UGC
+
+When setting up UGC in your game, you'll want users to be able to search for UGC before they subscribe to and install it.
+
+This guide covers:
+
+* [Querying UGC](#querying-ugc)
+* [Next steps](#next-steps)
+
+## Querying UGC
+
+The primary way this is done is through [`ListAllModsAsync`](/cppsdk/refdocs/#listallmodsasync). Note that authentication is not required to browse UGC.
+
+```cpp
+
+Modio::ListAllModsAsync(Modio::FilterParams(), [](Modio::ErrorCode ec, Modio::Optional<Modio::ModInfoList> Results)
+{
+    if (ec)
+    {
+        // Error handling
+    }
+    else
+    {
+        for (Modio::ModInfo& CurrentModProfile : *Results)
+        {
+            std::cout << CurrentModProfile.ProfileName;
+        }
+    }
+});
+```
+
+You'll notice that [`ListAllModsAsync`](/cppsdk/refdocs/#listallmodsasync) takes a [`FilterParams`](/cppsdk/refdocs/#FilterParams) object as its first parameter. The default state of this object is set to ask for the first 100 results (the maximum number returnable in a query), sorting by the UGC's mod ID.
+
+To search for a specific query string, sort in a different order, or combine different filters, you can pass in a FilterParams object like this:
+
+```cpp
+// Search queries
+Modio::ListAllModsAsync(Modio::FilterParams().NameContains("SomeString"), ...)
+// Sorting
+Modio::ListAllModsAsync(Modio::FilterParams().SortBy(Modio::FilterParams::SortFieldType::DownloadsToday, Modio::SortDirection::Ascending), ...)
+
+// Ranged results - starting at index 20, return 10 results
+Modio::ListAllModsAsync(Modio::FilterParams.NameContains("Your Query").IndexedResults(20, 10), ...)
+
+// Ranged results - return the 20th page of 10 results
+Modio::ListAllModsAsync(Modio::FilterParams.NameContains("Your Query").PagedResults(20, 10), ...)
+```
+
+## Next steps
+
+Now your users can find UGC in your game, so it's time to set up the ability to subscribe to and download UGC using the [Subscribing to UGC](/cppsdk/subscribing) guide.
+
+If you've already done this, we recommend working your way through the [C++ SDK Getting Started Guides](/cppsdk/#c-sdk-core-setup-guides) as they will teach you how to implement the mod.io fundamentals before moving onto exploring our [Features](/features).

@@ -50,14 +50,27 @@ namespace Modio
 
 	Modio::FilterParams& FilterParams::MatchingAuthor(const Modio::UserID& UserId)
 	{
-		AuthorUserIds.clear();
-		AuthorUserIds.push_back(UserId);
+		IncludedAuthorUserIds.clear();
+		IncludedAuthorUserIds.push_back(UserId);
+		return *this;
+	}
+
+	Modio::FilterParams& FilterParams::ExcludingAuthor(const Modio::UserID& UserId)
+	{
+		ExcludedAuthorUserIds.clear();
+		ExcludedAuthorUserIds.push_back(UserId);
 		return *this;
 	}
 
 	Modio::FilterParams& FilterParams::MatchingAuthors(const std::vector<Modio::UserID>& UserIds)
 	{
-		AuthorUserIds = UserIds;
+		IncludedAuthorUserIds = UserIds;
+		return *this;
+	}
+
+	Modio::FilterParams& FilterParams::ExcludingAuthors(const std::vector<Modio::UserID>& UserIds)
+	{
+		ExcludedAuthorUserIds = UserIds;
 		return *this;
 	}
 
@@ -215,9 +228,14 @@ namespace Modio
 			FilterFields.emplace("_q", SearchStr);
 		}
 
-		if (!AuthorUserIds.empty())
+		if (!IncludedAuthorUserIds.empty())
 		{
-			FilterFields.emplace("submitted_by-in", fmt::format("{}", fmt::join(AuthorUserIds, ",")));
+			FilterFields.emplace("submitted_by-in", fmt::format("{}", fmt::join(IncludedAuthorUserIds, ",")));
+		}
+
+		if (!ExcludedAuthorUserIds.empty())
+		{
+			FilterFields.emplace("submitted_by-not-in", fmt::format("{}", fmt::join(ExcludedAuthorUserIds, ",")));
 		}
 
 		if (DateRangeBegin)

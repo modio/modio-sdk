@@ -10,9 +10,13 @@
 
 include(GetGitRevisionDescription)
 find_package(Git)
+# enable PATH_EQUAL operator
+cmake_policy(SET CMP0139 NEW)
 
 function(GetVersionInfo _MainBranchName _MainCommitCount _BranchID _BranchCommitCount _CountDirtyChanges)
-	
+
+
+#bail if git is missing, a git dir was not found or the git dir was outside the SDK root directory
 	if (NOT GIT_EXECUTABLE)
 		message (STATUS "Cannot find git, falling back to version file")
 		file (STRINGS "${MODIO_ROOT_DIR}/.modio" MainCommitCount)
@@ -21,6 +25,20 @@ function(GetVersionInfo _MainBranchName _MainCommitCount _BranchID _BranchCommit
         set ("${_BranchID}" "" PARENT_SCOPE)
 		set ("${_BranchCommitCount}" "" PARENT_SCOPE)
         return()
+	endif()
+
+	_git_find_closest_git_dir(${CMAKE_CURRENT_LIST_DIR} MODIO_MAYBE_GIT_DIR)
+	file(TO_CMAKE_PATH ${MODIO_MAYBE_GIT_DIR} MODIO_MAYBE_GIT_DIR)
+	file(TO_CMAKE_PATH "${MODIO_ROOT_DIR}/.git" MODIO_EXPECTED_GIT_DIR )
+
+	if (NOT MODIO_MAYBE_GIT_DIR OR NOT "${MODIO_MAYBE_GIT_DIR}" PATH_EQUAL "${MODIO_EXPECTED_GIT_DIR}")
+		message(STATUS "No .git directory located in project root, falling back to version file")
+		file (STRINGS "${MODIO_ROOT_DIR}/.modio" MainCommitCount)
+		set ("${_MainCommitCount}" "${MainCommitCount}" PARENT_SCOPE)
+		#Empty default values
+		set ("${_BranchID}" "" PARENT_SCOPE)
+		set ("${_BranchCommitCount}" "" PARENT_SCOPE)
+		return()
 	endif()
 
 	#Abuse GetGitRevisionDescription commit detection to ensure commits are in sync

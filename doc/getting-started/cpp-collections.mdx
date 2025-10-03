@@ -1,0 +1,300 @@
+---
+id: cpp-collections
+title: Collections
+slug: /cppsdk/collections
+---
+
+
+# Collections
+
+A Collection is a list of mods that are grouped together by a mod.io user. They are useful for things like sharing specific mod lists, themed packs, conversions, and the like.
+
+Collections need to be enabled on your game's Content Settings page to allow users to create collections, and you can also choose whether or not to allow comments on Collections, as well as set a maximum number of mods per-collection.
+
+Collections share many of the same actions as Mods, such as subscribing, rating, commenting, etc, but also have the ability to be followed, to attach them to a user's account without subscribing to the mods therein.
+
+:::note
+Currently, Collection Management actions such as creating, editing, and deleting Collections can only be done through the web frontend. These actions will be added to the SDK in a later release.
+:::
+
+## List Mod Collections
+
+To get a filtered list of mod collections call [`ListModCollectionsAsync`](/cppsdk/refdocs/#listmodcollectionsasync) which will return a `Modio::ModCollectionInfoList` upon success.
+
+```cpp
+void ListModCollections(Modio::FilterParams Filter)
+{
+    Modio::ListModCollectionsAsync(Filter, [](Modio::ErrorCode ec, Modio::Optional<Modio::ModCollectionInfoList> Collections)
+    {
+        if(ec)
+        {
+            // an error occurred
+        }
+        else
+        {
+            for(Modio::ModCollectionInfo& CollectionInfo : Collections.value())
+            {
+                // CollectionInfo contains the Collection info (but not the list of mods!)
+            }
+        }
+    });
+}
+```
+
+## Get Mod Collection Info
+
+You can also use [`GetModCollectionInfoAsync`](/cppsdk/refdocs/#getmodcollectioninfoasync) to get the `Modio::ModCollectionInfo` about a specific Collection by querying it with the appropriate `Modio::ModCollectionID`.
+
+```cpp
+void GetModCollectionInfo(Modio::ModCollectionID CollectionId)
+{
+    Modio::GetModCollectionInfoAsync(CollectionId, [](Modio::ErrorCode ec, Modio::Options<Modio::ModCollectionInfo> Info)
+    {
+        if(ec)
+        {
+            // an error occurred
+        }
+        else
+        {
+            //Info.value() returns the Collection Info (but not the list of mods!)
+        }
+    });
+}
+```
+
+## Get Mod Collection Mods
+
+Calling [`GetModCollectionModsAsync`](/cppsdk/refdocs/#getmodcollectionmodsasync) will return a `Modio::ModInfoList` upon success, which will allow you to display the details of all mods within the given collection to your players.
+
+```cpp
+void GetModCollectionMods(Modio::ModCollectionID CollectionId)
+{
+    Modio::GetModCollectionModsAsync(CollectionId, [](Modio::ErrorCode ec, Modio::Optional<Modio::ModInfoList> ModList)
+    {
+        if(ec)
+        {
+            // an error occurred
+        }
+        else
+        {
+            // ModList is the (Modio::Optional) Mod Info List.
+            for(Modio::ModInfo& Mod : ModList.value())
+            {
+                // Mod is a Modio::ModInfo.
+            }
+        }
+    });
+}
+```
+
+## Follow Mod Collection
+
+Mod Collections can be Followed, distinct from Subscribing, which adds it to the user's list of Followed Collections, allowing them to quickly and easily find it for subscribing/unsubscribing. Following can be performed by calling [`FollowModCollectionAsync`](/cppsdk/refdocs/#followmodcollectionasync) which simply returns a `Modio::ErrorCode` to indicate success/failure.
+
+```cpp
+void FollowModCollections(Modio::ModCollectionID CollectionId)
+{
+    Modio::FollowModCollectionAsync(CollectionId, [](Modio::ErrorCode ec)
+    {
+        if(ec)
+        {
+            // an error occurred.
+        }
+        else
+        {
+            // the Collection was successfully followed
+        }
+    });
+}
+```
+
+## Unfollow Mod Collection
+
+The inverse of above, call [`UnfollowModCollectionAsync`](/cppsdk/refdocs/#unfollowmodcollectionasync) to Unfollow a Mod Collection.
+
+```cpp
+void UnfollowModCollections(Modio::ModCollectionID CollectionId)
+{
+    Modio::UnfollowModCollectionAsync(CollectionId, [](Modio::ErrorCode ec)
+    {
+        if(ec)
+        {
+            // an error occurred.
+        }
+        else
+        {
+            // the Collection was successfully unfollowed
+        }
+    });
+}
+```
+
+## List User Followed Mod Collections
+
+A list of all Collections the currently authenticated user is following can be acquired via [`ListUserFollowedModCollectionsAsync`](/cppsdk/refdocs/#listuserfollowedmodcollectionsasync). This query can be filtered if desired.
+
+```cpp
+void GetUserFollowedModCollections(Modio::FilterParams Filter)
+{
+    Modio::ListUserFollowedModCollectionsAsync(Filter, [](Modio::ErrorCode ec, Modio::Optional<Modio::ModCollectionInfoList> FollowedCollections)
+    {
+        if(ec)
+        {
+            // an error occurred.
+        }
+        else
+        {
+            for(Modio::ModCollectionInfo& CollectionInfo : FollowedCollections.value())
+            {
+                // CollectionInfo contains the Collection info (but not the list of mods!)
+            }
+        }
+    });
+}
+```
+## Subscribe To Mod Collection
+
+A Mod Collection can be subscribed to, which adds all of the Mods within the Collection to the user's subscription list. Do this by calling [`SubscribeToModCollectionAsync`](/cppsdk/refdocs/#subscribetomodcollectionasync) and providing the relevant Collection ID.
+
+:::note
+Subscribing to a Collection *only* subscribes the user to the mods within the collection; currently there is no concept of "subscription" specifically to a collection itself, just the mods within it.
+
+Additionally, calling `SubscribeToModCollectionAsync` does not queue the Mods for download and installation. You will still need to call `FetchExternalUpdatesAsync` to trigger the download, assuming you have called `EnableModManagement` prior to the fetching process.
+:::
+
+```cpp
+void SubscribeToModCollection(Modio::ModCollectionID CollectionId)
+{
+    // We are assuming Mod Management is already enabled.
+    Modio::SubscribeToModCollectionAsync(CollectionId, [](Modio::ErrorCode ec)
+    {
+        if(ec)
+        {
+            // an error occurred.
+        }
+        else
+        {
+            // The Collection was successfully subscribed to.
+            // Now you need to fetch external updates to synchronize the subscription list
+            Modio::FetchExternalUpdatesAsync([](Modio::ErrorCode ec)
+            {
+                if(ec)
+                {
+                    // an error occurred.
+                }
+                else
+                {
+                    // Updates were fetched.
+                    // So long as Mod Management is enabled the new mods will be queued for download and installation.
+                }
+            });
+        }
+    });
+}
+```
+
+## Unsubscribe From Mod Collection
+
+The inverse of above, [`UsubscribeFromModCollectionAsync`](/cppsdk/refdocs/#unsubscribefrommodcollectionasync) removes all Mods in a Collection from the user's subscription list. As before, you will need to call `FetchExternalUpdatesAsync` and have Mod Management enabled to trigger the uninstallation of the given mods.
+
+:::note
+Directly inverse of `SubscribeToModCollectionAsync`, this unsubscribes the user from the Mods within the Collection regardless of whether they were subscribed to them prior to subscribing to the collection itself. This can be somewhat opaque to the end-user, and should be communicated as such.
+
+And again, calling `UnsubscribeFromModCollectionAsync` does not queue the Mods for uninstallation. You will still need to call `FetchExternalUpdatesAsync` to trigger the uninstallation process, assuming you have called `EnableModManagement` prior to the fetching process.
+:::
+
+```cpp
+void UnsubscribeFromModCollection(Modio::ModCollectionID CollectionId)
+{
+    // We are assuming Mod Management is already enabled.
+    Modio::UnsubscribeFromModCollectionAsync(CollectionId, [](Modio::ErrorCode ec)
+    {
+        if(ec)
+        {
+            // an error occurred.
+        }
+        else
+        {
+            // The Collection was successfully unsubscribed from.
+            // Now you need to fetch external updates to synchronize the subscription list
+            Modio::FetchExternalUpdatesAsync([](Modio::ErrorCode ec)
+            {
+                if(ec)
+                {
+                    // an error occurred.
+                }
+                else
+                {
+                    // Updates were fetched.
+                    // So long as Mod Management is enabled the new mods will be queued for uninstallation.
+                }
+            });
+        }
+    });
+}
+```
+
+## Submit Mod Collection Rating
+
+A user can submit a rating for a Mod Collection by calling [`SubmitModCollectionRatingAsync`](/cppsdk/refdocs/#submitmodcollectionratingasync) and providing both the `Modio::ModCollectionID` and the `Modio::Rating`.
+
+```cpp
+void SubmitModCollectionRating(Modio::ModCollectionID CollectionId, Modio::Rating Rating)
+{
+    Modio::SubmitModCollectionRatingAsync(CollectionId, Rating, [](Modio::ErrorCode ec)
+    {
+        if(ec)
+        {
+            // an error occurred.
+        }
+        else
+        {
+            // the Collection rating was successfully submitted
+        }
+    });
+}
+```
+
+## Get Mod Media
+
+We provide a set of functions for downloading Mod Collection Logos and Mod Collection Author Avatars to disk in a similar manner to Mod Media, vias [`GetModCollectionMediaAsync`](/cppsdk/refdocs/#getmodcollectionmediaasync)
+
+### Get Mod Collection Logo
+
+```cpp
+void GetModCollectionLogo(Modio::ModCollectionID CollectionId)
+{
+    Modio::GetModCollectionMediaAsync(CollectionId, Modio::LogoSize::Thumb640, 
+        [](Modio::ErrorCode ec, Modio::Optional<std::string> PathToFile)
+        {
+            if(ec)
+            {
+                // an error occurred.
+            }
+            else
+            {
+                // success, the file should be at the path in PathToFile.value()
+            }
+        })
+}
+```
+
+### Get Mod Collection Author Avatar
+
+```cpp
+void GetModCollectionLogo(Modio::ModCollectionID CollectionId)
+{
+    Modio::GetModCollectionMediaAsync(CollectionId, Modio::AvatarSize::Thumb100, 
+        [](Modio::ErrorCode ec, Modio::Optional<std::string> PathToFile)
+        {
+            if(ec)
+            {
+                // an error occurred.
+            }
+            else
+            {
+                // success, the file should be at the path in PathToFile.value()
+            }
+        })
+}
+```

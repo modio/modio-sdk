@@ -1,16 +1,20 @@
 ---
 id: android-getting-started
-title: Getting Started
-slug: /cppsdk/android/getting-started/
-sidebar_position: 1
-custom_edit_url: https://github.com/modio/modio-sdk-internal/blob/develop/platform/android/doc/getting-started.mdx
+title: Android Setup
+slug: /cppsdk/android/getting-started
 ---
+
+# Android Setup
 
 ## Pre-requisites
 
 Install a Perl distribution (ie Strawberry Perl) and ensure perl.exe is in your path.
 
-## Android SDK/NDK Versions
+:::important[Find your guide]
+This setup guide is intended for those building for Android. If that's not you, check out our other [Platform Installation Guides](/cppsdk/installation/#platform-installation-guides) or continue to work through the [C++ SDK Getting Started Guides](/cppsdk/#getting-started) to implement mod.io's core functionality.
+:::
+
+## Android SDK/NDK versions
 
 The mod.io Android SDK is built against NDK version r25b and supports the arm64-v8a ABI. To install the correct NDK, open Android Studio, go to the SDK Manager and install the following: 
 
@@ -44,7 +48,7 @@ Prior to initializing the mod.io SDK via `Modio::InitializeAsync`, you have to p
 
 There are two ways that you can perform Google SSO, either via a server-side auth code which the mod.io service will exchange for an ID Token, or directly using an ID token.
 
-### Sever Auth Code
+### Server Auth Code
 
 Obtain a Server Auth Code from Google Play Games Services (v1 only) or the Google Sign-In Client library, ensuring you request Email access and the Profile scope.
 
@@ -89,7 +93,7 @@ Once you receive the ID Token, you can authenticate using `Modio::AuthenticateUs
 
 ## Marketplace
 
-You can set up your Android game so users can purchase creator credits through the Google Play Store, and the mod.io platform will verify those purchases and grant associated entitlements to the user. To enable this, first [follow these steps to configure entitlements for your game](/platforms/google/marketplace). 
+You can set up your Android game so users can purchase creator credits through the Google Play Store, and the mod.io platform will verify those purchases and grant associated entitlements to the user. To enable this, first [follow these steps to configure entitlements for your game](https://docs.mod.io/platforms/google/marketplace). 
 
 Next, [integrate the Google Play Billing Library into your game](https://developer.android.com/google/play/billing/integrate) to query for your In-App Products (IAPs) and make purchases. 
 
@@ -130,7 +134,7 @@ extern "C"
     const char* receipt = env->GetStringUTFChars(jsonReceipt, nullptr);
 
     Modio::EntitlementParams EntitlementParams;
-    EntitlementParams.ExtendedParameters.emplace(Modio::Detail::Constants::APIStrings::Receipt, receipt);
+    EntitlementParams.ExtendedParameters.emplace("receipt", receipt);
     Modio::RefreshUserEntitlementsAsync(
       EntitlementParams,
       [](Modio::ErrorCode ec, Modio::Optional<Modio::EntitlementConsumptionStatusList> entitlementList) {

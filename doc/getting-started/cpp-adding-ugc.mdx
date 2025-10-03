@@ -1,0 +1,96 @@
+---
+id: cpp-adding-ugc
+title: Adding UGC
+slug: /cppsdk/adding-ugc
+---
+
+# Adding UGC
+
+Submitting UGC from inside your game and making it visible to other players involves two steps: submitting the UGC and submitting the UGC's data.
+
+This guide covers:
+
+* [Submitting new UGC](#submitting-new-ugc)
+* [Submitting UGC data](#submitting-ugc-data)
+* [Edit existing UGC](#edit-existing-ugc)
+
+## Submitting new UGC
+
+To submit UGC, first create a mod handle using [`GetModCreationHandle`](/cppsdk/refdocs/#getmodcreationhandle) and use that handle when calling [`SubmitNewModAsync`](/cppsdk/refdocs/#submitnewmodasync). Note that the newly created mod will remain hidden until a mod file is added in the next step.
+
+```cpp
+
+Modio::ModCreationHandle Handle = GetModCreationHandle();
+
+Modio::CreateModParams Params;
+
+Params.PathToLogoFile = "C:/temp/image.png";
+Params.Name = "My Awesome Mod";
+Params.Summary = "This is an amazing mod";
+// add any additional optional parameters
+
+Modio::SubmitNewModAsync(Handle, Params, [](Modio::ErrorCode ec, Modio::Optional<Modio::ModID> NewModID)
+{
+    if (ec)
+    {
+        // error handling
+    }
+    else
+    {
+        // capture NewModID as needed for subsequent use
+    }
+});
+
+```
+
+## Submitting UGC data
+
+Once you have successfully submitted a piece of UGC, you can submit the UGC's data, also known as a 'mod file', using [`SubmitNewModFileForMod`](/cppsdk/refdocs/#submitnewmodfileformod). When you submit a file, pass a `Modio::CreateModFileParams` containing the directory of the files that you want to submit. The SDK will compress this folder into a zip file and upload it as the active version of the mod. Note that there is no callback for this method; you'll be notified of the completed upload by the Mod Management callback.
+
+```cpp
+
+Modio::CreateModFileParams Params;
+
+Params.RootDirectory = "C:/temp/mod_folder";
+// add any additional optional parameters
+
+// Use NewModID returned in SubmitNewModAsync() callback
+Modio::SubmitNewModFileForMod(NewModID, Params);
+
+```
+
+---
+
+## Edit existing UGC
+
+UGC details can be edited in-game using [`SubmitModChangesAsync`](/cppsdk/refdocs/#submitmodchangesasync).  This function allows you to edit multiple parameters with a single call.  It takes a `Modio::ModID` of the UGC to edit, a `Modio::EditModParams` containing one or more parameters to be altered, and a callback that will contain an optional updated `Modio::ModInfo` object on success.
+
+Note that updating the mod file itself is done via [`SubmitNewModFileForMod`](/cppsdk/refdocs/#submitnewmodfileformod), as detailed above in [`Submitting UGC data`](#submitting-ugc-data).
+
+```cpp
+
+Modio::EditModParams EditParams;
+
+// Add one or more parameters to edit
+EditParams.Name = "My Edited Mod Name";
+EditParams.Summary = "My edited summary";
+
+Modio::SubmitModChangesAsync(ModID, EditParams, [](Modio::ErrorCode ec, Modio::Optional<Modio::ModInfo> UpdatedModInfo)
+{
+    if (ec)
+    {
+        // error handling
+    }
+    else
+    {
+        // capture or display UpdatedModInfo as needed
+    }
+});
+
+```
+
+## Next steps
+
+Congratulations! You have completed all the [C++ SDK Getting Started Guides](/cppsdk/#c-sdk-core-setup-guides)! Your game should now be equipped with mod.io's core UGC functionally.
+
+The time's come to customize your game by exploring our [Features](/features) section. Here you can select features that suit your game's requirements.

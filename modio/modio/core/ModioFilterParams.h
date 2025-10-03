@@ -19,7 +19,7 @@
 namespace Modio
 {
 	/// @docpublic
-	/// @brief Class storing a set of filter parameters for use in xref:Modio::ListAllModsAsync[]
+	/// @brief Class storing a set of filter parameters for use in [`ListAllModsAsync`](#listallmodsasync)
 	class FilterParams
 	{
 	public:
@@ -81,10 +81,23 @@ namespace Modio
 		MODIO_IMPL FilterParams& MatchingAuthor(const Modio::UserID& UserId);
 
 		/// @docpublic
+		/// @brief Exclude mods with the specified author User ID
+		/// @param UserId The User ID to filter on
+		/// @return *this
+		MODIO_IMPL FilterParams& ExcludingAuthor(const Modio::UserID& UserId);
+
+		/// @docpublic
 		/// @brief Only include mods with the specified author User IDs
 		/// @param UserIds The list of User IDs to filter on
 		/// @return *this
 		MODIO_IMPL FilterParams& MatchingAuthors(const std::vector<Modio::UserID>& UserIds);
+
+		
+		/// @docpublic
+		/// @brief Exclude mods with the specified author User IDs
+		/// @param UserIds The list of User IDs to filter on
+		/// @return *this
+		MODIO_IMPL FilterParams& ExcludingAuthors(const std::vector<Modio::UserID>& UserIds);
 
 		/// @docpublic
 		/// @brief Only include mods with the specified IDs
@@ -200,7 +213,9 @@ namespace Modio
 		SortFieldType SortField = SortFieldType::ID;
 		SortDirection Direction = SortDirection::Ascending;
 
-		std::vector<Modio::UserID> AuthorUserIds {};
+		std::vector<Modio::UserID> IncludedAuthorUserIds {};
+		std::vector<Modio::UserID> ExcludedAuthorUserIds {};
+
 		std::vector<std::string> SearchKeywords {};
 
 		Modio::Optional<std::chrono::system_clock::time_point> DateRangeBegin {};

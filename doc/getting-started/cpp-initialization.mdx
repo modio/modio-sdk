@@ -1,0 +1,215 @@
+---
+id: cpp-initialization
+title: Initialization
+slug: /cppsdk/initialization
+---
+
+# Initialization
+
+This guide describes the C++ SDK's basic event loop, initialization, and shutdown functions.
+
+This guide covers:
+
+* [SDK configuration](#sdk-configuration)
+* [Extended initialization parameters](#extended-initialization-parameters)
+* [Event loop](#event-loop-runpendinghandlers)
+* [Multithreading](#multithreading)
+* [Shutting down](#shutting-down)
+* [Next steps](#next-steps)
+
+## SDK configuration
+
+When you are ready to initialize the SDK for the current session, you'll need to call [`InitializeAsync`](/cppsdk/refdocs/#initializeasync), passing in your product's mod.io ID, your API key, the Local Profile Name, and a callback/handler so you know when the SDK is initialized correctly. Note that [`InitializeAsync`](/cppsdk/refdocs/#initializeasync)'s callback will be invoked after calling [`RunPendingHandlers`](/cppsdk/refdocs/#runpendinghandlers) from your project's main loop.
+
+You should also ensure that you are targeting an appropriate Portal for mod.io to understand what storefront or app the request is originating from. This enabled additional storefront-based functionality, such as returning display name mappings for that portal.
+
+```
+// represents some external state so we know that the SDK is good to go
+Modio::Optional<bool> SDKInitialized;
+
+Modio::InitializeOptions Options;
+Options.APIKey = Modio::ApiKey(YOUR_API_KEY);
+Options.GameID = Modio::GameID(YOUR_GAME_ID);
+Options.User = "LocalProfileName";
+Options.GameEnvironment = Modio::Environment::Live;
+Options.PortalInUse = Modio::Portal::Steam;
+
+Modio::InitializeAsync(Options, [&SDKInitialized](Modio::ErrorCode ec) {
+    if (ec)
+    {
+        // SDK initialization failure
+    }
+    else
+    {
+        // SDK init OK - can now make other calls to the SDK, show mod browser UI, etc
+    }
+});
+```
+
+It is worth considering that the "LocalProfileName" is used by the mod.io SDK to associate a local session to a user, as mentioned in [Users and Local Profiles](/cppsdk/structure/#users-and-local-profiles). It is possible to forward a user nickname as the LocalProfileName, then initialize the mod.io SDK. Any data related to a user session will be stored in its corresponding [Mod Data Directory](/cppsdk/structure/#mod-data-directories).
+
+**Notes**
+
+* By convention you'll see these code examples pass in lambda functions as callback handlers, but you can use anything convertible to `std::function` with the appropriate signature.
+* The error-handling in this sample is deliberately kept brief. See [Error Handling](/cppsdk/structure/#error-handling) for more information on error handling.
+* You can perform calls to other functions, such as something that shows your mod browser UI implementation, directly in the callback. The primary caveat to doing much processing here is that you'll be running in the context of, and therefore blocking, the thread running the callback, which is the thread running [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers).
+
+## Extended initialization parameters
+
+The `ExtendedParameters` field on [InitializeOptions](/cppsdk/refdocs/#InitializeOptions) is a set of key-value pairs intended for platform-specific or special-case parameters that need to be passed to the SDK.
+Simply set the value before passing your initialization parameters in to [InitializeAsync](/cppsdk/refdocs/#initializeasync).
+
+```cpp
+Options.ExtendedParameters["SomeParameterName"] = "SomeParameterValue";
+```
+
+### General
+
+The SDK supports the following general use parameters that can be set through `ExtendedParameters`:
+
+| Parameter | Description |
+| --- | --- |
+| `PendingOnlyResults` | Only include UGC in search results that are pending moderation. For moderation and testing purposes. Set to "true" to enable. Warning: Should only be enabled when the user is a moderator or admin of the game, setting in shipping builds is not recommended. |
+| `PlatformOverride` | Set the platform to be used when making requests to show UGC for that platform instead. For moderation and testing purposes. This parameter will soon be deprecated. |
+
+### Storage Quota
+
+The SDK supports the following storage quota parameters that can be set through `ExtendedParameters`:
+
+| Parameter | Description |
+| --- | --- |
+| `ModStorageQuotaMB` | Defines a maximum quota of locally installed UGC for this game, in megabytes (minimum 25 MB). This includes temp mods/UGC and those installed by other users on this system. |
+| `CacheStorageQuotaMB` | Defines a maximum quota for cached image data such as UGC logos and gallery images, in megabytes (minimum 25 MB). |
+
+Example usage:
+
+```cpp
+// Set mod storage quota to 500 MB
+Options.ExtendedParameters["ModStorageQuotaMB"] = "500";
+
+// Set cache storage quota to 250 MB
+Options.ExtendedParameters["CacheStorageQuotaMB"] = "250";
+```
+
+By setting these values, the SDK will actively enforce the specified storage limits.
+
+### Metrics
+
+The SDK supports the following metric parameters that can be set through `ExtendedParameters`:
+
+| Parameter | Description |
+| --- | --- |
+| `MetricsSecretKey` | Set the secret key used by the metrics feature. |
+
+## Event loop (RunPendingHandlers)
+
+The SDK's internal event loop requires care and attention in the form of [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers).
+
+ALL SDK work is performed during executions of [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers), therefore calling it as often as possible will improve performance of the SDK's I/O operations.
+
+You can either call [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) on the main thread, or on a [dedicated background thread or existing thread of your choice](#using-a-dedicated-background-thread).
+
+For optimal execution, [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) should be called at least once per frame. 
+
+For example, if you wish to call RunPendingHandlers on the main thread, it could be located into your project's main loop or into a `tick`-style function on an appropriate controller/manager object.
+
+```cpp
+while(bGameIsRunning == true)
+{
+    // other stuff
+   Modio::RunPendingHandlers();
+    // other stuff
+}
+```
+
+:::note
+RunPendingHandlers is not reentrant-safe. Do not call [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) inside a callback you give to the SDK, or your application will deadlock. Callbacks are run inside [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers), and your inner [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) call will block infinitely waiting for the enclosing scope to exit.
+:::
+
+## Multithreading
+
+The SDK supports [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) being run on a secondary thread that already exists or a dedicated background thread you create specifically to peform SDK work. 
+
+Keep in mind, callbacks you provide to the SDK will run on the thread running [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers). If you host [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) on a different thread, it is your responsibility to synchronize with the main thread if you wish to pass results back to it, through callbacks you provide to the SDK.
+
+This allows the SDK to avoid blocking the main thread of your application while performing IO.
+
+### Using an existing secondary thread
+
+If you have an existing secondary thread which is not heavily utilized, you can call [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) on that thread:
+
+```cpp
+while(bRunBackgroundThread == true)
+{
+    // other stuff
+   Modio::RunPendingHandlers();
+    // other stuff
+}
+```
+
+Just remember, that performance of the SDK is proportional to the amount of CPU cycles you give it, so if you use an existing secondary thread you'll need to ensure that that thread's loop runs at a high enough frequency.
+
+### Using a dedicated background thread
+
+Using a dedicated background thread for [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) will ensure the best performance for the SDK's I/O operations by allowing SDK functionality to execute at a rate not limited by your application's main loop frequency or existing background loop frequencies.
+
+```cpp
+//Assumption: bHaltBackgroundThread is a threadsafe flag or atomic boolean whose lifetime is guaranteed to be longer than that of the handler thread
+HandlerThread = std::thread([&bHaltBackgroundThread]() {
+	while (!bHaltBackgroundThread)
+	{
+		Modio::RunPendingHandlers();
+        //Use one of the following if you intend to call ShutdownAsync in your program:
+        std::this_thread::yield();
+        //Change the sleep duration here as appropriate
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	}
+});
+```
+
+:::note
+[ShutdownAsync](/cppsdk/refdocs/#shutdownasync) takes a lock on the SDK's internal state in order to finalize the pending task queue and shut down internal services. 
+
+If you call [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) in a background thread, especially a dedicated background thread, and invoke [ShutdownAsync](/cppsdk/refdocs/#shutdownasync) to close the SDK while your application continues to run, on certain platforms you may find the mutex/lock to be unfair to the point that the main thread cannot take the lock, because the background thread does not get suspended by the OS' scheduler often enough. 
+
+If this occurs, we recommend you use either a `yield` or high-resolution `sleep` after each invocation of RunPendingHandlers to allow the main thread to take the shutdown lock. Alternatively, you can use some kind of signaling mechanism to pause the background thread calling RunPendingHandlers, call ShutdownAsync, and then allow that background thread to resume looping. 
+
+If the SDK runs for the lifetime of your application and you do not call [ShutdownAsync](/cppsdk/refdocs/#shutdownasync) this is not necessary.
+:::
+
+## Shutting down
+
+To finalize and shut down the mod.io SDK is equally simple:
+```cpp
+// State variable, stored in some valid scope
+bool SDKShutdownComplete = false;
+
+// Capture reference to the state variable in the lambda - could use shared_ptr for more safety instead
+Modio::ShutdownAsync([&SDKShutdownComplete](Modio::ErrorCode ec)
+{
+    SDKShutdownComplete = true;
+});
+
+while(!SDKShutdownComplete)
+{
+    Modio::RunPendingHandlers();
+}
+
+```
+
+:::note
+[ShutdownAsync](/cppsdk/refdocs/#shutdownasync) uses a lock to ensure that global SDK state is not mutated out from underneath an invocation of [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers). It is not safe to call [ShutdownAsync](/cppsdk/refdocs/#shutdownasync) in any callback you provide to the SDK. Callbacks are executed during [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) execution, your application will deadlock while waiting for the enclosing [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) to complete. The lock is deliberately not implemented to support recursive locking, again because [ShutdownAsync](/cppsdk/refdocs/#shutdownasync) mutates data structures that [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) expects to remain unchanged for the duration of its scope.
+:::
+
+:::note
+You will need to continue to call [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) while the async shutdown is in progress to allow for intermediate handlers to finish running.
+:::
+
+## Next steps
+
+Now that you are all set up, you may want to learn more about the [SDK Structure](/cppsdk/structure/) to get a better understanding of the C++ SDK and its processes. 
+
+Or if you are eager to get things moving, you can skip directly to setting up [User Authentication](/cppsdk/user-authentication) or [Searching for UGC](/cppsdk/searching-ugc).
+
+All the core setup information you need can be found in the [C++ SDK Getting Started Guides](/cppsdk/#c-sdk-core-setup-guides), which are designed to teach you how to implement mod.io's fundamentals.
+

@@ -817,17 +817,18 @@ namespace Modio
 
 	enum class MonetizationError
 	{
-		DisplayPriceIncorrect = 23041,
-		GameMonetizationNotEnabled = 23042,
-		IncorrectDisplayPrice = 23043,
-		InsufficientFunds = 23044,
-		ItemAlreadyOwned = 23045,
-		MonetizationAuthenticationFailed = 23046,
-		PaymentFailed = 23047,
-		RetryEntitlements = 23048,
-		UserMonetizationDisabled = 23049,
-		UserMonetizationNotConfigured = 23050,
-		WalletFetchFailed = 23051
+		AccountLacksEntitlement = 23041,
+		DisplayPriceIncorrect = 23042,
+		GameMonetizationNotEnabled = 23043,
+		IncorrectDisplayPrice = 23044,
+		InsufficientFunds = 23045,
+		ItemAlreadyOwned = 23046,
+		MonetizationAuthenticationFailed = 23047,
+		PaymentFailed = 23048,
+		RetryEntitlements = 23049,
+		UserMonetizationDisabled = 23050,
+		UserMonetizationNotConfigured = 23051,
+		WalletFetchFailed = 23052
 	};
 
 	/// @docnone
@@ -840,6 +841,9 @@ namespace Modio
 		{
 			switch (static_cast<Modio::MonetizationError>(ErrorValue))
 			{
+				case MonetizationError::AccountLacksEntitlement:
+						return "The account lacks an unconsumed entitlement matching the mod being purchased.";
+					break;
 				case MonetizationError::DisplayPriceIncorrect:
 						return "The display price for the mod was out-of-date or incorrect. Please retry with the correct display price.";
 					break;
@@ -1131,6 +1135,7 @@ namespace Modio
 		ModIsDependency = 15071,
 		ModfileNoUploadPermission = 15006,
 		ModioOutage = 10000,
+		MonetizationAccountLacksEntitlement = 900099,
 		MonetizationAuthentication = 900002,
 		MonetizationGameMonetizationNotEnabled = 900022,
 		MonetizationInMaintenance = 900012,
@@ -1295,6 +1300,9 @@ namespace Modio
 					break;
 				case ApiError::ModioOutage:
 						return "mod.io is currently experiencing an outage. (rare)";
+					break;
+				case ApiError::MonetizationAccountLacksEntitlement:
+						return "The account lacks an unconsumed entitlement matching the mod being purchased.";
 					break;
 				case ApiError::MonetizationAuthentication:
 						return "A failure has occured when trying to authenticate with the monetization system.";
@@ -2935,7 +2943,22 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::MonetizationError::AccountLacksEntitlement)
+					{
+						return true;
+					}
 
+					if (ec == Modio::ApiError::MonetizationAccountLacksEntitlement)
+					{
+						return true;
+					}
+
+
+
+					if (ec == Modio::MonetizationError::AccountLacksEntitlement)
+					{
+						return true;
+					}
 
 					if (ec == Modio::MonetizationError::DisplayPriceIncorrect)
 					{
@@ -3017,6 +3040,11 @@ namespace Modio
 
 
 
+					if (ec == Modio::MonetizationError::AccountLacksEntitlement)
+					{
+						return true;
+					}
+
 					if (ec == Modio::MonetizationError::DisplayPriceIncorrect)
 					{
 						return true;
@@ -3087,6 +3115,11 @@ namespace Modio
 
 
 
+					if (ec == Modio::MonetizationError::AccountLacksEntitlement)
+					{
+						return true;
+					}
+
 					if (ec == Modio::MonetizationError::DisplayPriceIncorrect)
 					{
 						return true;
@@ -3156,6 +3189,11 @@ namespace Modio
 					}
 
 
+
+					if (ec == Modio::MonetizationError::AccountLacksEntitlement)
+					{
+						return true;
+					}
 
 					if (ec == Modio::MonetizationError::DisplayPriceIncorrect)
 					{

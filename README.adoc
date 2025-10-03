@@ -39,7 +39,7 @@ Welcome to the mod.io SDK repository, built using C++. It allows game developers
 
 == Pre-requisites
 
-Pre-requisites to compile this SDK are listed in https://docs.mod.io/cppsdk/setup/[Getting Started documentation]
+Pre-requisites to compile this SDK are listed in https://docs.mod.io/cppsdk/[Getting Started documentation]
 
 == Download repository
 
@@ -226,7 +226,7 @@ Note that when using the Visual Studio code generator, you have to pass in the t
 cmake -S <modio-sdk folder> --preset=win -G "Visual Studio 16 2019" --Config=Release
 ```
 
-If you are using the `clang` compiler with Visual studio, check section https://docs.mod.io/cppsdk/setup/#clang-compiler-in-visual-studio[Clang compiler in Visual Studio] for further details
+If you are using the `clang` compiler with Visual studio, check section https://docs.mod.io/cppsdk/installation#clang-compiler-in-visual-studio] for further details
 
 ==== Custom FMT library
 If you have a custom version of the FMT library, you can modify the linking stage defining `MODIO_USE_CUSTOM_FMT`. This define signals the CMake build system to use a custom version of the library. Also, it requires that you define `MODIO_CUSTOM_FMT_PATH` to the system path that contains the FMT library to use.
@@ -261,10 +261,10 @@ FILE HEADER VALUES
 
 Please see the https://docs.mod.io/cppsdk/[Getting Started documentation] for a breakdown of the mod.io SDK's concepts and usage, including:
 
-* https://docs.mod.io/cppsdk/getting-started/#initialization-and-teardown[SDK initialization and event loop]
-* https://docs.mod.io/cppsdk/getting-started/#user-authentication[Authentication]
-* https://docs.mod.io/cppsdk/getting-started/#browsing-available-mods[Mod Browsing]
-* https://docs.mod.io/cppsdk/getting-started/#mod-management-and-subscriptions[Mod Subscription Management]
+* https://docs.mod.io/cppsdk/initialization[SDK initialization and event loop]
+* https://docs.mod.io/cppsdk/authentication[Authentication]
+* https://docs.mod.io/cppsdk/searching-ugc[Mod Browsing]
+* https://docs.mod.io/cppsdk/subscribing[Mod Subscription Management]
 
 == Game studios and Publishers [[contact-us]]
 If you need assistance with 1st party approvals, or require a private, white-label UGC solution. mailto:developers@mod.io[Contact us] to discuss.

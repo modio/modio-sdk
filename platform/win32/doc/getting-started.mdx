@@ -1,17 +1,23 @@
 ---
 id: windows-getting-started
-title: Getting Started
-slug: /cppsdk/windows/getting-started/
+title: Windows Setup
+slug: /cppsdk/windows/getting-started
 sidebar_position: 0
 custom_edit_url: https://github.com/modio/modio-sdk-internal/blob/develop/platform/win32/doc/getting-started.mdx
 ---
 
-## mod.io Windows SDK Integration
+# Windows Setup
+
+## mod.io Windows SDK integration
 
 The use of Windows with the mod.io SDK is ready by default. You can find the `windows` directory in the platform subdirectory of your SDK installation.
 You can then target `WIN` to compile the mod.io SDK for Windows.
 
-## Windows Terminal Compilation of x64 library
+:::important[Find your guide]
+This setup guide is intended for those building for Windows. If that's not you, check out our other [Platform Installation Guides](/cppsdk/installation/#platform-installation-guides) or continue to work through the [C++ SDK Getting Started Guides](/cppsdk/#getting-started) to implement mod.io's core functionality.
+:::
+
+## Windows terminal compilation of x64 library
 
 When you compile the mod.io SDK and you require a x64 library in Windows, confirm the use of the "x64 Native Tools Command Prompt" for your Visual Studio version, which by default employs the x64 compiler. To verify the Static or Shared library was compiled with x64 architecture, you can use the "dumpbin" command:
 ```

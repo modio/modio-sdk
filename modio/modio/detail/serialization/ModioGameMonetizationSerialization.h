@@ -19,7 +19,7 @@ namespace Modio
 {
 	inline void from_json(const nlohmann::json& Json, Modio::GameMonetization& GameMonetization)
 	{
-		std::uint8_t monetization = 0;
+		Modio::GameMonetization::StorageType monetization = 0;
 		if (Json.is_number_integer())
 		{
 			using nlohmann::from_json;

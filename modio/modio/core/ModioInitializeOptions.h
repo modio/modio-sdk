@@ -45,7 +45,7 @@ namespace Modio
 		Modio::Portal PortalInUse = Modio::Portal::None;
 		/// @brief The mod.io environment you want to run the SDK on.
 		Modio::Environment GameEnvironment = Modio::Environment::Test;
-		/// @brief Platform-specific extended initialization parameters. See xref:Platform-specific Notes[] for more
+		/// @brief Platform-specific extended initialization parameters. See Platform-specific Notes for more
 		/// information regarding any special values your platform requires or supports.
 		std::map<std::string, std::string> ExtendedParameters {};
 	};

@@ -24,11 +24,12 @@
 #include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/ModioModDependency.h"
 #include "modio/core/ModioReportParams.h"
+#include "modio/core/ModioServerInitializeOptions.h"
 #include "modio/core/ModioStdTypes.h"
+#include "modio/core/entities/ModioEntitlement.h"
 #include "modio/core/entities/ModioEntitlementConsumptionStatusList.h"
 #include "modio/core/entities/ModioGameInfo.h"
 #include "modio/core/entities/ModioGameInfoList.h"
-#include "modio/core/entities/ModioUserRatingList.h"
 #include "modio/core/entities/ModioModCollection.h"
 #include "modio/core/entities/ModioModCommunityOptions.h"
 #include "modio/core/entities/ModioModDetails.h"
@@ -40,7 +41,6 @@
 #include "modio/core/entities/ModioUserList.h"
 #include "modio/core/entities/ModioUserRatingList.h"
 #include "modio/detail/ModioLibraryConfigurationHelpers.h"
-#include "modio/core/ModioServerInitializeOptions.h"
 
 namespace Modio
 {
@@ -64,15 +64,15 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Provide a callback to handle log messages emitted by the SDK.
-	/// @param LogCallback Callback invoked by the SDK during xref:RunPendingHandlers[Modio::RunPendingHandlers] for
+	/// @param LogCallback Callback invoked by the SDK during [`Modio::RunPendingHandlers`](#runpendinghandlers) for
 	/// each log emitted during that invocation
 	MODIOSDK_API void SetLogCallback(std::function<void(Modio::LogLevel, const std::string&)> LogCallback);
 
 	/// @docpublic
 	/// @brief Runs any pending SDK work on the calling thread, including invoking any callbacks passed to asynchronous
 	/// operations.
-	/// NOTE: This should be called while xref:InitializeAsync[Modio::InitializeAsync] and
-	/// xref:ShutdownAsync[Modio::ShutdownAsync] are running, as they both utilize the internal event loop for
+	/// NOTE: This should be called while [`Modio::InitializeAsync`](#initializeasync) and
+	/// [`Modio::ShutdownAsync`](#shutdownasync) are running, as they both utilize the internal event loop for
 	/// functionality.
 	/// NOTE: `RunPendingHandlers` should never be called inside a callback you provide to the SDK. This will result in
 	/// a deadlock.
@@ -248,7 +248,7 @@ namespace Modio
 	/// @brief Forcibly uninstalls a mod from the system. This is intended for use when a host application requires more
 	/// room for a mod that the user wants to install, and as such will return an error if the current user is
 	/// subscribed to the mod. To remove a mod the current user is subscribed to, use
-	/// xref:UnsubscribeFromModAsync[Modio::UnsubscribeFromModAsync].
+	/// [`Modio::UnsubscribeFromModAsync`](#unsubscribefrommodasync).
 	/// @note This function reports its outcome (success or failure) exclusively through the provided `Callback`.
 	/// It **does not** emit a separate `Uninstalled` event.
 	/// @param ModToRemove The ID for the mod to force remove.
@@ -330,7 +330,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Requests a new mod be created with the specified properties
-	/// @param Handle Handle returned by xref:GetModCreationHandle[Modio::GetModCreationHandle]. Each successful call to
+	/// @param Handle Handle returned by [`Modio::GetModCreationHandle`](#getmodcreationhandle). Each successful call to
 	/// SubmitNewModAsync requires a new ModCreationHandle.
 	/// @param Params Information about the mod to be created
 	/// @param Callback Callback invoked with the ID of the created mod once the parameters are validated by the server
@@ -512,7 +512,8 @@ namespace Modio
 	/// @param ModID The mod to retrieve dependencies for
 	/// @param Recursive Include child dependencies in a recursive manner. \r\n NOTE: Recursion supports a maximum depth
 	/// of 5.
-	/// @param Callback Callback providing a status code and an optional xref:ModDependencyList[ModDependencyList]
+	/// @param Callback Callback providing a status code and an optional
+	/// [`Modio::ModDependencyList`](#ModDependencyList)
 	/// @requires initialized-sdk
 	/// @requires no-rate-limiting
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
@@ -806,7 +807,8 @@ namespace Modio
 	/// @brief Attempts to purchase a specified mod with an expected price. Purchasing a mod will add a subscription to
 	/// it
 	/// @param ModID The ID for the mod the user is trying to purchase
-	/// @param ExpectedVirtualCurrencyPrice The price that was displayed to the user, if using the Virtual Currency-based purchasing flow.
+	/// @param ExpectedVirtualCurrencyPrice The price that was displayed to the user, if using the Virtual
+	/// Currency-based purchasing flow.
 	/// @param Callback Callback providing a status code and optional transaction confirmation if the purchase was
 	/// successful. If the expected price that was displayed to the end user is no longer correct, for example if the
 	/// price was increased or decreased by the mod creator since the price was displayed, an error will be returned. If
@@ -823,6 +825,29 @@ namespace Modio
 	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void PurchaseModAsync(
 		Modio::ModID ModID, Modio::Optional<uint64_t> ExpectedVirtualCurrencyPrice,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)> Callback);
+
+	/// @docpublic
+	/// @brief Attempts to purchase a specified mod by consuming an existing, un-consumed entitlement that the user has
+	/// from the current portal. Purchasing a mod will add a subscription to it. If the user does not have an existing
+	/// entitlement, the purchase will fail. It is recommended to call GetAvailableUserEntitlementsAsync to query if the
+	/// current user has an available entitlement prior to this call.
+	/// @param ModID The ID for the mod the user is trying to purchase
+	/// @param Portal-specific additional parameters
+	/// @param Callback Callback providing a status code and optional transaction confirmation if the purchase was
+	/// successful. If the user does not have an available entitlement of the correct type, the purchase will fail.
+	/// @requires initialized-sdk
+	/// @requires authenticated-user
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @errorcategory MonetizationError|Problems during purchase transaction
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error GenericError::BadParameter|The supplied mod ID is invalid
+	/// @error MonetizationError::AccountLacksEntitlement|The user lacks a matching entitlement to make the purchase
+	MODIOSDK_API void PurchaseModWithEntitlementAsync(
+		Modio::ModID ModID, Modio::EntitlementParams Params,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)> Callback);
 
 	/// @docpublic
@@ -844,9 +869,11 @@ namespace Modio
 		Modio::EntitlementParams Params,
 		std::function<void(Modio::ErrorCode, Modio::Optional<EntitlementConsumptionStatusList>)> Callback);
 
-	/// @brief Fetches the updated mod.io wallet balance for the currently logged-in user
-	/// @param Callback Callback providing an error code indicating success or failure, as well as a value indicating
-	/// the updated balance
+	/// @docpublic
+	/// @brief Retrieves a list of the unconsumed entitlements that the mod.io user has available via the current
+	/// portal. Will not consume entitlements.
+	/// @param Params Additional parameters specific to the portal in use
+	/// @param Callback Callback providing an error code indicating success or failure of the retrieval operation
 	/// @requires initialized-sdk
 	/// @requires authenticated-user
 	/// @requires no-rate-limiting
@@ -855,8 +882,23 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @error UserDataError::InvalidUser|No authenticated user
-	MODIOSDK_API void GetUserWalletBalanceAsync(
-		std::function<void(Modio::ErrorCode, Modio::Optional<uint64_t>)> Callback);
+	MODIOSDK_API void GetAvailableUserEntitlementsAsync(
+		Modio::EntitlementParams Params,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)> Callback);
+
+	/// @brief Fetches the updated mod.io wallet balance for the currently logged-in user
+	/// @param Callback Callback providing an error code indicating success or failure, as well as a value
+	/// indicating the updated balance
+	/// @requires initialized-sdk
+	/// @requires authenticated-user
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @errorcategory MonetizationError|Problems during purchase transaction
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	/// @error UserDataError::InvalidUser|No authenticated user
+	MODIOSDK_API
+	void GetUserWalletBalanceAsync(std::function<void(Modio::ErrorCode, Modio::Optional<uint64_t>)> Callback);
 
 	/// @brief Get the currently applied language
 	/// @return Modio::Language currently set
@@ -1023,7 +1065,7 @@ namespace Modio
 	/// @param Callback callback executed upon completion of all mods being validated and installed
 	/// @experimental
 	MODIOSDK_API void InstallOrUpdateServerModsAsync(std::vector<ModID> Mods,
-												  std::function<void(Modio::ErrorCode)> Callback);
+													 std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
 	/// @brief Adds the provided Mods to the Server's list of client mods. Intended to be called on the
@@ -1060,7 +1102,7 @@ namespace Modio
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void ListModCollectionsAsync(
-		Modio::FilterParams Filter, 
+		Modio::FilterParams Filter,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfoList>)> Callback);
 
 	/// @docpublic
@@ -1177,7 +1219,8 @@ namespace Modio
 	/// @error ModManagementError::ModBeingProcessed|Specified mod is pending uninstall. Wait until the uninstall
 	/// process is complete before subscribing again.
 	/// @error GenericError::BadParameter|The supplied mod collection ID is invalid
-	MODIOSDK_API void FollowModCollectionAsync(Modio::ModCollectionID ModCollectionToFollow,
+	MODIOSDK_API void FollowModCollectionAsync(
+		Modio::ModCollectionID ModCollectionToFollow,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfo>)> OnFollowComplete);
 
 	/// @docpublic
@@ -1213,7 +1256,8 @@ namespace Modio
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfoList>)> Callback);
 
 	/// @docpublic
-	/// @brief Downloads the logo for the specified mod collection. Will use existing file if it is already present on disk
+	/// @brief Downloads the logo for the specified mod collection. Will use existing file if it is already present on
+	/// disk
 	/// @param ModId Mod Collection ID for use in logo retrieval
 	/// @param LogoSize Parameter indicating the size of logo that's required
 	/// @param Callback Callback providing a status code and an optional path object pointing to the location of the
@@ -1226,12 +1270,13 @@ namespace Modio
 	/// @error FilesystemError::InsufficientSpace|Not enough space for the file
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @error GenericError::BadParameter|The supplied mod collection ID is invalid
-	MODIOSDK_API void GetModCollectionMediaAsync(Modio::ModCollectionID CollectionId, Modio::LogoSize LogoSize,
-									   std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback);
+	MODIOSDK_API void GetModCollectionMediaAsync(
+		Modio::ModCollectionID CollectionId, Modio::LogoSize LogoSize,
+		std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback);
 
 	/// @docpublic
-	/// @brief Downloads the creator avatar for a specified mod collection. Will use existing file if it is already present on disk
-	/// and not outdated
+	/// @brief Downloads the creator avatar for a specified mod collection. Will use existing file if it is already
+	/// present on disk and not outdated
 	/// @param CollectionId ID of the mod collection the creator avatar will be retrieved for
 	/// @param AvatarSize Parameter indicating the size of avatar image that's required
 	/// @param Callback Callback providing a status code and an optional path object pointing to the location of the
@@ -1244,8 +1289,9 @@ namespace Modio
 	/// @error FilesystemError::InsufficientSpace|Not enough space for the file
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @error GenericError::BadParameter|The supplied mod collection ID is invalid
-	MODIOSDK_API void GetModCollectionMediaAsync(Modio::ModCollectionID CollectionId, Modio::AvatarSize AvatarSize,
-									   std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback);
+	MODIOSDK_API void GetModCollectionMediaAsync(
+		Modio::ModCollectionID CollectionId, Modio::AvatarSize AvatarSize,
+		std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback);
 
 	/// @docpublic
 } // namespace Modio

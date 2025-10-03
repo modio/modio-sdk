@@ -1,19 +1,23 @@
 ---
 id: ios-getting-started
-title: Getting Started
-slug: /cppsdk/ios/getting-started/
+title: iOS Setup
+slug: /cppsdk/ios/getting-started
 sidebar_position: 0
 custom_edit_url: https://github.com/modio/modio-sdk-internal/blob/develop/platform/ios/doc/getting-started.mdx
 ---
 
-# Getting Started
+# iOS Setup
 
-## mod.io iOS SDK Integration
+## mod.io iOS SDK integration
 
 The use of iOS with the mod.io SDK is ready by default. You can find the `ios` directory in the platform subdirectory of your SDK installation.
 You can then target `IOS` to compile the mod.io SDK for iOS SDK.
 
-## iOS SDK Versions
+:::important[Find your guide]
+This setup guide is intended for those building for iOS. If that's not you, check out our other [Platform Installation Guides](/cppsdk/installation/#platform-installation-guides) or continue to work through the [C++ SDK Getting Started Guides](/cppsdk/#getting-started) to implement mod.io's core functionality.
+:::
+
+## iOS SDK versions
 
 The mod.io SDK is built and tested against iOS using XCode v14 & v15.1. Using different versions of the iOS SDK may result in compilation issues.
 
@@ -23,13 +27,15 @@ In iOS, the default way to compile the mod.io SDK requires CMake, which you can 
 brew install cmake ninja
 ```
 
-NOTE: You can use Ninja or XCode as project generators. The former works like any other C++ project. The later will create a `.xcodeproj` file in the designated output folder.
+:::note
+You can use Ninja or XCode as project generators. The former works like any other C++ project. The later will create a `.xcodeproj` file in the designated output folder.
+:::
 
 iOS compiles by default to the simulator. If you need to deploy to a device, add variable `MODIO_IOS_DEVICE` to cmake. Check documentation in the platform link:platform/ios/README.adoc[README.adoc] for more details.
 
 The minimum deployment target is iOS 15.0
 
-## iOS Device Provisioning profiles
+## iOS device provisioning profiles
 
 The mod.io SDK in iOS compiles by default to the simulator. If you need to deploy to a device, add variable `MODIO_IOS_DEVICE` to cmake, for example:
 

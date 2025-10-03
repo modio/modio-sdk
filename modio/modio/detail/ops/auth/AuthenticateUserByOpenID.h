@@ -29,6 +29,26 @@ namespace Modio
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed,
 										User.bUserHasAcceptedTerms ? "true" : "false");
 
+			auto ParamIterator = User.ExtendedParameters.find("psn_token");
+			if (ParamIterator != User.ExtendedParameters.end())
+			{
+				Params = Params.AppendPayloadValue("psn_token", ParamIterator->second);
+			}
+
+			if (Modio::Detail::SDKSessionData::GetPlatformEnvironment().has_value())
+			{
+				Params = Params.AppendPayloadValue("psn_env",
+												   Modio::Detail::SDKSessionData::GetPlatformEnvironment().value());
+			}
+			else
+			{
+				ParamIterator = User.ExtendedParameters.find("psn_env");
+				if (ParamIterator != User.ExtendedParameters.end())
+				{
+					Params = Params.AppendPayloadValue("psn_env", ParamIterator->second);
+				}
+			}
+
 			Modio::Detail::AuthenticateUserExternalAsync(Params, Callback);
 		}
 	} // namespace Detail

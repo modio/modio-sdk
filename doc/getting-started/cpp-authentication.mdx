@@ -1,0 +1,294 @@
+---
+id: cpp-authentication
+title: User Authentication
+slug: /cppsdk/user-authentication
+---
+
+# User Authentication for C++ SDK
+
+[Authentication](https://docs.mod.io/authentication/) is an essential part of user and server communication with mod.io. There are two ways for user accounts to access our service: email authentication and single sign on (SSO) through an external authentication partner. 
+
+This guide covers:
+
+* [Email authentication](#email-authentication)
+* [SSO/external authentication](#ssoexternal-authentication)
+* [Authentication examples](#authentication-examples)
+* [Next steps](#next-steps)
+
+## Email authentication
+
+mod.io allows users to create an account on the mod.io website using an email address. Once the user has accepted the mod.io Terms of Use and created an account, they can use that email address to log in and access mod.io services in your game.
+
+Email authentication involves:
+
+1. Submitting the user's email address
+2. The user retrieving the one-time code mod.io sends to that address (externally to your application)
+3. Submitting the code provided by the user
+
+```cpp
+Modio::RequestEmailAuthCodeAsync(Modio::EmailAddress(UserProvidedEmailAddress), [](Modio::ErrorCode ec)
+{
+    // Handle errors if ec is truthy
+});
+
+// some time later, after the user inputs their authentication code
+
+Modio::AuthenticateUserEmailAsync(Modio::EmailAuthCode(UserProvidedAuthCode), [](Modio::ErrorCode ec) {
+		if (ec)
+		{
+            // Authentication failure, inspect ec to determine what information to provide to the end user
+		}
+		else
+		{
+            // User is now authenticated and able to manage their subscriptions via SDK calls
+		}
+	});
+
+```
+
+:::note
+Email authentication is not recommended for production releases. We strongly recommend the use of platform SSO to provide a seamless authentication experience for your players. Additional platform functionality such as platform display names, avatars and console certification requirements are supported via SSO flows.
+:::
+
+## SSO/external authentication
+
+There are two types of SSO to consider:
+
+1. [**Custom SSO**](https://docs.mod.io/authentication/openid/): Custom SSO harnesses your studio's authentication process as the single point of authentication. 
+2. [**Platform SSO**](https://docs.mod.io/authentication/platform/): Platform SSO uses a given platform's authentication process as the single point of authentication. 
+
+	The platforms included in this process are:
+
+	* [Xbox Live](https://docs.mod.io/platforms/gdk/#authentication)
+	* [Steam](https://docs.mod.io/platforms/steam/authentication)
+	* [GOG Galaxy](https://docs.mod.io/platforms/gog/authentication)
+	* [Nintendo Switch](https://docs.mod.io/platforms/switch/#authentication)
+	* [PlayStation™Network](https://docs.mod.io/platforms/playstation/#authentication)
+	* [Epic Online Services](https://docs.mod.io/platforms/epic/authentication)
+	* [Meta Quest](https://docs.mod.io/platforms/meta/authentication)
+	* [Google](https://docs.mod.io/platforms/google/authentication)
+
+Each platform has their own requirements and prerequisites for performing SSO.  Platform-specific authentication can be found in the respective [platform documentation](https://docs.mod.io/getting-started/#expand-with-cross-platform-functionality).
+
+To use SSO with mod.io, a user must have accepted the mod.io [Terms of Use](https://docs.mod.io/terms-user-consent/) in order to create an account.
+
+### Recommended flow
+
+1. Call [AuthenticateUserExternalAsync](/cppsdk/refdocs/#authenticateuserexternalasync) , passing in any provider-specific parameters, setting `AuthenticationParams::bUserHasAcceptedTerms` to false, and indicating which authentication provider you wish to use
+2. Check the error code in the callback - if it indicates the user has not yet created an account or accepted the terms, call [GetTermsOfUseAsync](/cppsdk/refdocs/#gettermsofuseasync) and display the provided information to your user
+3. If the user clicks the OK/affirmative button on your screen displaying the terms of use, repeat the call in step 1 but setting `AuthenticationParams::bUserHasAcceptedTerms` to **true** for this single authentication request only. For all subsequent authentication attempts, this parameter should be set back to **false** - the system will automatically authenticate the user if they've already accepted the latest terms. Otherwise, the system will return an error (`403 Forbidden (error_ref 11074)`) allowing you to show the updated terms
+4. Check the error code in the callback - a false-y error code indicates that authentication was successful, and users can now install and manage UGC and subscriptions.
+
+
+```cpp
+Modio::AuthenticationParams UserParams;
+UserParams.AuthToken = "AuthenticationToken";
+UserParams.UserEmail = "UserEmail";
+UserParams.bUserHasAcceptedTerms = false; // Always start with false
+
+Modio::AuthenticateUserExternalAsync(UserParams,Provider,[Provider](Modio::ErrorCode ec)
+{
+    if (ec)
+    {
+        if (ec == Modio::ApiError::UserNoAcceptTermsOfUse)
+        {
+            // We need to display the terms of use to the user
+            Modio::GetTermsOfUseAsync([](Modio::ErrorCode ec, Modio::Optional<Modio::Terms> Terms)
+            {
+                if (ec)
+                {
+                    // something went wrong fetching the terms, inspect ec to decide what to do
+                }
+                else
+                {
+                    // Display the terms of use to the user, remember not to block in the callback here!
+                    NonBlockingFunctionThatDisplaysTheTermsOfUse(Terms);
+                }
+            });
+        }
+    }
+});
+
+// Later sometime, when your user clicks accept on the terms of use
+UserParams.bUserHasAcceptedTerms = true;
+Modio::AuthenticateUserExternalAsync(UserParams,Provider,[](Modio::ErrorCode ec){/* ... */});
+
+```
+
+:::note
+Changing users via AuthenticateUserExternalAsync (ie performing an authentication for a different user) will disable mod management.
+:::
+
+:::important
+The `bUserHasAcceptedTerms` parameter should only be set to true for the specific authentication request made immediately after the user accepts the terms dialog. For all subsequent authentication attempts, this parameter should be set to false. If the user has already accepted the latest terms, they will be authenticated automatically. If the terms have been updated since their last acceptance, setting this parameter to false will trigger the appropriate error (403 Forbidden, error_ref 11074) allowing you to show the updated terms.
+:::
+
+:::important
+The `Modio::AuthenticationProvider` is different to the `PortalInUse` initialization parameter (`Modio::Portal`). For example, the user may authenticate through Google, while using the Steam portal.
+`DisplayNamePortal` will be null if a portal is not defined, and it will reflect changes in the username of the corresponding portal that were set using the initialization step.
+For example, if the users Steam username is changed - `DisplayNamePortal` will return the new username once the SDK is reauthenticated.
+:::
+
+## Authentication examples
+
+Below are exmaples for the authentication process for the Epic Games, Steam and GOG platforms. You can learn more about these process in our [PC Platform Authentication Guides](https://docs.mod.io/platforms/pc). 
+
+### Epic Games authentication example
+
+In order to use Epic Games Authentication, you must ensure that you have [configured Epic Account Services for your title](https://docs.mod.io/platforms/epic/authentication). Once you have done this, you can request an ID Token for a user that has been logged into Epic. You must ensure that the scopes you are authentication with match the scopes for the application you are configuring in EAS.
+
+:::note
+If your title is not yet live, you can use Epic's DevAuthTool and the `EOS_LCT_Developer` credential type for testing.
+:::
+
+```cpp
+static void EOS_CALL LoginCompleteCallbackFn(const EOS_Auth_LoginCallbackInfo* Data)
+{
+	EOS_Auth_CopyIdTokenOptions IdTokenOptions;
+	IdTokenOptions.AccountId = Data->LocalUserId;
+	IdTokenOptions.ApiVersion = EOS_AUTH_COPYIDTOKEN_API_LATEST;
+
+	EOS_Auth_IdToken* IdToken;
+	EOS_EResult Result = EOS_Auth_CopyIdToken(ModioTest::EpicAuthHelper::instance().AuthHandle, &IdTokenOptions, &IdToken);
+
+	if (Result == EOS_EResult::EOS_Success)
+	{
+		std::string Token = IdToken->JsonWebToken;
+
+		Modio::AuthenticationParams User;
+		User.AuthToken = Token;
+		User.bURLEncodeAuthToken = true;
+
+		// Note: bUserHasAcceptedTerms should only be set to true if the user has just accepted the terms dialog
+		// Otherwise it should be false - the system will authenticate automatically if the user has accepted the latest terms
+		User.bUserHasAcceptedTerms = true;
+
+		Modio::AuthenticateUserExternalAsync(User, Modio::AuthenticationProvider::Epic, [](Modio::ErrorCode ec) {
+			if (ec)
+			{
+				std::cout << "Failed to authenticate to mod.io: " << ec.message() << std::endl;
+			}
+			else
+			{
+				std::cout << "Authentication complete" << std::endl;
+			}
+		});
+	}
+	else
+	{
+		std::cout << "Failed to get Epic ID Token";
+	}
+}
+```
+
+### Steam authentication example
+
+:::note
+This functionality is demonstrated in advanced example 01_SteamAuthAndEntitlements
+:::
+
+In order to use the Steam authentication functionality, you must [configure your game's Encrypted App Ticket Key from Steamworks](https://docs.mod.io/platforms/steam/authentication). Once you have done that, you can request an Encrypted App Ticket for an authenticated user as follows, replacing your class references to your own Steam Subsystem as appropriate.
+
+```cpp
+uint32 k_unSecretData = 0x5444;
+SteamAPICall_t hSteamAPICall = SteamUser()->RequestEncryptedAppTicket(&k_unSecretData, sizeof(k_unSecretData));
+SteamAuthHelperInstance->m_SteamCallResultEncryptedAppTicket.Set(hSteamAPICall, SteamAuthHelperInstance, &SteamAuthHelper::OnEncryptedAppTicketResponse);
+```
+
+Ensure that you have defined a Steam CCallResult to listen for a callback, such as `CCallResult<SteamAuthHelper, EncryptedAppTicketResponse_t> m_SteamCallResultEncryptedAppTicket;`.
+
+Once you successfully receive that callback, you can get the Encrypted App Ticket as follows, ensuring you Base64 encode it. 
+
+```cpp
+std::string EncodedSteamAuthTicket;
+
+unsigned char rgubTicket[1024];
+uint32 cubTicket;
+if (SteamUser()->GetEncryptedAppTicket(rgubTicket, sizeof(rgubTicket), &cubTicket))
+{
+				EncodedSteamAuthTicket = base64_encode(rgubTicket, cubTicket);
+				std::cout << "Steam App Ticket received" << std::endl;
+}
+```
+
+Finally, once you have your Base64 encoded app ticket, you can SSO to mod.io as follows:
+
+```cpp
+Modio::AuthenticationParams AuthParams;
+AuthParams.AuthToken = EncodedSteamAuthTicket;
+AuthParams.bURLEncodeAuthToken = true;
+
+// Note: bUserHasAcceptedTerms should only be set to true if the user has just accepted the terms dialog
+// Otherwise it should be false - the system will authenticate automatically if the user has accepted the latest terms
+AuthParams.bUserHasAcceptedTerms = true;
+
+Modio::AuthenticateUserExternalAsync(
+	AuthParams, Modio::AuthenticationProvider::Steam, [&](Modio::ErrorCode ec) {
+		if (ec)
+		{
+			std::cout << "Failed to authenticate to mod.io: " << ec.message() << std::endl;
+		}
+		else
+		{
+			std::cout << "Authentication complete" << std::endl;
+		}
+	});
+```
+
+---
+
+### GOG authentication example
+
+In order to use the GOG authentication functionality, you must [configure your game's Encrypted App Ticket Key from GOG](https://docs.mod.io/platforms/gog/authentication). Ensure that you are signing into GOG using `galaxy::api::User()->SignInGalaxy`. Once you have done that, you can request an Encrypted App Ticket for an authenticated user as follows, replacing your class references to your own GOG as appropriate.
+
+```cpp
+galaxy::api::User()->RequestEncryptedAppTicket(nullptr, 0, &GOGAuthHelperInstance);
+```
+
+In your authentication helper, ensure that you are inheriting from `galaxy::api::GlobalEncryptedAppTicketListener` to get the result of the the app ticket request, via the `OnEncryptedAppTicketRetrieveSuccess()` method.
+
+Once you receive that callback, you can get the value of the encrypted app ticket as follows:
+
+```cpp
+unsigned char ticket[1024];
+uint32_t ticketLength;
+
+galaxy::api::User()->GetEncryptedAppTicket(ticket, sizeof(ticket), ticketLength);
+
+std::string AuthTicket;
+AuthTicket.assign(ticket, std::find(ticket, ticket + ticketLength, '\0'));
+```
+
+Finally, you can SSO to mod.io as follows:
+
+```cpp
+Modio::AuthenticationParams AuthParams;
+AuthParams.AuthToken = AuthTicket;
+AuthParams.bURLEncodeAuthToken = true;
+
+// Note: bUserHasAcceptedTerms should only be set to true if the user has just accepted the terms dialog
+// Otherwise it should be false - the system will authenticate automatically if the user has accepted the latest terms
+AuthParams.bUserHasAcceptedTerms = true;
+
+Modio::AuthenticateUserExternalAsync(
+	AuthParams, Modio::AuthenticationProvider::GoG, [&](Modio::ErrorCode ec) {
+		if (ec)
+		{
+			std::cout << "Failed to authenticate to mod.io: " << ec.message() << std::endl;
+		}
+		else
+		{
+			std::cout << "Authentication complete" << std::endl;
+		}
+	});
+```
+
+:::note
+Note that you do not need to base64 encode the app ticket that you receive from GOG; you only need to ensure it is URL encoded, either by setting `bURLEncodeAuthToken=true` or doing it yourself before passing it to `AuthenticateUserExternalAsync`.
+:::
+
+## Next steps
+
+Now that you've set up the authentication process, the next step is to allow users to find UGC by implementing the [Searching for UGC](/cppsdk/searching-ugc) guide.
+
+If you've already done this, we recommend working your way through the [C++ SDK Getting Started Guides](/cppsdk/#c-sdk-core-setup-guides) as they will teach you how to implement the mod.io fundamentals before moving onto exploring our [Features](/features).
