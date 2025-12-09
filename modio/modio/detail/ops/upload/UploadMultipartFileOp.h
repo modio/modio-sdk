@@ -57,7 +57,7 @@ namespace Modio
 			Modio::filesystem::path ArchivePath {};
 			Modio::Detail::OperationQueue::Ticket RequestTicket;
 			std::weak_ptr<Modio::ModProgressInfo> ProgressInfo {};
-			asio::coroutine Coroutine {};
+			ModioAsio::coroutine Coroutine {};
 
 		public:
 			UploadMultipartFileOp(std::shared_ptr<Modio::Detail::UploadSession> ResponseSession,
@@ -345,7 +345,7 @@ namespace Modio
 									  Modio::filesystem::path ArchivePath, std::string FileHash,
 									  std::weak_ptr<Modio::ModProgressInfo> ProgressInfo, CompletionTokenType&& Token)
 		{
-			return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
 				UploadMultipartFileOp(
 					std::move(Response), CurrentModID, ArchivePath, FileHash,
 					Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().GetFileDownloadTicket(),

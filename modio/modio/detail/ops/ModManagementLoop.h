@@ -29,7 +29,7 @@ namespace Modio
 		class ModManagementLoop
 		{
 			Modio::Detail::Timer IdleTimer {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			std::uint8_t ExternalUpdateCounter = 0;
 
 		public:
@@ -94,7 +94,7 @@ namespace Modio
 		template<typename ManagementLoopEndCallback>
 		auto BeginModManagementLoopAsync(ManagementLoopEndCallback&& OnLoopEnded)
 		{
-			return asio::async_compose<ManagementLoopEndCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<ManagementLoopEndCallback, void(Modio::ErrorCode)>(
 				ModManagementLoop(), OnLoopEnded, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	} // namespace Detail

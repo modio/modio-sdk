@@ -27,7 +27,7 @@ namespace Modio
 			Modio::GameID GameID {};
 			Modio::ApiKey ApiKey {};
 
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 
 		public:
 			GetUserWalletBalanceOp(Modio::GameID GameID, Modio::ApiKey ApiKey) : GameID(GameID), ApiKey(ApiKey) {}
@@ -69,7 +69,7 @@ namespace Modio
 		template<typename GetBalanceCompleteCallback>
 		void GetUserWalletBalanceAsync(GetBalanceCompleteCallback&& OnGetBalanceComplete)
 		{
-			return asio::async_compose<GetBalanceCompleteCallback, void(Modio::ErrorCode, Modio::Optional<uint64_t>)>(
+			return ModioAsio::async_compose<GetBalanceCompleteCallback, void(Modio::ErrorCode, Modio::Optional<uint64_t>)>(
 				Modio::Detail::GetUserWalletBalanceOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 													  Modio::Detail::SDKSessionData::CurrentAPIKey()),
 				OnGetBalanceComplete,

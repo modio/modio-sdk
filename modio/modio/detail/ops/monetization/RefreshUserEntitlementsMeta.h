@@ -22,7 +22,7 @@ namespace Modio
 				.AppendPayloadValue(Modio::Detail::Constants::APIStrings::Device, Params.ExtendedParameters[Modio::Detail::Constants::APIStrings::Device])
 				.AppendPayloadValue(Modio::Detail::Constants::APIStrings::UserID, Params.ExtendedParameters[Modio::Detail::Constants::APIStrings::UserID]);
 
-			return asio::async_compose<
+			return ModioAsio::async_compose<
 				std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)>,
 				void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)>(
 				Modio::Detail::RefreshUserEntitlementsOp(RequestParams), Callback,

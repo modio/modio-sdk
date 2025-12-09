@@ -58,7 +58,7 @@ namespace Modio
 
 				reenter(CoroutineState)
 				{
-					yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+					yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 
 					if (BufferSize == 0)
 					{
@@ -109,7 +109,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::Buffer Buffer;
 			std::shared_ptr<Modio::Detail::FileObjectImplementation> FileImpl {};
 			Modio::Optional<Modio::FileOffset> FileOffset {};

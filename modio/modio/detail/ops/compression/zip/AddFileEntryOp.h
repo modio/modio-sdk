@@ -347,7 +347,7 @@ namespace Modio
 			std::size_t MaxBytesToRead = 0;
 			std::size_t LocalHeaderSize = 0;
 			std::uint32_t InputCRC = 0;
-			asio::coroutine CoroutineState;
+			ModioAsio::coroutine CoroutineState;
 			Modio::Optional<Modio::Detail::Buffer> NextBuf;
 			std::shared_ptr<uint64_t> RollingFileHash;
 			std::weak_ptr<Modio::ModProgressInfo> ProgressInfo;

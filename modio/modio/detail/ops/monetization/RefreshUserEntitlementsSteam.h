@@ -21,7 +21,7 @@ namespace Modio
 		{
 			const Modio::Detail::HttpRequestParams RequestParams = Modio::Detail::SyncSteamEntitlementRequest;
 
-			return asio::async_compose<
+			return ModioAsio::async_compose<
 				std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)>,
 				void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)>(
 				Modio::Detail::RefreshUserEntitlementsOp(RequestParams), Callback,

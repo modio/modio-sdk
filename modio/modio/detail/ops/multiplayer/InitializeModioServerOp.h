@@ -31,7 +31,7 @@ namespace Modio
 		class InitializeModioServerOp
 		{
 		private:
-			asio::coroutine CoroutineState;
+			ModioAsio::coroutine CoroutineState;
 			Modio::ServerInitializeOptions InitOptions;
 
 		public:
@@ -92,7 +92,7 @@ namespace Modio
 		template<typename InitDoneCallback>
 		auto InitializeModioServerAsync(Modio::ServerInitializeOptions InitOptions, InitDoneCallback&& OnInitComplete)
 		{
-			return asio::async_compose<InitDoneCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<InitDoneCallback, void(Modio::ErrorCode)>(
 				InitializeModioServerOp(InitOptions), OnInitComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

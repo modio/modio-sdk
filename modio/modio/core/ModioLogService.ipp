@@ -16,10 +16,10 @@ namespace Modio
 {
 	namespace Detail
 	{
-		LogService::LogService(asio::io_context& IOService)
-			: asio::detail::service_base<LogService>(IOService),
+		LogService::LogService(ModioAsio::io_context& IOService)
+			: ModioAsio::detail::service_base<LogService>(IOService),
 			  CurrentLogLevel(LogLevel::Trace),
-			  LogStrand(asio::make_strand(IOService))
+			  LogStrand(ModioAsio::make_strand(IOService))
 		{}
 
 		void LogService::construct(implementation_type& Implementation)
@@ -73,7 +73,7 @@ namespace Modio
 		void LogService::SetGlobalLogLevel(Modio::LogLevel Level)
 		{
 			auto& LogService =
-				asio::use_service<Modio::Detail::LogService>(Modio::Detail::Services::GetGlobalContext());
+				ModioAsio::use_service<Modio::Detail::LogService>(Modio::Detail::Services::GetGlobalContext());
 			LogService.SetLogLevel(Level);
 		}
 #ifdef MODIO_SEPARATE_COMPILATION

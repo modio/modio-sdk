@@ -26,7 +26,7 @@ namespace Modio
 #include <asio/yield.hpp>
 		class SSLConnectionWriteOp
 		{
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			std::weak_ptr<HttpSharedState> SharedState {};
 			Modio::Detail::DynamicBuffer Payload {};
 			std::shared_ptr<HttpRequestImplementation> Request {};
@@ -76,7 +76,7 @@ namespace Modio
 									 Modio::Detail::DynamicBuffer Payload, std::weak_ptr<HttpSharedState> HttpState,
 									 SSLWriteCallback&& OnWriteComplete)
 		{
-			return asio::async_compose<SSLWriteCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<SSLWriteCallback, void(Modio::ErrorCode)>(
 				SSLConnectionWriteOp(Request, Payload, HttpState), OnWriteComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

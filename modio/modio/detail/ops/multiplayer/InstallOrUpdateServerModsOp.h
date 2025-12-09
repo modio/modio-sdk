@@ -25,7 +25,7 @@ namespace Modio
 		class InstallOrUpdateServerModsOp
 		{
 		private:
-			asio::coroutine CoroutineState;
+			ModioAsio::coroutine CoroutineState;
 			std::vector<ModID> Mods;
 			Modio::Optional<Modio::ModInfoList> ValidFoundMods;
 
@@ -107,14 +107,14 @@ namespace Modio
 								Modio::Detail::Logger().Log(
 									Modio::LogLevel::Error, Modio::LogCategory::ModManagement,
 									"Installing mod {} to path: {}", ModInfo.ModId,
-									Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+									Modio::ToModioString(Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
 										.MakeModPath(ModInfo.ModId)
-										.u8string());
+										.u8string()));
 
 								Modio::Detail::SDKSessionData::GetSystemModCollection().AddOrUpdateMod(
-									ModInfo, Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+									ModInfo, Modio::ToModioString(Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
 												 .MakeModPath(ModInfo.ModId)
-												 .u8string());
+												 .u8string()));
 							}
 
 							// Check if the number of mods we recieved is different to the number of mods we requested
@@ -144,7 +144,7 @@ namespace Modio
 		template<typename InstallDoneCallback>
 		auto InstallOrUpdateServerModsAsync(std::vector<ModID>& Mods, InstallDoneCallback&& OnInstallComplete)
 		{
-			return asio::async_compose<InstallDoneCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<InstallDoneCallback, void(Modio::ErrorCode)>(
 				InstallOrUpdateServerModsOp(Mods), OnInstallComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

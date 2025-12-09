@@ -78,7 +78,7 @@ namespace Modio
 		private:
 			Modio::ModID Mod {};
 			std::string RawRating {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 		};
 #include <asio/unyield.hpp>
@@ -86,7 +86,7 @@ namespace Modio
 		template<typename SubmitCompleteCallback>
 		void SubmitModRatingAsync(Modio::ModID ModId, Modio::Rating Rating, SubmitCompleteCallback&& OnSubmitComplete)
 		{
-			return asio::async_compose<SubmitCompleteCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<SubmitCompleteCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::SubmitModRatingOp(ModId, Rating), OnSubmitComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

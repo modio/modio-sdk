@@ -68,13 +68,13 @@ namespace Modio
 		private:
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
 			Modio::Detail::HttpRequestParams GetModCollectionModsParams;
-			asio::coroutine CoroutineState;
+			ModioAsio::coroutine CoroutineState;
 		};
 
 		template<typename CallbackType>
 		auto GetModCollectionModsAsync(Modio::ModCollectionID ModCollectionID, CallbackType&& OnComplete)
 		{
-			return asio::async_compose<CallbackType, void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>(
+			return ModioAsio::async_compose<CallbackType, void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>(
 				Modio::Detail::GetModCollectionModsOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModCollectionID),
 				OnComplete, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

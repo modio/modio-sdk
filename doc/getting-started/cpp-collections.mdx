@@ -2,6 +2,7 @@
 id: cpp-collections
 title: Collections
 slug: /cppsdk/collections
+custom_edit_url: https://github.com/modio/modio-sdk-internal/blob/develop/doc/getting-started/cpp-collections.mdx
 ---
 
 
@@ -19,7 +20,7 @@ Currently, Collection Management actions such as creating, editing, and deleting
 
 ## List Mod Collections
 
-To get a filtered list of mod collections call [`ListModCollectionsAsync`](/cppsdk/refdocs/#listmodcollectionsasync) which will return a `Modio::ModCollectionInfoList` upon success.
+To get a filtered list of mod collections call [`ListModCollectionsAsync`](https://docs.mod.io/cppsdk/refdocs#listmodcollectionsasync) which will return a `Modio::ModCollectionInfoList` upon success.
 
 ```cpp
 void ListModCollections(Modio::FilterParams Filter)
@@ -43,7 +44,7 @@ void ListModCollections(Modio::FilterParams Filter)
 
 ## Get Mod Collection Info
 
-You can also use [`GetModCollectionInfoAsync`](/cppsdk/refdocs/#getmodcollectioninfoasync) to get the `Modio::ModCollectionInfo` about a specific Collection by querying it with the appropriate `Modio::ModCollectionID`.
+You can also use [`GetModCollectionInfoAsync`](https://docs.mod.io/cppsdk/refdocs#getmodcollectioninfoasync) to get the `Modio::ModCollectionInfo` about a specific Collection by querying it with the appropriate `Modio::ModCollectionID`.
 
 ```cpp
 void GetModCollectionInfo(Modio::ModCollectionID CollectionId)
@@ -64,7 +65,7 @@ void GetModCollectionInfo(Modio::ModCollectionID CollectionId)
 
 ## Get Mod Collection Mods
 
-Calling [`GetModCollectionModsAsync`](/cppsdk/refdocs/#getmodcollectionmodsasync) will return a `Modio::ModInfoList` upon success, which will allow you to display the details of all mods within the given collection to your players.
+Calling [`GetModCollectionModsAsync`](https://docs.mod.io/cppsdk/refdocs#getmodcollectionmodsasync) will return a `Modio::ModInfoList` upon success, which will allow you to display the details of all mods within the given collection to your players.
 
 ```cpp
 void GetModCollectionMods(Modio::ModCollectionID CollectionId)
@@ -89,7 +90,7 @@ void GetModCollectionMods(Modio::ModCollectionID CollectionId)
 
 ## Follow Mod Collection
 
-Mod Collections can be Followed, distinct from Subscribing, which adds it to the user's list of Followed Collections, allowing them to quickly and easily find it for subscribing/unsubscribing. Following can be performed by calling [`FollowModCollectionAsync`](/cppsdk/refdocs/#followmodcollectionasync) which simply returns a `Modio::ErrorCode` to indicate success/failure.
+Mod Collections can be Followed, distinct from Subscribing, which adds it to the user's list of Followed Collections, allowing them to quickly and easily find it for subscribing/unsubscribing. Following can be performed by calling [`FollowModCollectionAsync`](https://docs.mod.io/cppsdk/refdocs#followmodcollectionasync) which simply returns a `Modio::ErrorCode` to indicate success/failure.
 
 ```cpp
 void FollowModCollections(Modio::ModCollectionID CollectionId)
@@ -110,7 +111,7 @@ void FollowModCollections(Modio::ModCollectionID CollectionId)
 
 ## Unfollow Mod Collection
 
-The inverse of above, call [`UnfollowModCollectionAsync`](/cppsdk/refdocs/#unfollowmodcollectionasync) to Unfollow a Mod Collection.
+The inverse of above, call [`UnfollowModCollectionAsync`](https://docs.mod.io/cppsdk/refdocs#unfollowmodcollectionasync) to Unfollow a Mod Collection.
 
 ```cpp
 void UnfollowModCollections(Modio::ModCollectionID CollectionId)
@@ -131,7 +132,7 @@ void UnfollowModCollections(Modio::ModCollectionID CollectionId)
 
 ## List User Followed Mod Collections
 
-A list of all Collections the currently authenticated user is following can be acquired via [`ListUserFollowedModCollectionsAsync`](/cppsdk/refdocs/#listuserfollowedmodcollectionsasync). This query can be filtered if desired.
+A list of all Collections the currently authenticated user is following can be acquired via [`ListUserFollowedModCollectionsAsync`](https://docs.mod.io/cppsdk/refdocs#listuserfollowedmodcollectionsasync). This query can be filtered if desired.
 
 ```cpp
 void GetUserFollowedModCollections(Modio::FilterParams Filter)
@@ -154,7 +155,7 @@ void GetUserFollowedModCollections(Modio::FilterParams Filter)
 ```
 ## Subscribe To Mod Collection
 
-A Mod Collection can be subscribed to, which adds all of the Mods within the Collection to the user's subscription list. Do this by calling [`SubscribeToModCollectionAsync`](/cppsdk/refdocs/#subscribetomodcollectionasync) and providing the relevant Collection ID.
+A Mod Collection can be subscribed to, which adds all of the Mods within the Collection to the user's subscription list. Do this by calling [`SubscribeToModCollectionAsync`](https://docs.mod.io/cppsdk/refdocs#subscribetomodcollectionasync) and providing the relevant Collection ID.
 
 :::note
 Subscribing to a Collection *only* subscribes the user to the mods within the collection; currently there is no concept of "subscription" specifically to a collection itself, just the mods within it.
@@ -195,7 +196,7 @@ void SubscribeToModCollection(Modio::ModCollectionID CollectionId)
 
 ## Unsubscribe From Mod Collection
 
-The inverse of above, [`UsubscribeFromModCollectionAsync`](/cppsdk/refdocs/#unsubscribefrommodcollectionasync) removes all Mods in a Collection from the user's subscription list. As before, you will need to call `FetchExternalUpdatesAsync` and have Mod Management enabled to trigger the uninstallation of the given mods.
+The inverse of above, [`UsubscribeFromModCollectionAsync`](https://docs.mod.io/cppsdk/refdocs#unsubscribefrommodcollectionasync) removes all Mods in a Collection from the user's subscription list. As before, you will need to call `FetchExternalUpdatesAsync` and have Mod Management enabled to trigger the uninstallation of the given mods.
 
 :::note
 Directly inverse of `SubscribeToModCollectionAsync`, this unsubscribes the user from the Mods within the Collection regardless of whether they were subscribed to them prior to subscribing to the collection itself. This can be somewhat opaque to the end-user, and should be communicated as such.
@@ -236,7 +237,7 @@ void UnsubscribeFromModCollection(Modio::ModCollectionID CollectionId)
 
 ## Submit Mod Collection Rating
 
-A user can submit a rating for a Mod Collection by calling [`SubmitModCollectionRatingAsync`](/cppsdk/refdocs/#submitmodcollectionratingasync) and providing both the `Modio::ModCollectionID` and the `Modio::Rating`.
+A user can submit a rating for a Mod Collection by calling [`SubmitModCollectionRatingAsync`](https://docs.mod.io/cppsdk/refdocs#submitmodcollectionratingasync) and providing both the `Modio::ModCollectionID` and the `Modio::Rating`.
 
 ```cpp
 void SubmitModCollectionRating(Modio::ModCollectionID CollectionId, Modio::Rating Rating)
@@ -257,7 +258,7 @@ void SubmitModCollectionRating(Modio::ModCollectionID CollectionId, Modio::Ratin
 
 ## Get Mod Media
 
-We provide a set of functions for downloading Mod Collection Logos and Mod Collection Author Avatars to disk in a similar manner to Mod Media, vias [`GetModCollectionMediaAsync`](/cppsdk/refdocs/#getmodcollectionmediaasync)
+We provide a set of functions for downloading Mod Collection Logos and Mod Collection Author Avatars to disk in a similar manner to Mod Media, vias [`GetModCollectionMediaAsync`](https://docs.mod.io/cppsdk/refdocs#getmodcollectionmediaasync)
 
 ### Get Mod Collection Logo
 

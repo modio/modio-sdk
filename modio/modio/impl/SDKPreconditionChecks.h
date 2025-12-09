@@ -44,7 +44,7 @@ namespace Modio
 			}
 			else
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::GenericError::SDKNotInitialized),
@@ -63,7 +63,7 @@ namespace Modio
 			}
 			else
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::UserDataError::InvalidUser),
@@ -84,7 +84,7 @@ namespace Modio
 			}
 			else
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::UserAuthError::AlreadyAuthenticated),
@@ -103,7 +103,7 @@ namespace Modio
 			}
 			else
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::MetricsError::SessionNotInitialized),
@@ -122,7 +122,7 @@ namespace Modio
 			}
 			else
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::MetricsError::SessionAlreadyInitialized),
@@ -141,7 +141,7 @@ namespace Modio
 			}
 			else
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::MetricsError::SessionIsNotActive),
@@ -160,7 +160,7 @@ namespace Modio
 			}
 			else
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::MetricsError::SessionIsActive),
@@ -195,7 +195,7 @@ namespace Modio
 
 			if (bInvalidParameter)
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -218,7 +218,7 @@ namespace Modio
 			}
 			else
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::HttpError::RateLimited),
@@ -237,7 +237,7 @@ namespace Modio
 			}
 			else
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(
@@ -254,7 +254,7 @@ namespace Modio
 		{
 			if (Modio::Detail::SDKSessionData::GetUserSubscriptions().Get().count(IDToCheck))
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::ModManagementError::AlreadySubscribed),
@@ -293,7 +293,7 @@ namespace Modio
 
 			if (bInvalidParameter)
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -325,7 +325,7 @@ namespace Modio
 
 			if (bInvalidParameter)
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -361,7 +361,7 @@ namespace Modio
 
 			if (!bHasValidParameter)
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -383,7 +383,7 @@ namespace Modio
 			{
 				if (Entry->GetModState() == Modio::ModState::UninstallPending)
 				{
-					asio::post(
+					ModioAsio::post(
 						Modio::Detail::Services::GetGlobalContext().get_executor(),
 						[CompletionHandler =
 							 std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
@@ -413,7 +413,7 @@ namespace Modio
 			}
 			else
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -427,13 +427,14 @@ namespace Modio
 		bool RequireValidPSNRefreshEntitlementsExtendedParameters(
 			Modio::EntitlementParams User, std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
 		{
-			if (User.ExtendedParameters.count(Modio::Detail::Constants::APIStrings::AuthCode))
+			if (User.ExtendedParameters.count(Modio::Detail::Constants::APIStrings::AuthCode) ||
+				User.ExtendedParameters.count(Modio::Detail::Constants::APIStrings::PsnToken))
 			{
 				return true;
 			}
 			else
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -458,7 +459,7 @@ namespace Modio
 			}
 			else
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -478,7 +479,7 @@ namespace Modio
 			}
 			else
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -501,7 +502,7 @@ namespace Modio
 			}
 			else
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -523,7 +524,7 @@ namespace Modio
 				return true;
 			}
 
-			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+			ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 					   [CompletionHandler =
 							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 						   CompletionHandler(Modio::make_error_code(Modio::FilesystemError::FileNotFound),
@@ -541,7 +542,7 @@ namespace Modio
 				return true;
 			}
 
-			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+			ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 					   [CompletionHandler =
 							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 						   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -557,7 +558,7 @@ namespace Modio
 			{
 				return true;
 			}
-			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+			ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 					   [CompletionHandler =
 							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 						   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -581,7 +582,7 @@ namespace Modio
 			}
 			if (InvalidMod)
 			{
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [CompletionHandler =
 								std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 							   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -603,7 +604,7 @@ namespace Modio
 			{
 				return true;
 			}
-			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+			ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 					   [CompletionHandler =
 							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 						   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -619,7 +620,7 @@ namespace Modio
 			{
 				return true;
 			}
-			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+			ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 					   [CompletionHandler =
 							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 						   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -634,7 +635,7 @@ namespace Modio
 			{
 				return true;
 			}
-			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+			ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 					   [CompletionHandler =
 							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 						   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -650,7 +651,7 @@ namespace Modio
 			{
 				return true;
 			}
-			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+			ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 					   [CompletionHandler =
 							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 						   CompletionHandler(Modio::make_error_code(Modio::GenericError::BadParameter),
@@ -667,7 +668,7 @@ namespace Modio
 				Modio::Detail::SDKSessionData::SetFetchExternalUpdatesRunning(true);
 				return true;
 			}
-			asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+			ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 					   [CompletionHandler =
 							std::forward<std::function<void(Modio::ErrorCode, OtherArgs...)>>(Handler)]() mutable {
 						   CompletionHandler(Modio::make_error_code(Modio::GenericError::RequestInProgress),

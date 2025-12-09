@@ -70,7 +70,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			std::unique_ptr<Modio::Detail::File> DestinationFile {};
 			Modio::Detail::DynamicBuffer DataBuffer {};
 		};
@@ -78,7 +78,7 @@ namespace Modio
 		template<typename LoadModCollectionCallback>
 		auto LoadModCollectionFromStorageAsync(LoadModCollectionCallback&& OnLoadComplete)
 		{
-			return asio::async_compose<LoadModCollectionCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<LoadModCollectionCallback, void(Modio::ErrorCode)>(
 				LoadModCollectionFromStorageOp(), OnLoadComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

@@ -22,7 +22,7 @@ namespace Modio
 {
 	namespace Detail
 	{
-		CacheService::CacheService(asio::io_context& IOService) : asio::detail::service_base<CacheService>(IOService)
+		CacheService::CacheService(ModioAsio::io_context& IOService) : ModioAsio::detail::service_base<CacheService>(IOService)
 		{
 			CacheInstance = std::make_shared<Cache>();
 		}

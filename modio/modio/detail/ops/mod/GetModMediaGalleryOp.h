@@ -114,7 +114,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 
 			// Parameters
 			Modio::GameID GameID {};
@@ -137,7 +137,7 @@ namespace Modio
 		void GetModMediaGalleryAsync(Modio::ModID ModId, Modio::GallerySize GallerySize, Modio::GalleryIndex ImageIndex,
 									 GetGalleryCompleteCallback&& OnGetGalleryComplete)
 		{
-			return asio::async_compose<GetGalleryCompleteCallback,
+			return ModioAsio::async_compose<GetGalleryCompleteCallback,
 									   void(Modio::ErrorCode, Modio::Optional<std::string>)>(
 				Modio::Detail::GetModMediaGalleryOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 													Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId, GallerySize,

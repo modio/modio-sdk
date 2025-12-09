@@ -20,11 +20,11 @@
 #include <string>
 #include <system_error>
 
-namespace asio
+namespace ModioAsio
 {
 	class mutable_buffer;
 	class const_buffer;
-} // namespace asio
+} // namespace ModioAsio
 
 namespace Modio
 {
@@ -52,8 +52,8 @@ namespace Modio
 	template<typename T>
 	using Optional = tl::optional<T>;
 
-	using MutableBufferView = asio::mutable_buffer;
-	using ConstBufferView = asio::const_buffer;
+	using MutableBufferView = ModioAsio::mutable_buffer;
+	using ConstBufferView = ModioAsio::const_buffer;
 
 	template<typename Object>
 	using StableStorage = std::shared_ptr<Object>;

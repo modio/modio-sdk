@@ -22,7 +22,7 @@ namespace Modio
 		/// @docinternal
 		/// @brief Base class Modio logger service that support log levels and platform
 		/// specific implementations
-		class LogService : public asio::detail::service_base<LogService>
+		class LogService : public ModioAsio::detail::service_base<LogService>
 		{
 			/// @docinternal
 			/// @brief Wrapper around a Log message and the level it was logged for
@@ -35,7 +35,7 @@ namespace Modio
 		public:
 			/// @docinternal
 			/// @brief Default constructor
-			MODIO_IMPL explicit LogService(asio::io_context& IOService);
+			MODIO_IMPL explicit LogService(ModioAsio::io_context& IOService);
 			LogService(LogService&&) = delete;
 
 			using implementation_type = std::shared_ptr<Modio::Detail::LoggerImplementation>;
@@ -98,7 +98,7 @@ namespace Modio
 			static MODIO_IMPL std::function<void(Modio::LogLevel, const std::string&)> UserCallbackFunction;
 
 			LogLevel CurrentLogLevel = LogLevel::Warning;
-			asio::strand<asio::io_context::executor_type> LogStrand;
+			ModioAsio::strand<ModioAsio::io_context::executor_type> LogStrand;
 			std::vector<LogMessage> LogBuffer {};
 		};
 	} // namespace Detail

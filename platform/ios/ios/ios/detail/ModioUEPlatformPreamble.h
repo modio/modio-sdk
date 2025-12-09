@@ -24,7 +24,7 @@
 #pragma GCC diagnostic push
 
 // This is required by file "resolver_base.hpp" in line 69 which complains about this:
-// Declaration shadows a variable in namespace 'asio::ip'
+// Declaration shadows a variable in namespace 'ModioAsio::ip'
 // https://github.com/chriskohlhoff/asio/issues/721
 #pragma GCC diagnostic ignored "-Wshadow"
 

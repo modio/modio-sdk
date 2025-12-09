@@ -26,7 +26,7 @@ namespace Modio
 	{
 		class GetModCollectionMediaAvatarOp
 		{
-			asio::coroutine CoroState {};
+			ModioAsio::coroutine CoroState {};
 
 			// Parameters
 			Modio::GameID GameID {};
@@ -117,7 +117,7 @@ namespace Modio
 		auto GetModCollectionMediaAvatarAsync(Modio::ModCollectionID CollectionId, Modio::AvatarSize AvatarSize,
 											  WrappedCallback&& Callback)
 		{
-			return asio::async_compose<WrappedCallback, void(Modio::ErrorCode, Modio::Optional<std::string>)>(
+			return ModioAsio::async_compose<WrappedCallback, void(Modio::ErrorCode, Modio::Optional<std::string>)>(
 				Modio::Detail::GetModCollectionMediaAvatarOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 															 Modio::Detail::SDKSessionData::CurrentAPIKey(),
 															 CollectionId, AvatarSize),

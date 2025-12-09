@@ -19,13 +19,13 @@ namespace Modio
 	namespace Detail
 	{
 		HttpRequest::HttpRequest(HttpRequest&& Other)
-			: asio::basic_io_object<HttpService>(std::move(Other)),
+			: ModioAsio::basic_io_object<HttpService>(std::move(Other)),
 			  RequestParameters(std::move(Other.RequestParameters))
 
 		{}
 
-		HttpRequest::HttpRequest(asio::io_context& Context, HttpRequestParams RequestParams)
-			: asio::basic_io_object<HttpService>(Context),
+		HttpRequest::HttpRequest(ModioAsio::io_context& Context, HttpRequestParams RequestParams)
+			: ModioAsio::basic_io_object<HttpService>(Context),
 			  RequestParameters(RequestParams)
 
 		{
@@ -35,7 +35,7 @@ namespace Modio
 		}
 
 		HttpRequest::HttpRequest(HttpRequestParams RequestParams)
-			: asio::basic_io_object<HttpService>(Modio::Detail::Services::GetGlobalContext()),
+			: ModioAsio::basic_io_object<HttpService>(Modio::Detail::Services::GetGlobalContext()),
 			  RequestParameters(RequestParams)
 		{
 			get_implementation()->Parameters = RequestParameters;

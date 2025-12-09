@@ -111,7 +111,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::DynamicBuffer SubscriptionBuffer {};
 			Modio::PagedResult PageInfo {};
 			std::unique_ptr<Modio::ModInfoList> CollatedResults{};
@@ -123,7 +123,7 @@ namespace Modio
 		template<typename FetchCompleteCallback>
 		auto FetchUserSubscriptionsFromServerAsync(FetchCompleteCallback&& OnFetchComplete)
 		{
-			return asio::async_compose<FetchCompleteCallback,
+			return ModioAsio::async_compose<FetchCompleteCallback,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>(
 				FetchUserSubscriptionsFromServerOp(), OnFetchComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());

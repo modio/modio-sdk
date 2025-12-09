@@ -58,7 +58,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
+			ModioAsio::coroutine CoroutineState;
 			Modio::Detail::HttpRequestParams UnsubscribeParams;
 			Modio::Detail::DynamicBuffer ResponseBuffer;
 		};
@@ -66,7 +66,7 @@ namespace Modio
 		template<typename CallbackType>
 		auto UnsubscribeFromModCollectionAsync(Modio::ModCollectionID ModCollectionID, CallbackType&& OnComplete)
 		{
-			return asio::async_compose<CallbackType, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<CallbackType, void(Modio::ErrorCode)>(
 				Modio::Detail::UnsubscribeFromModCollectionOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 															  ModCollectionID),
 				OnComplete, Modio::Detail::Services::GetGlobalContext().get_executor());

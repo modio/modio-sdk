@@ -82,6 +82,10 @@ namespace Modio
 					{
 						Self.complete(Modio::make_error_code(Modio::MonetizationError::AccountLacksEntitlement), {});
 					}
+					if (Modio::ErrorCodeMatches(ec, Modio::ApiError::MonetizationUnexpectedError))
+					{
+						Self.complete(Modio::make_error_code(Modio::MonetizationError::UnexpectedError), {});
+					}
 					if (ec)
 					{
 						Self.complete(ec, {});
@@ -168,7 +172,7 @@ namespace Modio
 			Modio::ModID ModId {};
 			Modio::Optional<uint64_t> PriceInTokens {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Optional<Modio::TransactionRecord> Record {};
 			Modio::Detail::HttpRequestParams RequestParameters;
 		};
@@ -178,7 +182,7 @@ namespace Modio
 		void PurchaseModAsync(Modio::ModID ModID, Modio::Optional<uint64_t> ExpectedVirtualCurrencyPrice,
 							  PurchaseCompleteCallback&& OnPurchaseComplete)
 		{
-			return asio::async_compose<PurchaseCompleteCallback,
+			return ModioAsio::async_compose<PurchaseCompleteCallback,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)>(
 				Modio::Detail::PurchaseModOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 											 Modio::Detail::SDKSessionData::CurrentAPIKey(), ModID,

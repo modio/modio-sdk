@@ -70,7 +70,7 @@ namespace Modio
 		private:
 			Modio::filesystem::path InstallPath {};
 			Modio::ModID ModId {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			bool bForce {};
 			bool bIsTempMod {};
 		};
@@ -79,7 +79,7 @@ namespace Modio
 		auto UninstallModAsync(Modio::ModID Mod, UninstallDoneCallback&& OnUninstallComplete, bool bForce = false,
 							   bool bIsTempMod = false)
 		{
-			return asio::async_compose<UninstallDoneCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<UninstallDoneCallback, void(Modio::ErrorCode)>(
 				UninstallModOp(Mod, bForce, bIsTempMod), OnUninstallComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

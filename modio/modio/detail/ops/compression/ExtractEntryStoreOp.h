@@ -48,7 +48,7 @@ namespace Modio
 			};
 
 			Modio::StableStorage<ExtractEntryImpl> Impl {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 
 		public:
 			ExtractEntryStoreOp(std::shared_ptr<ArchiveFileImplementation> ArchiveFileImpl,

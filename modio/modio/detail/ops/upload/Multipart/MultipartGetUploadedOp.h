@@ -28,7 +28,7 @@ namespace Modio
 			Modio::Detail::HttpRequestParams GetPartsRequest {};
 			Modio::Detail::DynamicBuffer ResponseBuffer {};
 			std::shared_ptr<Modio::Detail::UploadSessionPartList> ResponseParts {};
-			asio::coroutine Coroutine {};
+			ModioAsio::coroutine Coroutine {};
 
 		public:
 			MultipartGetUploadedOp(std::shared_ptr<Modio::Detail::UploadSessionPartList> Response,
@@ -83,7 +83,7 @@ namespace Modio
 									   Modio::ModID CurrentModID, Modio::Detail::UploadSession USession,
 									   CompletionTokenType&& Token)
 		{
-			return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
 				MultipartGetUploadedOp(std::move(Response), CurrentModID, USession), Token,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

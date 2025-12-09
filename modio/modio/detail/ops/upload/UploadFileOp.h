@@ -41,7 +41,7 @@ namespace Modio
 		class UploadFileOp
 		{
 			Modio::StableStorage<Modio::Detail::HttpRequest> Request {};
-			asio::coroutine Coroutine {};
+			ModioAsio::coroutine Coroutine {};
 			Modio::Detail::DynamicBuffer ResultBuffer {};
 			Modio::Detail::CachedResponse AllowCachedResponse {};
 
@@ -369,7 +369,7 @@ namespace Modio
 		auto UploadFileAsync(Modio::Detail::DynamicBuffer Response, Modio::Detail::HttpRequestParams RequestParameters,
 							 std::weak_ptr<Modio::ModProgressInfo> ProgressInfo, CompletionTokenType&& Token)
 		{
-			return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
 				UploadFileOp(
 					Response, RequestParameters,
 					Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().GetFileDownloadTicket(),

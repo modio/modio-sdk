@@ -22,20 +22,20 @@ namespace Modio
 	{
 		/// @brief Generic threadsafe logging object. Can either construct and retain an instance, or log via a
 		/// temporary
-		class Timer : public asio::basic_io_object<Modio::Detail::TimerService>
+		class Timer : public ModioAsio::basic_io_object<Modio::Detail::TimerService>
 		{
 		protected:
 		public:
 			/// @brief Explicit constructor for a Timer that posts messages via an explicit io_context
 			/// @param Context the io_context to use
-			explicit Timer(asio::io_context& Context) : asio::basic_io_object<Modio::Detail::TimerService>(Context) {}
+			explicit Timer(ModioAsio::io_context& Context) : ModioAsio::basic_io_object<Modio::Detail::TimerService>(Context) {}
 
 			/// @brief Explicit convenience constructor for a Timer that posts messages via the global SDK io_context
 			explicit Timer()
-				: asio::basic_io_object<Modio::Detail::TimerService>(Modio::Detail::Services::GetGlobalContext())
+				: ModioAsio::basic_io_object<Modio::Detail::TimerService>(Modio::Detail::Services::GetGlobalContext())
 			{}
 
-			Timer(Timer&& Other) : asio::basic_io_object<Modio::Detail::TimerService>(std::move(Other)) {}
+			Timer(Timer&& Other) : ModioAsio::basic_io_object<Modio::Detail::TimerService>(std::move(Other)) {}
 			Timer& operator=(Timer&& Other) = default; 	
 
 			void ExpiresAfter(std::chrono::steady_clock::duration Duration)

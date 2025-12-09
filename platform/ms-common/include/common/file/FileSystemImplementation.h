@@ -33,7 +33,7 @@ namespace Modio
 		template<typename Subplatform>
 		class FileSystemImplementationBase : public Modio::Detail::IFileServiceImplementation
 		{
-			asio::io_context::service& OwningService;
+			ModioAsio::io_context::service& OwningService;
 			/// <summary>
 			/// The root path for local persistent storage - all file paths are treated as relative to this root
 			/// </summary>
@@ -54,7 +54,7 @@ namespace Modio
 
 			std::vector<std::weak_ptr<FileObjectImplementation>> OpenFileObjects;
 
-			FileSystemImplementationBase(asio::io_context::service& OwningService) : OwningService(OwningService)
+			FileSystemImplementationBase(ModioAsio::io_context::service& OwningService) : OwningService(OwningService)
 			{
 				SharedState = static_cast<Subplatform*>(this)->MakeSharedState();
 			}
@@ -109,7 +109,7 @@ namespace Modio
 			{
 				CurrentGameID = InitParams.GameID;
 				CurrentSessionIdentifier = InitParams.User;
-				return asio::async_compose<CompletionTokenType, void(std::error_code)>(
+				return ModioAsio::async_compose<CompletionTokenType, void(std::error_code)>(
 					static_cast<Subplatform*>(this)->MakeInitializeStorageOp(InitParams, RootLocalStoragePath,
 																			 UserDataPath, RootTempPath),
 					Token, Modio::Detail::Services::GetGlobalContext().get_executor());
@@ -119,7 +119,7 @@ namespace Modio
 			auto WriteSomeAtAsync(IOObjectImplementationType PlatformIOObjectInstance, std::uintmax_t Offset,
 								  Modio::Detail::Buffer Buffer, CompletionTokenType&& Token)
 			{
-				return asio::async_compose<CompletionTokenType, void(std::error_code)>(
+				return ModioAsio::async_compose<CompletionTokenType, void(std::error_code)>(
 					static_cast<Subplatform*>(this)->MakeWriteSomeToFileOp(PlatformIOObjectInstance, Offset,
 																		   std::move(Buffer)),
 					Token, Modio::Detail::Services::GetGlobalContext().get_executor());
@@ -129,7 +129,7 @@ namespace Modio
 			auto ReadSomeAtAsync(IOObjectImplementationType PlatformIOObjectInstance, std::uintmax_t Offset,
 								 std::uintmax_t Length, CompletionTokenType&& Token)
 			{
-				return asio::async_compose<CompletionTokenType,
+				return ModioAsio::async_compose<CompletionTokenType,
 										   void(std::error_code, Modio::Optional<Modio::Detail::Buffer>)>(
 					ReadSomeFromFileOp(PlatformIOObjectInstance, Offset, Length), Token,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
@@ -140,7 +140,7 @@ namespace Modio
 								 std::uintmax_t MaxBytesToRead, Modio::Detail::DynamicBuffer Destination,
 								 CompletionTokenType&& Token)
 			{
-				return asio::async_compose<CompletionTokenType, void(std::error_code)>(
+				return ModioAsio::async_compose<CompletionTokenType, void(std::error_code)>(
 					ReadSomeFromFileBufferedOp(PlatformIOObjectInstance, Modio::FileOffset(Offset), MaxBytesToRead,
 											   Destination),
 					Token, Modio::Detail::Services::GetGlobalContext().get_executor());
@@ -150,7 +150,7 @@ namespace Modio
 			auto ReadAsync(IOObjectImplementationType PlatformIOObjectInstance, std::uintmax_t MaxBytesToRead,
 						   Modio::Detail::DynamicBuffer Destination, CompletionTokenType&& Token)
 			{
-				return asio::async_compose<CompletionTokenType, void(std::error_code)>(
+				return ModioAsio::async_compose<CompletionTokenType, void(std::error_code)>(
 					ReadSomeFromFileBufferedOp(PlatformIOObjectInstance, PlatformIOObjectInstance->Tell(),
 											   MaxBytesToRead, Destination),
 					Token, Modio::Detail::Services::GetGlobalContext().get_executor());
@@ -160,7 +160,7 @@ namespace Modio
 			auto WriteAsync(IOObjectImplementationType PlatformIOObjectInstance, Modio::Detail::Buffer Buffer,
 							CompletionTokenType&& Token)
 			{
-				return asio::async_compose<CompletionTokenType, void(std::error_code)>(
+				return ModioAsio::async_compose<CompletionTokenType, void(std::error_code)>(
 					static_cast<Subplatform*>(this)->MakeStreamWriteOp(PlatformIOObjectInstance, std::move(Buffer)),
 					Token, Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
@@ -168,7 +168,7 @@ namespace Modio
 			template<typename CompletionTokenType>
 			auto DeleteFolderAsync(Modio::filesystem::path FolderPath, CompletionTokenType&& Token)
 			{
-				return asio::async_compose<CompletionTokenType, void(std::error_code)>(
+				return ModioAsio::async_compose<CompletionTokenType, void(std::error_code)>(
 					DeleteFolderOp(FolderPath, SharedState), Token,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}

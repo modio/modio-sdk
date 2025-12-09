@@ -103,7 +103,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::EmailAuthCode EmailCode;
 			struct
 			{
@@ -117,7 +117,7 @@ namespace Modio
 		void AuthenticateUserByEmailAsync(Modio::EmailAuthCode EmailCode,
 										  AuthenticateUserByEmailCompleteCallback&& OnAuthenticateComplete)
 		{
-			return asio::async_compose<AuthenticateUserByEmailCompleteCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<AuthenticateUserByEmailCompleteCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::AuthenticateUserByEmailOp(EmailCode), OnAuthenticateComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

@@ -37,7 +37,7 @@ namespace Modio
 		class PerformRequestAndGetResponseOp : public Modio::Detail::BaseOperation<PerformRequestAndGetResponseOp>
 		{
 			Modio::StableStorage<Modio::Detail::HttpRequest> Request {};
-			asio::coroutine Coroutine {};
+			ModioAsio::coroutine Coroutine {};
 			Modio::Detail::DynamicBuffer ResultBuffer {};
 			Modio::Detail::CachedResponse AllowCachedResponse {};
 			std::unique_ptr<PerformRequestImpl> Impl {};
@@ -390,7 +390,7 @@ namespace Modio
 											   Modio::Detail::CachedResponse AllowCachedResponse,
 											   CompletionTokenType&& Token)
 		{
-			return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
 				PerformRequestAndGetResponseOp(
 					Response, RequestParameters,
 					Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().GetAPIRequestTicket(),

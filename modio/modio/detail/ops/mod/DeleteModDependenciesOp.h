@@ -58,7 +58,7 @@ namespace Modio
 		private:
 			Modio::ModID ModID {};
 			Modio::Detail::HttpRequestParams SubmitParams {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 		};
 #include <asio/unyield.hpp>
@@ -67,7 +67,7 @@ namespace Modio
 		void DeleteModDependenciesAsync(Modio::ModID ModID, const std::vector<Modio::ModID>& Dependencies,
 										DeleteCompleteCallback&& OnDeleteComplete)
 		{
-			return asio::async_compose<DeleteCompleteCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<DeleteCompleteCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::DeleteModDependenciesOp(ModID, Dependencies), OnDeleteComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

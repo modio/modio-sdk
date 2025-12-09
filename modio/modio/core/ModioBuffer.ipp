@@ -457,7 +457,7 @@ namespace Modio
 		std::size_t BufferCopy(Modio::Detail::Buffer& Destination, const Modio::Detail::DynamicBuffer Source)
 		{
 			MODIO_PROFILE_SCOPE(DynamicBufferCopyToLinear);
-			return asio::buffer_copy(Modio::MutableBufferView(Destination.Data(), Destination.GetSize()),
+			return ModioAsio::buffer_copy(Modio::MutableBufferView(Destination.Data(), Destination.GetSize()),
 									 Source.data());
 		}
 
@@ -467,7 +467,7 @@ namespace Modio
 			Modio::Detail::DynamicBuffer::Sequence SourceBufferView = Source.data();
 			Modio::Detail::DynamicBuffer::Sequence DestinationBufferView = Destination.data();
 
-			return asio::buffer_copy(DestinationBufferView, SourceBufferView);
+			return ModioAsio::buffer_copy(DestinationBufferView, SourceBufferView);
 		}
 
 	} // namespace Detail

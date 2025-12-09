@@ -146,7 +146,7 @@ namespace Modio
 			auto DesiredDataRange = BufferToRead.data(Offset, sizeof(DestinationType));
 			DestinationType Destination;
 			Modio::MutableBufferView MBV(&Destination, sizeof(Destination));
-			asio::buffer_copy(MBV, DesiredDataRange);
+			ModioAsio::buffer_copy(MBV, DesiredDataRange);
 			return Destination;
 		}
 
@@ -156,7 +156,7 @@ namespace Modio
 			DestinationType Destination;
 			Modio::ConstBufferView SourceBufferView(BufferToRead.Data() + Offset, sizeof(DestinationType));
 			Modio::MutableBufferView DestBufferView(&Destination, sizeof(Destination));
-			asio::buffer_copy(DestBufferView, SourceBufferView);
+			ModioAsio::buffer_copy(DestBufferView, SourceBufferView);
 			return Destination;
 		}
 
@@ -199,7 +199,7 @@ namespace Modio
 		{
 			Modio::ConstBufferView SourceBufferView(&Source, sizeof(SourceType));
 			Modio::MutableBufferView DestinationBufferView(BufferToWrite.Data() + Offset, sizeof(SourceType));
-			asio::buffer_copy(DestinationBufferView, SourceBufferView);
+			ModioAsio::buffer_copy(DestinationBufferView, SourceBufferView);
 			return {BufferToWrite, Offset + sizeof(SourceType)};
 		}
 

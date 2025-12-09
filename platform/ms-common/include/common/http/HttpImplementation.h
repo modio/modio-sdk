@@ -46,7 +46,7 @@ namespace Modio
 		class HttpImplementationBase : public Modio::Detail::IHttpServiceImplementation
 		{
 			std::shared_ptr<SharedStateType> HttpState {};
-			asio::io_context::service& OwningService;
+			ModioAsio::io_context::service& OwningService;
 
 		public:
 			using IOObjectImplementationType = std::shared_ptr<HttpRequestImplementation>;
@@ -62,7 +62,7 @@ namespace Modio
 				Implementation = std::move(OtherImplementation);
 			}
 
-			HttpImplementationBase(asio::io_context::service& OwningService) : OwningService(OwningService) {}
+			HttpImplementationBase(ModioAsio::io_context::service& OwningService) : OwningService(OwningService) {}
 			~HttpImplementationBase() override {}
 
 			template<typename CompletionToken>
@@ -79,7 +79,7 @@ namespace Modio
 								   std::string(static_cast<Subplatform*>(this)->GetPlatformHeaderString()));
 #endif
 				HttpState = std::make_shared<SharedStateType>(nullptr);
-				return asio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
+				return ModioAsio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
 					static_cast<Subplatform*>(this)->MakeInitializeHttpOp(ComputedAgentString, HttpState), Token,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
@@ -87,7 +87,7 @@ namespace Modio
 			template<typename CompletionToken>
 			auto SendRequestAsync(IOObjectImplementationType PlatformIOObjectInstance, CompletionToken&& Token)
 			{
-				return asio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
+				return ModioAsio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
 					SendHttpRequestOp(PlatformIOObjectInstance, HttpState), Token,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
@@ -95,7 +95,7 @@ namespace Modio
 			template<typename CompletionToken>
 			auto ReadResponseHeadersAsync(IOObjectImplementationType PlatformIOObjectInstance, CompletionToken Token)
 			{
-				return asio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
+				return ModioAsio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
 					ReadHttpResponseHeadersOp(PlatformIOObjectInstance, HttpState), Token,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
@@ -105,7 +105,7 @@ namespace Modio
 											   Modio::Detail::DynamicBuffer DynamicBufferInstance,
 											   CompletionToken Token)
 			{
-				return asio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
+				return ModioAsio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
 					ReadSomeResponseBodyOp(PlatformIOObjectInstance, DynamicBufferInstance, HttpState), Token,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
@@ -120,7 +120,7 @@ namespace Modio
 			auto WriteSomeAsync(IOObjectImplementationType PlatformIOObjectInstance, Modio::Detail::Buffer Data,
 								CompletionToken&& Token)
 			{
-				return asio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
+				return ModioAsio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
 					WriteSomeToRequestOp(PlatformIOObjectInstance, std::move(Data), HttpState), Token,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}

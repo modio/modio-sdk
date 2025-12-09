@@ -79,7 +79,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			struct
 			{
 				Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
@@ -91,7 +91,7 @@ namespace Modio
 		template<typename RefreshUserDataCallback>
 		auto RefreshUserDataAsync(RefreshUserDataCallback&& OnRefreshComplete)
 		{
-			return asio::async_compose<RefreshUserDataCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<RefreshUserDataCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::RefreshUserDataOp(), OnRefreshComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

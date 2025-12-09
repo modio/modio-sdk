@@ -41,7 +41,7 @@ namespace Modio
 		class UploadFilePartOp
 		{
 			Modio::StableStorage<Modio::Detail::HttpRequest> Request {};
-			asio::coroutine Coroutine {};
+			ModioAsio::coroutine Coroutine {};
 			Modio::Detail::DynamicBuffer ResponseBuffer {};
 			Modio::Detail::CachedResponse AllowCachedResponse {};
 			std::shared_ptr<Modio::Detail::UploadSession> Session {};
@@ -292,7 +292,7 @@ namespace Modio
 			int FilePart, std::shared_ptr<Modio::Detail::UploadSession> Session,
 			std::weak_ptr<Modio::ModProgressInfo> ProgressInfo, CompletionTokenType&& Token)
 		{
-			return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
 				UploadFilePartOp(
 					Response, RequestParameters, FilePath, FilePart, Session,
 					Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().GetFileDownloadTicket(),

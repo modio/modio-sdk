@@ -28,7 +28,7 @@ class ReadSomeResponseBodyOp
 	std::uintmax_t BufferSize = 512 * 1024;
 	std::pair<std::uintptr_t, std::uintmax_t> ExtendedStatus {};
 	std::weak_ptr<HttpSharedStateBase> SharedState {};
-	asio::coroutine CoroutineState {};
+	ModioAsio::coroutine CoroutineState {};
 	Modio::Detail::Timer SendTimer {};
 	bool bReadComplete = false;
 	WinHTTPCallbackStatus Status = WinHTTPCallbackStatus::Waiting;

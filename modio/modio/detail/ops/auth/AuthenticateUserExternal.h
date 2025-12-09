@@ -141,7 +141,7 @@ namespace Modio
 		private:
 			struct Impl
 			{
-				asio::coroutine CoroutineState {};
+				ModioAsio::coroutine CoroutineState {};
 				Modio::Detail::DynamicBuffer ResponseBuffer {};
 				Modio::Detail::HttpRequestParams AuthenticationParams {};
 				Modio::Detail::AccessTokenObject AuthResponse {};
@@ -153,7 +153,7 @@ namespace Modio
 		template<typename AuthDoneCallback>
 		auto AuthenticateUserExternalAsync(Modio::Detail::HttpRequestParams Params, AuthDoneCallback&& OnAuthComplete)
 		{
-			return asio::async_compose<AuthDoneCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<AuthDoneCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::AuthenticateUserExternal(Params), OnAuthComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

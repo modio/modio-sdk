@@ -27,7 +27,7 @@ class ReadSomeFromFileOp
 	std::uintmax_t Offset = 0;
 	std::uintmax_t Length = 0;
 	Modio::StableStorage<OVERLAPPED> ReadOpParams {};
-	asio::coroutine Coroutine {};
+	ModioAsio::coroutine Coroutine {};
 	Modio::Detail::Timer StatusTimer {};
 	Modio::StableStorage<DWORD> NumberOfBytesRead {};
 
@@ -81,7 +81,7 @@ public:
 				return;
 			}
 
-			yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+			yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
 										"Begin read of {} bytes from {} at {}", Length, FileImpl->GetPath().string(),

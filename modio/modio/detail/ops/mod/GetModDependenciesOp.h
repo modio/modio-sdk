@@ -140,7 +140,7 @@ namespace Modio
 
 		private:
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			bool Recursive {};
 			const std::uint16_t MaxResultSafetyLimit = 5000;
 			Modio::ModID ModID {};
@@ -157,7 +157,7 @@ namespace Modio
 		void GetModDependenciesAsync(Modio::ModID ModID, bool Recursive,
 									 GetDependenciesCompleteCallback&& OnGetDependenciesComplete)
 		{
-			return asio::async_compose<GetDependenciesCompleteCallback,
+			return ModioAsio::async_compose<GetDependenciesCompleteCallback,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList>)>(
 				Modio::Detail::GetModDependenciesOp(ModID, Modio::Detail::SDKSessionData::CurrentGameID(), Recursive),
 				OnGetDependenciesComplete,

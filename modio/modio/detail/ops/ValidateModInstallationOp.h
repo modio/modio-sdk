@@ -26,7 +26,7 @@ namespace Modio
 		/// directory exists, and contains data.
 		class ValidateModInstallationOp
 		{
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::ModCollectionEntry Entry {};
 
 		public:
@@ -37,7 +37,7 @@ namespace Modio
 			{
 				reenter(CoroutineState)
 				{
-					yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+					yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 					// If the directory does not exist
 					if (!Modio::filesystem::exists(Entry.GetPath(), ec))
 					{
@@ -75,7 +75,7 @@ namespace Modio
 		template<typename CompletionToken>
 		void ValidateModInstallationAsync(Modio::ModCollectionEntry& Entry, CompletionToken&& Callback)
 		{
-			return asio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
 				ValidateModInstallationOp(Entry), Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	} // namespace Detail

@@ -71,13 +71,13 @@ namespace Modio
 			uint32_t Interval {};
 			nlohmann::json BodyJson {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 		};
 
 		template<typename Callback>
 		auto MetricsSessionSendHeartbeatAtIntervalOpAsync(uint32_t SecondsInterval, Callback&& OnProcessComplete)
 		{
-			return asio::async_compose<Callback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<Callback, void(Modio::ErrorCode)>(
 				MetricsSessionSendHeartbeatAtIntervalOp(SecondsInterval), OnProcessComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

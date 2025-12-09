@@ -19,18 +19,18 @@ namespace Modio
 {
 	namespace Detail
 	{
-		class File : public asio::basic_io_object<Modio::Detail::FileService>
+		class File : public ModioAsio::basic_io_object<Modio::Detail::FileService>
 		{
 			Modio::filesystem::path FilePath {};
-			asio::strand<asio::io_context::executor_type> FileStrand;
+			ModioAsio::strand<ModioAsio::io_context::executor_type> FileStrand;
 			Modio::Detail::FileMode Mode {};
 
 		public:
 			explicit File(Modio::filesystem::path FilePath, Modio::Detail::FileMode Mode,
 						  bool bOverwriteExisting = false)
-				: asio::basic_io_object<Modio::Detail::FileService>(Modio::Detail::Services::GetGlobalContext()),
+				: ModioAsio::basic_io_object<Modio::Detail::FileService>(Modio::Detail::Services::GetGlobalContext()),
 				  FilePath(FilePath),
-				  FileStrand(asio::make_strand(Modio::Detail::Services::GetGlobalContext())),
+				  FileStrand(ModioAsio::make_strand(Modio::Detail::Services::GetGlobalContext())),
 				  Mode(Mode)
 			{
 				get_implementation()->SetFileStrand(FileStrand);
@@ -52,11 +52,11 @@ namespace Modio
 				}
 			}
 
-			explicit File(asio::io_context& Context, Modio::filesystem::path FilePath, Modio::Detail::FileMode Mode,
+			explicit File(ModioAsio::io_context& Context, Modio::filesystem::path FilePath, Modio::Detail::FileMode Mode,
 						  bool bOverwriteExisting = false)
-				: asio::basic_io_object<Modio::Detail::FileService>(Context),
+				: ModioAsio::basic_io_object<Modio::Detail::FileService>(Context),
 				  FilePath(FilePath),
-				  FileStrand(asio::make_strand(Context)),
+				  FileStrand(ModioAsio::make_strand(Context)),
 				  Mode(Mode)
 			{
 				get_implementation()->SetFileStrand(FileStrand);
@@ -79,7 +79,7 @@ namespace Modio
 			}
 
 			File(Modio::Detail::File&& Other)
-				: asio::basic_io_object<Modio::Detail::FileService>(std::move(Other)),
+				: ModioAsio::basic_io_object<Modio::Detail::FileService>(std::move(Other)),
 				  FilePath(std::move(Other.FilePath)),
 				  FileStrand(std::move(Other.FileStrand)),
 				  Mode(std::move(Other.Mode)) {}

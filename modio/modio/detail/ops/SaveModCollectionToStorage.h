@@ -84,7 +84,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::filesystem::path DestinationFilePath {};
 			Modio::filesystem::path TempFilePath {};
 			std::unique_ptr<Modio::Detail::File> TempFile {};
@@ -94,7 +94,7 @@ namespace Modio
 		template<typename SaveModCollectionCallback>
 		auto SaveModCollectionToStorageAsync(SaveModCollectionCallback&& OnSaveComplete)
 		{
-			return asio::async_compose<SaveModCollectionCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<SaveModCollectionCallback, void(Modio::ErrorCode)>(
 				SaveModCollectionToStorage(), OnSaveComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

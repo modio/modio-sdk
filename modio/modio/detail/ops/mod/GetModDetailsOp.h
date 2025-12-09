@@ -28,7 +28,7 @@ namespace Modio
 			Modio::ApiKey ApiKey {};
 			Modio::ModID ModId {};
 
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 
 		public:
 			GetModDetailsOp(Modio::GameID GameID, Modio::ApiKey ApiKey, Modio::ModID ModId)
@@ -75,7 +75,7 @@ namespace Modio
 		template<typename GetModDetailsCompleteCallback>
 		void GetModDetailsAsync(Modio::ModID ModId, GetModDetailsCompleteCallback&& OnGetModDetailsComplete)
 		{
-			return asio::async_compose<GetModDetailsCompleteCallback,
+			return ModioAsio::async_compose<GetModDetailsCompleteCallback,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::ModDetails>)>(
 				Modio::Detail::GetModDetailsOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 											   Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId),

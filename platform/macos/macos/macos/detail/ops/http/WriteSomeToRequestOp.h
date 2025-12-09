@@ -27,7 +27,7 @@ namespace Modio
 		{
 			std::shared_ptr<HttpRequestImplementation> Request {};
 			Modio::Detail::Buffer DataToWrite;
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::Timer StatusTimer {};
 			std::weak_ptr<HttpSharedState> SharedState {};
 

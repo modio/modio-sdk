@@ -31,10 +31,10 @@ namespace Modio
 		/// @docinternal
 		/// @brief A global service to store mod data retrieved from the server
 		/// in a form of cache, which would have a limited lifespan
-		class CacheService : public asio::detail::service_base<CacheService>
+		class CacheService : public ModioAsio::detail::service_base<CacheService>
 		{
 		public:
-			MODIO_IMPL explicit CacheService(asio::io_context& IOService);
+			MODIO_IMPL explicit CacheService(ModioAsio::io_context& IOService);
 			CacheService(CacheService&&) = delete;
 
 			MODIO_IMPL void Shutdown();
@@ -82,7 +82,7 @@ namespace Modio
 			struct CacheEntry
 			{
 				Modio::Detail::Timer MyTimer;
-				// std::unique_ptr<asio::steady_timer> Timer;
+				// std::unique_ptr<ModioAsio::steady_timer> Timer;
 				Modio::Detail::DynamicBuffer Data;
 			};
 

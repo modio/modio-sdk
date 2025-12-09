@@ -68,13 +68,13 @@ namespace Modio
 		private:
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
 			Modio::Detail::HttpRequestParams ListFollowedModCollectionsParams;
-			asio::coroutine CoroutineState;
+			ModioAsio::coroutine CoroutineState;
 		};
 
 		template<typename CallbackType>
 		auto ListUserFollowedModCollectionsAsync(Modio::FilterParams Filter, CallbackType&& OnComplete)
 		{
-			return asio::async_compose<CallbackType,
+			return ModioAsio::async_compose<CallbackType,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfoList>)>(
 				Modio::Detail::ListUserFollowedModCollectionsOp(Filter), OnComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());

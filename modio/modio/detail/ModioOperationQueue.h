@@ -27,13 +27,13 @@ namespace Modio
 		{
 			std::atomic<bool> OperationInProgress {};
 			std::atomic<std::int32_t> NumWaiters {};
-			// asio::steady_timer QueueImpl;
+			// ModioAsio::steady_timer QueueImpl;
 			std::deque<fu2::unique_function<void()>> QueueImpl {};
 			std::atomic<bool> bWasCancelled {};
 			std::string QueueName {};
 
 		public:
-			OperationQueue(asio::io_context& MODIO_UNUSED_ARGUMENT(OwningContext), const char* QueueName)
+			OperationQueue(ModioAsio::io_context& MODIO_UNUSED_ARGUMENT(OwningContext), const char* QueueName)
 				: OperationInProgress(false),
 				  NumWaiters(0),
 				  QueueName(QueueName)
@@ -102,8 +102,8 @@ namespace Modio
 					std::shared_ptr<Modio::Detail::OperationQueue> AssociatedQueue = Impl->AssociatedQueue.lock();
 					if (AssociatedQueue == nullptr)
 					{
-						auto Ex_ = asio::get_associated_executor(Operation);
-						asio::post(Ex_, [Op = std::move(Operation)]() mutable {
+						auto Ex_ = ModioAsio::get_associated_executor(Operation);
+						ModioAsio::post(Ex_, [Op = std::move(Operation)]() mutable {
 							Op(Modio::make_error_code(Modio::GenericError::QueueClosed));
 						});
 						return;
@@ -134,7 +134,7 @@ namespace Modio
 				}
 				else
 				{
-					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 							   std::forward<OperationType>(Operation));
 				}
 			}
@@ -151,7 +151,7 @@ namespace Modio
 				if (NumWaiters > 0)
 				{
 					--NumWaiters;
-					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 							   std::move(QueueImpl.front()));
 					QueueImpl.pop_front();
 					MODIO_PROFILE_COUNTER_SET_NAMED(QueueName.c_str(), std::uint64_t(NumWaiters.load()));

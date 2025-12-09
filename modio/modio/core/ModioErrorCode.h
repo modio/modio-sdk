@@ -826,9 +826,10 @@ namespace Modio
 		MonetizationAuthenticationFailed = 23047,
 		PaymentFailed = 23048,
 		RetryEntitlements = 23049,
-		UserMonetizationDisabled = 23050,
-		UserMonetizationNotConfigured = 23051,
-		WalletFetchFailed = 23052
+		UnexpectedError = 23050,
+		UserMonetizationDisabled = 23051,
+		UserMonetizationNotConfigured = 23052,
+		WalletFetchFailed = 23053
 	};
 
 	/// @docnone
@@ -867,6 +868,9 @@ namespace Modio
 					break;
 				case MonetizationError::RetryEntitlements:
 						return "Some entitlements could not be verified. Please try again.";
+					break;
+				case MonetizationError::UnexpectedError:
+						return "Unexpected server error encountered. Please try again later.";
 					break;
 				case MonetizationError::UserMonetizationDisabled:
 						return "The account does not have monetization enabled.";
@@ -1107,6 +1111,7 @@ namespace Modio
 		BinaryFileUnreadable = 13002,
 		CannotMuteYourself = 17039,
 		CannotVerifyExternalCredentials = 11032,
+		CloudCookingDisabled = 29700,
 		CrossOriginForbidden = 10001,
 		EmailExchangeCodeAlreadyRedeemed = 11011,
 		EmailLoginCodeExpired = 11012,
@@ -1150,6 +1155,7 @@ namespace Modio
 		OpenIDNotConfigured = 11086,
 		PSNChildAccountNotPermitted = 11085,
 		PSNNotAllowedToInteractWithUGC = 11096,
+		PlatformSpecificModfilesNotSupported = 14037,
 		PremiumFeatureNotEnabled = 14040,
 		Ratelimited = 11008,
 		RatelimitedSameEndpoint = 11009,
@@ -1216,6 +1222,9 @@ namespace Modio
 					break;
 				case ApiError::CannotVerifyExternalCredentials:
 						return "mod.io was unable to verify the credentials against the external service provider.";
+					break;
+				case ApiError::CloudCookingDisabled:
+						return "Cloud Cooking is disabled for this game";
 					break;
 				case ApiError::CrossOriginForbidden:
 						return "Cross-origin request forbidden.";
@@ -1345,6 +1354,9 @@ namespace Modio
 					break;
 				case ApiError::PSNNotAllowedToInteractWithUGC:
 						return "Account not allowed to interact with UGC";
+					break;
+				case ApiError::PlatformSpecificModfilesNotSupported:
+						return "This mod does not support platform specific modfiles.";
 					break;
 				case ApiError::PremiumFeatureNotEnabled:
 						return "Premium feature not enabled";
@@ -1691,7 +1703,9 @@ namespace Modio
 		/// @brief The asynchronous operation is already running. Please wait for it to complete before calling it again
 		RequestInProgress = 49,
 		/// @brief The zip file submitted is invalid.
-		InvalidZipFile = 50
+		InvalidZipFile = 50,
+		/// @brief Cloud Cooking is disabled for this game.
+		CloudCookingDisabled = 51
 	};
 
 	/// @docnone
@@ -1853,6 +1867,9 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::InvalidZipFile:
 					return "The zip file submitted is invalid.";
+				break;
+				case ErrorConditionTypes::CloudCookingDisabled:
+					return "Cloud Cooking is disabled for this game.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -2091,6 +2108,11 @@ namespace Modio
 					}
 
 					if (ec == Modio::ApiError::InvalidZipFile)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::CloudCookingDisabled)
 					{
 						return true;
 					}
@@ -3000,6 +3022,11 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::MonetizationError::UnexpectedError)
+					{
+						return true;
+					}
+
 					if (ec == Modio::MonetizationError::UserMonetizationDisabled)
 					{
 						return true;
@@ -3085,6 +3112,11 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::MonetizationError::UnexpectedError)
+					{
+						return true;
+					}
+
 					if (ec == Modio::MonetizationError::UserMonetizationDisabled)
 					{
 						return true;
@@ -3160,6 +3192,11 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::MonetizationError::UnexpectedError)
+					{
+						return true;
+					}
+
 					if (ec == Modio::MonetizationError::UserMonetizationDisabled)
 					{
 						return true;
@@ -3231,6 +3268,11 @@ namespace Modio
 					}
 
 					if (ec == Modio::MonetizationError::RetryEntitlements)
+					{
+						return true;
+					}
+
+					if (ec == Modio::MonetizationError::UnexpectedError)
 					{
 						return true;
 					}
@@ -3513,6 +3555,14 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::InvalidZipFile:
 					if (ec == Modio::ApiError::InvalidZipFile)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::CloudCookingDisabled:
+					if (ec == Modio::ApiError::CloudCookingDisabled)
 					{
 						return true;
 					}

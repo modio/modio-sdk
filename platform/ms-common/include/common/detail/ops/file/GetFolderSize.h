@@ -69,7 +69,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::filesystem::path FolderPath {};
 			std::vector<std::pair<Modio::filesystem::path, int>> Folders {};
 			Modio::filesystem::directory_iterator DirectoryIterator {};
@@ -81,7 +81,7 @@ namespace Modio
 		template<typename DeleteCallback>
 		auto GetFolderSizeAsync(Modio::filesystem::path FilePath, DeleteCallback&& OnDeleteDone)
 		{
-			return asio::async_compose<DeleteCallback, void(Modio::ErrorCode, std::size_t)>(
+			return ModioAsio::async_compose<DeleteCallback, void(Modio::ErrorCode, std::size_t)>(
 				GetFolderSizeOp(FilePath), OnDeleteDone, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	} // namespace Detail

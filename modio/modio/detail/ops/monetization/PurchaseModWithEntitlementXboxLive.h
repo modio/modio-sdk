@@ -25,7 +25,7 @@ namespace Modio
 										Params.ExtendedParameters[Modio::Detail::Constants::APIStrings::XboxToken])
 					.AddQueryParamRaw("type", "1");
 
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)>,
+			return ModioAsio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)>,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)>(
 				Modio::Detail::PurchaseModOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 											 Modio::Detail::SDKSessionData::CurrentAPIKey(), ModID, RequestParams),

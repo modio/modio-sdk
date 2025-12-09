@@ -31,7 +31,7 @@ namespace Modio
 			Modio::FilterParams Filter {};
 			Modio::GameID GameID {};
 
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 
 		public:
 			ListUserCreatedModsOp(Modio::GameID GameID, FilterParams InFilter) : Filter(std::move(InFilter)), GameID(GameID) {}
@@ -107,7 +107,7 @@ namespace Modio
 		template<typename ListCompleteCallback>
 		void ListUserCreatedModsAsync(FilterParams InFilter, ListCompleteCallback&& OnListComplete)
 		{
-			return asio::async_compose<ListCompleteCallback,
+			return ModioAsio::async_compose<ListCompleteCallback,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>(
 				Modio::Detail::ListUserCreatedModsOp(Modio::Detail::SDKSessionData::CurrentGameID(), InFilter),
 				OnListComplete,

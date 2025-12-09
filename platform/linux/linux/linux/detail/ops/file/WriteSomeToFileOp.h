@@ -60,7 +60,7 @@ namespace Modio
 
 				reenter(CoroutineState)
 				{
-					yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+					yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 
 					if (BufferSize == 0)
 					{
@@ -115,7 +115,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::Buffer Buffer;
 			std::shared_ptr<Modio::Detail::FileObjectImplementation> FileImpl {};
 			Modio::Optional<Modio::FileOffset> FileOffset {};
@@ -134,7 +134,7 @@ namespace Modio
 		auto WriteSomeAsync(std::shared_ptr<Modio::Detail::FileObjectImplementation> PlatformIOObjectInstance,
 							Modio::Detail::Buffer Buffer, CompletionTokenType&& Token)
 		{
-			return asio::async_compose<CompletionTokenType, void(std::error_code)>(
+			return ModioAsio::async_compose<CompletionTokenType, void(std::error_code)>(
 				WriteSomeToFileOp(PlatformIOObjectInstance, {}, std::move(Buffer)), Token,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}*/

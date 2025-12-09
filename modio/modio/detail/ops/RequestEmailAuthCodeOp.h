@@ -39,7 +39,7 @@ namespace Modio::Detail
 		}
 
 	private:
-		asio::coroutine CoroutineState {};
+		ModioAsio::coroutine CoroutineState {};
 		Modio::Detail::DynamicBuffer ResponseBuffer {};
 		Modio::EmailAddress EmailAddress;
 	};
@@ -48,7 +48,7 @@ namespace Modio::Detail
 	void RequestEmailAuthCodeAsync(Modio::EmailAddress EmailAddress,
 								   RequestEmailAuthCodeCompleteCallback&& OnRequestComplete)
 	{
-		return asio::async_compose<RequestEmailAuthCodeCompleteCallback, void(Modio::ErrorCode)>(
+		return ModioAsio::async_compose<RequestEmailAuthCodeCompleteCallback, void(Modio::ErrorCode)>(
 			Modio::Detail::RequestEmailAuthCodeOp(EmailAddress), OnRequestComplete,
 			Modio::Detail::Services::GetGlobalContext().get_executor());
 	}

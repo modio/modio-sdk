@@ -42,7 +42,7 @@ class WriteSomeToFileOp : public Modio::Detail::BaseOperation<WriteSomeToFile>
 	/// <summary>
 	/// State container for the coroutine invoked in the function call operator overload
 	/// </summary>
-	asio::coroutine Coroutine {};
+	ModioAsio::coroutine Coroutine {};
 	/// <summary>
 	/// Timer to allow the polling interval to be set for the waiting state of the operation
 	/// </summary>
@@ -96,7 +96,7 @@ public:
 				return;
 			}
 
-			yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+			yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
 										"Begin write of {} bytes to {} at {}", Buffer.GetSize(),
 										FileImpl->GetPath().string(), FileOffset);

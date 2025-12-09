@@ -99,6 +99,8 @@ namespace Modio
 		std::string ProfileSummary {};
 		/// @brief Detailed description in HTML format
 		std::string ProfileDescription {};
+		/// @brief Detailed description in plaintext format
+		std::string ProfileDescriptionPlaintext {};
 
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModCollectionInfo& ModCollection);

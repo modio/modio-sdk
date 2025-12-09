@@ -505,7 +505,7 @@ namespace Modio
 					Modio::Detail::Logger().Log(
 						Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
 						"Attempted to call SubmitNewModAsync with an already-used handle. Returning existing Mod ID");
-					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						[ID = ResolvedID.value(), Callback]() { Callback({}, ID); });
 					return;
 				}

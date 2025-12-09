@@ -24,7 +24,7 @@ namespace Modio
 #include <asio/yield.hpp>
 		class GetModMediaLogoOp
 		{
-			asio::coroutine CoroState {};
+			ModioAsio::coroutine CoroState {};
 
 			// Parameters
 			Modio::GameID GameID {};
@@ -114,7 +114,7 @@ namespace Modio
 		void GetModMediaLogoAsync(Modio::ModID ModId, Modio::LogoSize LogoSize,
 								  GetLogoCompleteCallback&& OnGetLogoComplete)
 		{
-			return asio::async_compose<GetLogoCompleteCallback, void(Modio::ErrorCode, Modio::Optional<std::string>)>(
+			return ModioAsio::async_compose<GetLogoCompleteCallback, void(Modio::ErrorCode, Modio::Optional<std::string>)>(
 				Modio::Detail::GetModMediaLogoOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 												 Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId, LogoSize),
 				OnGetLogoComplete,

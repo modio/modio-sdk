@@ -17,10 +17,10 @@ namespace Modio
 {
 	namespace Detail
 	{
-		class TimerService : public asio::detail::service_base<TimerService>
+		class TimerService : public ModioAsio::detail::service_base<TimerService>
 		{
 		public:
-			MODIO_IMPL explicit TimerService(asio::io_context& IOService);
+			MODIO_IMPL explicit TimerService(ModioAsio::io_context& IOService);
 			TimerService(TimerService&&) = delete;
 
 			using implementation_type = TimerServiceImplementation::IOObjectImplementationType;

@@ -16,6 +16,9 @@
 #include <iostream>
 #include <sstream>
 #include <utility>
+#include <future>
+
+#pragma warning(push, 0)
 
 /// This example demonstrates how to refresh a users monetization entitlements. Note that each platform
 ///	has additional functionality
@@ -335,3 +338,5 @@ int main()
 		HandlerThread.join();
 	}
 }
+
+#pragma warning(pop)

@@ -14,7 +14,6 @@
 
 #include "modio/core/entities/ModioProfileMaturity.h"
 #include "modio/detail/FmtWrapper.h"
-#include "modio/detail/ModioFormatters.h"
 #include "modio/detail/ModioStringHelpers.h"
 
 namespace Modio
@@ -89,18 +88,14 @@ namespace Modio
 	Modio::FilterParams& FilterParams::MarkedLiveAfter(std::chrono::system_clock::time_point LiveAfter,
 													   bool RoundToHour)
 	{
-		DateRangeBegin = RoundToHour
-			? std::chrono::round<std::chrono::hours>(LiveAfter)
-			: LiveAfter;
+		DateRangeBegin = RoundToHour ? std::chrono::round<std::chrono::hours>(LiveAfter) : LiveAfter;
 		return *this;
 	}
 
 	Modio::FilterParams& FilterParams::MarkedLiveBefore(std::chrono::system_clock::time_point LiveBefore,
 														bool RoundToHour)
 	{
-		DateRangeEnd = RoundToHour 
-			? std::chrono::round<std::chrono::hours>(LiveBefore) 
-			: LiveBefore;
+		DateRangeEnd = RoundToHour ? std::chrono::round<std::chrono::hours>(LiveBefore) : LiveBefore;
 		return *this;
 	}
 

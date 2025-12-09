@@ -237,7 +237,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			std::shared_ptr<Modio::ModCollectionEntry> EntryToProcess {};
 			Modio::Optional<std::pair<Modio::ModID, Modio::CreateModFileParams>> PendingUpload {};
 			Modio::Optional<std::pair<Modio::ModID, Modio::CreateSourceFileParams>> PendingSourceUpload {};
@@ -248,7 +248,7 @@ namespace Modio
 		template<typename ProcessNextCallback>
 		auto ProcessNextModInUserCollectionAsync(ProcessNextCallback&& OnProcessComplete)
 		{
-			return asio::async_compose<ProcessNextCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<ProcessNextCallback, void(Modio::ErrorCode)>(
 				ProcessNextModInUserCollection(), OnProcessComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

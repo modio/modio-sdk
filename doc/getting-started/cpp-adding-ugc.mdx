@@ -2,6 +2,7 @@
 id: cpp-adding-ugc
 title: Adding UGC
 slug: /cppsdk/adding-ugc
+custom_edit_url: https://github.com/modio/modio-sdk-internal/blob/develop/doc/getting-started/cpp-adding-ugc.mdx
 ---
 
 # Adding UGC
@@ -16,7 +17,7 @@ This guide covers:
 
 ## Submitting new UGC
 
-To submit UGC, first create a mod handle using [`GetModCreationHandle`](/cppsdk/refdocs/#getmodcreationhandle) and use that handle when calling [`SubmitNewModAsync`](/cppsdk/refdocs/#submitnewmodasync). Note that the newly created mod will remain hidden until a mod file is added in the next step.
+To submit UGC, first create a mod handle using [`GetModCreationHandle`](https://docs.mod.io/cppsdk/refdocs#getmodcreationhandle) and use that handle when calling [`SubmitNewModAsync`](https://docs.mod.io/cppsdk/refdocs#submitnewmodasync). Note that the newly created mod will remain hidden until a mod file is added in the next step.
 
 ```cpp
 
@@ -45,7 +46,7 @@ Modio::SubmitNewModAsync(Handle, Params, [](Modio::ErrorCode ec, Modio::Optional
 
 ## Submitting UGC data
 
-Once you have successfully submitted a piece of UGC, you can submit the UGC's data, also known as a 'mod file', using [`SubmitNewModFileForMod`](/cppsdk/refdocs/#submitnewmodfileformod). When you submit a file, pass a `Modio::CreateModFileParams` containing the directory of the files that you want to submit. The SDK will compress this folder into a zip file and upload it as the active version of the mod. Note that there is no callback for this method; you'll be notified of the completed upload by the Mod Management callback.
+Once you have successfully submitted a piece of UGC, you can submit the UGC's data, also known as a 'mod file', using [`SubmitNewModFileForMod`](https://docs.mod.io/cppsdk/refdocs#submitnewmodfileformod). When you submit a file, pass a `Modio::CreateModFileParams` containing the directory of the files that you want to submit. The SDK will compress this folder into a zip file and upload it as the active version of the mod. Note that there is no callback for this method; you'll be notified of the completed upload by the Mod Management callback.
 
 ```cpp
 
@@ -63,9 +64,9 @@ Modio::SubmitNewModFileForMod(NewModID, Params);
 
 ## Edit existing UGC
 
-UGC details can be edited in-game using [`SubmitModChangesAsync`](/cppsdk/refdocs/#submitmodchangesasync).  This function allows you to edit multiple parameters with a single call.  It takes a `Modio::ModID` of the UGC to edit, a `Modio::EditModParams` containing one or more parameters to be altered, and a callback that will contain an optional updated `Modio::ModInfo` object on success.
+UGC details can be edited in-game using [`SubmitModChangesAsync`](https://docs.mod.io/cppsdk/refdocs#submitmodchangesasync).  This function allows you to edit multiple parameters with a single call.  It takes a `Modio::ModID` of the UGC to edit, a `Modio::EditModParams` containing one or more parameters to be altered, and a callback that will contain an optional updated `Modio::ModInfo` object on success.
 
-Note that updating the mod file itself is done via [`SubmitNewModFileForMod`](/cppsdk/refdocs/#submitnewmodfileformod), as detailed above in [`Submitting UGC data`](#submitting-ugc-data).
+Note that updating the mod file itself is done via [`SubmitNewModFileForMod`](https://docs.mod.io/cppsdk/refdocs#submitnewmodfileformod), as detailed above in [`Submitting UGC data`](#submitting-ugc-data).
 
 ```cpp
 
@@ -91,6 +92,6 @@ Modio::SubmitModChangesAsync(ModID, EditParams, [](Modio::ErrorCode ec, Modio::O
 
 ## Next steps
 
-Congratulations! You have completed all the [C++ SDK Getting Started Guides](/cppsdk/#c-sdk-core-setup-guides)! Your game should now be equipped with mod.io's core UGC functionally.
+Congratulations! You have completed all the [C++ SDK Getting Started Guides](https://docs.mod.io/cppsdk#c-sdk-core-setup-guides)! Your game should now be equipped with mod.io's core UGC functionally.
 
-The time's come to customize your game by exploring our [Features](/features) section. Here you can select features that suit your game's requirements.
+The time's come to customize your game by exploring our [Features](https://docs.mod.io/features) section. Here you can select features that suit your game's requirements.

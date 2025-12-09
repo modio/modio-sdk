@@ -66,14 +66,14 @@ namespace Modio
 		private:
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 			Modio::Detail::CachedResponse CachedResponse {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 		};
 #include <asio/unyield.hpp>
 
 		template<typename GetTermsCompleteCallback>
 		void GetTermsOfUseAsync(GetTermsCompleteCallback&& OnGetTermsComplete)
 		{
-			return asio::async_compose<GetTermsCompleteCallback, void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)>(
+			return ModioAsio::async_compose<GetTermsCompleteCallback, void(Modio::ErrorCode, Modio::Optional<Modio::Terms>)>(
 				Modio::Detail::GetTermsOfUseOp(), OnGetTermsComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

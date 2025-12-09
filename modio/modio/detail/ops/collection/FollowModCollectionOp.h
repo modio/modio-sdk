@@ -74,7 +74,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
+			ModioAsio::coroutine CoroutineState;
 			Modio::Detail::HttpRequestParams FollowParams;
 			Modio::Detail::DynamicBuffer ResponseBuffer;
 		};
@@ -82,7 +82,7 @@ namespace Modio
 		template<typename CallbackType>
 		auto FollowModCollectionAsync(Modio::ModCollectionID ModCollectionID, CallbackType&& OnComplete)
 		{
-			return asio::async_compose<CallbackType, void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfo>)>(
+			return ModioAsio::async_compose<CallbackType, void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfo>)>(
 				Modio::Detail::FollowModCollectionOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModCollectionID),
 				OnComplete, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

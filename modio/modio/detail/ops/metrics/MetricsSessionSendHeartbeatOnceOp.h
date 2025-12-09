@@ -66,7 +66,7 @@ namespace Modio
 		private:
 			nlohmann::json BodyJson {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			MetricsSessionHeartbeatParams RequestParams {};
 		};
 
@@ -75,7 +75,7 @@ namespace Modio
 		{
 			auto Request = Modio::Detail::Services::GetGlobalService<Modio::Detail::MetricsService>()
 							   .GenerateSessionHeartbeatParams();
-			return asio::async_compose<Callback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<Callback, void(Modio::ErrorCode)>(
 				MetricsSessionSendHeartbeatOnceOp(Request), OnProcessComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

@@ -25,11 +25,11 @@ namespace Modio
 	{
 		/// @docinternal
 		/// @brief Class to manage metric session data
-		class MetricsService : public asio::detail::service_base<MetricsService>
+		class MetricsService : public ModioAsio::detail::service_base<MetricsService>
 		{
 		public:
-			explicit MetricsService(asio::io_context& IOService)
-				: asio::detail::service_base<MetricsService>(IOService),
+			explicit MetricsService(ModioAsio::io_context& IOService)
+				: ModioAsio::detail::service_base<MetricsService>(IOService),
 				  SessionId(Modio::Guid::InvalidGuid()),
 				  SessionStartTime(0),
 				  CurrentSessionOrderId(0),

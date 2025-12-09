@@ -131,14 +131,14 @@ namespace Modio
 			Modio::ModID ModId {};
 			bool IncludeDependencies = false;
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 		};
 
 		template<typename SubscribeCompleteCallback>
 		void SubscribeToModAsync(Modio::ModID ModToSubscribeTo, bool IncludeDependencies,
 								 SubscribeCompleteCallback&& OnSubscribeComplete)
 		{
-			return asio::async_compose<SubscribeCompleteCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<SubscribeCompleteCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::SubscribeToModOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 												Modio::Detail::SDKSessionData::CurrentAPIKey(),
 												ModToSubscribeTo, IncludeDependencies),

@@ -2,11 +2,12 @@
 id: cpp-authentication
 title: User Authentication
 slug: /cppsdk/user-authentication
+custom_edit_url: https://github.com/modio/modio-sdk-internal/blob/develop/doc/getting-started/cpp-authentication.mdx
 ---
 
 # User Authentication for C++ SDK
 
-[Authentication](https://docs.mod.io/authentication/) is an essential part of user and server communication with mod.io. There are two ways for user accounts to access our service: email authentication and single sign on (SSO) through an external authentication partner. 
+[Authentication](https://docs.mod.io/authentication) is an essential part of user and server communication with mod.io. There are two ways for user accounts to access our service: email authentication and single sign on (SSO) through an external authentication partner. 
 
 This guide covers:
 
@@ -54,28 +55,31 @@ Email authentication is not recommended for production releases. We strongly rec
 
 There are two types of SSO to consider:
 
-1. [**Custom SSO**](https://docs.mod.io/authentication/openid/): Custom SSO harnesses your studio's authentication process as the single point of authentication. 
-2. [**Platform SSO**](https://docs.mod.io/authentication/platform/): Platform SSO uses a given platform's authentication process as the single point of authentication. 
+1. [**Custom SSO**](https://docs.mod.io/authentication/openid): Custom SSO harnesses your studio's authentication process as the single point of authentication. 
+2. [**Platform SSO**](https://docs.mod.io/authentication/platform): Platform SSO uses a given platform's authentication process as the single point of authentication. 
 
 	The platforms included in this process are:
 
-	* [Xbox Live](https://docs.mod.io/platforms/gdk/#authentication)
 	* [Steam](https://docs.mod.io/platforms/steam/authentication)
-	* [GOG Galaxy](https://docs.mod.io/platforms/gog/authentication)
-	* [Nintendo Switch](https://docs.mod.io/platforms/switch/#authentication)
-	* [PlayStation™Network](https://docs.mod.io/platforms/playstation/#authentication)
-	* [Epic Online Services](https://docs.mod.io/platforms/epic/authentication)
+	* [PlayStation™Network](https://docs.mod.io/platforms/playstation#authentication)
+	* [Xbox Live](https://docs.mod.io/platforms/gdk#authentication)
+	* [Nintendo Switch](https://docs.mod.io/platforms/switch#authentication)
+	* [Apple (iOS)](https://docs.mod.io/platforms/apple/authentication)
+	* [Google Play (Android)](https://docs.mod.io/platforms/google/authentication)
 	* [Meta Quest](https://docs.mod.io/platforms/meta/authentication)
-	* [Google](https://docs.mod.io/platforms/google/authentication)
+	* [GOG Galaxy](https://docs.mod.io/platforms/gog/authentication)
+	* [Epic Games](https://docs.mod.io/platforms/epic/authentication)
+	* itch.io
+	* Discord
 
-Each platform has their own requirements and prerequisites for performing SSO.  Platform-specific authentication can be found in the respective [platform documentation](https://docs.mod.io/getting-started/#expand-with-cross-platform-functionality).
+Each platform has their own requirements and prerequisites for performing SSO.  Platform-specific authentication can be found in the respective [platform documentation](https://docs.mod.io/getting-started#expand-with-cross-platform-functionality).
 
-To use SSO with mod.io, a user must have accepted the mod.io [Terms of Use](https://docs.mod.io/terms-user-consent/) in order to create an account.
+To use SSO with mod.io, a user must have accepted the mod.io [Terms of Use](https://docs.mod.io/terms-user-consent) in order to create an account.
 
 ### Recommended flow
 
-1. Call [AuthenticateUserExternalAsync](/cppsdk/refdocs/#authenticateuserexternalasync) , passing in any provider-specific parameters, setting `AuthenticationParams::bUserHasAcceptedTerms` to false, and indicating which authentication provider you wish to use
-2. Check the error code in the callback - if it indicates the user has not yet created an account or accepted the terms, call [GetTermsOfUseAsync](/cppsdk/refdocs/#gettermsofuseasync) and display the provided information to your user
+1. Call [AuthenticateUserExternalAsync](https://docs.mod.io/cppsdk/refdocs#authenticateuserexternalasync) , passing in any provider-specific parameters, setting `AuthenticationParams::bUserHasAcceptedTerms` to false, and indicating which authentication provider you wish to use
+2. Check the error code in the callback - if it indicates the user has not yet created an account or accepted the terms, call [GetTermsOfUseAsync](https://docs.mod.io/cppsdk/refdocs#gettermsofuseasync) and display the provided information to your user
 3. If the user clicks the OK/affirmative button on your screen displaying the terms of use, repeat the call in step 1 but setting `AuthenticationParams::bUserHasAcceptedTerms` to **true** for this single authentication request only. For all subsequent authentication attempts, this parameter should be set back to **false** - the system will automatically authenticate the user if they've already accepted the latest terms. Otherwise, the system will return an error (`403 Forbidden (error_ref 11074)`) allowing you to show the updated terms
 4. Check the error code in the callback - a false-y error code indicates that authentication was successful, and users can now install and manage UGC and subscriptions.
 
@@ -289,6 +293,6 @@ Note that you do not need to base64 encode the app ticket that you receive from 
 
 ## Next steps
 
-Now that you've set up the authentication process, the next step is to allow users to find UGC by implementing the [Searching for UGC](/cppsdk/searching-ugc) guide.
+Now that you've set up the authentication process, the next step is to allow users to find UGC by implementing the [Searching for UGC](https://docs.mod.io/cppsdk/searching-ugc) guide.
 
-If you've already done this, we recommend working your way through the [C++ SDK Getting Started Guides](/cppsdk/#c-sdk-core-setup-guides) as they will teach you how to implement the mod.io fundamentals before moving onto exploring our [Features](/features).
+If you've already done this, we recommend working your way through the [C++ SDK Getting Started Guides](https://docs.mod.io/cppsdk#c-sdk-core-setup-guides) as they will teach you how to implement the mod.io fundamentals before moving onto exploring our [Features](https://docs.mod.io/features).

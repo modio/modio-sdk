@@ -63,7 +63,7 @@ namespace Modio
 		private:
 			nlohmann::json BodyJson {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			MetricsSessionEndParams RequestParams {};
 		};
 
@@ -72,7 +72,7 @@ namespace Modio
 		{
 			auto Request =
 				Modio::Detail::Services::GetGlobalService<Modio::Detail::MetricsService>().GenerateSessionEndParams();
-			return asio::async_compose<Callback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<Callback, void(Modio::ErrorCode)>(
 				MetricsSessionEndOp(Request), OnProcessComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

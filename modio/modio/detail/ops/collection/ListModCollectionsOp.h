@@ -75,14 +75,14 @@ namespace Modio
 			Modio::GameID GameID;
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
 			Modio::Detail::HttpRequestParams ListModCollectionsParams;
-			asio::coroutine CoroutineState;
+			ModioAsio::coroutine CoroutineState;
 			Modio::FilterParams FilterParams;
 		};
 
 		template<typename CallbackType>
 		auto ListModCollectionsAsync(Modio::FilterParams Filter, CallbackType&& OnComplete)
 		{
-			return asio::async_compose<CallbackType, void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfoList>)>(
+			return ModioAsio::async_compose<CallbackType, void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfoList>)>(
 				Modio::Detail::ListModCollectionsOp(Modio::Detail::SDKSessionData::CurrentGameID(), Filter),
 				OnComplete, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

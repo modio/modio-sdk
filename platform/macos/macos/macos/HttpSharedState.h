@@ -74,6 +74,8 @@ namespace Modio
 				if (Request->GetParameters().GetTypedVerb() == Verb::POST ||
 					Request->GetParameters().GetTypedVerb() == Verb::PUT)
 				{
+					// Host URL does not need https://
+					ServerAddressStdStr = Request->Parameters.GetServerAddress(); 
 					CFStringRef HostURL = CFStringCreateWithCString(kCFAllocatorDefault, ServerAddressStdStr.c_str(),
 																	kCFStringEncodingUTF8);
 					std::string PayloadStr = std::to_string(Request->GetParameters().GetPayloadSize());

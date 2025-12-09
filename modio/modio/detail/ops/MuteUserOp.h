@@ -42,13 +42,13 @@ namespace Modio::Detail
 	private:
 		Modio::UserID ID {};
 		Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
-		asio::coroutine CoroutineState {};
+		ModioAsio::coroutine CoroutineState {};
 	};
 
 	template<typename MuteUserCompleteCallback>
 	void MuteUserAsync(Modio::UserID UserID, MuteUserCompleteCallback&& OnMuteUserComplete)
 	{
-		return asio::async_compose<MuteUserCompleteCallback, void(Modio::ErrorCode)>(
+		return ModioAsio::async_compose<MuteUserCompleteCallback, void(Modio::ErrorCode)>(
 			Modio::Detail::MuteUserOp(UserID), OnMuteUserComplete,
 			Modio::Detail::Services::GetGlobalContext().get_executor());
 	}

@@ -124,7 +124,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::HttpRequestParams EditRequestParams {};
 			Modio::Detail::DynamicBuffer ResponseBuffer {};
 		};
@@ -150,7 +150,7 @@ namespace Modio
 
 			if (FileExists == true)
 			{
-				return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>,
+				return ModioAsio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>,
 					void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>(
 						Modio::Detail::SubmitModChangesOp(Mod, Params), Callback,
 						Modio::Detail::Services::GetGlobalContext().get_executor());

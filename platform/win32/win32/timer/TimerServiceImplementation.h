@@ -30,7 +30,7 @@ namespace Modio
 		public:
 			using IOObjectImplementationType = std::shared_ptr<TimerImplementation>;
 
-			TimerServiceImplementation(asio::io_context::service& MODIO_UNUSED_ARGUMENT(OwningService))
+			TimerServiceImplementation(ModioAsio::io_context::service& MODIO_UNUSED_ARGUMENT(OwningService))
 			{
 				SharedState = std::make_shared<TimerSharedState>();
 			}
@@ -44,14 +44,14 @@ namespace Modio
 			template<typename CompletionTokenType>
 			void InitializeAsync(CompletionTokenType&& Token)
 			{
-				return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
+				return ModioAsio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
 					InitializeTimerServiceOp(SharedState), Token, Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 
 			template<typename CompletionToken>
 			auto WaitAsync(IOObjectImplementationType PlatformIOObjectInstance, CompletionToken&& Token)
 			{
-				return asio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
+				return ModioAsio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
 					WaitForTimerOp(PlatformIOObjectInstance, SharedState), Token,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}

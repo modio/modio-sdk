@@ -178,7 +178,7 @@ namespace Modio
 
 		private:
 			std::unique_ptr<Modio::Detail::ArchiveWriter> DestinationArchive {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::filesystem::path SourceDirectoryRootPath {};
 			Modio::filesystem::recursive_directory_iterator EntriesInFolder {};
 			Modio::filesystem::recursive_directory_iterator CurrentEntry {};
@@ -194,7 +194,7 @@ namespace Modio
 								 std::shared_ptr<uint64_t> FileHash, std::weak_ptr<Modio::ModProgressInfo> ProgressInfo,
 								 CompletionHandlerType&& Handler)
 		{
-			return asio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
 				CompressFolderOp(FolderToCompress, PathToOutputArchive, FileHash, ProgressInfo), Handler,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

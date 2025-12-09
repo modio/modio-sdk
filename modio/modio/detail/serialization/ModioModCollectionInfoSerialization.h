@@ -59,5 +59,6 @@ namespace Modio
 		Detail::ParseSafe(Json, ModCollection.ProfileNameId, "name_id");
 		Detail::ParseSafe(Json, ModCollection.ProfileSummary, "summary");
 		Detail::ParseSafe(Json, ModCollection.ProfileDescription, "description");
+		Detail::ParseSafe(Json, ModCollection.ProfileDescriptionPlaintext, "description_plaintext");
 	}
 } // namespace Modio

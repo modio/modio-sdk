@@ -26,7 +26,7 @@ namespace Modio
 		class ShutdownRunOneOp
 		{
 		public:
-			ShutdownRunOneOp(std::shared_ptr<asio::io_context> InTargetContext) : TargetContext(InTargetContext) {}
+			ShutdownRunOneOp(std::shared_ptr<ModioAsio::io_context> InTargetContext) : TargetContext(InTargetContext) {}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
@@ -36,13 +36,13 @@ namespace Modio
 			}
 
 		private:
-			std::shared_ptr<asio::io_context> TargetContext;
+			std::shared_ptr<ModioAsio::io_context> TargetContext;
 		};
 		template<typename CompletionHandlerType>
-		void ShutdownRunOneAsync(std::shared_ptr<asio::io_context> OldContext,
+		void ShutdownRunOneAsync(std::shared_ptr<ModioAsio::io_context> OldContext,
 								 CompletionHandlerType&& OnOneHandlerCalled)
 		{
-			return asio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
 				ShutdownRunOneOp(OldContext), OnOneHandlerCalled,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
@@ -50,7 +50,7 @@ namespace Modio
 		class ShutdownOp
 		{
 		public:
-			ShutdownOp(std::shared_ptr<asio::io_context> ContextToFlush) : ContextToFlush(ContextToFlush)
+			ShutdownOp(std::shared_ptr<ModioAsio::io_context> ContextToFlush) : ContextToFlush(ContextToFlush)
 			{
 				ContextToFlush->restart();
 			}
@@ -62,7 +62,7 @@ namespace Modio
 				{
 					while (ContextToFlush->poll_one())
 					{
-						yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+						yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 						// If we use the op, then we get stack overflow if the shutdown takes a long time
 						// yield ShutdownRunOneAsync(ContextToFlush, std::move(Self));
 					}
@@ -71,14 +71,14 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
-			std::shared_ptr<asio::io_context> ContextToFlush;
+			ModioAsio::coroutine CoroutineState;
+			std::shared_ptr<ModioAsio::io_context> ContextToFlush;
 		};
 
 		template<typename ShutdownCompleteCallback>
-		auto ShutdownAsync(std::shared_ptr<asio::io_context> Context, ShutdownCompleteCallback&& OnShutdownComplete)
+		auto ShutdownAsync(std::shared_ptr<ModioAsio::io_context> Context, ShutdownCompleteCallback&& OnShutdownComplete)
 		{
-			return asio::async_compose<ShutdownCompleteCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<ShutdownCompleteCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::ShutdownOp(std::move(Context)), OnShutdownComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		};

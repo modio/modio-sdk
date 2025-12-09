@@ -29,7 +29,7 @@ namespace Modio
 			Modio::GameID GameID {};
 			Modio::ApiKey ApiKey {};
 
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 
 		public:
 			GetUserDelegationTokenOp(Modio::GameID GameID, Modio::ApiKey ApiKey) : GameID(GameID), ApiKey(ApiKey) {}
@@ -72,7 +72,7 @@ namespace Modio
 		template<typename GetUserDelegationCompleteCallback>
 		void GetUserDelegationTokenAsync(GetUserDelegationCompleteCallback&& OnGetUserDelegationComplete)
 		{
-			return asio::async_compose<GetUserDelegationCompleteCallback, void(Modio::ErrorCode, std::string)>(
+			return ModioAsio::async_compose<GetUserDelegationCompleteCallback, void(Modio::ErrorCode, std::string)>(
 				Modio::Detail::GetUserDelegationTokenOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 														Modio::Detail::SDKSessionData::CurrentAPIKey()),
 				OnGetUserDelegationComplete,

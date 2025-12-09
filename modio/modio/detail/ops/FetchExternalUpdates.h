@@ -181,7 +181,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::ModID CurrentPendingUnsubscribe {};
 			bool bDirtyState = false;
 		};
@@ -189,7 +189,7 @@ namespace Modio
 		template<typename FetchDoneCallback>
 		auto FetchExternalUpdatesAsync(FetchDoneCallback&& OnFetchComplete)
 		{
-			return asio::async_compose<FetchDoneCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<FetchDoneCallback, void(Modio::ErrorCode)>(
 				FetchExternalUpdatesOp(), OnFetchComplete, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 

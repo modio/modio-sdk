@@ -56,7 +56,7 @@ namespace Modio
 
 				reenter(CoroutineState)
 				{
-					yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+					yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 
 					if (MaxBytesToRead == 0)
 					{
@@ -150,7 +150,7 @@ namespace Modio
 
 		private:
 			Modio::Optional<Modio::Detail::Buffer> ReadBuffer {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			std::shared_ptr<Modio::Detail::FileObjectImplementation> FileImpl {};
 			Modio::FileSize MaxBytesToRead {};
 			Modio::Optional<Modio::FileOffset> FileOffset {};

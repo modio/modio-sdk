@@ -32,13 +32,13 @@ namespace Modio
 			ExtractAllToFolderOp& operator = (ExtractAllToFolderOp&& Other) = delete;
 			struct ExtractAllImpl
 			{
-				asio::coroutine CoroutineState {};
+				ModioAsio::coroutine CoroutineState {};
 				Modio::filesystem::path ArchivePath {};
 				Modio::filesystem::path RootOutputPath {};
 				Modio::Detail::ArchiveReader ArchiveView;
 				Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo {};
 				std::vector<Modio::Detail::ArchiveFileImplementation::ArchiveEntry>::iterator CurrentEntryIterator {};
-				ExtractAllImpl(asio::coroutine CoroutineState, Modio::filesystem::path ArchivePath,
+				ExtractAllImpl(ModioAsio::coroutine CoroutineState, Modio::filesystem::path ArchivePath,
 							   Modio::filesystem::path RootOutputPath, Modio::Detail::ArchiveReader ArchiveView,
 							   Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo)
 					: CoroutineState(CoroutineState),
@@ -166,7 +166,7 @@ namespace Modio
 						else
 						{
 							// Clear Stack
-							yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),std::move(Self));
+							yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),std::move(Self));
 							// Otherwise, begin an async operation to extract that entry to a file with the path
 							// based on the root path
 							yield Impl->ArchiveView.ExtractEntryAsync(*Impl->CurrentEntryIterator, Impl->RootOutputPath,
@@ -191,7 +191,7 @@ namespace Modio
 								  Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo,
 								  CompletionTokenType&& Token)
 		{
-			return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode, Modio::FileSize)>(
+			return ModioAsio::async_compose<CompletionTokenType, void(Modio::ErrorCode, Modio::FileSize)>(
 				ExtractAllToFolderOp(ArchiveFile, AbsoluteDestinationPath, ProgressInfo), Token,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

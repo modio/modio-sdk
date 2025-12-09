@@ -31,7 +31,7 @@ namespace Modio
 			Modio::FilterParams Filter {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 
 		public:
 			ListUserGamesOp(FilterParams InFilter) : Filter(std::move(InFilter)) {}
@@ -83,7 +83,7 @@ namespace Modio
 		template<typename ListUserGamesCompleteCallback>
 		void ListUserGamesAsync(FilterParams InFilter, ListUserGamesCompleteCallback&& OnListUserGamesComplete)
 		{
-			return asio::async_compose<ListUserGamesCompleteCallback, void(Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)>(
+			return ModioAsio::async_compose<ListUserGamesCompleteCallback, void(Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)>(
 				Modio::Detail::ListUserGamesOp(std::move(InFilter)), OnListUserGamesComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

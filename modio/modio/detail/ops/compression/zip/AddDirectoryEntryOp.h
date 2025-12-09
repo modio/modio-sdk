@@ -109,7 +109,7 @@ namespace Modio
 			Modio::filesystem::path DirectoryPath;
 			Modio::Detail::Buffer LocalFileHeaderBuffer;
 			Modio::FileOffset LocalHeaderOffset;
-			asio::coroutine CoroutineState;
+			ModioAsio::coroutine CoroutineState;
 			std::string FileName;
 		};
 #include <asio/unyield.hpp>

@@ -28,7 +28,7 @@ namespace Modio
 			Modio::GameID GameID {};
 			Modio::ApiKey ApiKey {};
 
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 
 		public:
 			GetGameInfoOp(Modio::GameID GameID, Modio::ApiKey ApiKey) : GameID(GameID), ApiKey(ApiKey) {}
@@ -79,7 +79,7 @@ namespace Modio
 		void GetGameInfoAsync(Modio::GameID GameID,
 							  GetGameInfoCompleteCallback&& OnGetGameInfoComplete)
 		{
-			return asio::async_compose<GetGameInfoCompleteCallback,
+			return ModioAsio::async_compose<GetGameInfoCompleteCallback,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::GameInfo>)>(
 				Modio::Detail::GetGameInfoOp(GameID, Modio::Detail::SDKSessionData::CurrentAPIKey()),
 				OnGetGameInfoComplete,

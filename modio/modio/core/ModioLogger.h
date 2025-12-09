@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -14,7 +14,6 @@
 #include "modio/core/ModioLogService.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
-#include "modio/detail/ModioFormatters.h"
 
 namespace Modio
 {
@@ -23,9 +22,10 @@ namespace Modio
 		/// @docinternal
 		/// @brief Generic threadsafe logging object. Can either construct and retain an instance, or log via a
 		/// temporary
-		class Logger : public asio::basic_io_object<Modio::Detail::LogService>
+		class Logger : public ModioAsio::basic_io_object<Modio::Detail::LogService>
 		{
 			Logger(Logger&&) = delete;
+
 		protected:
 			template<typename... ArgTypes>
 			void LogImmediate(LogLevel Level, LogCategory Category, std::string Format, ArgTypes... Args)
@@ -36,11 +36,13 @@ namespace Modio
 		public:
 			/// @brief Explicit constructor for a Logger that posts messages via an explicit io_context
 			/// @param Context the io_context to use
-			explicit Logger(asio::io_context& Context) : asio::basic_io_object<Modio::Detail::LogService>(Context) {}
+			explicit Logger(ModioAsio::io_context& Context)
+				: ModioAsio::basic_io_object<Modio::Detail::LogService>(Context)
+			{}
 
 			/// @brief Explicit convenience constructor for a Logger that posts messages via the global SDK io_context
 			explicit Logger()
-				: asio::basic_io_object<Modio::Detail::LogService>(Modio::Detail::Services::GetGlobalContext())
+				: ModioAsio::basic_io_object<Modio::Detail::LogService>(Modio::Detail::Services::GetGlobalContext())
 			{}
 
 			/// @brief Print a message to the platform output device

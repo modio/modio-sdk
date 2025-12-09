@@ -22,7 +22,7 @@
 	#define MODIO_WRAPPING_ASIO
 	#include MODIO_UNREAL_PLATFORM_PREAMBLE
 
-namespace asio
+namespace ModioAsio
 {
 	namespace detail
 	{
@@ -33,7 +33,8 @@ namespace asio
 		}
 
 	} // namespace detail
-} // namespace asio
+} // namespace ModioAsio
+
 
 	#pragma push_macro("ASIO_NO_TYPEID")
 #ifndef ASIO_NO_TYPEID
@@ -93,7 +94,7 @@ namespace asio
 #elif defined(_WIN32)
 	// Set the proper SDK version before including asio
 	#include <sdkddkver.h>
-namespace asio
+namespace ModioAsio
 {
 	namespace detail
 	{
@@ -102,7 +103,7 @@ namespace asio
 		{}
 
 	} // namespace detail
-} // namespace asio
+} // namespace ModioAsio
 
 	#pragma push_macro("ASIO_NO_TYPEID")
 #ifndef ASIO_NO_TYPEID
@@ -145,7 +146,7 @@ namespace asio
 #else // _WIN32
 	#ifdef ASIO_NO_EXCEPTIONS
 
-namespace asio
+namespace ModioAsio
 {
 	namespace detail
 	{
@@ -153,7 +154,7 @@ namespace asio
 		void throw_exception(const Exception& e)
 		{}
 	} // namespace detail
-} // namespace asio
+} // namespace ModioAsio
 
 	#endif
 	#pragma push_macro("ASIO_DONT_USE_PAUSE")
@@ -203,3 +204,4 @@ MODIO_DIAGNOSTIC_POP
 	//#pragma pop_macro("ASIO_DISABLE_SOCKETS")
 	#pragma pop_macro("ASIO_DONT_USE_PAUSE")
 #endif //_WIN32
+

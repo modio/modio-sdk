@@ -62,7 +62,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 
 			// Parameters
 			Modio::GameID GameID {};
@@ -80,7 +80,7 @@ namespace Modio
 		template<typename GetUserMediaCompleteCallback>
 		void GetUserMediaAsync(Modio::AvatarSize AvatarSize, GetUserMediaCompleteCallback&& OnGetUserMediaComplete)
 		{
-			return asio::async_compose<GetUserMediaCompleteCallback,
+			return ModioAsio::async_compose<GetUserMediaCompleteCallback,
 									   void(Modio::ErrorCode, Modio::Optional<std::string>)>(
 				Modio::Detail::GetUserMediaOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 											  Modio::Detail::SDKSessionData::CurrentAPIKey(), AvatarSize),

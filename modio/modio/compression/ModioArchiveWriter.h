@@ -21,19 +21,19 @@ namespace Modio
 {
 	namespace Detail
 	{
-		class ArchiveWriter : public asio::basic_io_object<CompressionService>
+		class ArchiveWriter : public ModioAsio::basic_io_object<CompressionService>
 		{
 			Modio::filesystem::path FilePath {};
 
 		public:
 			explicit ArchiveWriter(Modio::filesystem::path FilePath)
-				: asio::basic_io_object<CompressionService>(Modio::Detail::Services::GetGlobalContext()),
+				: ModioAsio::basic_io_object<CompressionService>(Modio::Detail::Services::GetGlobalContext()),
 				  FilePath(FilePath)
 			{
 				get_implementation()->FilePath = FilePath;
 			}
 			ArchiveWriter(ArchiveWriter&& Other)
-				: asio::basic_io_object<CompressionService>(std::move(Other)),
+				: ModioAsio::basic_io_object<CompressionService>(std::move(Other)),
 				  FilePath(std::move(Other.FilePath))
 			{}
 

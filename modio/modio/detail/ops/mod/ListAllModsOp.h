@@ -32,7 +32,7 @@ namespace Modio
 			Modio::FilterParams Filter {};
 			Modio::GameID GameID {};
 
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 
 		public:
 			ListAllModsOp(Modio::GameID GameID, FilterParams InFilter) : Filter(std::move(InFilter)), GameID(GameID) {}
@@ -100,7 +100,7 @@ namespace Modio
 		template<typename WrappedCallback>
 		auto ListAllModsAsync(FilterParams Filter, WrappedCallback&& Callback)
 		{
-			return asio::async_compose<WrappedCallback, void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>(
+			return ModioAsio::async_compose<WrappedCallback, void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>(
 				Modio::Detail::ListAllModsOp(Modio::Detail::SDKSessionData::CurrentGameID(), Filter), Callback,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

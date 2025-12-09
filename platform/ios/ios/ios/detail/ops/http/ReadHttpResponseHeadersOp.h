@@ -39,7 +39,7 @@ namespace Modio
 
 		class ReadHttpResponseHeadersOp
 		{
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			std::shared_ptr<HttpRequestImplementation> Request {};
 			std::weak_ptr<HttpSharedState> SharedState {};
 			Modio::Detail::Timer StatusTimer {};

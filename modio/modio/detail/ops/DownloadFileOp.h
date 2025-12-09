@@ -35,7 +35,7 @@ namespace Modio
 		class DownloadFileOp : public Modio::Detail::BaseOperation<DownloadFileOp>
 		{
 			Modio::StableStorage<Modio::Detail::HttpRequest> Request {};
-			asio::coroutine Coroutine {};
+			ModioAsio::coroutine Coroutine {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 			Modio::StableStorage<Modio::Detail::File> File {};
 
@@ -319,7 +319,7 @@ namespace Modio
 							   Modio::Optional<std::uint64_t> Filesize,
 							   CompletionTokenType&& Token)
 		{
-			return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
 				DownloadFileOp(
 					DownloadParameters, DestinationPath,
 					Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().GetFileDownloadTicket(),
@@ -333,7 +333,7 @@ namespace Modio
 		auto DownloadFileAsApiRequestAsync(Modio::Detail::HttpRequestParams DownloadParameters,
 										   Modio::filesystem::path DestinationPath, Modio::Optional<std::uint64_t> Filesize, CompletionTokenType&& Token)
 		{
-			return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
 				DownloadFileOp(
 					DownloadParameters, DestinationPath,
 					Modio::Detail::Services::GetGlobalService<Modio::Detail::HttpService>().GetAPIRequestTicket(), {}, Filesize),

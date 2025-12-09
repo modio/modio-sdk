@@ -24,19 +24,19 @@ namespace Modio
 {
 	namespace Detail
 	{
-		class ArchiveReader : public asio::basic_io_object<CompressionService>
+		class ArchiveReader : public ModioAsio::basic_io_object<CompressionService>
 		{
 			Modio::filesystem::path FilePath {};
 
 		public:
 			explicit ArchiveReader(Modio::filesystem::path FilePath)
-				: asio::basic_io_object<CompressionService>(Modio::Detail::Services::GetGlobalContext()),
+				: ModioAsio::basic_io_object<CompressionService>(Modio::Detail::Services::GetGlobalContext()),
 				  FilePath(FilePath)
 			{
 				get_implementation()->FilePath = FilePath;
 			}
 			ArchiveReader(ArchiveReader&& Other)
-				: asio::basic_io_object<CompressionService>(std::move(Other)),
+				: ModioAsio::basic_io_object<CompressionService>(std::move(Other)),
 				  FilePath(std::move(Other.FilePath))
 			{}
 
@@ -54,7 +54,7 @@ namespace Modio
 			template<typename CompletionHandlerType>
 			auto ParseArchiveContentsAsync(CompletionHandlerType&& Handler)
 			{
-				return asio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
+				return ModioAsio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
 					ParseArchiveContentsOp(get_implementation()), Handler,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
@@ -69,19 +69,19 @@ namespace Modio
 			//This should live in the implementation perhaps?
 				if (Entry.Compression == ArchiveFileImplementation::CompressionMethod::Deflate)
 				{
-					return asio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
+					return ModioAsio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
 						ExtractEntryDeflateOp(get_implementation(), Entry, RootPathToExtractTo, ProgressInfo), Handler,
 						Modio::Detail::Services::GetGlobalContext().get_executor());
 				}
 				else if (Entry.Compression == ArchiveFileImplementation::CompressionMethod::Store)
 				{
-					return asio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
+					return ModioAsio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
 						ExtractEntryStoreOp(get_implementation(), Entry, RootPathToExtractTo, ProgressInfo), Handler,
 						Modio::Detail::Services::GetGlobalContext().get_executor());
 				}
 				else
 				{
-					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 							   [Handler = std::forward<CompletionHandlerType>(Handler)]() mutable {
 								   Handler(Modio::make_error_code(Modio::ArchiveError::UnsupportedCompression));
 							   });

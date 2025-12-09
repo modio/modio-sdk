@@ -67,7 +67,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::Timer StatusTimer {};
 			std::shared_ptr<HttpRequestImplementation> Request {};
 			std::weak_ptr<HttpSharedState> SharedState {};
@@ -78,7 +78,7 @@ namespace Modio
 									  std::weak_ptr<HttpSharedState> HttpState,
 									  SSLHandshakeCallback&& OnHandshakeComplete)
 		{
-			return asio::async_compose<SSLHandshakeCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<SSLHandshakeCallback, void(Modio::ErrorCode)>(
 				WaitForSSLHandshakeOp(Request, HttpState), OnHandshakeComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

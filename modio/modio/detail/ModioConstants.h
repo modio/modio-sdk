@@ -28,6 +28,7 @@ namespace Modio
 				constexpr const char* XboxToken = "xbox_token";
 				constexpr const char* SwitchToken = "id_token";
 				constexpr const char* OpenIDToken = "id_token";
+				constexpr const char* PsnToken = "psn_token";
 				constexpr const char* GoogleIDToken = "id_token";
 				constexpr const char* GoogleServerSideToken = "auth_code";
 				constexpr const char* DiscordToken = "discord_token";

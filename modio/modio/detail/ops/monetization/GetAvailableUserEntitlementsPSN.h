@@ -20,24 +20,29 @@ namespace Modio
 			Modio::EntitlementParams Params,
 			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)> Callback)
 		{
-			Modio::Detail::HttpRequestParams RequestParams =
-				Modio::Detail::GetUserEntitlementsRequest.AppendPayloadValue(
-					Modio::Detail::Constants::APIStrings::AuthCode,
-					Params.ExtendedParameters[Modio::Detail::Constants::APIStrings::AuthCode]);
+			Modio::Detail::HttpRequestParams RequestParams = Modio::Detail::GetUserEntitlementsRequest;
+
+			auto AuthCodeIterator = Params.ExtendedParameters.find(Modio::Detail::Constants::APIStrings::AuthCode);
+			bool hasAuthCode = AuthCodeIterator != Params.ExtendedParameters.end();
+
+			RequestParams = RequestParams.AppendPayloadValue(Modio::Detail::Constants::APIStrings::PsnToken,
+				hasAuthCode 
+				? AuthCodeIterator->second
+				: Params.ExtendedParameters[Modio::Detail::Constants::APIStrings::PsnToken]);
 
 			if (Modio::Detail::SDKSessionData::GetPlatformEnvironment().has_value())
 			{
 				RequestParams = RequestParams.AppendPayloadValue(
-					"env", Modio::Detail::SDKSessionData::GetPlatformEnvironment().value());
+					"psn_env", Modio::Detail::SDKSessionData::GetPlatformEnvironment().value());
 			}
 
-			auto ParamIterator = Params.ExtendedParameters.find("service_label");
-			if (ParamIterator != Params.ExtendedParameters.end())
+			auto ServiceLabelIterator = Params.ExtendedParameters.find("service_label");
+			if (ServiceLabelIterator != Params.ExtendedParameters.end())
 			{
-				RequestParams = RequestParams.AppendPayloadValue("service_label", ParamIterator->second);
+				RequestParams = RequestParams.AppendPayloadValue("service_label", ServiceLabelIterator->second);
 			}
 
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)>,
+			return ModioAsio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)>,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)>(
 				Modio::Detail::GetAvailableUserEntitlementsOp(RequestParams), Callback,
 				Modio::Detail::Services::GetGlobalContext().get_executor());

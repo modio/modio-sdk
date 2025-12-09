@@ -32,7 +32,7 @@ namespace Modio
 			Modio::Detail::CachedResponse CachedResponse {};
 			Modio::Optional<Modio::ModInfoList> List {};
 
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 
 
 		public:
@@ -108,7 +108,7 @@ namespace Modio
 		template<typename FetchDoneCallback>
 		auto FetchUserPurchasesAsync(FetchDoneCallback&& OnFetchComplete)
 		{
-			return asio::async_compose<FetchDoneCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<FetchDoneCallback, void(Modio::ErrorCode)>(
 				FetchUserPurchasesOp(), OnFetchComplete, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	} // namespace Detail

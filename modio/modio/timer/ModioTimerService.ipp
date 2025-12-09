@@ -16,8 +16,8 @@ namespace Modio
 {
 	namespace Detail
 	{
-		TimerService::TimerService(asio::io_context& IOService)
-			: asio::detail::service_base<TimerService>(IOService)
+		TimerService::TimerService(ModioAsio::io_context& IOService)
+			: ModioAsio::detail::service_base<TimerService>(IOService)
 		{
 			PlatformImplementation = std::make_shared<TimerServiceImplementation>(*this);
 		}

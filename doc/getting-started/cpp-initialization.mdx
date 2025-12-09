@@ -2,6 +2,7 @@
 id: cpp-initialization
 title: Initialization
 slug: /cppsdk/initialization
+custom_edit_url: https://github.com/modio/modio-sdk-internal/blob/develop/doc/getting-started/cpp-initialization.mdx
 ---
 
 # Initialization
@@ -19,7 +20,7 @@ This guide covers:
 
 ## SDK configuration
 
-When you are ready to initialize the SDK for the current session, you'll need to call [`InitializeAsync`](/cppsdk/refdocs/#initializeasync), passing in your product's mod.io ID, your API key, the Local Profile Name, and a callback/handler so you know when the SDK is initialized correctly. Note that [`InitializeAsync`](/cppsdk/refdocs/#initializeasync)'s callback will be invoked after calling [`RunPendingHandlers`](/cppsdk/refdocs/#runpendinghandlers) from your project's main loop.
+When you are ready to initialize the SDK for the current session, you'll need to call [`InitializeAsync`](https://docs.mod.io/cppsdk/refdocs#initializeasync), passing in your product's mod.io ID, your API key, the Local Profile Name, and a callback/handler so you know when the SDK is initialized correctly. Note that [`InitializeAsync`](https://docs.mod.io/cppsdk/refdocs#initializeasync)'s callback will be invoked after calling [`RunPendingHandlers`](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) from your project's main loop.
 
 You should also ensure that you are targeting an appropriate Portal for mod.io to understand what storefront or app the request is originating from. This enabled additional storefront-based functionality, such as returning display name mappings for that portal.
 
@@ -46,18 +47,18 @@ Modio::InitializeAsync(Options, [&SDKInitialized](Modio::ErrorCode ec) {
 });
 ```
 
-It is worth considering that the "LocalProfileName" is used by the mod.io SDK to associate a local session to a user, as mentioned in [Users and Local Profiles](/cppsdk/structure/#users-and-local-profiles). It is possible to forward a user nickname as the LocalProfileName, then initialize the mod.io SDK. Any data related to a user session will be stored in its corresponding [Mod Data Directory](/cppsdk/structure/#mod-data-directories).
+It is worth considering that the "LocalProfileName" is used by the mod.io SDK to associate a local session to a user, as mentioned in [Users and Local Profiles](https://docs.mod.io/cppsdk/structure#users-and-local-profiles). It is possible to forward a user nickname as the LocalProfileName, then initialize the mod.io SDK. Any data related to a user session will be stored in its corresponding [Mod Data Directory](https://docs.mod.io/cppsdk/structure#mod-data-directories).
 
 **Notes**
 
 * By convention you'll see these code examples pass in lambda functions as callback handlers, but you can use anything convertible to `std::function` with the appropriate signature.
-* The error-handling in this sample is deliberately kept brief. See [Error Handling](/cppsdk/structure/#error-handling) for more information on error handling.
-* You can perform calls to other functions, such as something that shows your mod browser UI implementation, directly in the callback. The primary caveat to doing much processing here is that you'll be running in the context of, and therefore blocking, the thread running the callback, which is the thread running [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers).
+* The error-handling in this sample is deliberately kept brief. See [Error Handling](https://docs.mod.io/cppsdk/structure#error-handling) for more information on error handling.
+* You can perform calls to other functions, such as something that shows your mod browser UI implementation, directly in the callback. The primary caveat to doing much processing here is that you'll be running in the context of, and therefore blocking, the thread running the callback, which is the thread running [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers).
 
 ## Extended initialization parameters
 
-The `ExtendedParameters` field on [InitializeOptions](/cppsdk/refdocs/#InitializeOptions) is a set of key-value pairs intended for platform-specific or special-case parameters that need to be passed to the SDK.
-Simply set the value before passing your initialization parameters in to [InitializeAsync](/cppsdk/refdocs/#initializeasync).
+The `ExtendedParameters` field on [InitializeOptions](https://docs.mod.io/cppsdk/refdocs#InitializeOptions) is a set of key-value pairs intended for platform-specific or special-case parameters that need to be passed to the SDK.
+Simply set the value before passing your initialization parameters in to [InitializeAsync](https://docs.mod.io/cppsdk/refdocs#initializeasync).
 
 ```cpp
 Options.ExtendedParameters["SomeParameterName"] = "SomeParameterValue";
@@ -103,13 +104,13 @@ The SDK supports the following metric parameters that can be set through `Extend
 
 ## Event loop (RunPendingHandlers)
 
-The SDK's internal event loop requires care and attention in the form of [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers).
+The SDK's internal event loop requires care and attention in the form of [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers).
 
-ALL SDK work is performed during executions of [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers), therefore calling it as often as possible will improve performance of the SDK's I/O operations.
+ALL SDK work is performed during executions of [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers), therefore calling it as often as possible will improve performance of the SDK's I/O operations.
 
-You can either call [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) on the main thread, or on a [dedicated background thread or existing thread of your choice](#using-a-dedicated-background-thread).
+You can either call [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) on the main thread, or on a [dedicated background thread or existing thread of your choice](#using-a-dedicated-background-thread).
 
-For optimal execution, [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) should be called at least once per frame. 
+For optimal execution, [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) should be called at least once per frame. 
 
 For example, if you wish to call RunPendingHandlers on the main thread, it could be located into your project's main loop or into a `tick`-style function on an appropriate controller/manager object.
 
@@ -123,20 +124,20 @@ while(bGameIsRunning == true)
 ```
 
 :::note
-RunPendingHandlers is not reentrant-safe. Do not call [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) inside a callback you give to the SDK, or your application will deadlock. Callbacks are run inside [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers), and your inner [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) call will block infinitely waiting for the enclosing scope to exit.
+RunPendingHandlers is not reentrant-safe. Do not call [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) inside a callback you give to the SDK, or your application will deadlock. Callbacks are run inside [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers), and your inner [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) call will block infinitely waiting for the enclosing scope to exit.
 :::
 
 ## Multithreading
 
-The SDK supports [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) being run on a secondary thread that already exists or a dedicated background thread you create specifically to peform SDK work. 
+The SDK supports [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) being run on a secondary thread that already exists or a dedicated background thread you create specifically to peform SDK work. 
 
-Keep in mind, callbacks you provide to the SDK will run on the thread running [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers). If you host [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) on a different thread, it is your responsibility to synchronize with the main thread if you wish to pass results back to it, through callbacks you provide to the SDK.
+Keep in mind, callbacks you provide to the SDK will run on the thread running [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers). If you host [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) on a different thread, it is your responsibility to synchronize with the main thread if you wish to pass results back to it, through callbacks you provide to the SDK.
 
 This allows the SDK to avoid blocking the main thread of your application while performing IO.
 
 ### Using an existing secondary thread
 
-If you have an existing secondary thread which is not heavily utilized, you can call [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) on that thread:
+If you have an existing secondary thread which is not heavily utilized, you can call [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) on that thread:
 
 ```cpp
 while(bRunBackgroundThread == true)
@@ -151,7 +152,7 @@ Just remember, that performance of the SDK is proportional to the amount of CPU 
 
 ### Using a dedicated background thread
 
-Using a dedicated background thread for [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) will ensure the best performance for the SDK's I/O operations by allowing SDK functionality to execute at a rate not limited by your application's main loop frequency or existing background loop frequencies.
+Using a dedicated background thread for [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) will ensure the best performance for the SDK's I/O operations by allowing SDK functionality to execute at a rate not limited by your application's main loop frequency or existing background loop frequencies.
 
 ```cpp
 //Assumption: bHaltBackgroundThread is a threadsafe flag or atomic boolean whose lifetime is guaranteed to be longer than that of the handler thread
@@ -168,13 +169,13 @@ HandlerThread = std::thread([&bHaltBackgroundThread]() {
 ```
 
 :::note
-[ShutdownAsync](/cppsdk/refdocs/#shutdownasync) takes a lock on the SDK's internal state in order to finalize the pending task queue and shut down internal services. 
+[ShutdownAsync](https://docs.mod.io/cppsdk/refdocs#shutdownasync) takes a lock on the SDK's internal state in order to finalize the pending task queue and shut down internal services. 
 
-If you call [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) in a background thread, especially a dedicated background thread, and invoke [ShutdownAsync](/cppsdk/refdocs/#shutdownasync) to close the SDK while your application continues to run, on certain platforms you may find the mutex/lock to be unfair to the point that the main thread cannot take the lock, because the background thread does not get suspended by the OS' scheduler often enough. 
+If you call [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) in a background thread, especially a dedicated background thread, and invoke [ShutdownAsync](https://docs.mod.io/cppsdk/refdocs#shutdownasync) to close the SDK while your application continues to run, on certain platforms you may find the mutex/lock to be unfair to the point that the main thread cannot take the lock, because the background thread does not get suspended by the OS' scheduler often enough. 
 
 If this occurs, we recommend you use either a `yield` or high-resolution `sleep` after each invocation of RunPendingHandlers to allow the main thread to take the shutdown lock. Alternatively, you can use some kind of signaling mechanism to pause the background thread calling RunPendingHandlers, call ShutdownAsync, and then allow that background thread to resume looping. 
 
-If the SDK runs for the lifetime of your application and you do not call [ShutdownAsync](/cppsdk/refdocs/#shutdownasync) this is not necessary.
+If the SDK runs for the lifetime of your application and you do not call [ShutdownAsync](https://docs.mod.io/cppsdk/refdocs#shutdownasync) this is not necessary.
 :::
 
 ## Shutting down
@@ -198,18 +199,18 @@ while(!SDKShutdownComplete)
 ```
 
 :::note
-[ShutdownAsync](/cppsdk/refdocs/#shutdownasync) uses a lock to ensure that global SDK state is not mutated out from underneath an invocation of [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers). It is not safe to call [ShutdownAsync](/cppsdk/refdocs/#shutdownasync) in any callback you provide to the SDK. Callbacks are executed during [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) execution, your application will deadlock while waiting for the enclosing [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) to complete. The lock is deliberately not implemented to support recursive locking, again because [ShutdownAsync](/cppsdk/refdocs/#shutdownasync) mutates data structures that [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) expects to remain unchanged for the duration of its scope.
+[ShutdownAsync](https://docs.mod.io/cppsdk/refdocs#shutdownasync) uses a lock to ensure that global SDK state is not mutated out from underneath an invocation of [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers). It is not safe to call [ShutdownAsync](https://docs.mod.io/cppsdk/refdocs#shutdownasync) in any callback you provide to the SDK. Callbacks are executed during [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) execution, your application will deadlock while waiting for the enclosing [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) to complete. The lock is deliberately not implemented to support recursive locking, again because [ShutdownAsync](https://docs.mod.io/cppsdk/refdocs#shutdownasync) mutates data structures that [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) expects to remain unchanged for the duration of its scope.
 :::
 
 :::note
-You will need to continue to call [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) while the async shutdown is in progress to allow for intermediate handlers to finish running.
+You will need to continue to call [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) while the async shutdown is in progress to allow for intermediate handlers to finish running.
 :::
 
 ## Next steps
 
-Now that you are all set up, you may want to learn more about the [SDK Structure](/cppsdk/structure/) to get a better understanding of the C++ SDK and its processes. 
+Now that you are all set up, you may want to learn more about the [SDK Structure](https://docs.mod.io/cppsdk/structure) to get a better understanding of the C++ SDK and its processes. 
 
-Or if you are eager to get things moving, you can skip directly to setting up [User Authentication](/cppsdk/user-authentication) or [Searching for UGC](/cppsdk/searching-ugc).
+Or if you are eager to get things moving, you can skip directly to setting up [User Authentication](https://docs.mod.io/cppsdk/user-authentication) or [Searching for UGC](https://docs.mod.io/cppsdk/searching-ugc).
 
-All the core setup information you need can be found in the [C++ SDK Getting Started Guides](/cppsdk/#c-sdk-core-setup-guides), which are designed to teach you how to implement mod.io's fundamentals.
+All the core setup information you need can be found in the [C++ SDK Getting Started Guides](https://docs.mod.io/cppsdk#c-sdk-core-setup-guides), which are designed to teach you how to implement mod.io's fundamentals.
 

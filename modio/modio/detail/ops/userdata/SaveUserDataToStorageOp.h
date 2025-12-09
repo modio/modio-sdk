@@ -59,7 +59,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			struct Impl
 			{
 				std::unique_ptr<Modio::Detail::File> UserDataFile {};

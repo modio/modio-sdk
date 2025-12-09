@@ -41,7 +41,7 @@ namespace Modio
 								   std::weak_ptr<class Modio::ModProgressInfo> ProgressInfo,
 								   CompletionHandlerType&& Handler)
 			{
-				return asio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
+				return ModioAsio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
 					Modio::Detail::AddFileEntryOp(PlatformIOObject, SourceFilePath, PathInsideArchive, FileHash,
 												  ProgressInfo),
 					Handler, Modio::Detail::Services::GetGlobalContext().get_executor());
@@ -51,7 +51,7 @@ namespace Modio
 			auto AddDirectoryEntryAsync(IOObjectImplementationType& PlatformIOObject,
 										Modio::filesystem::path DirectoryPath, CompletionHandlerType&& Handler)
 			{
-				return asio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
+				return ModioAsio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
 					Modio::Detail::AddDirectoryEntryOp(PlatformIOObject, DirectoryPath),
 					Handler,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
@@ -60,7 +60,7 @@ namespace Modio
 			template<typename CompletionHandlerType>
 			auto FinalizeArchiveAsync(IOObjectImplementationType& PlatformIOObject, CompletionHandlerType&& Handler)
 			{
-				return asio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
+				return ModioAsio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
 					Modio::Detail::FinalizeArchiveOp(PlatformIOObject), Handler,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}

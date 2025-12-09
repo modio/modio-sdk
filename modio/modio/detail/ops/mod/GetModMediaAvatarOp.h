@@ -94,7 +94,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 
 			// Parameters
 			Modio::GameID GameID {};
@@ -116,7 +116,7 @@ namespace Modio
 		void GetModMediaAvatarAsync(Modio::ModID ModId, Modio::AvatarSize AvatarSize,
 									GetAvatarCompleteCallback&& OnGetAvatarComplete)
 		{
-			return asio::async_compose<GetAvatarCompleteCallback, void(Modio::ErrorCode, Modio::Optional<std::string>)>(
+			return ModioAsio::async_compose<GetAvatarCompleteCallback, void(Modio::ErrorCode, Modio::Optional<std::string>)>(
 				Modio::Detail::GetModMediaAvatarOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 												   Modio::Detail::SDKSessionData::CurrentAPIKey(), ModId, AvatarSize),
 				OnGetAvatarComplete,

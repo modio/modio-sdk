@@ -73,7 +73,7 @@ public:
 	}
 
 private:
-	asio::coroutine CoroutineState {};
+	ModioAsio::coroutine CoroutineState {};
 	std::shared_ptr<HttpSharedState> SharedState {};
 	std::wstring UserAgentString {};
 };

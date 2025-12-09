@@ -99,7 +99,7 @@ namespace Modio
 
 		private:
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 
 			// Keep track of our results
 			std::int32_t CurrentResultIndex = 0;
@@ -110,7 +110,7 @@ namespace Modio
 		template<typename GetMutedUsersCompleteCallback>
 		void GetMutedUsersAsync(GetMutedUsersCompleteCallback&& OnGetMutedUsersComplete)
 		{
-			return asio::async_compose<GetMutedUsersCompleteCallback,
+			return ModioAsio::async_compose<GetMutedUsersCompleteCallback,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)>(
 				Modio::Detail::GetMutedUsersOp(), OnGetMutedUsersComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());

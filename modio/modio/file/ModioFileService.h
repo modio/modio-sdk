@@ -29,10 +29,10 @@ namespace Modio
 {
 	namespace Detail
 	{
-		class FileService : public asio::detail::service_base<FileService>
+		class FileService : public ModioAsio::detail::service_base<FileService>
 		{
 		public:
-			explicit FileService(asio::io_context& IOService) : asio::detail::service_base<FileService>(IOService)
+			explicit FileService(ModioAsio::io_context& IOService) : ModioAsio::detail::service_base<FileService>(IOService)
 			{
 				auto NewImplementation = std::make_shared<FileSystemImplementation>(*this);
 				PlatformImplementation.swap(NewImplementation);

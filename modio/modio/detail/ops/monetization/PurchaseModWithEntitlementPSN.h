@@ -20,10 +20,15 @@ namespace Modio
 			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)> Callback)
 		{
 			Modio::Detail::HttpRequestParams RequestParams =
-				Modio::Detail::PurchaseRequest
-					.AppendPayloadValue("psn_auth_code",
-										Params.ExtendedParameters[Modio::Detail::Constants::APIStrings::AuthCode])
-					.AddQueryParamRaw("type", "1");
+				Modio::Detail::PurchaseRequest.AddQueryParamRaw("type", "1");
+
+			auto AuthTokenParamIterator = Params.ExtendedParameters.find(Modio::Detail::Constants::APIStrings::AuthCode);
+			bool HasAuthToken = AuthTokenParamIterator != Params.ExtendedParameters.end();
+
+			RequestParams = RequestParams.AppendPayloadValue(
+				Modio::Detail::Constants::APIStrings::PsnToken,
+				Params.ExtendedParameters[HasAuthToken ? Modio::Detail::Constants::APIStrings::AuthCode
+													   : Modio::Detail::Constants::APIStrings::PsnToken]);
 
 			if (Modio::Detail::SDKSessionData::GetPlatformEnvironment().has_value())
 			{
@@ -37,7 +42,7 @@ namespace Modio
 				RequestParams = RequestParams.AppendPayloadValue("psn_service_label", ParamIterator->second);
 			}
 
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)>,
+			return ModioAsio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)>,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)>(
 				Modio::Detail::PurchaseModOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 											 Modio::Detail::SDKSessionData::CurrentAPIKey(), ModID, RequestParams),

@@ -918,7 +918,7 @@ namespace Modio
 			{
 				if (Get().IncomingTaskQueue.try_dequeue(Task))
 				{
-					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Task));
+					ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Task));
 				}
 			}
 		}

@@ -292,7 +292,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
+			ModioAsio::coroutine CoroutineState;
 			Modio::Detail::HttpRequestParams SubmitParams;
 			Modio::Detail::DynamicBuffer ResponseBuffer;
 			std::shared_ptr<Modio::Detail::UploadSession> Session = {};
@@ -309,7 +309,7 @@ namespace Modio
 		auto SubmitNewModSourceFileAsync(Modio::ModID ModID, Modio::CreateSourceFileParams Params,
 										 SubmitDoneCallback&& Callback)
 		{
-			return asio::async_compose<SubmitDoneCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<SubmitDoneCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::SubmitNewModSourceFileOp(ModID, Params), Callback,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

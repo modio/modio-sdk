@@ -21,7 +21,7 @@ namespace Modio
 			const Modio::Detail::HttpRequestParams RequestParams = Modio::Detail::SyncXboxLiveEntitlementsRequest
 			.AppendPayloadValue(Modio::Detail::Constants::APIStrings::XboxToken, Params.ExtendedParameters[Modio::Detail::Constants::APIStrings::XboxToken]);
 
-			return asio::async_compose<
+			return ModioAsio::async_compose<
 				std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)>,
 				void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)>(
 				Modio::Detail::RefreshUserEntitlementsOp(RequestParams), Callback,

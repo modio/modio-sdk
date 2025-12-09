@@ -78,7 +78,7 @@ namespace Modio
 			{
 				Modio::Detail::DynamicBuffer ResponseBuffer {};
 				Modio::Detail::HttpRequestParams Params {};
-				asio::coroutine CoroutineState {};
+				ModioAsio::coroutine CoroutineState {};
 			};
 
 			Modio::StableStorage<Impl> LocalState {};

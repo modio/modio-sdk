@@ -25,7 +25,7 @@ namespace Modio
 	{
 		class GetModCollectionMediaLogoOp
 		{
-			asio::coroutine CoroState {};
+			ModioAsio::coroutine CoroState {};
 
 			// Parameters
 			Modio::GameID GameID {};
@@ -115,7 +115,7 @@ namespace Modio
 		template<typename WrappedCallback>
 		auto GetModCollectionMediaLogoAsync(Modio::ModCollectionID CollectionId, Modio::LogoSize LogoSize, WrappedCallback&& Callback)
 		{
-			return asio::async_compose<WrappedCallback, void(Modio::ErrorCode, Modio::Optional<std::string>)>(
+			return ModioAsio::async_compose<WrappedCallback, void(Modio::ErrorCode, Modio::Optional<std::string>)>(
 				Modio::Detail::GetModCollectionMediaLogoOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 														   Modio::Detail::SDKSessionData::CurrentAPIKey(), CollectionId, LogoSize),
 				Callback,

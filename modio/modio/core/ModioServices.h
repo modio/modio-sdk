@@ -28,19 +28,19 @@ namespace Modio
 		public:
 			/// @brief Singleton getter containing the global IO context for all mod.io SDK operations
 			/// @return reference to the global io_context object
-			static asio::io_context& GetGlobalContext()
+			static ModioAsio::io_context& GetGlobalContext()
 			{
 				return *(std::atomic_load(&GetGlobalContextInternal()).get());
 			}
 
 			/// @brief Restart the GlobalContext
 			/// @return A new instance of the GlobalContext
-			static std::shared_ptr<asio::io_context> ResetGlobalContext()
+			static std::shared_ptr<ModioAsio::io_context> ResetGlobalContext()
 			{
 				// Make a copy of the old context. Note this is not a reference, but an actual copy so lifetime is
 				// extended.
-				std::shared_ptr<asio::io_context> OldContext = GetGlobalContextInternal();
-				std::atomic_exchange(&GetGlobalContextInternal(), std::make_shared<asio::io_context>(1));
+				std::shared_ptr<ModioAsio::io_context> OldContext = GetGlobalContextInternal();
+				std::atomic_exchange(&GetGlobalContextInternal(), std::make_shared<ModioAsio::io_context>(1));
 				return OldContext;
 			}
 
@@ -48,26 +48,26 @@ namespace Modio
 			template<typename ServiceType>
 			static ServiceType& GetGlobalService()
 			{
-				return asio::use_service<ServiceType>(GetGlobalContext());
+				return ModioAsio::use_service<ServiceType>(GetGlobalContext());
 			}
 
 		private:
 
 			/// @docinternal
 			/// @brief Static method that stores the GlobalContext
-			static std::shared_ptr<asio::io_context>& GetGlobalContextInternal()
+			static std::shared_ptr<ModioAsio::io_context>& GetGlobalContextInternal()
 			{
 				/// @docnone
 				/// @brief Singleton struct to contain a Globalcontext
 				struct ContextHolder
 				{
-					std::shared_ptr<asio::io_context> Context;
+					std::shared_ptr<ModioAsio::io_context> Context;
 					
 					/// @docnone
 					/// @brief Default constructor
 					ContextHolder()
 					{
-						Context = std::make_shared<asio::io_context>(1);
+						Context = std::make_shared<ModioAsio::io_context>(1);
 					}
 				};
 				static ContextHolder InternalContext {};

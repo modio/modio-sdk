@@ -45,14 +45,14 @@ namespace Modio
 
 		private:
 			Modio::ModID ModToRemove {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 		};
 #include <asio/unyield.hpp>
 
 		template<typename UninstallCompleteCallback>
 		void ForceUninstallModAsync(Modio::ModID ModToRemove, UninstallCompleteCallback&& OnUninstallComplete)
 		{
-			return asio::async_compose<UninstallCompleteCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<UninstallCompleteCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::ForceUninstallModOp(ModToRemove), OnUninstallComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

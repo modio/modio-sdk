@@ -20,9 +20,10 @@ namespace Modio
 			Modio::EntitlementParams /*Params*/,
 			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)> Callback)
 		{
-			const Modio::Detail::HttpRequestParams RequestParams = Modio::Detail::GetUserEntitlementsRequest;
+			const Modio::Detail::HttpRequestParams RequestParams =
+				Modio::Detail::GetUserEntitlementsRequest.AddCurrentGameIdQueryParam();
 
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)>,
+			return ModioAsio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)>,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)>(
 				Modio::Detail::GetAvailableUserEntitlementsOp(RequestParams), Callback,
 				Modio::Detail::Services::GetGlobalContext().get_executor());

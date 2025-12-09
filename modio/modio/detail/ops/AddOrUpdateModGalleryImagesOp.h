@@ -24,7 +24,7 @@ namespace Modio
 	{
 		class AddOrUpdateModGalleryImagesOp
 		{
-			asio::coroutine CoroState;
+			ModioAsio::coroutine CoroState;
 			Modio::ModID ModID;
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
 			Modio::Detail::HttpRequestParams AddOrUpdateRequest;
@@ -103,7 +103,7 @@ namespace Modio
 		template<typename GalleryActionCompleteCallback>
 		void AddOrUpdateModGalleryImagesAsync(Modio::ModID ModID, std::vector<std::string> InImagePaths, bool SyncGallery, GalleryActionCompleteCallback&& OnGalleryActionComplete)
 		{
-			return asio::async_compose<GalleryActionCompleteCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<GalleryActionCompleteCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::AddOrUpdateModGalleryImagesOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID, InImagePaths, SyncGallery),
 				OnGalleryActionComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());

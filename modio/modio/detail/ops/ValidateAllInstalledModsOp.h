@@ -27,7 +27,7 @@ namespace Modio
 		/// ValidateModInstallationAsync
 		class ValidateAllInstalledModsOp
 		{
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> UserModCollection {};
 			std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>::iterator It {};
 
@@ -78,7 +78,7 @@ namespace Modio
 		template<typename CompletionToken>
 		void ValidateAllInstalledModsAsync(CompletionToken&& Callback)
 		{
-			return asio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
 				ValidateAllInstalledModsOp(), Callback, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	} // namespace Detail

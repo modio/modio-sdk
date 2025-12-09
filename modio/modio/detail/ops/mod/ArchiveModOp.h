@@ -25,7 +25,7 @@ namespace Modio
 	{
 		class ArchiveModOp
 		{
-			asio::coroutine CoroState {};
+			ModioAsio::coroutine CoroState {};
 			Modio::GameID GameID {};
 			Modio::ModID ModID {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
@@ -40,7 +40,7 @@ namespace Modio
 				reenter(CoroState)
 				{
 					// Get ModInfo to find ModStatus and ensure it has not already been archived
-					yield asio::async_compose<CoroType, void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>(
+					yield ModioAsio::async_compose<CoroType, void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>(
 						Modio::Detail::GetModInfoOp(GameID, Modio::Detail::SDKSessionData::CurrentAPIKey(), ModID),
 						Self, Modio::Detail::Services::GetGlobalContext().get_executor());
 
@@ -88,7 +88,7 @@ namespace Modio
 		template<typename ArchiveModCompleteCallback>
 		void ArchiveModAsync(Modio::ModID ModID, ArchiveModCompleteCallback&& OnArchiveComplete)
 		{
-			return asio::async_compose<ArchiveModCompleteCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<ArchiveModCompleteCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::ArchiveModOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID), OnArchiveComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

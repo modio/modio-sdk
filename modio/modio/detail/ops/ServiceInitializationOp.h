@@ -43,7 +43,7 @@
 
 class ServiceInitializationOp
 {
-	asio::coroutine CoroutineState {};
+	ModioAsio::coroutine CoroutineState {};
 	Modio::InitializeOptions InitParams {};
 	Modio::filesystem::path GlobalOverridePath {};
 	Modio::Detail::DynamicBuffer GlobalConfigFileReadBuffer {};
@@ -115,7 +115,7 @@ public:
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Core,
 										"Initializing mod.io services");
-			yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+			yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 
 			yield Modio::Detail::Services::GetGlobalService<Modio::Detail::TimerService>().InitializeAsync(
 				std::move(Self));
@@ -302,7 +302,7 @@ public:
 					.GetTempModRootInstallationPath(),
 				std::move(Self));
 
-			yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+			yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 
 			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Core,
 										"mod.io service initialization complete");
@@ -317,7 +317,7 @@ public:
 template<typename InitDoneCallback>
 auto InitializeServiceAsync(Modio::InitializeOptions InitOptions, InitDoneCallback&& OnInitComplete)
 {
-	return asio::async_compose<InitDoneCallback, void(Modio::ErrorCode)>(
+	return ModioAsio::async_compose<InitDoneCallback, void(Modio::ErrorCode)>(
 		ServiceInitializationOp(InitOptions), OnInitComplete,
 		Modio::Detail::Services::GetGlobalContext().get_executor());
 };

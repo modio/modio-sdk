@@ -26,7 +26,7 @@ namespace Modio
 		{
 			Modio::StableStorage<Modio::Detail::File> ArchiveFileOnDisk {};
 			Modio::StableStorage<ArchiveFileImplementation> ArchiveState {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			std::uintmax_t CurrentSearchOffset = 0;
 			std::uintmax_t CurrentRecordOffset = 0;
 			std::vector<ArchiveFileImplementation::ArchiveEntry> PendingEntries {};

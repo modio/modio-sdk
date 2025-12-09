@@ -21,22 +21,22 @@
 
 namespace Modio
 {
-	NLOHMANN_JSON_SERIALIZE_ENUM(Modio::ModfilePlatform,
-								 {{Modio::ModfilePlatform::Windows, Modio::Detail::Constants::PlatformNames::Windows},
-								  {Modio::ModfilePlatform::Mac, Modio::Detail::Constants::PlatformNames::Mac},
-								  {Modio::ModfilePlatform::Linux, Modio::Detail::Constants::PlatformNames::Linux},
-								  {Modio::ModfilePlatform::Android, Modio::Detail::Constants::PlatformNames::Android},
-								  {Modio::ModfilePlatform::iOS, Modio::Detail::Constants::PlatformNames::iOS},
-								  {Modio::ModfilePlatform::XboxOne, Modio::Detail::Constants::PlatformNames::XboxOne},
-								  {Modio::ModfilePlatform::XboxSeriesX,
-								   Modio::Detail::Constants::PlatformNames::XboxSeriesX},
-								  {Modio::ModfilePlatform::PS4, Modio::Detail::Constants::PlatformNames::PS4},
-								  {Modio::ModfilePlatform::PS5, Modio::Detail::Constants::PlatformNames::PS5},
-								  {Modio::ModfilePlatform::Switch, Modio::Detail::Constants::PlatformNames::Switch},
-								  {Modio::ModfilePlatform::Oculus, Modio::Detail::Constants::PlatformNames::Oculus},
-								  {Modio::ModfilePlatform::Source, Modio::Detail::Constants::PlatformNames::Source},
-								  {Modio::ModfilePlatform::WindowsServer, Modio::Detail::Constants::PlatformNames::WindowsServer},
-								  {Modio::ModfilePlatform::LinuxServer, Modio::Detail::Constants::PlatformNames::LinuxServer}});
+	NLOHMANN_JSON_SERIALIZE_ENUM(
+		Modio::ModfilePlatform,
+		{{Modio::ModfilePlatform::Windows, Modio::Detail::Constants::PlatformNames::Windows},
+		 {Modio::ModfilePlatform::Mac, Modio::Detail::Constants::PlatformNames::Mac},
+		 {Modio::ModfilePlatform::Linux, Modio::Detail::Constants::PlatformNames::Linux},
+		 {Modio::ModfilePlatform::Android, Modio::Detail::Constants::PlatformNames::Android},
+		 {Modio::ModfilePlatform::iOS, Modio::Detail::Constants::PlatformNames::iOS},
+		 {Modio::ModfilePlatform::XboxOne, Modio::Detail::Constants::PlatformNames::XboxOne},
+		 {Modio::ModfilePlatform::XboxSeriesX, Modio::Detail::Constants::PlatformNames::XboxSeriesX},
+		 {Modio::ModfilePlatform::PS4, Modio::Detail::Constants::PlatformNames::PS4},
+		 {Modio::ModfilePlatform::PS5, Modio::Detail::Constants::PlatformNames::PS5},
+		 {Modio::ModfilePlatform::Switch, Modio::Detail::Constants::PlatformNames::Switch},
+		 {Modio::ModfilePlatform::Oculus, Modio::Detail::Constants::PlatformNames::Oculus},
+		 {Modio::ModfilePlatform::Source, Modio::Detail::Constants::PlatformNames::Source},
+		 {Modio::ModfilePlatform::WindowsServer, Modio::Detail::Constants::PlatformNames::WindowsServer},
+		 {Modio::ModfilePlatform::LinuxServer, Modio::Detail::Constants::PlatformNames::LinuxServer}});
 
 	/// @docnone
 	inline void from_json(const nlohmann::json& Json, Modio::HeaderImage& HeaderImage)
@@ -87,6 +87,7 @@ namespace Modio
 		Detail::ParseSafe(Json, GameInfo.MaturityOptions, "maturity_options");
 		Detail::ParseSafe(Json, GameInfo.VirtualTokenName, "token_name");
 		Detail::ParseSafe(Json, GameInfo.TagOptions, "tag_options");
+		Detail::ParseSafe(Json, GameInfo.CloudCookingStatus, "cloud_cooking_status");
 
 		nlohmann::json PlatformsJson;
 		if (Detail::GetSubobjectSafe(Json, "platforms", PlatformsJson))

@@ -75,6 +75,19 @@ namespace Modio
 	};
 
 	/// @docpublic
+	/// @brief Cloud Cooking status for this game
+	enum class GameCloudCookingStatus : uint16_t
+	{
+		Disabled = 0,
+		Initializing = 1,
+		Initialized = 2,
+		Finalizing = 3,
+		Enabled = 4,
+		ActionRequired = 5,
+		TearingDown = 6
+	};
+
+	/// @docpublic
 	/// @brief Details about a game
 	struct GameInfo
 	{
@@ -123,6 +136,8 @@ namespace Modio
 		std::string VirtualTokenName;
 		/// @brief Tags for this game
 		std::vector<Modio::ModTagInfo> TagOptions {};
+		/// @brief Cloud Cooking status for this game
+		GameCloudCookingStatus CloudCookingStatus = GameCloudCookingStatus::Disabled;
 
 		/// @docnone
 		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GameInfo& GameInfo);

@@ -85,13 +85,13 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState;
+			ModioAsio::coroutine CoroutineState;
 		}; // PreviewExternalUpdatesOp
 
 		template<typename PreviewDoneCallback>
 		auto PreviewExternalUpdatesAsync(PreviewDoneCallback&& OnPreviewComplete)
 		{
-			return asio::async_compose<PreviewDoneCallback,
+			return ModioAsio::async_compose<PreviewDoneCallback,
 									   void(Modio::ErrorCode,
 											std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType>)>(
 				PreviewExternalUpdatesOp(), OnPreviewComplete,

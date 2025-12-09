@@ -30,7 +30,7 @@ class InitializeTimerServiceOp
 		}
 	}
 	private:
-	asio::coroutine CoroState {};
+	ModioAsio::coroutine CoroState {};
 };
 
 #include <asio/unyield.hpp>

@@ -30,7 +30,7 @@ namespace Modio
 #include <asio/yield.hpp>
 		class ReadSomeResponseBodyOp
 		{
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			std::shared_ptr<HttpRequestImplementation> Request {};
 			std::weak_ptr<HttpSharedState> SharedState {};
 			Modio::Detail::DynamicBuffer ResponseBuffer {};
@@ -64,7 +64,7 @@ namespace Modio
 
 				reenter(CoroutineState)
 				{
-					yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+					yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 					/*Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
 												"Reading response body",
 												Request->GetParameters().GetFormattedResourcePath());*/

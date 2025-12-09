@@ -63,7 +63,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 		};
 #include <asio/unyield.hpp>
@@ -71,7 +71,7 @@ namespace Modio
 		template<typename VerifyUserAuthenticationCallback>
 		auto VerifyUserAuthenticationAsync(VerifyUserAuthenticationCallback&& OnVerifyComplete)
 		{
-			return asio::async_compose<VerifyUserAuthenticationCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<VerifyUserAuthenticationCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::VerifyUserAuthenticationOp(), OnVerifyComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

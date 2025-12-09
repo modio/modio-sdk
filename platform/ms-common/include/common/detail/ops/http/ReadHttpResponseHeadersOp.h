@@ -26,7 +26,7 @@ class ReadHttpResponseHeadersOp
 {
 	std::weak_ptr<HttpSharedStateBase> SharedState {};
 	std::shared_ptr<HttpRequestImplementation> Request {};
-	asio::coroutine CoroutineState {};
+	ModioAsio::coroutine CoroutineState {};
 	Modio::Detail::Timer Timer {};
 
 public:

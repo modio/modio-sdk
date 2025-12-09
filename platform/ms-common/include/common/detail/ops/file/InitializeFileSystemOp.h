@@ -84,7 +84,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::InitializeOptions InitParams {};
 			Modio::filesystem::path& CommonDataPath;
 			Modio::filesystem::path& UserDataPath;

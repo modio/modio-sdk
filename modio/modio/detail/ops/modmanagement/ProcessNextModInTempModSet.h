@@ -105,14 +105,14 @@ namespace Modio
 			Modio::ModID ModId {};
 			Modio::Detail::CachedResponse CachedResponse {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Optional<Modio::ModInfo> ModInfoData {};
 		};
 
 		template<typename ProcessNextCallback>
 		auto ProcessNextModInTempModSetAsync(ProcessNextCallback&& OnProcessComplete)
 		{
-			return asio::async_compose<ProcessNextCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<ProcessNextCallback, void(Modio::ErrorCode)>(
 				ProcessNextModInTempModSet(), OnProcessComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

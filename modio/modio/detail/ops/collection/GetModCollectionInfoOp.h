@@ -90,13 +90,13 @@ namespace Modio
 			Modio::Detail::HttpRequestParams GetCollectionRequestParams;
 			Modio::Detail::CachedResponse CachedResponse;
 			Modio::ModCollectionID ModCollectionId;
-			asio::coroutine CoroutineState;
+			ModioAsio::coroutine CoroutineState;
 		};
 
 		template<typename CallbackType>
 		auto GetModCollectionInfoAsync(Modio::ModCollectionID ModCollectionID, CallbackType&& OnComplete)
 		{
-			return asio::async_compose<CallbackType, void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfo>)>(
+			return ModioAsio::async_compose<CallbackType, void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfo>)>(
 				Modio::Detail::GetModCollectionInfoOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModCollectionID),
 				OnComplete, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

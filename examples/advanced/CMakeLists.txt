@@ -1,1 +1,2 @@
 add_subdirectory(01_SteamAuthAndEntitlements)
+add_subdirectory(02_SteamUSDMonetization)

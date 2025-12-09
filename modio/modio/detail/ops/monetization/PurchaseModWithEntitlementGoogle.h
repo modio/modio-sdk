@@ -19,7 +19,7 @@ namespace Modio
 			Modio::ModID ModID, Modio::EntitlementParams /*Params*/,
 			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)> OnPurchaseComplete)
 		{
-			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)>,
+			return ModioAsio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)>,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)>(
 				Modio::Detail::PurchaseModOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 											 Modio::Detail::SDKSessionData::CurrentAPIKey(), ModID,

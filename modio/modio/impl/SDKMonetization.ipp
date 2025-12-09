@@ -66,7 +66,8 @@ namespace Modio
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([ModID, Params, Callback = std::move(Callback)]() mutable {
-			if (Modio::Detail::RequireSDKIsInitialized(Callback) == false &&
+			if (Modio::Detail::RequireValidModID(ModID, Callback) == false &&
+				Modio::Detail::RequireSDKIsInitialized(Callback) == false &&
 				Modio::Detail::RequireUserIsAuthenticated(Callback) == false &&
 				Modio::Detail::RequireNotRateLimited(Callback) == false)
 			{
@@ -127,7 +128,7 @@ namespace Modio
 												"Called RefreshEntitlements with an unsupported Portal of {}",
 												Detail::SDKSessionData::GetPortal());
 
-					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 							   [CompletionHandler = std::forward<
 									std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)>>(
 									Callback)]() mutable {
@@ -204,7 +205,7 @@ namespace Modio
 												"Called RefreshEntitlements with an unsupported Portal of {}",
 												Detail::SDKSessionData::GetPortal());
 
-					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 							   [CompletionHandler = std::forward<std::function<void(
 									Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)>>(
 									Callback)]() mutable {
@@ -281,7 +282,7 @@ namespace Modio
 												"Called GetAvailableEntitlements with an unsupported Portal of {}",
 												Detail::SDKSessionData::GetPortal());
 
-					asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+					ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 							   [CompletionHandler = std::forward<
 									std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)>>(
 									Callback)]() mutable {

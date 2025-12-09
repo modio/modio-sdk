@@ -276,7 +276,7 @@ namespace Modio
 		private:
 			std::shared_ptr<Modio::Detail::ArchiveFileImplementation> ArchiveFile;
 			std::unique_ptr<Modio::Detail::File> OutputFile;
-			asio::coroutine CoroutineState;
+			ModioAsio::coroutine CoroutineState;
 			std::unique_ptr<Modio::Detail::Buffer> RecordBuffer;
 			std::vector<Modio::Detail::ArchiveFileImplementation::ArchiveEntry>::const_iterator CurrentArchiveEntry;
 			Modio::FileOffset StartOfCentralDirectory;

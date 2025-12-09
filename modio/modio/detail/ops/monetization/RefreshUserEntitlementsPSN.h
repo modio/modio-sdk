@@ -34,7 +34,7 @@ namespace Modio
 				RequestParams = RequestParams.AppendPayloadValue("service_label", ParamIterator->second);
 			}
 
-			return asio::async_compose<
+			return ModioAsio::async_compose<
 				std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)>,
 				void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)>(
 				Modio::Detail::RefreshUserEntitlementsOp(RequestParams), Callback,

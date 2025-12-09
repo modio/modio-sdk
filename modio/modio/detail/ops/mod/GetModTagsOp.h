@@ -58,7 +58,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::DynamicBuffer TagResponseBuffer {};
 		};
 #include <asio/unyield.hpp>
@@ -66,7 +66,7 @@ namespace Modio
 		template<typename GetTagsCompleteCallback>
 		void GetModTagsAsync(GetTagsCompleteCallback&& OnGetTagsComplete)
 		{
-			return asio::async_compose<GetTagsCompleteCallback,
+			return ModioAsio::async_compose<GetTagsCompleteCallback,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)>(
 				Modio::Detail::GetModTagsOp(), OnGetTagsComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());

@@ -375,6 +375,15 @@ namespace Modio
 		}
 	};
 
+	/// @docnone
+	/// @brief Transform the UserID into the underlying type
+	/// @param IdValue UserID value
+	/// @return A statically casted underlying UserID value
+	inline auto format_as(Modio::UserID IdVal)
+	{
+		return static_cast<UserID::UnderlyingType>(IdVal);
+	}
+
 	/// @docpublic
 	/// @brief Strong type for Mod IDs
 	struct ModID : public StrongInteger<std::int64_t>
@@ -400,6 +409,15 @@ namespace Modio
 			return ID;
 		}
 	};
+
+	/// @docnone
+	/// @brief Transform the ModID into the underlying type
+	/// @param IdValue ModID value
+	/// @return A statically casted underlying ModID value
+	inline auto format_as(Modio::ModID IdVal)
+	{
+		return static_cast<ModID::UnderlyingType>(IdVal);
+	}
 
 	/// @docpublic
 	/// @brief Strong type for Mod Collection IDs
@@ -427,6 +445,15 @@ namespace Modio
 		}
 	};
 
+	/// @docnone
+	/// @brief Transform the ModCollectionID into the underlying type
+	/// @param IdValue ModCollectionID value
+	/// @return A statically casted underlying ModCollectionID value
+	inline auto format_as(Modio::ModCollectionID IdVal)
+	{
+		return static_cast<ModCollectionID::UnderlyingType>(IdVal);
+	}
+
 	/// @docpublic
 	/// @brief Strong type for File Metadata IDs
 	struct FileMetadataID : public StrongInteger<std::int64_t>
@@ -448,12 +475,30 @@ namespace Modio
 		using StrongInteger::StrongInteger;
 	};
 
+	/// @docnone
+	/// @brief Transform the FileOffset into the underlying type
+	/// @param OffsetVal FileOffset value
+	/// @return A statically casted underlying FileOffset value
+	inline auto format_as(FileOffset OffsetVal)
+	{
+		return static_cast<FileOffset::UnderlyingType>(OffsetVal);
+	}
+
 	/// @docpublic
 	/// @brief Strong type for file sizes
 	struct FileSize : public StrongInteger<std::uintmax_t>
 	{
 		using StrongInteger::StrongInteger;
 	};
+
+	/// @docnone
+	/// @brief Transform the FileSize into the underlying type
+	/// @param SizeValue FileSize value
+	/// @return A statically casted underlying FileSize value
+	inline auto format_as(FileSize SizeVal)
+	{
+		return static_cast<FileSize::UnderlyingType>(SizeVal);
+	}
 
 	/// @docpublic
 	/// @brief Strong type for a game ID
@@ -480,6 +525,15 @@ namespace Modio
 			return ID;
 		}
 	};
+
+	/// @docnone
+	/// @brief Transform the GameID into the underlying type
+	/// @param IdValue GameID value
+	/// @return A statically casted underlying GameID value
+	inline auto format_as(Modio::GameID IdVal)
+	{
+		return static_cast<GameID::UnderlyingType>(IdVal);
+	}
 
 	/// @docpublic
 	/// @brief Strong type representing a Guid as 16byte binary value
@@ -682,6 +736,16 @@ namespace Modio
 	{
 		using StrongInteger::StrongInteger;
 	};
+
+	/// @docnone
+	/// @brief Transform the ModCreationHandle into the underlying type
+	/// @param IdValue ModCreationHandle value
+	/// @return A statically casted underlying ModCreationHandle value
+	inline auto format_as(Modio::ModCreationHandle IdVal)
+	{
+		return static_cast<ModCreationHandle::UnderlyingType>(IdVal);
+	}
+
 	// TODO: @Modio-core strong type for filesystem::paths that are directories?
 
 	/// @docpublic
@@ -726,7 +790,9 @@ namespace Modio
 		ChineseTraditional,
 		Turkish,
 		Ukrainian,
-		Arabic
+		Arabic,
+		Czech,
+		PortugueseBrazilian
 	};
 
 	/// @docpublic
@@ -971,6 +1037,10 @@ namespace Modio
 					return "uk";
 				case Language::Arabic:
 					return "ar";
+				case Language::Czech:
+					return "cs";
+				case Language::PortugueseBrazilian:
+					return "pt-BR";
 			}
 			assert(false && "Invalid value to ToString(Modio::Language)");
 			return "Unknown";

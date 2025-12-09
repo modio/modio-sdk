@@ -31,9 +31,9 @@ namespace Modio
 		public:
 			virtual ~IFileObjectImplementation() {}
 
-			virtual void SetFileStrand(asio::strand<asio::io_context::executor_type>& FileStrand) = 0;
+			virtual void SetFileStrand(ModioAsio::strand<ModioAsio::io_context::executor_type>& FileStrand) = 0;
 
-			virtual asio::strand<asio::io_context::executor_type>& GetFileStrand() = 0;
+			virtual ModioAsio::strand<ModioAsio::io_context::executor_type>& GetFileStrand() = 0;
 
 			virtual Modio::ErrorCode CreateFile(filesystem::path NewFilePath) = 0;
 

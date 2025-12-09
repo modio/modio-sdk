@@ -25,7 +25,7 @@ namespace Modio
 	{
 		class AddOrUpdateModLogoOp
 		{
-			asio::coroutine CoroState {};
+			ModioAsio::coroutine CoroState {};
 			Modio::GameID GameID {};
 			Modio::ModID ModID {};
 			Modio::filesystem::path LogoPath {};
@@ -88,7 +88,7 @@ namespace Modio
 		void AddOrUpdateModLogoAsync(Modio::ModID ModID, Modio::filesystem::path LogoPath,
 									 LogoActionCompleteCallback&& OnLogoActionComplete)
 		{
-			return asio::async_compose<LogoActionCompleteCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<LogoActionCompleteCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::AddOrUpdateModLogoOp(Modio::Detail::SDKSessionData::CurrentGameID(), ModID, LogoPath),
 				OnLogoActionComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());

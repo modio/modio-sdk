@@ -21,7 +21,7 @@ namespace
 	inline auto RecursivelyDeleteFile(Modio::filesystem::path FilePath,
 							   std::weak_ptr<Modio::Detail::FileSharedState> SharedState, DeleteCallback&& OnDeleteDone)
 	{
-		return asio::async_compose<DeleteCallback, void(Modio::ErrorCode)>(
+		return ModioAsio::async_compose<DeleteCallback, void(Modio::ErrorCode)>(
 			DeleteFileOp(FilePath, SharedState), OnDeleteDone,
 			Modio::Detail::Services::GetGlobalContext().get_executor());
 	}
@@ -119,7 +119,7 @@ public:
 	}
 
 private:
-	asio::coroutine CoroutineState {};
+	ModioAsio::coroutine CoroutineState {};
 	Modio::filesystem::path FolderPath {};
 	std::vector<std::pair<Modio::filesystem::path, int>> Folders {};
 	Modio::filesystem::recursive_directory_iterator DirectoryIterator {};

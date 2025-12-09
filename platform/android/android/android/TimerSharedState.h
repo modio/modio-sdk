@@ -41,7 +41,7 @@ public:
 		std::chrono::steady_clock::duration TimerDuration = TimerToStart->GetTimerDuration();
 		fu2::unique_function<void(Modio::ErrorCode)> WrappedCallback {
 			[Token = std::move(Token)](Modio::ErrorCode ec) mutable {
-				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+				ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
 						   [Token = std::move(Token), ec]() mutable {
 							   Token(ec);
 						   });

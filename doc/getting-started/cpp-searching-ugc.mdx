@@ -2,6 +2,7 @@
 id: cpp-searching-ugc
 title: Searching for UGC
 slug: /cppsdk/searching-ugc
+custom_edit_url: https://github.com/modio/modio-sdk-internal/blob/develop/doc/getting-started/cpp-searching-ugc.mdx
 ---
 
 # Searching for UGC
@@ -15,7 +16,7 @@ This guide covers:
 
 ## Querying UGC
 
-The primary way this is done is through [`ListAllModsAsync`](/cppsdk/refdocs/#listallmodsasync). Note that authentication is not required to browse UGC.
+The primary way this is done is through [`ListAllModsAsync`](https://docs.mod.io/cppsdk/refdocs#listallmodsasync). Note that authentication is not required to browse UGC.
 
 ```cpp
 
@@ -35,7 +36,7 @@ Modio::ListAllModsAsync(Modio::FilterParams(), [](Modio::ErrorCode ec, Modio::Op
 });
 ```
 
-You'll notice that [`ListAllModsAsync`](/cppsdk/refdocs/#listallmodsasync) takes a [`FilterParams`](/cppsdk/refdocs/#FilterParams) object as its first parameter. The default state of this object is set to ask for the first 100 results (the maximum number returnable in a query), sorting by the UGC's mod ID.
+You'll notice that [`ListAllModsAsync`](https://docs.mod.io/cppsdk/refdocs#listallmodsasync) takes a [`FilterParams`](https://docs.mod.io/cppsdk/refdocs#FilterParams) object as its first parameter. The default state of this object is set to ask for the first 100 results (the maximum number returnable in a query), sorting by the UGC's mod ID.
 
 To search for a specific query string, sort in a different order, or combine different filters, you can pass in a FilterParams object like this:
 
@@ -54,6 +55,6 @@ Modio::ListAllModsAsync(Modio::FilterParams.NameContains("Your Query").PagedResu
 
 ## Next steps
 
-Now your users can find UGC in your game, so it's time to set up the ability to subscribe to and download UGC using the [Subscribing to UGC](/cppsdk/subscribing) guide.
+Now your users can find UGC in your game, so it's time to set up the ability to subscribe to and download UGC using the [Subscribing to UGC](https://docs.mod.io/cppsdk/subscribing) guide.
 
-If you've already done this, we recommend working your way through the [C++ SDK Getting Started Guides](/cppsdk/#c-sdk-core-setup-guides) as they will teach you how to implement the mod.io fundamentals before moving onto exploring our [Features](/features).
+If you've already done this, we recommend working your way through the [C++ SDK Getting Started Guides](https://docs.mod.io/cppsdk#c-sdk-core-setup-guides) as they will teach you how to implement the mod.io fundamentals before moving onto exploring our [Features](https://docs.mod.io/features).

@@ -18,14 +18,14 @@ namespace Modio
 {
 	namespace Detail
 	{
-		class HttpRequest : public asio::basic_io_object<HttpService>
+		class HttpRequest : public ModioAsio::basic_io_object<HttpService>
 		{
 			HttpRequestParams RequestParameters;
 
 		public:
 			MODIO_IMPL explicit HttpRequest(HttpRequestParams RequestParams);
 
-			MODIO_IMPL explicit HttpRequest(asio::io_context& Context, HttpRequestParams RequestParams);
+			MODIO_IMPL explicit HttpRequest(ModioAsio::io_context& Context, HttpRequestParams RequestParams);
 
 			MODIO_IMPL HttpRequest(HttpRequest&& Other);
 			MODIO_IMPL ~HttpRequest();

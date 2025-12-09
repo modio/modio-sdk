@@ -79,14 +79,14 @@ namespace Modio
 
 		private:
 			HttpRequestParams RatingParams;
-			asio::coroutine CoroutineState;
+			ModioAsio::coroutine CoroutineState;
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer;
 		};
 
 		template<typename CallbackType>
 		auto SubmitModCollectionRatingAsync(Modio::ModCollectionID ModCollectionID, Modio::Rating Rating, CallbackType&& OnComplete)
 		{
-			return asio::async_compose<CallbackType, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<CallbackType, void(Modio::ErrorCode)>(
 				Modio::Detail::SubmitModCollectionRatingOp(ModCollectionID, Rating),
 				OnComplete, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

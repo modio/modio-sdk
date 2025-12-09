@@ -301,7 +301,7 @@ namespace Modio
 
 		private:
 			Modio::ModID Mod {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::DynamicBuffer ModInfoBuffer {};
 			Modio::filesystem::path DownloadPath {};
 			bool IsTempMod {};
@@ -315,7 +315,7 @@ namespace Modio
 		template<typename InstallDoneCallback>
 		auto InstallOrUpdateModAsync(Modio::ModID Mod, bool IsTempMod, InstallDoneCallback&& OnInstallComplete)
 		{
-			return asio::async_compose<InstallDoneCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<InstallDoneCallback, void(Modio::ErrorCode)>(
 				InstallOrUpdateModOp(Mod, IsTempMod), OnInstallComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

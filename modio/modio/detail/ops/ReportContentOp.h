@@ -24,7 +24,7 @@ namespace Modio
 		{
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::HttpRequestParams Request {};
 
 		public:
@@ -49,7 +49,7 @@ namespace Modio
 		template<typename ReportContentCompleteCallback>
 		void ReportContentAsync(Modio::ReportParams Params, ReportContentCompleteCallback&& OnReportContentComplete)
 		{
-			return asio::async_compose<ReportContentCompleteCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<ReportContentCompleteCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::ReportContentOp(Params), OnReportContentComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

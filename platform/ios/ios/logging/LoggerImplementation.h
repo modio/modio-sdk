@@ -22,12 +22,12 @@ namespace Modio
 		/// @brief Helper implementation class to organize logging operations and formatting
 		class LoggerImplementation
 		{
-			asio::strand<asio::io_context::executor_type>& LogStrand;
+			ModioAsio::strand<ModioAsio::io_context::executor_type>& LogStrand;
 
 		public:
 			/// @docinternal
 			/// @brief LoggerImplementation constructor
-			LoggerImplementation(asio::strand<asio::io_context::executor_type>& Strand) : LogStrand(Strand) {}
+			LoggerImplementation(ModioAsio::strand<ModioAsio::io_context::executor_type>& Strand) : LogStrand(Strand) {}
 			
 			/// @docinternal
 			/// @brief Receive an formatted string and transform it to another string that fits 
@@ -49,7 +49,7 @@ namespace Modio
 				fmt::format(LogFormatString, Now,
 							std::chrono::duration_cast<std::chrono::milliseconds>(Now.time_since_epoch()) % 1000,
 							LogLevelToString(Level), LogCategoryToString(Category), LogUserString);
-				asio::post(LogStrand, [FormattedOutput]() { fmt::print(fmt::runtime(FormattedOutput)); });
+				ModioAsio::post(LogStrand, [FormattedOutput]() { fmt::print(fmt::runtime(FormattedOutput)); });
 				return FormattedOutput;
 			}
 

@@ -108,14 +108,14 @@ namespace Modio
 			std::unique_ptr<Modio::Detail::Buffer> DefaultConfigBuffer {};
 			std::unique_ptr<nlohmann::json> ConfigJson {};
 			std::unique_ptr<Modio::Detail::File> ConfigFile {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::DynamicBuffer FileBuffer {};
 		};
 
 		template<typename CompletionTokenType>
 		auto LoadGlobalConfigOverrideFileDataAsync(Modio::Detail::DynamicBuffer FileData, CompletionTokenType&& Token)
 		{
-			return asio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
 				LoadGlobalConfigOverrideFileDataOp(FileData), Token,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

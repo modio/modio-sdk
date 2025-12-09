@@ -110,7 +110,7 @@ namespace Modio
 		private:
 			Modio::GameID GameID {};
 			Modio::ModID ModId {};
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 		};
 
@@ -118,7 +118,7 @@ namespace Modio
 		void UnsubscribeFromModAsync(Modio::ModID ModToUnsubscribeFrom,
 									 UnsubscribeCompleteCallback&& OnUnsubscribeComplete)
 		{
-			return asio::async_compose<UnsubscribeCompleteCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<UnsubscribeCompleteCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::UnsubscribeFromModOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 													ModToUnsubscribeFrom),
 				OnUnsubscribeComplete, Modio::Detail::Services::GetGlobalContext().get_executor());

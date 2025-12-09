@@ -27,7 +27,7 @@ namespace Modio
 #include <asio/yield.hpp>
 		class SendHttpRequestOp
 		{
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 			std::shared_ptr<HttpRequestImplementation> Request {};
 			std::weak_ptr<HttpSharedState> SharedState {};
 

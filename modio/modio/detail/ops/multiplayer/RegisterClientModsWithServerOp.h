@@ -25,7 +25,7 @@ namespace Modio
 		class RegisterClientModsWithServerOp
 		{
 		private:
-			asio::coroutine CoroutineState;
+			ModioAsio::coroutine CoroutineState;
 			std::vector<ModID> Mods;
 
 		public:
@@ -106,7 +106,7 @@ namespace Modio
 		template<typename RegisterDoneCallback>
 		auto RegisterClientModsWithServerAsync(std::vector<ModID>& Mods, RegisterDoneCallback&& OnRegisterComplete)
 		{
-			return asio::async_compose<RegisterDoneCallback, void(Modio::ErrorCode, std::set<Modio::ModID>)>(
+			return ModioAsio::async_compose<RegisterDoneCallback, void(Modio::ErrorCode, std::set<Modio::ModID>)>(
 				RegisterClientModsWithServerOp(Mods), OnRegisterComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

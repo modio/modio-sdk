@@ -34,7 +34,7 @@ public:
 		{
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File, "Begin file delete of {}",
 										FilePath.string());
-			yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+			yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 			Modio::ErrorCode RemoveStatus;
 			Modio::filesystem::remove(FilePath, RemoveStatus);
 			Self.complete(RemoveStatus);
@@ -42,7 +42,7 @@ public:
 	}
 
 private:
-	asio::coroutine CoroState {};
+	ModioAsio::coroutine CoroState {};
 	Modio::filesystem::path FilePath {};
 	std::weak_ptr<Modio::Detail::FileSharedState> SharedState {};
 };

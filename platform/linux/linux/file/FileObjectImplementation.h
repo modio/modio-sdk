@@ -31,15 +31,15 @@ namespace Modio
 			Modio::filesystem::path BasePath {};
 			int FileDescriptor = 0;
 			// Strand so that IO ops don't get performed simultaneously
-			asio::strand<asio::io_context::executor_type>* Strand = nullptr;
+			ModioAsio::strand<ModioAsio::io_context::executor_type>* Strand = nullptr;
 			std::atomic<bool> OperationInProgress {false};
 			std::atomic<std::int32_t> NumWaiters {0};
-			// asio::steady_timer OperationQueue;
+			// ModioAsio::steady_timer OperationQueue;
 			Modio::FileOffset CurrentSeekOffset = Modio::FileOffset(0);
 			bool CancelRequested = false;
 
 		public:
-			FileObjectImplementation(asio::io_context& ParentContext, Modio::filesystem::path BasePath)
+			FileObjectImplementation(ModioAsio::io_context& ParentContext, Modio::filesystem::path BasePath)
 				: FilePath(),
 				  BasePath(BasePath),
 				  FileDescriptor(InvalidFileDescriptor),
@@ -140,12 +140,12 @@ namespace Modio
 				return CurrentSeekOffset;
 			}
 
-			void SetFileStrand(asio::strand<asio::io_context::executor_type>& FileStrand) override
+			void SetFileStrand(ModioAsio::strand<ModioAsio::io_context::executor_type>& FileStrand) override
 			{
 				Strand = &FileStrand;
 			}
 
-			asio::strand<asio::io_context::executor_type>& GetFileStrand() override
+			ModioAsio::strand<ModioAsio::io_context::executor_type>& GetFileStrand() override
 			{
 				return *Strand;
 			}

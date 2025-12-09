@@ -24,11 +24,11 @@ namespace Modio
 	
 	namespace Detail
 	{
-		class UserDataService : public asio::detail::service_base<UserDataService>
+		class UserDataService : public ModioAsio::detail::service_base<UserDataService>
 		{
 		public:
-			explicit UserDataService(asio::io_context& IOService)
-				: asio::detail::service_base<UserDataService>(IOService)
+			explicit UserDataService(ModioAsio::io_context& IOService)
+				: ModioAsio::detail::service_base<UserDataService>(IOService)
 			{
 				
 			}
@@ -42,7 +42,7 @@ namespace Modio
 			template<typename CompletionHandlerType>
 			auto InitializeAsync( CompletionHandlerType&& Handler)
 			{
-				return asio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
+				return ModioAsio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
 					InitializeUserDataOp(), Handler, Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 
@@ -93,7 +93,7 @@ namespace Modio
 			template<typename CompletionHandlerType>
 			auto SaveUserDataToStorageAsync(CompletionHandlerType&& Handler)
 			{
-				return asio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
+				return ModioAsio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
 					SaveUserDataToStorageOp(), Handler,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}

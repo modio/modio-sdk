@@ -44,7 +44,7 @@ public:
 					// error code
 				}
 				// Queue us up to run on the next tick
-				yield asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
+				yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 			}
 			Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
 			return;
@@ -52,13 +52,13 @@ public:
 	}
 
 private:
-	asio::coroutine CoroutineState;
+	ModioAsio::coroutine CoroutineState;
 };
 
 template<typename CompletionTokenType>
 void BeginTimerLoopAsync(std::weak_ptr<TimerSharedState> SharedState, CompletionTokenType&& OnTimerLoopEnded)
 {
-	asio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
+	ModioAsio::async_compose<CompletionTokenType, void(Modio::ErrorCode)>(
 		ProcessTimersOp(SharedState), OnTimerLoopEnded, Modio::Detail::Services::GetGlobalContext().get_executor());
 }
 

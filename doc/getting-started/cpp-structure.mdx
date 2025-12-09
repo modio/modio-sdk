@@ -2,6 +2,7 @@
 id: cpp-structure
 title: Structure & Error Handling
 slug: /cppsdk/structure
+custom_edit_url: https://github.com/modio/modio-sdk-internal/blob/develop/doc/getting-started/cpp-structure.mdx
 ---
 
 # C++ SDK Structure
@@ -45,36 +46,36 @@ All asynchronous methods in the public API have the suffix `Async`.
 ### Callback conventions
 These asynchronous methods take a `std::function`-derived callback, which will be invoked exactly once with the results of the requested operation.
 
-Every async callback takes an [ErrorCode](/cppsdk/refdocs/#ErrorCode) as its first parameter, with any results wrapped in [Optional](/cppsdk/refdocs/#Optional) to check if a result is valid or empty.
+Every async callback takes an [ErrorCode](https://docs.mod.io/cppsdk/refdocs#ErrorCode) as its first parameter, with any results wrapped in [Optional](https://docs.mod.io/cppsdk/refdocs#Optional) to check if a result is valid or empty.
 
 Return values provided to your callback are passed `by-value`. The SDK does not expect you to have to call `release` or free up resources given to you.
 
 :::note
-Even if the SDK shuts down while asynchronous operations are pending, the remaining callbacks will still execute **exactly once**. In this case, the callback receives an [ErrorCode](/cppsdk/refdocs/#ErrorCode) to indicate a canceled state. Your project should handle gracefully this behavior as part of your error handling.
+Even if the SDK shuts down while asynchronous operations are pending, the remaining callbacks will still execute **exactly once**. In this case, the callback receives an [ErrorCode](https://docs.mod.io/cppsdk/refdocs#ErrorCode) to indicate a canceled state. Your project should handle gracefully this behavior as part of your error handling.
 :::
 
 ### Maintaining the SDK event loop
 
-In order to provide a non-blocking implementation, the SDK operates an internal event loop. This event loop only runs on the thread which calls [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers).
+In order to provide a non-blocking implementation, the SDK operates an internal event loop. This event loop only runs on the thread which calls [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers).
 
-The event loop, all internal event handlers and callbacks provided to the mod.io SDK execute on the thread invoking [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers). [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) must only be called on one thread, otherwise, its behavior is undefined.
+The event loop, all internal event handlers and callbacks provided to the mod.io SDK execute on the thread invoking [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers). [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) must only be called on one thread, otherwise, its behavior is undefined.
 
 :::note
-If you stop calling [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers), any pending asynchronous API methods will not complete and their associated callbacks will not be invoked. It also includes the internal data allocated for those operations, as well as the release of any allocated objects.
+If you stop calling [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers), any pending asynchronous API methods will not complete and their associated callbacks will not be invoked. It also includes the internal data allocated for those operations, as well as the release of any allocated objects.
 :::
 
 ## Thread safety
 
-Given that [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) performs all the work of the SDK and executes the callbacks that you provide as handlers for the completion of async functions, your application needs to be calling it at regular intervals. However, you may not wish to do so on the main thread of your application, given that the function has to execute for long enough to actually 'get some work done'.
+Given that [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) performs all the work of the SDK and executes the callbacks that you provide as handlers for the completion of async functions, your application needs to be calling it at regular intervals. However, you may not wish to do so on the main thread of your application, given that the function has to execute for long enough to actually 'get some work done'.
 
-The mod.io SDK supports the execution of [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) on a background thread while your application invokes other SDK functions on the main thread, for example in response to user input in your application's user interface. 
+The mod.io SDK supports the execution of [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) on a background thread while your application invokes other SDK functions on the main thread, for example in response to user input in your application's user interface. 
 
-Whilst it is safe to call all other SDK functions from a different thread to the one executing [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers), it is important to note that our existing guarantees are maintained, namely, you'll still receive exactly one callback invocation per asynchronous function you run, and callbacks you provide to those methods will be executed on the thread running [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers). 
+Whilst it is safe to call all other SDK functions from a different thread to the one executing [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers), it is important to note that our existing guarantees are maintained, namely, you'll still receive exactly one callback invocation per asynchronous function you run, and callbacks you provide to those methods will be executed on the thread running [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers). 
 
 :::note
-[RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) should still only be called on a single thread - it is not safe to call [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers) from multiple threads, either simultaneously or sequentially.
+[RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) should still only be called on a single thread - it is not safe to call [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers) from multiple threads, either simultaneously or sequentially.
 
-By using a background thread for [RunPendingHandlers](/cppsdk/refdocs/#runpendinghandlers), you can decouple the frequency with which you perform SDK 'work' from the frequency of your application's main loop for greater performance. 
+By using a background thread for [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers), you can decouple the frequency with which you perform SDK 'work' from the frequency of your application's main loop for greater performance. 
 
 See * [Thread Safety](#thread-safety) for more information.
 :::
@@ -106,17 +107,17 @@ This allows multiple players, such as siblings, to each have their own session t
 
 An authenticated user is required to install UGC and perform other operations. Check the `requires` section on any SDK function to see what operations need an authenticated user. However, anyone can freely browse and search your game's available UGC and only prompt the user to authenticate/create an account when they wish to perform any restricted operations (such as rating or subscribing to UGC).
 
-To change a Local Profile's authenticated user, call [`ClearUserDataAsync`](/cppsdk/refdocs/#clearuserdataasync) to remove the authenticated user, and then re-authenticate as normal.
+To change a Local Profile's authenticated user, call [`ClearUserDataAsync`](https://docs.mod.io/cppsdk/refdocs#clearuserdataasync) to remove the authenticated user, and then re-authenticate as normal.
 
 :::note
-A call to [`ClearUserDataAsync`](/cppsdk/refdocs/#clearuserdataasync) removes the authenticated user from the local device, and disables UGC management. Any installed content is marked for uninstallation from local storage if no other Local Profiles contain authenticated users with active subscriptions to it.
+A call to [`ClearUserDataAsync`](https://docs.mod.io/cppsdk/refdocs#clearuserdataasync) removes the authenticated user from the local device, and disables UGC management. Any installed content is marked for uninstallation from local storage if no other Local Profiles contain authenticated users with active subscriptions to it.
 :::
 
-To add a newly authenticated user or switch to one already-authenticated without removing the current one, swap to another Local Profile by calling [`ShutdownAsync`](/cppsdk/refdocs/#shutdownasync), then re-initialize via [InitializeAsync](/cppsdk/refdocs/#initializeasync) specifying a different Local Profile name in the initialization parameters you supply.
+To add a newly authenticated user or switch to one already-authenticated without removing the current one, swap to another Local Profile by calling [`ShutdownAsync`](https://docs.mod.io/cppsdk/refdocs#shutdownasync), then re-initialize via [InitializeAsync](https://docs.mod.io/cppsdk/refdocs#initializeasync) specifying a different Local Profile name in the initialization parameters you supply.
 
 ## Error handling
 
-Callback functions in the SDK either return a value or provide an [ErrorCode](/cppsdk/refdocs/#ErrorCode) value. It is a numeric error code with a category and an associated string message.
+Callback functions in the SDK either return a value or provide an [ErrorCode](https://docs.mod.io/cppsdk/refdocs#ErrorCode) value. It is a numeric error code with a category and an associated string message.
 
 The SDK doesn't attempt to predict what your error-handling logic or requirements are. For example, if you call a function and receive an error code `ec == Modio::HttpError::CannotOpenConnection`, your application could potentially handle this by shutting down the SDK. Another application, however, might wish to retry after an interval determined by its own internal logic. As a result, the SDK defers to your application to decide how to handle errors for the functions you call.
 
@@ -218,7 +219,7 @@ else if (Modio::ErrorCodeMatches(ec, Modio::HttpError::ServerClosedConnection))
 
 However, this still requires knowledge of the different types of HTTP errors. In your application you probably don't need to handle them differently. The semantics of networking errors are largely 'try the function again later'.
 
-This is where the second overload of [ErrorCodeMatches](/cppsdk/refdocs/#ErrorCodeMatches) comes in. It allows you to query if the error satisfies a particular condition, such as 'does this code represent some kind of networking error':
+This is where the second overload of [ErrorCodeMatches](https://docs.mod.io/cppsdk/refdocs#ErrorCodeMatches) comes in. It allows you to query if the error satisfies a particular condition, such as 'does this code represent some kind of networking error':
 
 ```cpp
 Modio::ErrorCode ec;
@@ -294,7 +295,7 @@ Modio::GetModInfoAsync(ModID, [](Modio::ErrorCode ec, Modio::Optional<Modio::Mod
 
 ### Parameter validation errors
 
-Some of the SDK functions may return errors that indicate a parameter or data validation failure. For these cases, the SDK parses the error response from the mod.io API and stores the information about which parameters failed validation until the next network request executes. If an SDK function returns an error which matches `Modio::ErrorConditionTypes::InvalidArgsError`, you can call [`GetLastValidationError`](/cppsdk/refdocs/#getlastvalidationerror) in your callback to retrieve those errors and display appropriate feedback to the end-user.
+Some of the SDK functions may return errors that indicate a parameter or data validation failure. For these cases, the SDK parses the error response from the mod.io API and stores the information about which parameters failed validation until the next network request executes. If an SDK function returns an error which matches `Modio::ErrorConditionTypes::InvalidArgsError`, you can call [`GetLastValidationError`](https://docs.mod.io/cppsdk/refdocs#getlastvalidationerror) in your callback to retrieve those errors and display appropriate feedback to the end-user.
 
 ## Mod data directories
 
@@ -332,6 +333,6 @@ However, this value can be overridden in one of two ways:
 
 ## Next steps
 
-Now you know more about how the plugin works, it's time to set up [User Authentication](/cppsdk/user-authentication) or skip straight to [Searching for UGC](/cppsdk/searching-ugc).
+Now you know more about how the plugin works, it's time to set up [User Authentication](https://docs.mod.io/cppsdk/user-authentication) or skip straight to [Searching for UGC](https://docs.mod.io/cppsdk/searching-ugc).
 
-If you've already done this, we recommend working your way through the [C++ SDK Getting Started Guides](/cppsdk/#c-sdk-core-setup-guides) as they will teach you how to implement the mod.io fundamentals before moving onto exploring our [Features](/features).
+If you've already done this, we recommend working your way through the [C++ SDK Getting Started Guides](https://docs.mod.io/cppsdk#c-sdk-core-setup-guides) as they will teach you how to implement the mod.io fundamentals before moving onto exploring our [Features](https://docs.mod.io/features).

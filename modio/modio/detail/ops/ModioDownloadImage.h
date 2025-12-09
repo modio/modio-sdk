@@ -138,7 +138,7 @@ namespace Modio
 			}
 
 		private:
-			asio::coroutine CoroutineState {};
+			ModioAsio::coroutine CoroutineState {};
 
 			// Parameters
 			ImageType ImageTypeImp {};
@@ -160,7 +160,7 @@ namespace Modio
 		auto DownloadImageAsync(ImageType&& Wrapper, Modio::StableStorage<Modio::filesystem::path> OutAvatarPath,
 								DownloadImageCallback&& OnDownloadComplete)
 		{
-			return asio::async_compose<DownloadImageCallback, void(Modio::ErrorCode)>(
+			return ModioAsio::async_compose<DownloadImageCallback, void(Modio::ErrorCode)>(
 				DownloadImageOp<ImageType>(Wrapper, OutAvatarPath), OnDownloadComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
