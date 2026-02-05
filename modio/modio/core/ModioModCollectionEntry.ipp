@@ -102,6 +102,8 @@ namespace Modio
 
 	void ModCollectionEntry::SetModState(Modio::ModState NewState)
 	{
+		Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::ModManagement, "Setting mod {} state from {} to {}", GetID(),
+									Modio::ModStateToString(CurrentState), Modio::ModStateToString(NewState));
 		CurrentState = NewState;
 		if (CurrentState == Modio::ModState::Installed)
 		{
@@ -217,6 +219,11 @@ namespace Modio
 	void ModCollectionEntry::UpdateSizeOnDisk(Modio::FileSize NewSize)
 	{
 		SizeOnDisk = NewSize;
+	}
+
+	void ModCollectionEntry::UpdateModPath(std::string NewPath)
+	{
+		PathOnDisk = NewPath;
 	}
 
 	void RollbackTransactionImpl(ModCollectionEntry& Entry)
@@ -500,7 +507,7 @@ namespace Modio
 		}
 	}
 
-	bool ModCollection::UpdateMod(Modio::ModInfo ModToUpdate, std::string /*CalculatedModPath*/)
+	bool ModCollection::UpdateMod(Modio::ModInfo ModToUpdate, std::string CalculatedModPath)
 	{
 		auto ModEntry = ModEntries.find(ModToUpdate.ModId);
 		if (ModEntry == ModEntries.end())
@@ -510,6 +517,21 @@ namespace Modio
 		else
 		{
 			(ModEntry)->second->UpdateModProfile(ModToUpdate);
+			(ModEntry)->second->UpdateModPath(CalculatedModPath);
+			return true;
+		}
+	}
+
+	bool ModCollection::UpdateModPath(Modio::ModID ModToUpdate, std::string CalculatedModPath)
+	{
+		auto ModEntry = ModEntries.find(ModToUpdate);
+		if (ModEntry == ModEntries.end())
+		{
+			return false;
+		}
+		else
+		{
+			(ModEntry)->second->UpdateModPath(CalculatedModPath);
 			return true;
 		}
 	}

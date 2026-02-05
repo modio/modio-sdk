@@ -136,6 +136,7 @@ namespace Modio
 								}
 								case Modio::UserSubscriptionList::ChangeType::Removed:
 								{
+									Modio::Detail::SDKSessionData::CancelModDownloadOrUpdate(ModChange.first);
 									Modio::Detail::SDKSessionData::GetUserSubscriptions().RemoveMod(ModChange.first);
 
 									if (Modio::Optional<Modio::ModCollectionEntry&> ModEntry =

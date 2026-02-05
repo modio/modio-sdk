@@ -62,6 +62,18 @@ namespace Modio
 							: Modio::Detail::SDKSessionData::GetSystemModCollection();
 
 					Collection.RemoveMod(ModId, bForce);
+					// notify platform specific code for any additional cleanup
+					if ((ec = Modio::Detail::NotifyModUninstall(InstallPath, ModId, bIsTempMod)))
+					{
+						Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::File,
+													"NotifyModUninstall during UninstallModOp was not successful, path: "
+													"{} and error message: {}",
+													InstallPath.string(), ec.message());
+
+						// Mod will still be considered as installed as something went wrong when deleting the file
+						Self.complete(ec);
+						return;
+					}
 
 					Self.complete({});
 				}

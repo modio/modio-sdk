@@ -127,6 +127,10 @@ namespace Modio
 							// installations
 							if (EntryToProcess == nullptr)
 							{
+								Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::ModManagement,
+															"Didn't find priority upload/installation. Executing "
+															"normal uploads/installations.");
+
 								// if we have a pending upload, process that immediately before bothering with iterating
 								// the user subscriptions
 								if ((PendingUpload = Modio::Detail::SDKSessionData::GetNextPendingModfileUpload()))
@@ -150,16 +154,26 @@ namespace Modio
 								Modio::ModCollection UserModCollection =
 									Modio::Detail::SDKSessionData::FilterSystemModCollectionByUserSubscriptions();
 
+								Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::ModManagement,
+															"Found {} mods in the User Subscriptions", UserModCollection.Entries().size());
+
 								// No prioritized mod, sort by normal retry priority
 								for (auto ModEntry : UserModCollection.SortEntriesByRetryPriority())
 								{
 									Modio::ModState CurrentState = ModEntry->GetModState();
+
+
+									Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::ModManagement,
+																"Checking {} state: {}", ModEntry->GetID(),
+																Modio::ModStateToString(CurrentState));
+
 									if (CurrentState == Modio::ModState::InstallationPending ||
 										CurrentState == Modio::ModState::UpdatePending)
 									{
 										if (ModEntry->ShouldRetry())
 										{
 											EntryToProcess = ModEntry;
+											//break;
 										}
 									}
 								}
@@ -168,6 +182,9 @@ namespace Modio
 					}
 					if (EntryToProcess == nullptr)
 					{
+
+						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::ModManagement,
+													"No entries to process. Exiting.");
 						Self.complete({});
 						return;
 					}

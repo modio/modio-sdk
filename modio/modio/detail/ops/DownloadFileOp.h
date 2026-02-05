@@ -47,6 +47,7 @@ namespace Modio
 
 			struct DownloadFileImpl
 			{
+				Modio::Detail::DynamicBuffer WriteBuffers;
 				Modio::Detail::OperationQueue::Ticket DownloadTicket;
 				std::uint8_t RedirectLimit = 8;
 				bool bRequiresRedirect = false;
@@ -111,6 +112,8 @@ namespace Modio
 
 				// Temporary optional to hold buffers without causing issues with coroutine switch statement
 				Modio::Optional<Modio::Detail::Buffer> CurrentBuffer;
+				Modio::Detail::Buffer Combined(0, 1);
+				size_t TotalSize = 0;
 
 				reenter(Coroutine)
 				{
@@ -218,8 +221,10 @@ namespace Modio
 
 					} while (Impl->bRequiresRedirect && Impl->RedirectLimit);
 
+
 					while (!ec)
 					{
+
 						// Read in a chunk from the response
 						yield Request->ReadSomeFromResponseBodyAsync(ResponseBodyBuffer, std::move(Self));
 						if (ec && ec != Modio::make_error_code(Modio::GenericError::EndOfFile))
@@ -237,30 +242,68 @@ namespace Modio
 						// call so make sure we steal all of them
 						while ((CurrentBuffer = ResponseBodyBuffer.TakeInternalBuffer()))
 						{
-							*CurrentFilePosition += CurrentBuffer->GetSize();
+							Impl->WriteBuffers.AppendBuffer(std::move(CurrentBuffer.value()));
 
-							if (ProgressInfo.has_value())
+							// buffers are in 16Kb blocks, coalesce into 512Kb blocks for the writes.
+							if ((Impl->WriteBuffers.end() - Impl->WriteBuffers.begin()) == 32)
 							{
-								if (!ProgressInfo->expired())
-								{
-									auto Progress = ProgressInfo->lock();
-									SetCurrentProgress(*Progress.get(), Modio::FileSize(*CurrentFilePosition));
-								}
-								else
-								{
-									Self.complete(
-										Modio::make_error_code(Modio::ModManagementError::InstallOrUpdateCancelled));
-									return;
-								}
-							}
+								Combined = Modio::Detail::Buffer(Impl->WriteBuffers.size());
+								TotalSize = Modio::Detail::BufferCopy(Combined, Impl->WriteBuffers);
+								Impl->WriteBuffers.Clear();
 
-							yield File->WriteSomeAtAsync(*CurrentFilePosition - CurrentBuffer->GetSize(),
-														 std::move(CurrentBuffer.value()), std::move(Self));
+								*CurrentFilePosition += TotalSize;
+
+								if (ProgressInfo.has_value())
+								{
+									if (!ProgressInfo->expired())
+									{
+										auto Progress = ProgressInfo->lock();
+										SetCurrentProgress(*Progress.get(), Modio::FileSize(*CurrentFilePosition));
+									}
+									else
+									{
+										Self.complete(Modio::make_error_code(
+											Modio::ModManagementError::InstallOrUpdateCancelled));
+										return;
+									}
+								}
+
+								yield File->WriteSomeAtAsync(*CurrentFilePosition - TotalSize,
+															 std::move(Combined), std::move(Self));
+							}
 						}
 
 						// Did we receive the entire response body?
 						if (*EndOfFileReached)
 						{
+							// ensure that we write out any remaining blocks
+							if (Impl->WriteBuffers.end() != Impl->WriteBuffers.begin())
+							{
+								Combined = Modio::Detail::Buffer(Impl->WriteBuffers.size());
+								TotalSize = Modio::Detail::BufferCopy(Combined, Impl->WriteBuffers);
+								Impl->WriteBuffers.Clear();
+
+								*CurrentFilePosition += TotalSize;
+
+								if (ProgressInfo.has_value())
+								{
+									if (!ProgressInfo->expired())
+									{
+										auto Progress = ProgressInfo->lock();
+										SetCurrentProgress(*Progress.get(), Modio::FileSize(*CurrentFilePosition));
+									}
+									else
+									{
+										Self.complete(Modio::make_error_code(
+											Modio::ModManagementError::InstallOrUpdateCancelled));
+										return;
+									}
+								}
+
+								yield File->WriteSomeAtAsync(*CurrentFilePosition - TotalSize,
+															 std::move(Combined), std::move(Self));
+							}
+
 							Modio::filesystem::path Destination = File->GetPath().replace_extension();
 							if (Modio::ErrorCode RenameResult = File->Rename(Destination))
 							{

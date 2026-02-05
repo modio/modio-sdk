@@ -43,7 +43,7 @@ namespace Modio
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {},
 							Modio::Optional<Modio::Detail::Buffer> FileChunk = {})
 			{
-				constexpr std::uint64_t ChunkOfBytes = 64 * 1024;
+				constexpr std::uint64_t ChunkOfBytes = 512 * 1024;
 				std::uint64_t FileSize = 0;
 				std::uint64_t MaxBytesToRead = 0;
 				MODIO_PROFILE_SCOPE(ParseArchiveContents);

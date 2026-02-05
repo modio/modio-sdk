@@ -143,6 +143,7 @@ namespace Modio
         static const HttpRequestParams GetMeFollowedCollectionsRequest { Modio::Detail::Verb::GET, "/me/following/collections" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetUserGamesRequest { Modio::Detail::Verb::GET, "/me/games" }; 
         static const HttpRequestParams SyncAppleEntitlementRequest { Modio::Detail::Verb::POST, "/me/iap/apple/sync" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
+        static const HttpRequestParams SyncEpicgamesEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/epicgames/sync" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams SyncGoogleEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/google/sync" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams SyncMetaEntitlementRequest { Modio::Detail::Verb::POST, "/me/iap/meta/sync" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams SyncPlaystationNetworkEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/psn/sync" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 

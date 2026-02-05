@@ -17,6 +17,7 @@
 #include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/file/ModioFileService.h"
+#include "file/ArchiveUtilities.h"
 
 MODIO_DIAGNOSTIC_PUSH
 
@@ -36,31 +37,37 @@ namespace Modio
 				Modio::filesystem::path ArchivePath {};
 				Modio::filesystem::path RootOutputPath {};
 				Modio::Detail::ArchiveReader ArchiveView;
+				Modio::Optional<Modio::ModID> ModId {};
 				Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo {};
 				std::vector<Modio::Detail::ArchiveFileImplementation::ArchiveEntry>::iterator CurrentEntryIterator {};
 				ExtractAllImpl(ModioAsio::coroutine CoroutineState, Modio::filesystem::path ArchivePath,
 							   Modio::filesystem::path RootOutputPath, Modio::Detail::ArchiveReader ArchiveView,
-							   Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo)
+							   Modio::Optional<Modio::ModID> ModId, Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo)
 					: CoroutineState(CoroutineState),
 					  ArchivePath(ArchivePath),
 					  RootOutputPath(RootOutputPath),
 					  ArchiveView(std::move(ArchiveView)),
+					  ModId(ModId),
 					  ProgressInfo(ProgressInfo) {}
 			};
 			Modio::StableStorage<ExtractAllImpl> Impl {};
 
 		public:
+
 			ExtractAllToFolderOp(ExtractAllToFolderOp&& Other)
 			{
 				this->Impl = Other.Impl;
 			}
+
 			ExtractAllToFolderOp(Modio::filesystem::path ArchivePath, Modio::filesystem::path RootOutputPath,
+								 Modio::Optional<Modio::ModID> ModId,
 								 Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo)
 			{
 				Impl = std::make_shared<ExtractAllImpl>(ExtractAllImpl ({},
 																		ArchivePath,
 																		RootOutputPath,
-																		Modio::Detail::ArchiveReader(ArchivePath),
+																		Modio::Detail::ArchiveReader(ArchivePath), 
+																	    ModId,
 																		ProgressInfo));
 			}
 
@@ -103,13 +110,18 @@ namespace Modio
 						return;
 					}
 
-					if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CheckSpaceAvailable(
-							Impl->RootOutputPath, Impl->ArchiveView.GetTotalExtractedSize()))
+					
+					yield ValidateDiskSpaceForArchiveAsync(Impl->RootOutputPath, 
+														   Impl->ArchiveView.begin(),
+														   Impl->ArchiveView.end(), 
+														   Impl->ModId,
+														   std::move(Self));
+					if (ec)
 					{
-						Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace),
-									  Modio::FileSize(0));
+						Self.complete(ec, Modio::FileSize(0));
 						return;
 					}
+
 
 					// Update the total size of the archive
 					if (Impl->ProgressInfo.has_value())
@@ -188,11 +200,12 @@ namespace Modio
 
 		template<typename CompletionTokenType>
 		auto ExtractAllFilesAsync(Modio::filesystem::path ArchiveFile, Modio::filesystem::path AbsoluteDestinationPath,
+								  Modio::Optional<Modio::ModID> ModId,
 								  Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo,
 								  CompletionTokenType&& Token)
 		{
 			return ModioAsio::async_compose<CompletionTokenType, void(Modio::ErrorCode, Modio::FileSize)>(
-				ExtractAllToFolderOp(ArchiveFile, AbsoluteDestinationPath, ProgressInfo), Token,
+				ExtractAllToFolderOp(ArchiveFile, AbsoluteDestinationPath, ModId, ProgressInfo), Token,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	} // namespace Detail

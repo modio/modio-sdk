@@ -31,6 +31,8 @@ namespace Modio
 	{
 		class FileService : public ModioAsio::detail::service_base<FileService>
 		{
+			friend class UnitTestFileSystemAccessor;
+			friend class PlatformFileSystemAccessor;
 		public:
 			explicit FileService(ModioAsio::io_context& IOService) : ModioAsio::detail::service_base<FileService>(IOService)
 			{
@@ -135,6 +137,7 @@ namespace Modio
 			{
 				return PlatformImplementation->DeleteFolderAsync(FolderPath, std::forward<CompletionTokenType>(Token));
 			}
+
 
 			Modio::ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string> Overrides)
 			{
@@ -453,6 +456,11 @@ namespace Modio
 											"Media cache contains {} images totalling {} bytes in size",
 											ImagePaths.size(), TotalSize);
 				return {};
+			}
+
+			std::shared_ptr<FileSystemImplementation> Implementation() 
+			{
+				return PlatformImplementation;
 			}
 
 		private:

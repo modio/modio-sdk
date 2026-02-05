@@ -38,6 +38,27 @@ namespace Modio
 		UninstallPending
 	};
 
+	constexpr static const char* ModStateToString(ModState State)
+	{
+		switch (State)
+		{
+			case ModState::InstallationPending:
+				return "InstallationPending";
+			case ModState::Installed:
+				return "Installed";
+			case ModState::UpdatePending:
+				return "UpdatePending";
+			case ModState::Downloading:
+				return "Downloading";
+			case ModState::Extracting:
+				return "Extracting";
+			case ModState::UninstallPending:
+				return "UninstallPending";
+			default:
+				return "Unknown State";
+		}
+	}
+
 	/// @docpublic
 	/// @brief Class representing a mod which is installed locally
 	class ModCollectionEntry : public Modio::Detail::Transactional<ModCollectionEntry>
@@ -183,6 +204,11 @@ namespace Modio
 		/// successful extraction/installation
 		/// @param NewSize The total size on disk of all files in the mod
 		MODIO_IMPL void UpdateSizeOnDisk(Modio::FileSize NewSize);
+
+		/// @docinternal
+		/// @brief Updates the path of the mod on disk in the collection entry. 
+		/// @param NewPath The new path for the mod
+		MODIO_IMPL void UpdateModPath(std::string NewPath);
 
 		/// @docinternal
 		/// @return Modio::ErrorCode The last error that occurred for this mod
@@ -511,6 +537,13 @@ namespace Modio
 		/// @param CalculatedModPath The new path to the mod on disk
 		/// @return True of mod was updated, false if mod was not present
 		MODIO_IMPL bool UpdateMod(Modio::ModInfo ModToUpdate, std::string CalculatedModPath);
+
+		/// @docpublic
+		/// @brief Updates the mod path in the mod collection if it exists, otherwise does nothing
+		/// @param ModToUpdate The mod to update
+		/// @param CalculatedModPath The new path to the mod on disk
+		/// @return True of mod was updated, false if mod was not present
+		MODIO_IMPL bool UpdateModPath(Modio::ModID ModToUpdate, std::string CalculatedModPath);
 
 		/// @docpublic
 		/// @brief Retrieve a dictionary of ModID - ModCollectionEntry stored in this ModCollection

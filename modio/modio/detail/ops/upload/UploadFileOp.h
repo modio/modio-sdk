@@ -179,7 +179,7 @@ namespace Modio
 									{
 										// Limitting the number of bytes to what is necessary for the file size
 										// is required in macOS to correctly send data over the WriteStream
-										constexpr size_t MaxBytesBuffer = 64 * 1024;
+										constexpr size_t MaxBytesBuffer = 512 * 1024;
 										size_t FileSize = Impl->CurrentPayloadFile->GetFileSize();
 										size_t RemainingBytes = FileSize - Impl->CurrentPayloadFileBytesRead;
 										BytesToRead = std::min(MaxBytesBuffer, RemainingBytes);

@@ -28,8 +28,10 @@ function(GetVersionInfo _MainBranchName _MainCommitCount _BranchID _BranchCommit
 	endif()
 
 	_git_find_closest_git_dir(${CMAKE_CURRENT_LIST_DIR} MODIO_MAYBE_GIT_DIR)
-	file(TO_CMAKE_PATH ${MODIO_MAYBE_GIT_DIR} MODIO_MAYBE_GIT_DIR)
-	file(TO_CMAKE_PATH "${MODIO_ROOT_DIR}/.git" MODIO_EXPECTED_GIT_DIR )
+#modio-public-cmake		if ("${MODIO_MAYBE_GIT_DIR}")
+#modio-public-cmake			file(TO_CMAKE_PATH ${MODIO_MAYBE_GIT_DIR} MODIO_MAYBE_GIT_DIR)
+#modio-public-cmake			file(TO_CMAKE_PATH "${MODIO_ROOT_DIR}/.git" MODIO_EXPECTED_GIT_DIR )
+#modio-public-cmake		endif()
 
 	if (NOT MODIO_MAYBE_GIT_DIR OR NOT "${MODIO_MAYBE_GIT_DIR}" PATH_EQUAL "${MODIO_EXPECTED_GIT_DIR}")
 		message(STATUS "No .git directory located in project root, falling back to version file")

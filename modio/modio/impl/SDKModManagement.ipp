@@ -77,6 +77,9 @@ namespace Modio
 				}
 				});
 			});
+
+		Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::ModManagement, "Enabled mod management.");
+
 		return {};
 	}
 	void DisableModManagement()
@@ -85,6 +88,8 @@ namespace Modio
 
 		Modio::Detail::SDKSessionData::SetUserModManagementCallback(std::function<void(Modio::ModManagementEvent)> {});
 		Modio::Detail::SDKSessionData::DisableModManagement();
+
+		Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::ModManagement, "Disabled mod management.");
 	}
 
 	void FetchExternalUpdatesAsync(std::function<void(Modio::ErrorCode)> OnFetchDone)

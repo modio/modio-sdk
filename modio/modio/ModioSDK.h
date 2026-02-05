@@ -920,7 +920,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Fetches the locally cached view of the user's purchased mods, populated from
-	/// <<RefreshUserPurchasesAsync>>
+	/// <<GetModPurchases>>
 	/// @return std::map using Mod IDs as keys and ModInfo objects providing information about the mod that was
 	/// purchased. mods
 	MODIOSDK_API std::map<Modio::ModID, Modio::ModInfo> QueryUserPurchasedMods();
@@ -1086,7 +1086,7 @@ namespace Modio
 	MODIOSDK_API void ClearRegisteredClientMods();
 
 	/// @docpublic
-	/// @brief Returns the full list of mods that have been registered with the server via AddClientModsToServerAsync
+	/// @brief Returns the full list of mods that have been registered with the server via RegisterClientModsWithServerAsync
 	/// @return A std::set of ModIDs representing the Mods registered with the server.
 	/// @experimental
 	MODIOSDK_API std::set<Modio::ModID> GetRegisteredClientMods();
@@ -1163,7 +1163,6 @@ namespace Modio
 	/// new subscriptions arising from a successful request. Call FetchExternalUpdatesAsync after this function succeeds
 	/// in order to initiate installation.
 	/// @param ModCollectionToSubscribeTo Mod Collection ID of the mod collection requiring a subscription.
-	/// @param IncludeDependencies If this mod has any dependencies, all of those will also be subscribed to.
 	/// @param OnSubscribeComplete Callback invoked when the subscription request is completed.
 	/// @requires initialized-sdk
 	/// @requires authenticated-user

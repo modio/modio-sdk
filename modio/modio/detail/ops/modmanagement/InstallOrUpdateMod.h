@@ -268,7 +268,7 @@ namespace Modio
 						return;
 					}
 
-					yield Modio::Detail::ExtractAllFilesAsync(DownloadPath, CollectionEntry->GetPath(), ModProgress,
+					yield Modio::Detail::ExtractAllFilesAsync(DownloadPath, CollectionEntry->GetPath(), Mod, ModProgress,
 															  std::move(Self));
 					if (ec)
 					{
