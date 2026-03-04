@@ -72,6 +72,7 @@ namespace Modio
 						 });
 
 				if (Request->GetParameters().GetTypedVerb() == Verb::POST ||
+					Request->GetParameters().GetTypedVerb() == Verb::DELETE ||
 					Request->GetParameters().GetTypedVerb() == Verb::PUT)
 				{
 					// Host URL does not need https://

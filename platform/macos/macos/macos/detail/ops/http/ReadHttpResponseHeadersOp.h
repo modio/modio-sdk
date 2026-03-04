@@ -155,7 +155,8 @@ namespace Modio
 
 					// In case of POST, response headers in the HTTP request are embeded within the ReadStream
 					if (Request->GetParameters().GetTypedVerb() == Verb::POST ||
-						Request->GetParameters().GetTypedVerb() == Verb::PUT)
+						Request->GetParameters().GetTypedVerb() == Verb::PUT ||
+						Request->GetParameters().GetTypedVerb() == Verb::DELETE)
 					{
 						// Read a portion of the streaming bytes into the ResponseDataBuffer, at this stage we know that
 						// it has bytes because previously while was true

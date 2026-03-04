@@ -68,6 +68,7 @@ namespace Modio
 					}
 
 					if (Request->GetParameters().GetTypedVerb() == Verb::POST ||
+					    Request->GetParameters().GetTypedVerb() == Verb::DELETE ||
 						Request->GetParameters().GetTypedVerb() == Verb::PUT)
 					{
 						if (CFWriteStreamOpen(Request->WriteStream) == false ||

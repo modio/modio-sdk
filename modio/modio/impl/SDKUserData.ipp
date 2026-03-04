@@ -9,6 +9,7 @@
  */
 
 // Implementation header - do not include directly
+#include "modio/core/ModioStdTypes.h"
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "modio/ModioSDK.h"
 #else
@@ -32,6 +33,7 @@
 #include "modio/detail/ops/auth/AuthenticateUserBySteam.h"
 #include "modio/detail/ops/auth/AuthenticateUserBySwitchID.h"
 #include "modio/detail/ops/auth/AuthenticateUserByXBoxLive.h"
+#include "modio/detail/ops/auth/AuthenticateUserDelegatedToken.h"
 #include "modio/detail/ops/auth/ModioGetTermsOfUseOp.h"
 #include "modio/detail/ops/user/GetUserMediaOp.h"
 #include "modio/detail/ops/userdata/ListUserGamesOp.h"
@@ -130,6 +132,16 @@ namespace Modio
 			});
 
 		// Return immediately if the SDK is not initialized or the API rate limit is reached
+	}
+
+	void AuthenticateUserDelegatedTokenAsync(Modio::AuthenticationParams User, std::function<void(Modio::ErrorCode)> Callback){
+		Modio::Detail::SDKSessionData::EnqueueTask([User, Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
+			{
+				Modio::Detail::AuthenticateUserDelegatedTokenAsync(User, Callback);
+			}
+
+		});
 	}
 
 	void AuthenticateUserEmailAsync(Modio::EmailAuthCode AuthenticationCode,

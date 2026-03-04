@@ -73,7 +73,8 @@ namespace Modio
 						 });
 
 				if (Request->GetParameters().GetTypedVerb() == Verb::POST ||
-					Request->GetParameters().GetTypedVerb() == Verb::PUT)
+					Request->GetParameters().GetTypedVerb() == Verb::PUT ||
+					Request->GetParameters().GetTypedVerb() == Verb::DELETE)
 				{
 					CFStringRef HostURL = CFStringCreateWithCString(kCFAllocatorDefault, ServerAddressStdStr.c_str(),
 																	kCFStringEncodingUTF8);

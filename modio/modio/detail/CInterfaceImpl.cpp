@@ -4793,15 +4793,11 @@ MODIODLL_EXPORT CModioString* GetModioModCollectionInfoProfileSummary(const CMod
 	return new CModioString{ ModCollectionInfo->Impl.ProfileSummary };
 }
 
-MODIODLL_EXPORT CModioString* GetModioModCollectionInfoProfileDescription(const CModioModCollectionInfo* ModCollectionInfo)
+MODIODLL_EXPORT CModioString* GetModioModCollectionInfoProfileDescription(const CModioModCollectionInfo* ModInfo)
 {
-	return new CModioString{ ModCollectionInfo->Impl.ProfileDescription };
+	return new CModioString{ ModInfo->Impl.ProfileDescription };
 }
 
-MODIODLL_EXPORT CModioString* GetModioModCollectionInfoProfileDescriptionPlaintext(const CModioModCollectionInfo* ModInfo)
-{
-	return new CModioString {ModInfo->Impl.ProfileDescriptionPlaintext};
-}
 
 MODIODLL_EXPORT void SetModioModCollectionInfoId(CModioModCollectionInfo* Item, const CModioModCollectionID* Id)
 {
@@ -4948,15 +4944,6 @@ MODIODLL_EXPORT void SetModioModCollectionInfoProfileDescription(CModioModCollec
 	if (Item != nullptr)
 	{
 		Item->Impl.ProfileDescription = Modio::GetImpl(ProfileDescription);
-	}
-}
-
-MODIODLL_EXPORT void SetModioModCollectionInfoProfileDescriptionPlaintext(CModioModCollectionInfo* Item,
-																 const CModioString* ProfileDescriptionPlaintext)
-{
-	if (Item != nullptr)
-	{
-		Item->Impl.ProfileDescriptionPlaintext = Modio::GetImpl(ProfileDescriptionPlaintext);
 	}
 }
 
@@ -7182,6 +7169,28 @@ MODIODLL_EXPORT void ModioAuthenticateUserExternalAsync(CModioAuthenticationPara
 	if (RequireParametersNotNull(WrappedCallback, User, Provider))
 	{
 		Modio::AuthenticateUserExternalAsync(Modio::GetImpl<CModioAuthenticationParams>(User), static_cast<Modio::AuthenticationProvider>(Provider), WrappedCallback);
+	}
+}	
+
+
+MODIODLL_EXPORT void ModioAuthenticateUserDelegatedTokenAsync(CModioAuthenticationParams* User, ModioErrorCodeCallback Callback, void* ContextPtr)
+{
+	std::function<void(Modio::ErrorCode)> WrappedCallback = 
+	[Callback, ContextPtr](Modio::ErrorCode ec) {
+		CModioErrorCode ErrorCode { ec };
+		
+		if (!ec)
+		{
+			Callback(&ErrorCode, ContextPtr);
+		}
+		else
+		{
+			Callback(&ErrorCode, ContextPtr);
+		}
+	};
+	if (RequireParametersNotNull(WrappedCallback, User))
+	{
+		Modio::AuthenticateUserDelegatedTokenAsync(Modio::GetImpl<CModioAuthenticationParams>(User), WrappedCallback);
 	}
 }	
 

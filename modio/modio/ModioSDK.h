@@ -314,6 +314,20 @@ namespace Modio
 													std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic
+	/// @brief Authenticates a user from a mod.io-supplied Delegated Token provided by our Device Login flow or generated via the mod.io user control panel.
+	/// @param User Authentication data to submit to the mod.io API. The AuthToken member should be set to contain the Delegated Token as a string.
+	/// @param Callback Callback invoked once the authentication request has been made
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @errorcategory ConfigurationError|The SDK's configuration is not valid
+	/// @errorcategory InvalidArgsError|The arguments passed to the function have failed validation
+	/// @errorcategory UserTermsOfUseError|The user has not yet accepted the mod.io Terms of Use
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	MODIOSDK_API void AuthenticateUserDelegatedTokenAsync(Modio::AuthenticationParams User, std::function<void(Modio::ErrorCode)> Callback);
+	
+	/// @docpublic
 	/// @brief This function retrieves the information required for a game to display the mod.io terms of use to a
 	/// player who wishes to create a mod.io account
 	/// @param Callback Callback invoked with the terms of use data once retrieved from the server
