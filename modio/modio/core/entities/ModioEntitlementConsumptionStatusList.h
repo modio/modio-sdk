@@ -9,13 +9,10 @@
  */
 
 #pragma once
-#include "modio/core/ModioStdTypes.h"
+
 #include "modio/core/entities/ModioEntitlementConsumptionStatus.h"
 #include "modio/core/entities/ModioList.h"
 #include "modio/core/entities/ModioPagedResult.h"
-#include "modio/detail/JsonWrapper.h"
-#include "modio/detail/ModioDefines.h"
-#include <vector>
 
 namespace Modio
 {
@@ -54,13 +51,6 @@ namespace Modio
 		/// @brief Filter elements that require a second request to confirm the entitlement
 		/// @return Optional list with the elements that need a retry, otherwise an empty object.
 		MODIO_IMPL Modio::Optional<EntitlementConsumptionStatusList> EntitlementsThatRequireRetry() const;
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json,
-										 EntitlementConsumptionStatusList& OutEntitlementConsumptionStatusList);
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, EntitlementWalletBalance& WalletBalance);
 	};
 
 } // namespace Modio

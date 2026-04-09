@@ -9,11 +9,11 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/AsioWrapper.h"
-#include "modio/detail/ModioJsonHelpers.h"
+#include "modio/http/ModioHttpParams.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
-#include "modio/detail/serialization/ModioModDependencySerialization.h"
 
 namespace Modio
 {
@@ -23,21 +23,7 @@ namespace Modio
 		class AddModDependenciesOp
 		{
 		public:
-			AddModDependenciesOp(Modio::ModID ModID, const std::vector<Modio::ModID>& Dependencies) : ModID(ModID)
-			{
-				SubmitParams =
-					Modio::Detail::AddModDependenciesRequest.SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
-						.SetModID(ModID);
-
-				// Add each dependency to the payload
-				std::size_t Index = 0;
-				for (const Modio::ModID& Dependency : Dependencies)
-				{
-					SubmitParams = SubmitParams.AppendPayloadValue(fmt::format("dependencies[{}]", Index),
-																   fmt::format("{}", Dependency));
-					Index++;
-				}
-			}
+			AddModDependenciesOp(Modio::ModID ModID, const std::vector<Modio::ModID>& Dependencies);
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
@@ -73,3 +59,7 @@ namespace Modio
 		}
 	} // namespace Detail
 } // namespace Modio
+
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "AddModDependenciesOp.ipp"
+#endif

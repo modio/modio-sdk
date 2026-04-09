@@ -9,9 +9,10 @@
  */
 
 #pragma once
+
+#include "common/HttpSharedState.h"
 #include "modio/detail/http/IHttpRequestImplementation.h"
 #include "modio/http/ModioHttpParams.h"
-#include "common/HttpSharedState.h"
 
 class HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementation
 {

@@ -11,6 +11,8 @@
 #pragma once
 
 #include "modio/core/entities/ModioMetricsSessionStartParams.h"
+#include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/serialization/ModioStrongIntegerSerialization.h"
 
 namespace Modio
 {

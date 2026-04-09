@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021-2025 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io SDK.
  *
@@ -10,40 +10,47 @@
 
 #pragma once
 
-#include "modio/core/ModioSplitCompilation.h"
-#include "modio/detail/ModioDefines.h"
-
-#include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioCreateModFileParams.h"
-#include "modio/core/ModioCreateModParams.h"
-#include "modio/core/ModioCreateSourceFileParams.h"
-#include "modio/core/ModioEditModParams.h"
-#include "modio/core/ModioErrorCode.h"
-#include "modio/core/ModioFilterParams.h"
-#include "modio/core/ModioInitializeOptions.h"
-#include "modio/core/ModioModCollectionEntry.h"
-#include "modio/core/ModioModDependency.h"
-#include "modio/core/ModioReportParams.h"
-#include "modio/core/ModioServerInitializeOptions.h"
-#include "modio/core/ModioStdTypes.h"
-#include "modio/core/entities/ModioEntitlement.h"
-#include "modio/core/entities/ModioEntitlementConsumptionStatusList.h"
-#include "modio/core/entities/ModioGameInfo.h"
-#include "modio/core/entities/ModioGameInfoList.h"
-#include "modio/core/entities/ModioModCollection.h"
-#include "modio/core/entities/ModioModCommunityOptions.h"
-#include "modio/core/entities/ModioModDetails.h"
-#include "modio/core/entities/ModioModInfoList.h"
-#include "modio/core/entities/ModioModTagOptions.h"
-#include "modio/core/entities/ModioTerms.h"
-#include "modio/core/entities/ModioTransactionRecord.h"
-#include "modio/core/entities/ModioUser.h"
-#include "modio/core/entities/ModioUserList.h"
-#include "modio/core/entities/ModioUserRatingList.h"
 #include "modio/detail/ModioLibraryConfigurationHelpers.h"
+#include "modio/detail/ModioDefines.h"
+#include <functional>
+#include <string>
+#include <vector>
+#include <map>
+#include <set>
+
+#if defined(MODIO_SDK_PROTOTYPES_ONLY)
+	#include "modio/core/ModioSDKForwardDecls.h"
+#else
+	#include "modio/core/ModioCreateModFileParams.h"
+	#include "modio/core/ModioCreateModParams.h"
+	#include "modio/core/ModioCreateSourceFileParams.h"
+	#include "modio/core/ModioEditModParams.h"
+	#include "modio/core/ModioErrorCode.h"
+	#include "modio/core/ModioFilterParams.h"
+	#include "modio/core/ModioInitializeOptions.h"
+	#include "modio/core/ModioModCollectionEntry.h"
+	#include "modio/core/ModioModDependency.h"
+	#include "modio/core/ModioReportParams.h"
+	#include "modio/core/ModioServerInitializeOptions.h"
+	#include "modio/core/entities/ModioEntitlement.h"
+	#include "modio/core/entities/ModioEntitlementConsumptionStatusList.h"
+	#include "modio/core/entities/ModioGameInfo.h"
+	#include "modio/core/entities/ModioGameInfoList.h"
+	#include "modio/core/entities/ModioModCollection.h"
+	#include "modio/core/entities/ModioModCommunityOptions.h"
+	#include "modio/core/entities/ModioModDetails.h"
+	#include "modio/core/entities/ModioModInfoList.h"
+	#include "modio/core/entities/ModioModTagOptions.h"
+	#include "modio/core/entities/ModioTerms.h"
+	#include "modio/core/entities/ModioTransactionRecord.h"
+	#include "modio/core/entities/ModioUser.h"
+	#include "modio/core/entities/ModioUserList.h"
+	#include "modio/core/entities/ModioUserRatingList.h"
+#endif
 
 namespace Modio
 {
+
 	/// @docpublic
 	/// @brief Initializes the SDK for the given user. Loads the state of mods installed on the system as well as the
 	/// set of mods the specified user has installed on this device
@@ -165,7 +172,7 @@ namespace Modio
 	/// @error UserDataError::InvalidUser|No authenticated user
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void PreviewExternalUpdatesAsync(
-		std::function<void(Modio::ErrorCode, std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType>)>
+		std::function<void(Modio::ErrorCode, std::map<Modio::ModID, Modio::UserSubscriptionListChangeType>)>
 			OnPreviewDone);
 
 	/// @docpublic
@@ -833,9 +840,9 @@ namespace Modio
 	/// @requires no-rate-limiting
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @errorcategory MonetizationError|Problems during purchase transaction
+	/// @errorcategory UserNotAuthenticatedError|No authenticated user
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
-	/// @error UserDataError::InvalidUser|No authenticated user
 	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void PurchaseModAsync(
 		Modio::ModID ModID, Modio::Optional<uint64_t> ExpectedVirtualCurrencyPrice,
@@ -855,9 +862,9 @@ namespace Modio
 	/// @requires no-rate-limiting
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @errorcategory MonetizationError|Problems during purchase transaction
+	/// @errorcategory UserNotAuthenticatedError|No authenticated user
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
-	/// @error UserDataError::InvalidUser|No authenticated user
 	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	/// @error MonetizationError::AccountLacksEntitlement|The user lacks a matching entitlement to make the purchase
 	MODIOSDK_API void PurchaseModWithEntitlementAsync(
@@ -1306,19 +1313,72 @@ namespace Modio
 		Modio::ModCollectionID CollectionId, Modio::AvatarSize AvatarSize,
 		std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback);
 
+
 	/// @docpublic
+	/// @brief Gets a list of users following the given user.
+	/// @param UserID The ID of the user to get the followers of
+	/// @param Callback A Callback providing a status code and an optional user list of the users who are following the given user
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error GenericError::BadParameter|The supplied user ID is invalid
+	/// @experimental
+	MODIOSDK_API void GetUserFollowersAsync(Modio::UserID UserID, 
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)> Callback);
+
+	/// @docpublic
+	/// @brief Gets a list of users the given user is following
+	/// @param UserID The ID of the user in question
+	/// @param Callback A Callback providing a status code and an optional user list of the users who the given user follows
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error GenericError::BadParameter|The supplied user ID is invalid
+	/// @experimental
+	MODIOSDK_API void GetUserFollowingAsync(Modio::UserID UserID,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)> Callback);
+
+	/// @docpublic
+	/// @brief Follows the given user for the currently authenticated user
+	/// @param UserID ID of the User to follow
+	/// @param Callback A Callback returning an error code indicated the result of the operation
+	/// @requires authenticated-user
+	/// @requires initialized-sdk
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error GenericError::BadParameter|The supplied user ID is invalid
+	/// @experimental
+	MODIOSDK_API void FollowUserAsync(Modio::UserID UserID, std::function<void(Modio::ErrorCode)> Callback);
+
+	/// @docpublic
+	/// @brief Unfollows a given user for the currently authenticated user.
+	/// @param UserID ID of the User to unfollow
+	/// @param Callback A Callback returning an error code indicated the result of the operation
+	/// @requires authenticated-user
+	/// @requires initialized-sdk
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @error GenericError::BadParameter|The supplied user ID is invalid
+	/// @experimental
+	MODIOSDK_API void UnfollowUserAsync(Modio::UserID UserID, std::function<void(Modio::ErrorCode)> Callback);
+
 } // namespace Modio
 
 // Implementation headers
 
 #ifndef MODIO_SEPARATE_COMPILATION
 	#include "modio/impl/SDKCore.ipp"
+	#include "modio/impl/SDKEnableModManagement.ipp"
 	#include "modio/impl/SDKMetrics.ipp"
 	#include "modio/impl/SDKModCollections.ipp"
 	#include "modio/impl/SDKModManagement.ipp"
 	#include "modio/impl/SDKModMetadata.ipp"
 	#include "modio/impl/SDKMonetization.ipp"
+	#include "modio/impl/SDKPreconditionChecks.ipp"
 	#include "modio/impl/SDKUserData.ipp"
+	#include "modio/impl/SDKUserFollowing.ipp"
 #endif
 
 #include "modio/detail/ModioUndefs.h"

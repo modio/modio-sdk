@@ -8,12 +8,22 @@
 # 
 
 include(split-compilation)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioCRC.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioProfiling.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioSDKSessionData.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioJsonHelpers.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioStringHelpers.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/compression/zip/ArchiveFileImplementation.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/compression/zlib/detail/deflate_stream.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/compression/zlib/detail/inflate_stream.ipp)
+
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ops/http/PerformRequestAndGetResponseOp.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ops/mod/AddModDependenciesOp.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ops/mod/DeleteModDependenciesOp.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ops/mod/SubmitModChangesOp.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ops/mod/SubmitNewModFileOp.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ops/mod/SubmitNewModSourceFileOp.ipp)
+
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/userdata/ModioUserDataContainer.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/userdata/ModioUserProfile.ipp)
 add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/ModioDefines.h)

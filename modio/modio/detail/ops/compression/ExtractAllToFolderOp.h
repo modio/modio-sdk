@@ -20,7 +20,6 @@
 #include "file/ArchiveUtilities.h"
 
 MODIO_DIAGNOSTIC_PUSH
-
 MODIO_ALLOW_DEPRECATED_SYMBOLS
 
 namespace Modio

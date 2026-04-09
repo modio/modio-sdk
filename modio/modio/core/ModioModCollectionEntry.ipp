@@ -12,21 +12,10 @@
 	#include "modio/core/ModioModCollectionEntry.h"
 #endif
 
+#include "modio/core/entities/ModioModInfoList.h"
+#include "modio/detail/ModioConstants.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
-#include "modio/detail/ModioConstants.h"
-#include "modio/detail/ModioJsonHelpers.h"
-#include "modio/detail/serialization/ModioFileMetadataSerialization.h"
-#include "modio/detail/serialization/ModioGalleryListSerialization.h"
-#include "modio/detail/serialization/ModioImageSerialization.h"
-#include "modio/detail/serialization/ModioLogoSerialization.h"
-#include "modio/detail/serialization/ModioModCollectionEntrySerialization.h"
-#include "modio/detail/serialization/ModioModInfoSerialization.h"
-#include "modio/detail/serialization/ModioModStatsSerialization.h"
-#include "modio/detail/serialization/ModioProfileMaturitySerialization.h"
-#include "modio/detail/serialization/ModioTokenSerialization.h"
-#include "modio/detail/serialization/ModioUserSerialization.h"
-#include <algorithm>
 
 namespace Modio
 {
@@ -186,7 +175,7 @@ namespace Modio
 
 	Modio::ModState ModCollectionEntry::GetModState() const
 	{
-		return CurrentState;
+		return CurrentState.load();
 	}
 
 	Modio::ModID ModCollectionEntry::GetID() const
@@ -194,7 +183,7 @@ namespace Modio
 		return ID;
 	}
 
-	Modio::ModInfo ModCollectionEntry::GetModProfile() const
+	const Modio::ModInfo& ModCollectionEntry::GetModProfile() const
 	{
 		return ModProfile;
 	}
@@ -214,6 +203,21 @@ namespace Modio
 		{
 			return {};
 		}
+	}
+
+	Modio::FileSize ModCollectionEntry::GetRawSizeOnDisk() const
+	{
+		return SizeOnDisk;
+	}
+
+	std::set<Modio::UserID> ModCollectionEntry::GetLocalUserSubscriptions() const
+	{
+		return LocalUserSubscriptions;
+	}
+
+	Modio::ErrorCode ModCollectionEntry::GetNeverRetryReason() const
+	{
+		return NeverRetryReason;
 	}
 
 	void ModCollectionEntry::UpdateSizeOnDisk(Modio::FileSize NewSize)
@@ -393,6 +397,11 @@ namespace Modio
 		return InternalList;
 	}
 
+	std::set<Modio::ModID>& BaseModList::Get() 
+	{
+		return InternalList;
+	}
+
 	std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType> UserSubscriptionList::CalculateChanges(
 		const UserSubscriptionList& Original, const UserSubscriptionList& Updated)
 	{
@@ -448,19 +457,6 @@ namespace Modio
 		}
 
 		return Diff;
-	}
-
-	void to_json(nlohmann::json& j, const UserSubscriptionList& List)
-	{
-		j = nlohmann::json {Modio::Detail::Constants::JSONKeys::UserSubscriptionList, List.InternalList};
-	}
-	void from_json(const nlohmann::json& j, UserSubscriptionList& List)
-	{
-		if (j.is_array())
-		{
-			using nlohmann::from_json;
-			from_json(j, List.InternalList);
-		}
 	}
 
 	ModCollection::ModCollection(std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> Entries)
@@ -541,6 +537,11 @@ namespace Modio
 		return ModEntries;
 	}
 
+	std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& ModCollection::Entries()
+	{
+		return ModEntries;
+	}
+
 	Modio::Optional<Modio::ModCollectionEntry&> ModCollection::GetByModID(Modio::ModID ModId) const
 	{
 		if (ModEntries.count(ModId))
@@ -590,26 +591,6 @@ namespace Modio
 				return Elem->GetRetriesRemaining() == Modio::Detail::Constants::Configuration::DefaultNumberOfRetries;
 			});
 		return SortedEntries;
-	}
-
-	void to_json(nlohmann::json& Json, const Modio::ModCollection& Collection)
-	{
-		std::vector<Modio::ModCollectionEntry> ResolvedEntries;
-		for (auto& Mod : Collection.ModEntries)
-		{
-			ResolvedEntries.push_back(*(Mod.second));
-		}
-		Json = {Modio::Detail::Constants::JSONKeys::ModCollection, ResolvedEntries};
-	}
-
-	void from_json(const nlohmann::json& Json, Modio::ModCollection& Collection)
-	{
-		std::vector<Modio::ModCollectionEntry> LoadedEntries;
-		Modio::Detail::ParseSafe(Json, LoadedEntries, Modio::Detail::Constants::JSONKeys::ModCollection);
-		for (Modio::ModCollectionEntry& Entry : LoadedEntries)
-		{
-			Collection.ModEntries[Entry.GetID()] = std::make_shared<Modio::ModCollectionEntry>(Entry);
-		}
 	}
 
 	void ModEventLog::AddEntry(Modio::ModManagementEvent Entry)

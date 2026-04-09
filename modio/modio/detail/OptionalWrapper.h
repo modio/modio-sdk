@@ -10,7 +10,6 @@
 
 #pragma once
 
-
 #define TL_OPTIONAL_NO_EXCEPTIONS
 
 #ifdef MODIO_PLATFORM_UNREAL

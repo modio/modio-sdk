@@ -9,10 +9,12 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/entities/ModioList.h"
+#include "modio/core/entities/ModioModInfo.h"
 #include "modio/core/entities/ModioPagedResult.h"
-#include "modio/detail/JsonWrapper.h"
+#include "modio/detail/entities/ModioLogo.h"
 
 namespace Modio
 {
@@ -41,9 +43,6 @@ namespace Modio
 		Modio::ModServerSideStatus Status = Modio::ModServerSideStatus::NotAccepted;
 		/// @brief The visibility status of the mod, default to Public
 		Modio::ObjectVisibility Visibility = Modio::ObjectVisibility::Public;
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModDependency& Dependency);
 
 		/// @docnone
 		friend bool operator==(const ModDependency& A, const ModDependency& B)
@@ -98,9 +97,6 @@ namespace Modio
 		/// @brief Total Size of the uncompressed dependency files in bytes.
 		std::uint64_t TotalFilesizeUncompressed = 0;
 
-	private:
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModDependencyList& List);
 	};
 } // namespace Modio
 

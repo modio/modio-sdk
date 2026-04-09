@@ -11,11 +11,6 @@
 #pragma once
 
 #include "modio/compression/ModioCompressionService.h"
-#include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioStdTypes.h"
-#include "modio/detail/AsioWrapper.h"
-#include <memory>
-#include <vector>
 
 namespace Modio
 {

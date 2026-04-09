@@ -8,18 +8,11 @@
  *
  */
 
-#ifdef MODIO_SEPARATE_COMPILATION
-	#include "modio/ModioSDK.h"
-#else
-	#pragma once
-#endif
-
 #include "modio/core/ModioMetricsService.h"
+#include "modio/core/ModioLogger.h"
+#include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioSDKSessionData.h"
-#include "modio/detail/ops/metrics/MetricsSessionEndOp.h"
-#include "modio/detail/ops/metrics/MetricsSessionSendHeartbeatOnceOp.h"
 #include "modio/impl/SDKPreconditionChecks.h"
-#include <functional>
 
 namespace Modio
 {

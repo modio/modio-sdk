@@ -10,15 +10,15 @@
 
 #pragma once
 
-#include "modio/core/ModioErrorCode.h"
-#include "modio/core/ModioLogger.h"
-#include "modio/detail/Function2Wrapper.h"
-#include "modio/detail/ModioProfiling.h"
 #include "timer/TimerImplementation.h"
-#include <cstdio>
-#include <iostream>
-#include <list>
+#include "modio/core/ModioErrorCode.h"
+#include "modio/core/ModioServices.h"
+#include "modio/detail/Function2Wrapper.h"
+#include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioProfiling.h"
+#include <algorithm>
 #include <memory>
+#include <map>
 
 class TimerSharedState : public std::enable_shared_from_this<TimerSharedState>
 {

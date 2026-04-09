@@ -10,15 +10,11 @@
 
 #pragma once
 
-#include "modio/core/ModioBuffer.h"
-#include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioServices.h"
-#include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioObjectTrack.h"
-#include "modio/detail/ModioProfiling.h"
-#include "modio/detail/ModioSDKSessionData.h"
 #include "modio/file/ModioFile.h"
 #include "modio/file/ModioFileService.h"
+#include "modio/detail/ModioSDKSessionData.h"
+#include "modio/detail/serialization/ModioModCollectionSerialization.h"
 
 #include <asio/yield.hpp>
 namespace Modio

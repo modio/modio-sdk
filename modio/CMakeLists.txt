@@ -35,6 +35,7 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/modio/detail)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/modio/http)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/modio/impl)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/modio/timer)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/modio/userdata)
 
 #Populate INTERFACE_SOURCES so CMake view in VS shows the headers in projects using the SDK
 target_sources(${MODIO_TARGET_NAME} INTERFACE 

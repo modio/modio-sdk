@@ -9,11 +9,12 @@
  */
 
 #pragma once
-#include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioServices.h"
-#include "modio/file/ModioFileService.h"
 
+#include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioSDKSessionData.h"
+#include "modio/file/ModioFileService.h"
+#include "file/ArchiveUtilities.h"
 
 #include <asio/yield.hpp>
 namespace Modio

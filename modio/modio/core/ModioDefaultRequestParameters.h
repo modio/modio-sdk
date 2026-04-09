@@ -13,6 +13,7 @@
 // Should never be included directly - include ModioHttpParams.h instead
 
 #include "modio/detail/ModioCompilerMacros.h"
+#include "modio/http/ModioHttpParams.h"
 
 MODIO_DISABLE_WARNING_PUSH 
 MODIO_DISABLE_WARNING_L2R_EVALUATION_ORDER_OPERATOR
@@ -157,6 +158,8 @@ namespace Modio
         static const HttpRequestParams RegisterMonetizationUserRequest { Modio::Detail::Verb::POST, "/me/register" }; 
         static const HttpRequestParams RequestUserDelegationTokenRequest { Modio::Detail::Verb::POST, "/me/s2s/oauth/token" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetUserSubscriptionsRequest { Modio::Detail::Verb::GET, "/me/subscribed" }; 
+        static const HttpRequestParams BulkUnfollowUsersRequest { Modio::Detail::Verb::POST, "/me/unfollow" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
+        static const HttpRequestParams UnsubscribeFromModsBulkRequest { Modio::Detail::Verb::POST, "/me/unsubscribe" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetUsersMutedRequest { Modio::Detail::Verb::GET, "/me/users/muted" }; 
         static const HttpRequestParams GetUserWalletRequest { Modio::Detail::Verb::GET, "/me/wallets" }; 
         static const HttpRequestParams MetricsSessionEndRequest { Modio::Detail::Verb::POST, "/metrics/sessions/end" , GetContentTypeEnum("application/json") }; 

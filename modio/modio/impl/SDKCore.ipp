@@ -8,39 +8,23 @@
  *
  */
 
-#ifdef MODIO_SEPARATE_COMPILATION
-	#include "modio/ModioSDK.h"
-#else
-	#pragma once
-#endif
-
 #include "modio/cache/ModioCacheService.h"
-#include "modio/detail/ModioProfiling.h"
-#include "modio/detail/ModioSDKSessionData.h"
+#include "modio/detail/ModioLibraryConfigurationHelpers.h"
+#include "modio/detail/ModioSDKMultiplayerLibrary.h"
+#include "modio/detail/ops/ServiceInitializationOp.h"
 #include "modio/detail/ops/GetGameInfoOp.h"
 #include "modio/detail/ops/GetMutedUsersOp.h"
 #include "modio/detail/ops/MuteUserOp.h"
 #include "modio/detail/ops/ReportContentOp.h"
-#include "modio/detail/ops/ServiceInitializationOp.h"
 #include "modio/detail/ops/Shutdown.h"
 #include "modio/detail/ops/UnmuteUserOp.h"
-#include "modio/detail/serialization/ModioGameCommunityOptionsSerialization.h"
-#include "modio/detail/serialization/ModioGameMaturityOptionsSerialization.h"
-#include "modio/detail/serialization/ModioGameMonetizationSerialization.h"
-#include "modio/detail/serialization/ModioGameStatsSerialization.h"
-#include "modio/detail/serialization/ModioModCommunityOptionsSerialization.h"
-#include "modio/detail/serialization/ModioIconSerialization.h"
-#include "modio/detail/serialization/ModioModMonetizationSKUSerialization.h"
-#include "modio/file/ModioFileService.h"
-#include "modio/http/ModioHttpService.h"
+#include "modio/detail/serialization/ModioUserListSerialization.h"
+#include "modio/detail/serialization/ModioGameInfoSerialization.h"
 #include "modio/impl/SDKPostAsync.h"
 #include "modio/impl/SDKPreconditionChecks.h"
-#include "modio/userdata/ModioUserDataService.h"
-#include "modio/detail/ModioSDKMultiplayerLibrary.h"
-#include <chrono>
-#include <functional>
-#include <thread>
-#include <atomic>
+#define MODIO_SDK_PROTOTYPES_ONLY
+#include "modio/ModioSDK.h"
+
 // Implementation header - do not include directly
 
 namespace Modio

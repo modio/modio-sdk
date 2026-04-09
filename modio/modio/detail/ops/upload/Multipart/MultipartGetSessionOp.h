@@ -10,10 +10,11 @@
 
 #pragma once
 
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/entities/ModioUploadSession.h"
+
 MODIO_DIAGNOSTIC_PUSH
-
 MODIO_ALLOW_DEPRECATED_SYMBOLS
-
 
 #include <asio/yield.hpp>
 namespace Modio

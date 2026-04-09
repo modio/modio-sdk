@@ -11,9 +11,9 @@
 #pragma once
 
 #include "modio/core/entities/ModioFileMetadata.h"
-
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/serialization/ModioStrongIntegerSerialization.h"
 
 namespace Modio
 {
@@ -70,6 +70,7 @@ namespace Modio
 				{"changelog", FileMetadata.Changelog},
 				{"metadata_blob", FileMetadata.MetadataBlob},
 				{"download", nlohmann::json::object({{"binary_url", FileMetadata.DownloadBinaryURL},
-													 {"date_expires", FileMetadata.DownloadExpiryDate}})}};
+													 {"date_expires", FileMetadata.DownloadExpiryDate}})}
+		};
 	}
 } // namespace Modio

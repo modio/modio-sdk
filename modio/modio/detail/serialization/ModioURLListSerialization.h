@@ -11,19 +11,18 @@
 #pragma once
 
 #include "modio/core/entities/ModioURLList.h"
-
 #include "modio/detail/ModioJsonHelpers.h"
 
 namespace Modio
 {
 	inline void from_json(const nlohmann::json& Json, Modio::YoutubeURLList& YoutubeURLList)
 	{
-		Detail::ParseSafe(Json, YoutubeURLList.InternalList, "youtube");
+		Detail::ParseSafe(Json, YoutubeURLList.GetRawList(), "youtube");
 	}
 
 	inline void from_json(const nlohmann::json& Json, Modio::SketchfabURLList& SketchfabURLList)
 	{
-		Detail::ParseSafe(Json, SketchfabURLList.InternalList, "sketchfab");
+		Detail::ParseSafe(Json, SketchfabURLList.GetRawList(), "sketchfab");
 	}
 
 	inline void to_json(nlohmann::json& Json, const Modio::YoutubeURLList& YoutubeURLList)

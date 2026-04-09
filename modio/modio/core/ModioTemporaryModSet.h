@@ -9,11 +9,8 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioStdTypes.h"
-#include "modio/core/ModioModCollectionEntry.h"
-
-
 
 namespace Modio
 {

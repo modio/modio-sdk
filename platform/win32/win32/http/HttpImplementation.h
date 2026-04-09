@@ -9,22 +9,11 @@
  */
 
 #pragma once
-#include "ModioPlatformDefines.h"
 
 #include "common/HttpSharedState.h"
-#include "common/detail/ops/http/InitializeHttpOp.h"
 #include "common/http/HttpImplementation.h"
-#include "modio/core/ModioErrorCode.h"
-#include "modio/core/ModioServices.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/http/IHttpServiceImplementation.h"
-#include "modio/http/ModioHttpParams.h"
-#include <iostream>
-#include <map>
-#include <memory>
-#include <string>
-#include <thread>
-#include <winhttp.h>
+#include "common/detail/ops/http/InitializeHttpOp.h"
+
 namespace Modio
 {
 	namespace Detail

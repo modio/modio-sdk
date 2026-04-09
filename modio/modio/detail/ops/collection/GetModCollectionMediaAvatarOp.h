@@ -17,9 +17,8 @@
 #include "modio/detail/serialization/ModioUserSerialization.h"
 #include "modio/detail/serialization/ModioModCollectionInfoSerialization.h"
 #include "modio/detail/ops/ModioAvatarImageType.h"
-#include <asio/coroutine.hpp>
-#include <asio/yield.hpp>
 
+#include <asio/yield.hpp>
 namespace Modio
 {
 	namespace Detail

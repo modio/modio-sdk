@@ -11,9 +11,9 @@
 #pragma once
 
 #include "modio/core/entities/ModioUserList.h"
-
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/serialization/ModioPagedResultSerialization.h"
 
 namespace Modio
 {
@@ -21,6 +21,6 @@ namespace Modio
 	{
 		from_json(Json, static_cast<Modio::PagedResult&>(OutUserList));
 
-		Detail::ParseSafe(Json, OutUserList.InternalList, "data");
+		Detail::ParseSafe(Json, OutUserList.GetRawList(), "data");
 	}
 } // namespace Modio

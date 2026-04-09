@@ -10,8 +10,10 @@
 
 #pragma once
 
+#include "modio/core/ModioSDKForwardDecls.h"
 #include <utility>
 #include <vector>
+#include <string>
 
 namespace Modio
 {

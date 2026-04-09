@@ -9,17 +9,16 @@
  */
 
 #pragma once
-#include "modio/core/ModioBuffer.h"
+
 #include "modio/core/ModioStdTypes.h"
+#include "modio/detail/AsioWrapper.h"
+#include "modio/timer/ModioTimer.h"
+#include "modio/core/ModioBuffer.h"
+#include "modio/core/entities/ModioList.h"
 #include "modio/core/entities/ModioGameInfo.h"
 #include "modio/core/entities/ModioModInfo.h"
 #include "modio/core/entities/ModioModInfoList.h"
 #include "modio/core/entities/ModioModCollection.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/timer/ModioTimer.h"
-#include <chrono>
-#include <memory>
-#include <string>
 #include <unordered_map>
 
 namespace Modio

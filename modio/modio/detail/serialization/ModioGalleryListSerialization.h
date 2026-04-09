@@ -12,7 +12,6 @@
 
 #include "modio/detail/entities/ModioGalleryList.h"
 #include "modio/detail/serialization/ModioImageSerialization.h"
-
 #include "modio/detail/ModioJsonHelpers.h"
 
 namespace Modio
@@ -20,11 +19,11 @@ namespace Modio
 	inline void from_json(const nlohmann::json& Json, Modio::GalleryList& GalleryList)
 	{
 		using nlohmann::from_json;
-		from_json(Json, GalleryList.InternalList);
+		from_json(Json, GalleryList.GetRawList());
 	}
 	inline void to_json(nlohmann::json& Json, const Modio::GalleryList& GalleryList)
 	{
 		using nlohmann::to_json;
-		to_json(Json, GalleryList.InternalList);
+		to_json(Json, GalleryList.GetRawList());
 	}
 } // namespace Modio

@@ -9,18 +9,12 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioStdTypes.h"
-#include "modio/core/entities/ModioModInfo.h"
-#include "modio/core/entities/ModioModInfoList.h"
-#include "modio/detail/HedleyWrapper.h"
-#include "modio/detail/JsonWrapper.h"
-#include "modio/detail/ModioConstants.h"
-#include "modio/detail/ModioDefines.h"
 #include "modio/detail/ModioTransactional.h"
-#include <atomic>
-#include <memory>
+#include "modio/core/entities/ModioModInfo.h"
 #include <set>
+#include <atomic>
 
 namespace Modio
 {
@@ -59,6 +53,11 @@ namespace Modio
 		}
 	}
 
+	/// @docinternal
+	/// @brief Serialisation helper for Mod Collection Entry
+	class ModCollectionEntryAccessor;
+	class ModCollectionEntryConstAccessor;
+
 	/// @docpublic
 	/// @brief Class representing a mod which is installed locally
 	class ModCollectionEntry : public Modio::Detail::Transactional<ModCollectionEntry>
@@ -72,7 +71,7 @@ namespace Modio
 		Modio::Optional<Modio::ModState> RollbackState {};
 
 		/// @brief Mod descriptor from the REST API
-		ModInfo ModProfile {};
+		Modio::ModInfo ModProfile {};
 
 		/// @brief Reference counting to allow automatic uninstallation of unused local mods
 		std::atomic<uint8_t> LocalUserSubscriptionCount {};
@@ -109,7 +108,11 @@ namespace Modio
 			}
 		}
 
+		friend class ModCollectionEntryAccessor;
+		friend class ModCollectionEntryConstAccessor;
+
 	public:
+
 		/// @docinternal
 		/// @brief Default constructor
 		ModCollectionEntry() = default;
@@ -187,7 +190,7 @@ namespace Modio
 
 		/// @docinternal
 		/// @return Modio::ModInfo containing mod profile data
-		MODIO_IMPL Modio::ModInfo GetModProfile() const;
+		MODIO_IMPL const Modio::ModInfo& GetModProfile() const;
 
 		/// @docinternal
 		/// @return Path to the mod's installation folder on disk
@@ -196,8 +199,20 @@ namespace Modio
 		MODIO_IMPL std::string GetPath() const;
 
 		/// @docinternal
+		/// @return Size on disk of the mod
+		MODIO_IMPL Modio::FileSize GetRawSizeOnDisk() const;
+
+		/// @docinternal
 		/// @return Size on disk if the mod has been installed, or empty optional if installation is in progress
 		MODIO_IMPL Modio::Optional<Modio::FileSize> GetSizeOnDisk() const;
+
+		/// @docinternal
+		/// @return The local user subscriptions
+		MODIO_IMPL std::set<Modio::UserID> GetLocalUserSubscriptions() const;
+
+		/// @docinternal
+		/// @return The reason for never retrying
+		MODIO_IMPL Modio::ErrorCode GetNeverRetryReason() const;
 
 		/// @docinternal
 		/// @brief Updates the size of the mod on disk in the collection entry. Called by the archive extraction code on
@@ -213,12 +228,6 @@ namespace Modio
 		/// @docinternal
 		/// @return Modio::ErrorCode The last error that occurred for this mod
 		MODIO_IMPL Modio::ErrorCode GetLastError() const;
-
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& j, const ModCollectionEntry& Entry);
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& j, ModCollectionEntry& Entry);
 
 		/// @docinternal
 		/// @brief If the conditions are met, it starts a transaction over the ModCollectionEntry
@@ -390,6 +399,10 @@ namespace Modio
 		/// @brief Retrieve a set of ModID
 		MODIO_IMPL const std::set<Modio::ModID>& Get() const;
 
+		/// @docinternal
+		/// @brief Retrieve a set of ModID
+		MODIO_IMPL std::set<Modio::ModID>& Get();
+
 		/// @docnone
 		friend bool operator==(const Modio::BaseModList& A, const Modio::BaseModList& B)
 		{
@@ -403,6 +416,16 @@ namespace Modio
 	};
 
 	/// @docpublic
+	/// @brief Enum indicating if a mod was added or removed when calculating the difference of two user
+	/// subscription lists
+	enum class UserSubscriptionListChangeType
+	{
+		Added,
+		Removed,
+		Updated
+	};
+
+	/// @docpublic
 	/// @brief Class containing the mod IDs the current user is subscribed to
 	class UserSubscriptionList : public BaseModList
 	{
@@ -410,12 +433,7 @@ namespace Modio
 		/// @docpublic
 		/// @brief Enum indicating if a mod was added or removed when calculating the difference of two user
 		/// subscription lists
-		enum class ChangeType
-		{
-			Added,
-			Removed,
-			Updated
-		};
+		using ChangeType = UserSubscriptionListChangeType;
 
 		/// @docinternal
 		/// @brief Calculates removals or additions between the two user subscription lists
@@ -433,12 +451,6 @@ namespace Modio
 		/// @return Map containing all mod ID that have updates in their ModInfo
 		MODIO_IMPL static std::map<Modio::ModID, ChangeType> CalculateUpdates(const Modio::ModInfoList& Baseline,
 																			  const Modio::ModCollection& Collection);
-
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& j, const UserSubscriptionList& List);
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& j, UserSubscriptionList& List);
 
 	};
 
@@ -551,6 +563,11 @@ namespace Modio
 		MODIO_IMPL const std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& Entries() const;
 
 		/// @docpublic
+		/// @brief Retrieve a dictionary of ModID - ModCollectionEntry stored in this ModCollection
+		/// @return Dictionary where keys are ModID and values are ModCollectionEntry
+		MODIO_IMPL std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& Entries();
+
+		/// @docpublic
 		/// @brief Retrieve a single ModCollectionEntry if one is found using a ModID
 		/// @return A ModCollectionEntry when the ModCollection finds it using a ModID, otherwise empty
 		MODIO_IMPL Modio::Optional<Modio::ModCollectionEntry&> GetByModID(Modio::ModID ModId) const;
@@ -564,12 +581,6 @@ namespace Modio
 		/// @brief Retrieved a sorted ModCollectionEntry vector by priority
 		/// @return Vector with ModCollectionEntry
 		MODIO_IMPL std::vector<std::shared_ptr<Modio::ModCollectionEntry>> SortEntriesByRetryPriority() const;
-
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::ModCollection& Collection);
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModCollection& Collection);
 
 	private:
 		std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> ModEntries;

@@ -14,6 +14,7 @@
 #include <future>
 #include <iostream>
 #include <thread>
+#include <sstream>
 
 /// This example extends 03_Authentication.cpp by demonstrating how to submit new mod.
 /// When Mod Management is enabled, the SDK will upload any mods that you submit.

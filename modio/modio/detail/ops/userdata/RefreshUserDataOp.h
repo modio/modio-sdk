@@ -10,11 +10,8 @@
 
 #pragma once
 
-#include "modio/core/ModioBuffer.h"
 #include "modio/core/entities/ModioUser.h"
-#include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
-#include "modio/http/ModioHttpParams.h"
 
 namespace Modio
 {

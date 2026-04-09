@@ -11,9 +11,9 @@
 #pragma once
 
 #include "modio/core/entities/ModioTransactionRecord.h"
-
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/serialization/ModioModInfoSerialization.h"
 
 namespace Modio
 {

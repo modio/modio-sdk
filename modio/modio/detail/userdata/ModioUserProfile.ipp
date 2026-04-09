@@ -12,7 +12,6 @@
 #include "modio/detail/userdata/ModioUserProfile.h"
 #endif
 
-
 namespace Modio
 {
 	namespace Detail

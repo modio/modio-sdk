@@ -9,9 +9,9 @@
  */
 
 #pragma once
-#include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/AsioWrapper.h"
+
 #include "modio/detail/ops/auth/AuthenticateUserExternal.h"
+
 namespace Modio
 {
 	namespace Detail

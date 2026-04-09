@@ -9,12 +9,11 @@
  */
 
 #pragma once
+
 #include "http/HttpImplementation.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioOperationQueue.h"
 #include "modio/detail/ModioSDKSessionData.h"
-#include <iostream>
-#include <memory>
 
 namespace Modio
 {

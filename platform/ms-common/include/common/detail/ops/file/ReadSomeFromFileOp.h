@@ -9,15 +9,10 @@
  */
 
 #pragma once
-#include "common/file/FileObjectImplementation.h"
-#include "fileapi.h"
-#include "modio/core/ModioBuffer.h"
-#include "modio/core/ModioErrorCode.h"
-#include "modio/core/ModioLogger.h"
-#include "modio/detail/ModioConstants.h"
-#include "modio/detail/ModioProfiling.h"
-#include "modio/timer/ModioTimer.h"
 
+#include "common/file/FileObjectImplementation.h"
+#include "modio/core/ModioBuffer.h"
+#include "modio/timer/ModioTimer.h"
 #include <asio/yield.hpp>
 
 class ReadSomeFromFileOp

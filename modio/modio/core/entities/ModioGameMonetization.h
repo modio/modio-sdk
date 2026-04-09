@@ -9,8 +9,9 @@
  */
 
 #pragma once
+
+#include "modio/core/ModioSplitCompilation.h"
 #include "modio/core/ModioFlag.h"
-#include "modio/detail/JsonWrapper.h"
 
 namespace Modio
 {
@@ -56,12 +57,6 @@ namespace Modio
 		constexpr GameMonetization(const Modio::FlagImpl<GameMonetizationOptions>& InitialValue)
 			: Modio::FlagImpl<GameMonetizationOptions>(InitialValue)
 		{}
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GameMonetization& GameMonetization);
-
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::GameMonetization& GameMonetization);
 	};
 	MODIO_DEFINE_FLAG_OPERATORS(GameMonetizationOptions, GameMonetization);
 

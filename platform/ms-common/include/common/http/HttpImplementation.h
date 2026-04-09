@@ -9,25 +9,13 @@
  */
 
 #pragma once
-#include "ModioPlatformDefines.h"
 
-#include "common/UTF16Support.h"
+#include "ModioPlatformDefines.h"
+#include "modio/detail/http/IHttpServiceImplementation.h"
 #include "common/detail/ops/http/ReadHttpResponseHeadersOp.h"
 #include "common/detail/ops/http/ReadSomeResponseBodyOp.h"
 #include "common/detail/ops/http/SendHttpRequestOp.h"
 #include "common/detail/ops/http/WriteSomeToRequestOp.h"
-#include "common/http/HttpRequestImplementation.h"
-#include "modio/core/ModioErrorCode.h"
-#include "modio/core/ModioServices.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/http/IHttpServiceImplementation.h"
-#include "modio/http/ModioHttpParams.h"
-#include <iostream>
-#include <map>
-#include <memory>
-#include <string>
-#include <thread>
-#include <winhttp.h>
 
 namespace Modio
 {

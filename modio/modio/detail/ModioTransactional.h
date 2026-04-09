@@ -9,6 +9,7 @@
  */
 
 #pragma once
+
 #include <memory>
 
 namespace Modio
@@ -18,12 +19,12 @@ namespace Modio
 		template<typename TargetType>
 		class Transaction
 		{
-			bool bCommitted = false;
 			std::weak_ptr<TargetType> TargetObject {};
+			bool bCommitted = false;
 			bool bMovedFrom = false;
 
 		public:
-			Transaction() : bCommitted(false), TargetObject() {}
+			Transaction() : TargetObject(), bCommitted(false) {}
 			Transaction(std::weak_ptr<TargetType> TargetObject) : TargetObject(TargetObject)
 			{
 				if (std::shared_ptr<TargetType> ResolvedTarget = TargetObject.lock())
@@ -34,14 +35,14 @@ namespace Modio
 			}
 			Transaction(Transaction&& Other)
 			{
-				bCommitted = std::move(Other.bCommitted);
 				TargetObject = std::move(Other.TargetObject);
+				bCommitted = std::move(Other.bCommitted);
 				Other.bMovedFrom = true;
 			}
 			Transaction& operator=(Transaction&& Other)
 			{
-				bCommitted = std::move(Other.bCommitted);
 				TargetObject = std::move(Other.TargetObject);
+				bCommitted = std::move(Other.bCommitted);
 				Other.bMovedFrom = true;
 				return *this;
 			}

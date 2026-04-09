@@ -11,6 +11,7 @@
 #pragma once
 
 #include "modio/core/ModioErrorCode.h"
+#include "modio/core/ModioServices.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/Function2Wrapper.h"

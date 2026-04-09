@@ -12,7 +12,7 @@
 
 #include "modio/core/entities/ModioGameInfoList.h"
 #include "modio/detail/serialization/ModioPagedResultSerialization.h"
-
+#include "modio/detail/serialization/ModioGameInfoSerialization.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
 
@@ -22,6 +22,6 @@ namespace Modio
 	{
 		from_json(Json, static_cast<Modio::PagedResult&>(OutGameInfoList));
 
-		Detail::ParseSafe(Json, OutGameInfoList.InternalList, "data");
+		Detail::ParseSafe(Json, OutGameInfoList.GetRawList(), "data");
 	}
 } // namespace Modio

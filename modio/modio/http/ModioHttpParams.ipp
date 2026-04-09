@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io SDK.
  *
@@ -11,11 +11,13 @@
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "modio/http/ModioHttpParams.h"
 #endif
+
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ModioStringHelpers.h"
 #include "modio/http/ModioHttpService.h"
+#include <regex>
 
 namespace Modio
 {
@@ -96,6 +98,19 @@ namespace Modio
 		Modio::Detail::HttpRequestParams& HttpRequestParams::SetUserID(Modio::UserID ID)
 		{
 			this->UserID = std::uint64_t(ID);
+			return *this;
+		}
+
+		Modio::Detail::HttpRequestParams HttpRequestParams::SetTargetUserID(Modio::UserID ID) const
+		{
+			HttpRequestParams NewParamsInstance(*this);
+			NewParamsInstance.TargetUserID = std::uint64_t(ID);
+			return NewParamsInstance;
+		}
+
+		Modio::Detail::HttpRequestParams& HttpRequestParams::SetTargetUserID(Modio::UserID ID)
+		{
+			this->TargetUserID = std::uint64_t(ID);
 			return *this;
 		}
 
@@ -733,6 +748,7 @@ namespace Modio
 			  ModID(0),
 			  UserID(0),
 			  CollectionID(0),
+			  TargetUserID(0),
 			  CurrentOperationType(Modio::Detail::Verb::GET),
 			  CurrentAPIVersion(Modio::Detail::APIVersion::V1)
 		{}
@@ -836,6 +852,7 @@ namespace Modio
 			String::ReplaceAll(TempResourcePath, "{mod-id}", std::to_string(ModID));
 			String::ReplaceAll(TempResourcePath, "{user-id}", std::to_string(UserID));
 			String::ReplaceAll(TempResourcePath, "{collection-id}", std::to_string(CollectionID));
+			String::ReplaceAll(TempResourcePath, "{target-user-id}", std::to_string(TargetUserID));
 
 			return TempResourcePath;
 		}

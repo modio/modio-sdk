@@ -10,12 +10,8 @@
 
 #pragma once
 
-#include "modio/core/ModioStdTypes.h"
-#include "modio/core/entities/ModioModInfoList.h"
 #include "modio/core/entities/ModioToken.h"
 #include "modio/core/entities/ModioUser.h"
-
-#include <memory>
 
 namespace Modio
 {

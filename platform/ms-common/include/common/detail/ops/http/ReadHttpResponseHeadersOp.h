@@ -9,25 +9,20 @@
  */
 
 #pragma once
+
 #include "common/HttpSharedState.h"
 #include "common/UTF16Support.h"
 #include "common/http/HttpRequestImplementation.h"
-#include "modio/core/ModioLogger.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioConstants.h"
-#include "modio/detail/ModioProfiling.h"
 #include "modio/timer/ModioTimer.h"
 
 #include <asio/yield.hpp>
-#include <memory>
-
 class ReadHttpResponseHeadersOp
 {
 	std::weak_ptr<HttpSharedStateBase> SharedState {};
 	std::shared_ptr<HttpRequestImplementation> Request {};
 	ModioAsio::coroutine CoroutineState {};
-	Modio::Detail::Timer Timer {};
+	Modio::Detail::Timer MyTimer {};
 
 public:
 	ReadHttpResponseHeadersOp(std::shared_ptr<HttpRequestImplementation> Request,
@@ -61,8 +56,8 @@ public:
 
 			while (PinnedState->PeekHandleStatus(Request->RequestHandle) == WinHTTPCallbackStatus::Waiting)
 			{
-				Timer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
-				yield Timer.WaitAsync(std::move(Self));
+				MyTimer.ExpiresAfter(Modio::Detail::Constants::Configuration::PollInterval);
+				yield MyTimer.WaitAsync(std::move(Self));
 			}
 
 			switch (PinnedState->FetchAndClearHandleStatus(Request->RequestHandle))

@@ -1,5 +1,5 @@
 # 
-#  Copyright (C) 2021-2025 mod.io Pty Ltd. <https://mod.io>
+#  Copyright (C) 2021-2026 mod.io Pty Ltd. <https://mod.io>
 #  
 #  This file is part of the mod.io SDK.
 #  
@@ -9,11 +9,14 @@
 
 include(split-compilation)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/SDKCore.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/SDKEnableModManagement.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/SDKMetrics.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/SDKModCollections.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/SDKModManagement.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/SDKModMetadata.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/SDKMonetization.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/SDKPreconditionChecks.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/SDKUserData.ipp)
+add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/SDKUserFollowing.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/ModioSDKMultiplayerLibrary.ipp)
 add_modio_implementation_file(${CMAKE_CURRENT_LIST_DIR}/detail/ModioObjectTrack.ipp)

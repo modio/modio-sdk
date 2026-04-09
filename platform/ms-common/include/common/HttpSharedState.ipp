@@ -12,6 +12,7 @@
 	#include "common/HttpSharedState.h"
 #endif
 
+#include "common/UTF16Support.h"
 #include "common/http/HttpRequestImplementation.h"
 #include "modio/detail/ModioProfiling.h"
 

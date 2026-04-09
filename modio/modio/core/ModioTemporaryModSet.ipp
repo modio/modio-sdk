@@ -12,13 +12,11 @@
 	#include "modio/core/ModioTemporaryModSet.h"
 #endif
 
-#include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioServices.h"
-#include "modio/core/ModioLogger.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/file/ModioFileService.h"
+#include "modio/core/ModioCreateModFileParams.h"
+#include "modio/core/ModioCreateSourceFileParams.h"
 
-#include <algorithm>
 
 namespace Modio
 {

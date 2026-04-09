@@ -11,8 +11,6 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 

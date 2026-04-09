@@ -10,6 +10,9 @@
 
 #pragma once
 
+#include <cstdint>
+#include <cstddef>
+
 // FNV1a c++11 constexpr compile time hash functions, 32 and 64 bit
 // str should be a null terminated string literal, value should be left out
 // e.g hash_32_fnv1a_const("example")

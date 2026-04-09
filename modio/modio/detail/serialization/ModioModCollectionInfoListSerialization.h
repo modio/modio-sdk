@@ -11,9 +11,10 @@
 #pragma once
 
 #include "modio/core/entities/ModioModCollection.h"
-
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/serialization/ModioPagedResultSerialization.h"
+#include "modio/detail/serialization/ModioModCollectionInfoSerialization.h"
 
 namespace Modio
 {
@@ -21,6 +22,6 @@ namespace Modio
 	{
 		from_json(Json, static_cast<Modio::PagedResult&>(OutModInfoList));
 
-		Detail::ParseSafe(Json, OutModInfoList.InternalList, "data");
+		Detail::ParseSafe(Json, OutModInfoList.GetRawList(), "data");
 	}
 } // namespace Modio

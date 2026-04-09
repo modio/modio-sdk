@@ -9,37 +9,27 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioSplitCompilation.h"
 #include "modio/core/entities/ModioList.h"
-#include "modio/detail/JsonWrapper.h"
 #include <string>
 #include <vector>
 
 namespace Modio
 {
-	/// @brief Typedef a List<vector,string> into URLList
-	using URLList = List<std::vector,std::string>;
+	/// @brief Typedef a List<vector, string> into URLList
+	using URLList = List<std::vector, std::string>;
 
 	/// @docpublic
 	/// @brief A URLList subclass to match Youtube urls
 	class YoutubeURLList : public URLList
 	{
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::YoutubeURLList& YoutubeURLList);
-		
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::YoutubeURLList& YoutubeURLList);
 	};
 
 	/// @docpublic
 	/// @brief A URLList subclass to match Sketchfab urls
 	class SketchfabURLList : public URLList
 	{
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::SketchfabURLList& SketchfabURLList);
-		
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::SketchfabURLList& SketchfabURLList);
 	};
 
 } // namespace Modio

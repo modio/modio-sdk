@@ -11,9 +11,9 @@
 #pragma once
 
 #include "modio/detail/entities/ModioUploadPart.h"
-
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/serialization/ModioPagedResultSerialization.h"
 
 namespace Modio
 {
@@ -41,7 +41,7 @@ namespace Modio
 		inline void from_json(const nlohmann::json& Json, Modio::Detail::UploadSessionPartList& List)
 		{
 			from_json(Json, static_cast<Modio::PagedResult&>(List));
-			Modio::Detail::ParseSafe(Json, List.InternalList, "data");
+			Modio::Detail::ParseSafe(Json, List.GetRawList(), "data");
 		}
 
 	} // namespace Detail

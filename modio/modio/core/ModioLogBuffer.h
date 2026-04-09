@@ -10,6 +10,7 @@
 
 #pragma once
 #include <deque>
+#include <string>
 
 /// @brief Internal buffer of the most recent log messages
 class LogBuffer

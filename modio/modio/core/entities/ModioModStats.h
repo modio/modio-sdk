@@ -9,8 +9,9 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioSplitCompilation.h"
-#include "modio/detail/JsonWrapper.h"
+#include <cstdint>
 #include <string>
 
 namespace Modio
@@ -45,12 +46,6 @@ namespace Modio
 		/// Negative -> Mostly Negative -> Very Negative -> Overwhelmingly
 		/// Negative -> Unrated
 		std::string RatingDisplayText {};
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModStats& ModStats);
-		
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::ModStats Stats);
 
 		/// @docnone
 		friend bool operator==(const Modio::ModStats& A, const Modio::ModStats& B)

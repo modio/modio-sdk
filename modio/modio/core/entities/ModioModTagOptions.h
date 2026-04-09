@@ -9,11 +9,12 @@
  */
 
 #pragma once
+
 #include "modio/core/entities/ModioList.h"
 #include "modio/core/entities/ModioPagedResult.h"
-#include "modio/detail/JsonWrapper.h"
-#include <vector>
 #include <string>
+#include <map>
+#include <vector>
 
 namespace Modio
 {
@@ -29,9 +30,6 @@ namespace Modio
 
 		/// @brief Culture code -> Localized tag value string mapping for all configured languages.
 		std::map<std::string, std::string> Translations {};
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModTagLocalizationData& TagLocalization);
 	};
 
 	/// @docpublic
@@ -70,15 +68,20 @@ namespace Modio
 		/// @brief True if only editable by admins
 		bool bLocked = false;
 
+		/// @docinternal
+		/// @brief Utility method to allow serialization to modify Local entry
+		/// @param Value the new Locale value
+		void SetLocale(std::string Value)
+		{
+			Locale = Value;
+		}
+
 	private:
 
 		/// @brief the culture code for the mod.io locale at the time the mod.io API returned this data
 		std::string Locale {};
 
 	public:
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModTagInfo& TagInfo);
 
 		/// @brief Returns Localized display string for this tag category and its values in the current mod.io locale set at the time this data was requested from the API
 		///	@returns Struct of Tag Category and values.
@@ -111,7 +114,5 @@ namespace Modio
 	/// @brief Container for a collection of ModTagInfo objects
 	class ModTagOptions : public PagedResult, public List<std::vector, ModTagInfo>
 	{
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModTagOptions& Options);
 	};
 } // namespace Modio

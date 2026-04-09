@@ -9,19 +9,12 @@
  */
 
 #pragma once
-#include "modio/core/entities/ModioUser.h"
-#include "modio/core/ModioModCollectionEntry.h"
+
 #include "modio/detail/ops/userdata/SaveUserDataToStorageOp.h"
 #include "modio/detail/ops/userdata/InitializeUserDataOp.h"
 
-#include "modio/detail/AsioWrapper.h"
-#include <vector>
-
-#include <asio/yield.hpp>
-
 namespace Modio
 {
-	
 	namespace Detail
 	{
 		class UserDataService : public ModioAsio::detail::service_base<UserDataService>
@@ -40,7 +33,7 @@ namespace Modio
 			}
 
 			template<typename CompletionHandlerType>
-			auto InitializeAsync( CompletionHandlerType&& Handler)
+			auto InitializeAsync(CompletionHandlerType&& Handler)
 			{
 				return ModioAsio::async_compose<CompletionHandlerType, void(Modio::ErrorCode)>(
 					InitializeUserDataOp(), Handler, Modio::Detail::Services::GetGlobalContext().get_executor());
@@ -49,44 +42,7 @@ namespace Modio
 			template<typename CompletionHandlerType>
 			auto ClearUserDataAsync(CompletionHandlerType&& Handler, bool bShouldDisableModManagement = true)
 			{
-				ModCollection FilteredModCollection =
-					Modio::Detail::SDKSessionData::FilterSystemModCollectionByUserSubscriptions();
-				// This may require additional testing to ensure that we don't decrement the count further than we ought
-				for (auto& Entry : FilteredModCollection.Entries())
-				{
-					uint8_t Subscribers = Entry.second->RemoveLocalUserSubscription(Modio::Detail::SDKSessionData::GetAuthenticatedUser());
-					
-					if (Subscribers == 0)
-					{
-						SDKSessionData::ClearModCacheInvalid(Entry.first);
-					}
-				}
-
-				Modio::Detail::SDKSessionData::ClearUserData();
-				Modio::Detail::Services::GetGlobalService<Modio::Detail::CacheService>().ClearCache();
-
-				// This block makes sure to cancel any mod in progress and disable mod management
-				{				
-					Modio::Optional<Modio::ModProgressInfo> CurrentMod = Modio::QueryCurrentModUpdate();
-
-					if (CurrentMod.has_value() == true)
-					{
-						SDKSessionData::CancelModDownloadOrUpdate(CurrentMod.value().ID);
-					}
-
-					// Make sure to cancel any operation by the user subscription
-					Modio::ModCollection UserModCollection = Modio::Detail::SDKSessionData::FilterSystemModCollectionByUserSubscriptions();
-					for (auto ModEntry : UserModCollection.Entries())
-					{
-						SDKSessionData::CancelModDownloadOrUpdate(ModEntry.first);
-					}
-
-					if (bShouldDisableModManagement)
-					{
-						Modio::DisableModManagement();	
-					}
-				}
-				
+				ClearUserData(bShouldDisableModManagement);				
 				return SaveUserDataToStorageAsync(std::forward<CompletionHandlerType>(Handler));			
 			}
 
@@ -97,9 +53,15 @@ namespace Modio
 					SaveUserDataToStorageOp(), Handler,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
+
 			MODIO_IMPL Modio::ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string> MODIO_UNUSED_ARGUMENT(Overrides)) { return {};}
+
 		private:
+			void ClearUserData(bool bShouldDisableModManagement = true);
 		};
 	} // namespace Detail
 } // namespace Modio
-#include <asio/unyield.hpp>
+
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "ModioUserDataService.ipp"
+#endif

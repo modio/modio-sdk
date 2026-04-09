@@ -11,9 +11,6 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/HedleyWrapper.h"
-#include "modio/detail/JsonWrapper.h"
-#include <string>
 
 namespace Modio
 {
@@ -47,8 +44,6 @@ namespace Modio
 					return false;
 				}
 			}
-
-			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::Icon& Icon);
 		};
 
 		/// @docpublic

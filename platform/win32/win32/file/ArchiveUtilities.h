@@ -11,12 +11,6 @@
 #pragma once
 
 #include "modio/compression/ModioArchiveReader.h"
-#include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioErrorCode.h"
-#include "modio/core/ModioServices.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/HedleyWrapper.h"
-#include "modio/detail/ModioProfiling.h"
 #include "modio/file/ModioFileService.h"
 
 namespace Modio

@@ -10,12 +10,8 @@
 
 #pragma once
 
-#include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/serialization/ModioGameInfoSerialization.h"
-
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/ModioJsonHelpers.h"
 
 #include <asio/yield.hpp>
 namespace Modio

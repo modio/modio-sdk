@@ -9,8 +9,9 @@
  */
 
 #pragma once
+
 #include "modio/detail/ops/auth/AuthenticateUserExternal.h"
-#include "modio/detail/AsioWrapper.h"
+
 namespace Modio
 {
 	namespace Detail

@@ -12,9 +12,9 @@
 
 #include "modio/core/entities/ModioUserRatingList.h"
 #include "modio/detail/serialization/ModioPagedResultSerialization.h"
-
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/serialization/ModioStrongIntegerSerialization.h"
 
 namespace Modio
 {
@@ -29,6 +29,6 @@ namespace Modio
 	{
 		from_json(Json, static_cast<Modio::PagedResult&>(OutUserRatingList));
 
-		Detail::ParseSafe(Json, OutUserRatingList.InternalList, "data");
+		Detail::ParseSafe(Json, OutUserRatingList.GetRawList(), "data");
 	}
 } // namespace Modio

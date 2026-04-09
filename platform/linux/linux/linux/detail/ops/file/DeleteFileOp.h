@@ -1,17 +1,15 @@
 /* 
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2026 mod.io Pty Ltd. <https://mod.io>
  *  
  *  This file is part of the mod.io SDK.
  *  
  *  Distributed under the MIT License. (See accompanying file LICENSE or 
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
-#include "modio/core/ModioErrorCode.h"
-#include "modio/core/ModioLogger.h"
-#include "modio/detail/AsioWrapper.h"
+#include "linux/detail/FileHelpers.h"
 
 #include <asio/yield.hpp>
 class DeleteFileOp
@@ -37,7 +35,15 @@ public:
 			yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
 			Modio::ErrorCode RemoveStatus;
 			Modio::filesystem::remove(FilePath, RemoveStatus);
-			Self.complete(RemoveStatus);
+			if (RemoveStatus.category() == std::system_category())
+			{
+				Self.complete(Modio::Detail::TranslateFilesystemError(RemoveStatus.value(),
+																	  Modio::Detail::FilesystemErrorContext::File));
+			}
+			else
+			{
+				Self.complete(RemoveStatus);
+			}
 		}
 	}
 

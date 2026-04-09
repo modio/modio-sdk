@@ -8,15 +8,7 @@
  *
  */
 
-#ifdef MODIO_SEPARATE_COMPILATION
-	#include "modio/ModioSDK.h"
-#else
-	#pragma once
-#endif
-
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioStdTypes.h"
-#include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/monetization/FetchUserPurchasesOp.h"
 #include "modio/detail/ops/monetization/GetAvailableUserEntitlementsGoogle.h"
@@ -37,11 +29,7 @@
 #include "modio/detail/ops/monetization/RefreshUserEntitlementsPSN.h"
 #include "modio/detail/ops/monetization/RefreshUserEntitlementsSteam.h"
 #include "modio/detail/ops/monetization/RefreshUserEntitlementsXboxLive.h"
-#include "modio/detail/serialization/ModioEntitlementConsumptionStatusListSerialization.h"
 #include "modio/detail/serialization/ModioEntitlementConsumptionStatusSerialization.h"
-#include "modio/detail/serialization/ModioResponseErrorSerialization.h"
-#include "modio/detail/serialization/ModioTransactionRecordSerialization.h"
-#include "modio/detail/serialization/ModioUserDelegationTokenSerialization.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 
 // Implementation header - do not include directly

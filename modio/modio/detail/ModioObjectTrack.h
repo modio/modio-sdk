@@ -9,6 +9,7 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioSplitCompilation.h"
 #include <unordered_map>
 

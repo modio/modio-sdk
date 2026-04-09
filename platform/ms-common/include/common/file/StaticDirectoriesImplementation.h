@@ -13,7 +13,6 @@
 #include "modio/detail/FilesystemWrapper.h"
 #include "modio/detail/FmtWrapper.h"
 #include <ShlObj.h>
-#include <string>
 
 namespace Modio
 {

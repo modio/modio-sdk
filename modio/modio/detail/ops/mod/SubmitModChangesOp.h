@@ -9,12 +9,13 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioBuffer.h"
-#include "modio/core/ModioCreateModParams.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/ModioJsonHelpers.h"
+#include "modio/core/ModioEditModParams.h"
+#include "modio/core/ModioLogger.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/serialization/ModioModInfoSerialization.h"
+#include "modio/http/ModioHttpParams.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 
 namespace Modio
@@ -25,67 +26,8 @@ namespace Modio
 		class SubmitModChangesOp
 		{
 		public:
-			SubmitModChangesOp(Modio::ModID Mod, Modio::EditModParams Params)
-			{
-				EditRequestParams =
-					Modio::Detail::EditModRequest.SetGameID(Modio::Detail::SDKSessionData::CurrentGameID())
-					.SetModID(Mod)
-					.AppendPayloadValue("name", Params.Name)
-					.AppendPayloadValue("summary", Params.Summary)
-					.AppendPayloadValue("name_id", Params.NamePath)
-					.AppendPayloadValue("description", Params.Description)
-					.AppendPayloadValue("homepage_url", Params.HomepageURL)
-					.AppendPayloadValue("metadata_blob", Params.MetadataBlob);
 
-				if (Params.LogoPath.has_value())
-				{
-					EditRequestParams = EditRequestParams.AppendPayloadFile("logo", Params.LogoPath.value());
-				}
-
-				if (Params.Visibility.has_value())
-				{
-					EditRequestParams = EditRequestParams.AppendPayloadValue(
-						"visible", fmt::format("{}", static_cast<std::uint8_t>(Params.Visibility.value())));
-				}
-
-				if (Params.MaturityRating.has_value())
-				{
-					EditRequestParams = EditRequestParams.AppendPayloadValue(
-						"maturity_option", fmt::format("{}", static_cast<std::uint8_t>(Params.MaturityRating.value())));
-				}
-
-				if (Params.Tags.has_value())
-				{
-					int i = 0;
-
-					if (Params.Tags->size() != 0)
-					{
-						for (const std::string& tag : *Params.Tags)
-						{
-							EditRequestParams = EditRequestParams.AppendPayloadValue(fmt::format("tags[{}]", i), tag);
-							i++;
-						}
-					}
-					else
-					{
-						EditRequestParams = EditRequestParams.AppendEmptyPayload("tags[]");
-					}
-				}
-
-				if (Params.CommunityOptions)
-				{
-					EditRequestParams = EditRequestParams.AppendPayloadValue(
-						"community_options", fmt::format("{}", Params.CommunityOptions->RawValue()));
-				}
-
-				if (Params.MetadataKvp)
-				{
-					for (const Modio::Metadata& metadata : *Params.MetadataKvp)
-					{
-						EditRequestParams = EditRequestParams.AppendPayloadValue("metadata_kvp[]", fmt::format("{}:{}", metadata.Key, metadata.Value));
-					}
-				}
-			}
+			SubmitModChangesOp(Modio::ModID Mod, Modio::EditModParams Params);
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
@@ -158,3 +100,7 @@ namespace Modio
 		}
 	} // namespace Detail
 } // namespace Modio
+
+#ifndef MODIO_SEPARATE_COMPILATION
+	#include "SubmitModChangesOp.ipp"
+#endif

@@ -9,9 +9,8 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioSplitCompilation.h"
-#include "modio/detail/JsonWrapper.h"
 
 namespace Modio
 {
@@ -33,9 +32,6 @@ namespace Modio
 		std::int64_t ModSubscribersTotal = 0;
 		/// @brief Unix timestamp until this game's statistics are considered stale
 		std::int64_t DateExpires = 0;
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GameStats& GameStats);
 	};
 } // namespace Modio
 

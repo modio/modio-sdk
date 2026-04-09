@@ -9,11 +9,10 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/entities/ModioToken.h"
-#include "modio/detail/JsonWrapper.h"
 #include "modio/detail/entities/ModioAvatar.h"
-#include <string>
 
 namespace Modio
 {
@@ -29,6 +28,9 @@ namespace Modio
 
 		/// @brief Authentification token of the user
 		Modio::Optional<Modio::Detail::OAuthToken> AuthToken {};
+
+		/// @brief If the user has connected an email address to their account
+		bool Verified = false;
 
 		/// @brief Unix timestamp the user was last online
 		std::int64_t DateOnline = 0;
@@ -49,11 +51,5 @@ namespace Modio
 			return (A.UserId == B.UserId && A.Username == B.Username && A.DateOnline == B.DateOnline &&
 					A.ProfileUrl == B.ProfileUrl && A.Avatar == B.Avatar) && (A.DisplayNamePortal == B.DisplayNamePortal);
 		}
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::User& User);
-
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::User& User);
 	};
 } // namespace Modio

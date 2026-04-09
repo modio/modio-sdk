@@ -9,8 +9,10 @@
  */
 
 #pragma once
-#include <functional>
+
 #include "modio/core/ModioStdTypes.h"
+#include "modio/core/ModioErrorCode.h"
+#include <functional>
 
 namespace Modio
 {

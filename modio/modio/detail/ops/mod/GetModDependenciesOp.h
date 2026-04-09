@@ -11,11 +11,12 @@
 #pragma once
 
 #include "modio/core/ModioBuffer.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/ModioJsonHelpers.h"
-#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
-#include "modio/detail/serialization/ModioModDependencySerialization.h"
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/http/ModioHttpParams.h"
+#include "modio/core/ModioModDependency.h"
+#include "modio/core/ModioDefaultRequestParameters.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/ModioJsonHelpers.h"
 
 namespace Modio
 {

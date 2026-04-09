@@ -9,8 +9,8 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioFlag.h"
-#include "modio/detail/JsonWrapper.h"
 
 namespace Modio
 {
@@ -44,12 +44,6 @@ namespace Modio
 		constexpr ModCommunityOptionsFlags(const Modio::FlagImpl<ModCommunityOptions>& InitialValue)
 			: Modio::FlagImpl<ModCommunityOptions>(InitialValue)
 		{}
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModCommunityOptionsFlags& ModCommunity);
-
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::ModCommunityOptionsFlags& ModCommunity);
 	};
 	MODIO_DEFINE_FLAG_OPERATORS(ModCommunityOptions, ModCommunityOptionsFlags);
 

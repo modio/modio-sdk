@@ -9,6 +9,7 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioLogEnum.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/FmtWrapper.h"

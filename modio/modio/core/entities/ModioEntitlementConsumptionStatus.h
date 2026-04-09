@@ -10,10 +10,8 @@
 
 #pragma once
 
+#include "modio/core/ModioSplitCompilation.h"
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/core/entities/ModioModStats.h"
-#include "modio/detail/JsonWrapper.h"
-#include <string>
 
 namespace Modio
 {
@@ -33,14 +31,6 @@ namespace Modio
 	{
 		/// @brief Amount of tokens that were issued for this specific entitlement consumption
 		int TokensAllocated = 0;
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json,
-										 EntitlementConsumptionVirtualCurrencyDetails& Details);
-
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json,
-									   const EntitlementConsumptionVirtualCurrencyDetails& Details);
 	};
 
 	/// @docpublic
@@ -81,13 +71,5 @@ namespace Modio
 			return (TransactionState == Modio::EntitlementConsumptionState::Failed ||
 					TransactionState == Modio::EntitlementConsumptionState::Pending);
 		}
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json,
-										 Modio::EntitlementConsumptionStatus& EntitlementTransaction);
-
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json,
-									   const Modio::EntitlementConsumptionStatus& EntitlementTransaction);
 	};
 } // namespace Modio

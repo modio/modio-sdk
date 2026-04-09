@@ -10,21 +10,14 @@
 
 // MIRRORED TO gdk/file/FileSystemImplementation.h, UPDATE THAT FILE IF THIS IS UPDATED
 #pragma once
+
+#include "modio/core/ModioInitializeOptions.h"
+#include "modio/detail/file/IFileObjectImplementation.h"
+#include "modio/detail/file/IFileServiceImplementation.h"
 #include "common/detail/ops/file/DeleteFolderOp.h"
 #include "common/detail/ops/file/ReadSomeFromFileBufferedOp.h"
 #include "common/detail/ops/file/ReadSomeFromFileOp.h"
 #include "common/detail/ops/file/StreamReadOp.h"
-#include "common/file/FileObjectImplementation.h"
-#include "modio/core/ModioInitializeOptions.h"
-#include "modio/detail/FmtWrapper.h"
-#include "modio/detail/ModioConstants.h"
-#include "modio/detail/entities/ModioAvatar.h"
-#include "modio/detail/entities/ModioImage.h"
-#include "modio/detail/entities/ModioLogo.h"
-#include "modio/detail/file/IFileObjectImplementation.h"
-#include "modio/detail/file/IFileServiceImplementation.h"
-#include "modio/file/ModioFileService.h"
-#include <memory>
 
 namespace Modio
 {

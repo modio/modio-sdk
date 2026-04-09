@@ -1,5 +1,5 @@
 /* 
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2026 mod.io Pty Ltd. <https://mod.io>
  *  
  *  This file is part of the mod.io SDK.
  *  
@@ -9,8 +9,9 @@
  */
 
 #pragma once
+
 #include "modio/detail/ops/auth/AuthenticateUserExternal.h"
-#include "modio/detail/AsioWrapper.h"
+
 namespace Modio
 {
 	namespace Detail
@@ -22,8 +23,9 @@ namespace Modio
 				Modio::Detail::AuthenticateViaSwitchRequest
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::SwitchToken, User.AuthToken)
 					.EncodeAndAppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
-					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed,
-										User.bUserHasAcceptedTerms ? "true" : "false");
+					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed, User.bUserHasAcceptedTerms ? "true" : "false")
+					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::DisplayName,
+										User.ExtendedParameters["DisplayName"]);
 			Modio::Detail::AuthenticateUserExternalAsync(Params, Callback);
 		}
 	} // namespace Detail

@@ -9,20 +9,16 @@
  */
 
 #pragma once
-#include "modio/detail/ModioDefines.h"
 
 #include "modio/core/entities/ModioFileMetadata.h"
 #include "modio/core/entities/ModioModCommunityOptions.h"
+#include "modio/core/entities/ModioModMonetizationSKU.h"
 #include "modio/core/entities/ModioModStats.h"
 #include "modio/core/entities/ModioProfileMaturity.h"
-#include "modio/core/entities/ModioURLList.h"
 #include "modio/core/entities/ModioUser.h"
-#include "modio/core/entities/ModioModMonetizationSKU.h"
-#include "modio/detail/JsonWrapper.h"
+#include "modio/core/entities/ModioURLList.h"
 #include "modio/detail/entities/ModioGalleryList.h"
 #include "modio/detail/entities/ModioLogo.h"
-#include <string>
-#include <vector>
 
 namespace Modio
 {
@@ -39,12 +35,6 @@ namespace Modio
 		{
 			return (A.Tag == B.Tag);
 		}
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModTag& ModTag);
-
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::ModTag& Tag);
 	};
 
 	// Migrate: std::vector<Modio::ModTag> Tags to a custom class that encapsulates std::map helpers to fetch Values as
@@ -61,12 +51,6 @@ namespace Modio
 		{
 			return (A.Key == B.Key && A.Value == B.Value);
 		}
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Metadata& Metadata);
-
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::Metadata& Metadata);
 	};
 
 	/// @docpublic
@@ -187,11 +171,5 @@ namespace Modio
 				return false;
 			}
 		}
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModInfo& ModInfo);
-
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::ModInfo& Info);
 	};
 } // namespace Modio

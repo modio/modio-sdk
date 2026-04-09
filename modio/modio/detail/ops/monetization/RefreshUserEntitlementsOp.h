@@ -11,12 +11,7 @@
 #pragma once
 
 #include "modio/core/entities/ModioEntitlementConsumptionStatusList.h"
-#include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
-#include "modio/detail/ops/userdata/VerifyUserAuthenticationOp.h"
-#include "modio/http/ModioHttpParams.h"
-#include "modio/userdata/ModioUserDataService.h"
-#include <memory>
 
 #include <asio/yield.hpp>
 namespace Modio

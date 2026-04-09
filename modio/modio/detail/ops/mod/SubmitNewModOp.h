@@ -9,6 +9,7 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCreateModParams.h"
 #include "modio/detail/AsioWrapper.h"
@@ -71,9 +72,11 @@ namespace Modio
 
 				if (Params.MetadataKvp)
 				{
+					std::size_t Index = 0;
 					for (const Modio::Metadata& metadata : *Params.MetadataKvp)
 					{
-						SubmitParams = SubmitParams.AppendPayloadValue("metadata_kvp[]", fmt::format("{}:{}", metadata.Key, metadata.Value));
+						SubmitParams = SubmitParams.AppendPayloadValue(fmt::format("metadata_kvp[{}]", Index), fmt::format("{}:{}", metadata.Key, metadata.Value));
+						Index++;
 					}
 				}
 			}

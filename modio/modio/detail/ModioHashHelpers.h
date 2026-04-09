@@ -2,14 +2,10 @@
 
 #include "hmac_sha256.h"
 #include "modio/core/ModioStdTypes.h"
-
-#include <algorithm>
 #include <iomanip>
-#include <map>
 #include <sstream>
-#include <string>
 #include <vector>
-
+#include <cstdint>
 
 namespace Modio
 {

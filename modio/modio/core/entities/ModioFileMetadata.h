@@ -11,8 +11,6 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/JsonWrapper.h"
-#include <string>
 
 namespace Modio
 {
@@ -68,12 +66,6 @@ namespace Modio
 		std::string DownloadBinaryURL {};
 		/// @brief Modfile download expiry date
 		std::int64_t DownloadExpiryDate = 0;
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::FileMetadata& FileMetadata);
-		
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::FileMetadata& FileMetadata);
 
 		/// @docnone
 		friend bool operator==(const Modio::FileMetadata& A, const Modio::FileMetadata& B)

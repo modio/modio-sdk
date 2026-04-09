@@ -10,6 +10,7 @@
 
 #pragma once
 #include "modio/detail/ModioCompilerMacros.h"
+#include <chrono>
 
 
 namespace Modio
@@ -49,6 +50,7 @@ namespace Modio
 				constexpr const char* Nonce = "nonce";
 				constexpr const char* AccessToken = "access_token";
 				constexpr const char* UploadID = "upload_id";
+				constexpr const char* DisplayName = "display_name_portal";
 			} // namespace APIStrings
 			namespace QueryParamStrings
 			{

@@ -9,11 +9,10 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioStdTypes.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/ModioDefines.h"
-#include <memory>
 #include <mutex>
+#include <vector>
 
 namespace Modio
 {
@@ -141,24 +140,10 @@ namespace Modio
 		};
 
 		template<typename DestinationType>
-		DestinationType TypedBufferRead(Modio::Detail::DynamicBuffer& BufferToRead, std::uintmax_t Offset)
-		{
-			auto DesiredDataRange = BufferToRead.data(Offset, sizeof(DestinationType));
-			DestinationType Destination;
-			Modio::MutableBufferView MBV(&Destination, sizeof(Destination));
-			ModioAsio::buffer_copy(MBV, DesiredDataRange);
-			return Destination;
-		}
+		DestinationType TypedBufferRead(Modio::Detail::DynamicBuffer& BufferToRead, std::uintmax_t Offset);
 
 		template<typename DestinationType>
-		DestinationType TypedBufferRead(Modio::Detail::Buffer& BufferToRead, std::uintmax_t Offset)
-		{
-			DestinationType Destination;
-			Modio::ConstBufferView SourceBufferView(BufferToRead.Data() + Offset, sizeof(DestinationType));
-			Modio::MutableBufferView DestBufferView(&Destination, sizeof(Destination));
-			ModioAsio::buffer_copy(DestBufferView, SourceBufferView);
-			return Destination;
-		}
+		DestinationType TypedBufferRead(Modio::Detail::Buffer& BufferToRead, std::uintmax_t Offset);
 
 		struct TypedWriteHelper;
 
@@ -192,16 +177,6 @@ namespace Modio
 				}
 			}
 		};
-
-		template<typename SourceType>
-		TypedWriteHelper TypedBufferWrite(const SourceType& Source, Modio::Detail::Buffer& BufferToWrite,
-										  std::uintmax_t Offset)
-		{
-			Modio::ConstBufferView SourceBufferView(&Source, sizeof(SourceType));
-			Modio::MutableBufferView DestinationBufferView(BufferToWrite.Data() + Offset, sizeof(SourceType));
-			ModioAsio::buffer_copy(DestinationBufferView, SourceBufferView);
-			return {BufferToWrite, Offset + sizeof(SourceType)};
-		}
 
 		/// @docinternal
 		/// @brief Copies a Modio::Detail::DynamicBuffer into a Modio::Detail::Buffer with no error checking

@@ -11,16 +11,18 @@
 #pragma once
 
 #include "modio/core/entities/ModioModInfo.h"
-
 #include "modio/detail/JsonWrapper.h"
 #include "modio/detail/ModioJsonHelpers.h"
-
 #include "modio/detail/serialization/ModioModCommunityOptionsSerialization.h"
 #include "modio/detail/serialization/ModioGalleryListSerialization.h"
 #include "modio/detail/serialization/ModioModMonetizationSKUSerialization.h"
 #include "modio/detail/serialization/ModioProfileMaturitySerialization.h"
 #include "modio/detail/serialization/ModioImageSerialization.h"
 #include "modio/detail/serialization/ModioLogoSerialization.h"
+#include "modio/detail/serialization/ModioModStatsSerialization.h"
+#include "modio/detail/serialization/ModioFileMetadataSerialization.h"
+#include "modio/detail/serialization/ModioUserSerialization.h"
+#include "modio/detail/serialization/ModioStrongIntegerSerialization.h"
 
 namespace Modio
 {

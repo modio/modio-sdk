@@ -1,0 +1,45 @@
+---
+id: cpp-getting-started
+title: C++ Getting Started
+slug: /cppsdk/getting-started
+---
+
+# C++ Getting Started
+
+This page introduces the C++ SDK getting started guides and how they’re organized.
+It highlights what each guide covers and suggests an order if you’d like a linear pass.
+
+Across these guides, you’ll find:
+
+- How to install and build the SDK for your target platforms
+- How initialization, the event loop, and shutdown fit together
+- How the public API is structured and how errors are reported
+- How authentication and user sessions work in practice
+- How to browse, subscribe to, and manage UGC from within your game
+- How to extend the workflow with collections and UGC submission
+
+To get set up first, start with the [installation guide](https://docs.mod.io/cppsdk/installation).
+Each guide focuses on one area and includes concrete examples, and you can jump directly to the topic you need.
+
+## Guides in this series
+
+* [Installation](https://docs.mod.io/cppsdk/installation)
+* [Initialization](https://docs.mod.io/cppsdk/initialization)
+* [Structure & Error Handling](https://docs.mod.io/cppsdk/structure)
+* [User Authentication](https://docs.mod.io/cppsdk/user-authentication)
+* [Searching for UGC](https://docs.mod.io/cppsdk/searching-ugc)
+* [Subscribing to UGC](https://docs.mod.io/cppsdk/subscribing)
+* [Adding UGC](https://docs.mod.io/cppsdk/adding-ugc)
+* [Collections](https://docs.mod.io/cppsdk/collections)
+
+## The SDK flow
+
+This is a typical SDK flow:
+
+1. Install and configure the SDK in your project. This typically involves downloading the SDK, including the necessary header files and libraries, and setting up your build environment.
+2. Set up the SDK event loop so asynchronous work can complete.
+3. Initialize the SDK with your game credentials and configuration.
+4. Authenticate a user and establish a local profile.
+5. Enable mod management and respond to mod events in your game.
+6. Perform core operations such as searching, subscribing, and unsubscribing.
+7. Extend your integration with collections and UGC submission.

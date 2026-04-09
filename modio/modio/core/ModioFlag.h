@@ -10,7 +10,8 @@
 
 #pragma once
 
-#include "modio/core/ModioStdTypes.h"
+#include <initializer_list>
+#include <type_traits>
 
 namespace Modio
 {

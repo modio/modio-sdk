@@ -11,9 +11,8 @@
 #pragma once
 
 #include "modio/core/entities/ModioUser.h"
-
 #include "modio/detail/serialization/ModioAvatarSerialization.h"
-
+#include "modio/detail/serialization/ModioStrongIntegerSerialization.h"
 #include "modio/detail/ModioJsonHelpers.h"
 
 namespace Modio
@@ -22,6 +21,7 @@ namespace Modio
 	{
 		Detail::ParseSafe(Json, User.UserId, "id");
 		Detail::ParseSafe(Json, User.Username, "username");
+		Detail::ParseSafe(Json, User.Verified, "verified");
 		Detail::ParseSafe(Json, User.DateOnline, "date_online");
 		Detail::ParseSafe(Json, User.ProfileUrl, "profile_url");
 		nlohmann::json AvatarJsonData;
@@ -37,6 +37,7 @@ namespace Modio
 	{
 		Json = nlohmann::json {{"id", User.UserId},
 							   {"username", User.Username},
+							   {"verified", User.Verified},
 							   {"date_online", User.DateOnline},
 							   {"profile_url", User.ProfileUrl},
 							   {"avatar", User.Avatar},

@@ -9,15 +9,11 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioBuffer.h"
-#include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioServices.h"
-#include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
 #include "modio/file/ModioFile.h"
-#include "modio/file/ModioFileService.h"
-#include <algorithm>
 
 #include <asio/yield.hpp>
 namespace Modio
@@ -70,7 +66,7 @@ namespace Modio
 					// ConfigJson is non null but invalid) so just recreate it
 					ConfigJson = std::make_unique<nlohmann::json>();
 					(*ConfigJson)[Modio::Detail::Constants::JSONKeys::RootLocalStoragePath] =
-						FileService.GetRootLocalStoragePath().generic_u8string();
+						Modio::ToModioString(FileService.GetRootLocalStoragePath().generic_u8string());
 
 					{
 						std::string DefaultConfigString = ConfigJson->dump();

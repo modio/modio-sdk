@@ -8,6 +8,8 @@
  *
  */
 
+#include "modio/detail/FmtWrapper.h"
+
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "modio/core/ModioMetricsService.h"
 #endif
@@ -17,6 +19,7 @@
 #include "modio/detail/ops/metrics/MetricsSessionSendHeartbeatAtIntervalOp.h"
 #include "modio/detail/ops/metrics/MetricsSessionSendHeartbeatOnceOp.h"
 #include "modio/detail/ops/metrics/MetricsSessionStartOp.h"
+#include "modio/detail/serialization/ModioMetricsSessionEndParamsSerialization.h"
 
 #include <algorithm>
 
@@ -193,6 +196,17 @@ namespace Modio
 			Request.SessionHash = Modio::Detail::Hash::HMACSHA256String(SecretKey, StringToHash);
 
 			return Request;
+		}
+
+		time_t MetricsService::GetSessionDuration() const
+		{
+			if (!GetSessionIsActive())
+			{
+				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::ModMetrics,
+											"Cannot get session duration when no session is active");
+				return 0;
+			}
+			return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) - SessionStartTime;
 		}
 	} // namespace Detail
 } // namespace Modio

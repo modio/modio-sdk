@@ -9,11 +9,8 @@
  */
 
 #pragma once
-#include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioSplitCompilation.h"
-#include "modio/detail/JsonWrapper.h"
-#include "modio/core/entities/ModioModInfo.h"
 
+#include "modio/core/entities/ModioModInfo.h"
 
 namespace Modio
 {
@@ -29,9 +26,6 @@ namespace Modio
 		uint64_t UpdatedUserWalletBalance = 0;
 		/// @brief ModInfo of the mod that was purchase and subscribed to
 		Modio::ModInfo Mod {};
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::TransactionRecord& Transaction);
 
 	};
 }

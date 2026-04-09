@@ -12,9 +12,7 @@
 
 #include "common/HttpSharedState.h"
 #include "modio/core/ModioLogger.h"
-#include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioProfiling.h"
-#include <winhttp.h>
 
 MODIO_DISABLE_WARNING_PUSH
 MODIO_DISABLE_WARNING_UNREFERENCED_FUNCTION

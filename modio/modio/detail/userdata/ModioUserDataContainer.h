@@ -9,12 +9,11 @@
  */
 
 #pragma once
-#include "modio/core/ModioModCollectionEntry.h"
+
 #include "modio/core/ModioStdTypes.h"
-#include "modio/core/entities/ModioUser.h"
-#include "modio/detail/ModioJsonHelpers.h"
 #include "modio/detail/userdata/ModioUserProfile.h"
-#include <vector>
+#include "modio/core/ModioModCollectionEntry.h"
+#include "modio/detail/FilesystemWrapper.h"
 
 namespace Modio
 {
@@ -55,12 +54,6 @@ namespace Modio
 			Modio::Optional<Modio::Detail::ProfileData> AuthenticatedProfile {};
 
 			Modio::Optional<Modio::filesystem::path> UserModDirectoryOverride {};
-
-			/// @docnone
-			MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::Detail::UserDataContainer& UserData);
-
-			/// @docnone
-			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::UserDataContainer& UserData);
 			
 		};
 	} // namespace Detail

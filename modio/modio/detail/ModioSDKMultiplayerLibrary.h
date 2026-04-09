@@ -10,10 +10,9 @@
 
 #pragma once
 
-#include "modio/ModioSDK.h"
-
+#include "modio/core/ModioSDKForwardDecls.h"
 #include "modio/core/ModioServerInitializeOptions.h"
-
+#include <set>
 
 namespace Modio
 {

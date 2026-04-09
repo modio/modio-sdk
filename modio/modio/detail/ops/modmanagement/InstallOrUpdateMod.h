@@ -9,20 +9,17 @@
  */
 
 #pragma once
-#include "modio/core/ModioServices.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/HedleyWrapper.h"
-#include "modio/detail/JsonWrapper.h"
-#include "modio/detail/ModioObjectTrack.h"
-#include "modio/detail/ModioProfiling.h"
-#include "modio/detail/ModioSDKSessionData.h"
+
+#include "modio/detail/ModioJsonHelpers.h"
 #include "modio/detail/ops/DownloadFileOp.h"
 #include "modio/detail/ops/compression/ExtractAllToFolderOp.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
-#include "modio/file/ModioFileService.h"
+#include "modio/detail/ModioLibraryConfigurationHelpers.h"
+#include "modio/detail/serialization/ModioModInfoSerialization.h"
+#define MODIO_SDK_PROTOTYPES_ONLY
+#include "modio/ModioSDK.h"
 
 MODIO_DIAGNOSTIC_PUSH
-
 MODIO_ALLOW_DEPRECATED_SYMBOLS
 
 #include <asio/yield.hpp>

@@ -10,13 +10,11 @@
 
 #pragma once
 
-#include "modio/detail/AsioWrapper.h"
 #include "modio/detail/timer/ITimerServiceImplementation.h"
-#include "timer/TimerImplementation.h"
 #include "win32/TimerSharedState.h"
-#include "win32/detail/ops/timer/InitializeTimerServiceOp.h"
 #include "win32/detail/ops/timer/ProcessTimersOp.h"
 #include "win32/detail/ops/timer/WaitForTimerOp.h"
+#include "win32/detail/ops/timer/InitializeTimerServiceOp.h"
 #include <memory>
 
 namespace Modio

@@ -9,12 +9,12 @@
  */
 
 #pragma once
-#include "common/FileSharedState.h"
-#include "common/file/FileSystemImplementation.h"
 
+#include "common/FileSharedState.h"
 #include "common/detail/ops/file/InitializeFileSystemOp.h"
 #include "common/detail/ops/file/StreamWriteOp.h"
 #include "common/detail/ops/file/WriteSomeToFileOp.h"
+#include "common/file/FileSystemImplementation.h"
 #include "common/file/StaticDirectoriesImplementation.h"
 
 namespace Modio

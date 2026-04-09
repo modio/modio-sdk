@@ -11,6 +11,7 @@
 #pragma once
 
 #include "modio/detail/http/ResponseError.h"
+#include "modio/detail/ModioJsonHelpers.h"
 
 namespace Modio
 {

@@ -7,13 +7,13 @@
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
  *
  */
+#include "modio/detail/FmtWrapper.h"
 
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "modio/core/ModioFilterParams.h"
 #endif
 
 #include "modio/core/entities/ModioProfileMaturity.h"
-#include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioStringHelpers.h"
 
 namespace Modio

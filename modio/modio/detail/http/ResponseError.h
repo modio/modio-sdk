@@ -9,11 +9,8 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/JsonWrapper.h"
-#include "modio/detail/ModioJsonHelpers.h"
-#include <string>
-#include <vector>
 
 namespace Modio
 {
@@ -27,8 +24,6 @@ namespace Modio
 			std::int32_t ErrorRef = -1;
 			std::string Error {};
 			Modio::Optional<std::vector<Modio::FieldError>> ExtendedErrorInformation {};
-
-			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::ResponseError& Error);
 		};
 
 	} // namespace Detail

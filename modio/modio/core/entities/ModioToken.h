@@ -11,8 +11,7 @@
 #pragma once
 
 #include "modio/core/ModioStdTypes.h"
-#include "modio/detail/JsonWrapper.h"
-#include <memory>
+#include <chrono>
 
 namespace Modio
 {
@@ -30,9 +29,6 @@ namespace Modio
 
 			/// @brief The date the token expires
 			Modio::Timestamp DateExpires {};
-
-			/// @docnone
-			MODIO_IMPL friend void from_json(const nlohmann::json& Json, AccessTokenObject& AccessToken);
 		};
 
 		/// @docinternal
@@ -43,6 +39,10 @@ namespace Modio
 			Expired,
 			Invalid
 		};
+
+		/// @docinternal
+		/// @brief Serialization helper class
+		class OAuthTokenStateAccessor;
 
 		/// @docinternal
 		/// @brief OAuth token object
@@ -108,12 +108,26 @@ namespace Modio
 
 			static MODIO_IMPL Modio::Optional<std::string> NoToken;
 
-			/// @docnone
-			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::OAuthToken& InToken);
+			/// @docinternal
+			/// @brief Access token for serialization
+			Modio::Optional<std::string> GetRawToken() const 
+			{
+				return Token;
+			}
 
-			/// @docnone
-			MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::Detail::OAuthToken& InToken);
+			/// @docinternal
+			/// @brief Access expire for serialization
+			Modio::Timestamp GetExpireDate() const
+			{
+				return ExpireDate;
+			}
 
+			/// @docinternal
+			/// @brief Access the state of the token for serialization
+			OAuthTokenState GetRawState() const
+			{
+				return State;
+			}
 		private:
 			/// @docinternal
 			/// @brief Optional here so that the accessors can return references to avoid memcpy, will always be set
@@ -134,6 +148,8 @@ namespace Modio
 				return (A.Token == B.Token && A.ExpireDate == B.ExpireDate && A.State == B.State &&
 						A.NoToken == B.NoToken);
 			}
+
+			friend class Modio::Detail::OAuthTokenStateAccessor;
 		};	
 	} // namespace Detail
 } // namespace Modio

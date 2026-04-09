@@ -10,10 +10,7 @@
 
 #pragma once
 
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/ops/userdata/VerifyUserAuthenticationOp.h"
-#include "modio/http/ModioHttpParams.h"
 
 #include <asio/yield.hpp>
 namespace Modio::Detail

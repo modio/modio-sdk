@@ -9,14 +9,12 @@
  */
 
 #pragma once
-#include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/ModioCompilerMacros.h"
-#include "modio/detail/FilesystemWrapper.h"
-#include "modio/detail/ModioProfiling.h"
-#include <cstdint>
-#include <vector>
 
+#include "modio/core/ModioCoreTypes.h"
+#include "modio/core/ModioBuffer.h"
+#include "modio/detail/compression/zip/CompressionImplementation.h"
+#include "modio/detail/ModioProfiling.h"
+#include "modio/detail/ModioCompilerMacros.h"
 
 namespace Modio
 {

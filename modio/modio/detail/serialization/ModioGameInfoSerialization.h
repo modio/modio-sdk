@@ -11,13 +11,15 @@
 #pragma once
 
 #include "modio/core/entities/ModioGameInfo.h"
-
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
-
 #include "modio/detail/serialization/ModioGameCommunityOptionsSerialization.h"
 #include "modio/detail/serialization/ModioGameMaturityOptionsSerialization.h"
 #include "modio/detail/serialization/ModioGameMonetizationSerialization.h"
+#include "modio/detail/serialization/ModioGameStatsSerialization.h"
+#include "modio/detail/serialization/ModioIconSerialization.h"
+#include "modio/detail/serialization/ModioLogoSerialization.h"
+#include "modio/detail/serialization/ModioModTagOptionsSerialization.h"
 
 namespace Modio
 {

@@ -9,12 +9,11 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioStdTypes.h"
-#include "modio/detail/JsonWrapper.h"
-#include <cstdint>
-#include <random>
-#include <sstream>
-#include <string>
+#include <map>
+#include <vector>
+#include <cstring>
 
 namespace Modio
 {
@@ -263,24 +262,6 @@ namespace Modio
 		constexpr bool operator!=(const StrongInteger Other) const
 		{
 			return Value != Other.Value;
-		}
-		///@}
-
-		/// @docnone
-		friend void from_json(const nlohmann::json& Json, Modio::StrongInteger<UnderlyingIntegerType>& Integer)
-		{
-			using nlohmann::from_json;
-			UnderlyingIntegerType RawValue;
-			from_json(Json, RawValue);
-			Integer = Modio::StrongInteger<UnderlyingIntegerType>(RawValue);
-		}
-
-		/// @docnone
-		friend void to_json(nlohmann::json& Json, const Modio::StrongInteger<UnderlyingIntegerType>& Integer)
-		{
-			using nlohmann::to_json;
-			UnderlyingIntegerType RawValue = Integer;
-			to_json(Json, RawValue);
 		}
 	};
 
@@ -977,115 +958,17 @@ namespace Modio
 
 		/// @docnone
 		///	@brief Transform the PlatformStatus to its query parameter string for appending to requests
-		inline std::string ToString(Modio::PlatformStatus Status)
-		{
-			switch (Status)
-			{
-				case PlatformStatus::PendingOnly:
-					return "pending_only";
-				case PlatformStatus::LiveAndPending:
-					return "live_and_pending";
-				case PlatformStatus::ApprovedOnly:
-					return "approved_only";
-			}
-
-			assert(false && "Invalid value to ToString(Modio::PlatformStatus)");
-			return "Unknown";
-		}
+		std::string ToString(Modio::PlatformStatus Status);
 
 		/// @docnone
 		/// @brief Transform a Language to its two letter string representation
-		inline std::string ToString(Modio::Language Locale)
-		{
-			switch (Locale)
-			{
-				case Language::English:
-					return "en";
-				case Language::Bulgarian:
-					return "bg";
-				case Language::French:
-					return "fr";
-				case Language::German:
-					return "de";
-				case Language::Italian:
-					return "it";
-				case Language::Polish:
-					return "pl";
-				case Language::Portuguese:
-					return "pt";
-				case Language::Hungarian:
-					return "hu";
-				case Language::Japanese:
-					return "ja";
-				case Language::Korean:
-					return "ko";
-				case Language::Russian:
-					return "ru";
-				case Language::Spanish:
-					return "es";
-				case Language::SpanishLatinAmerican:
-					return "es-419";
-				case Language::Thai:
-					return "th";
-				case Language::ChineseSimplified:
-					return "zh-CN";
-				case Language::ChineseTraditional:
-					return "zh-TW";
-				case Language::Turkish:
-					return "tr";
-				case Language::Ukrainian:
-					return "uk";
-				case Language::Arabic:
-					return "ar";
-				case Language::Czech:
-					return "cs";
-				case Language::PortugueseBrazilian:
-					return "pt-BR";
-			}
-			assert(false && "Invalid value to ToString(Modio::Language)");
-			return "Unknown";
-		}
+		std::string ToString(Modio::Language Locale);
 
 		/// @docinternal
 		/// @brief Transform an Authentication Provider to its string representation which
 		/// match the backend list of supported platforms
-		inline std::string ToString(Modio::AuthenticationProvider Provider)
-		{
-			switch (Provider)
-			{
-				case AuthenticationProvider::XboxLive:
-					return "xbox";
-				case AuthenticationProvider::Steam:
-					return "steam";
-				case AuthenticationProvider::GoG:
-					return "gog";
-				case AuthenticationProvider::Itch:
-					return "itchio";
-				case AuthenticationProvider::Switch:
-					return "switch";
-				case AuthenticationProvider::Discord:
-					return "discord";
-				case AuthenticationProvider::PSN:
-					return "psn";
-				case AuthenticationProvider::Oculus:
-					return "oculus";
-				case AuthenticationProvider::Epic:
-					return "epic";
-				case AuthenticationProvider::OpenID:
-					return "openid";
-				case AuthenticationProvider::Apple:
-					return "apple";
-				case AuthenticationProvider::GoogleIDToken:
-					return "googleidtoken";
-				case AuthenticationProvider::GoogleServerSideToken:
-					return "googleserversidetoken";
-				default:
-					return "none";
-			}
+		std::string ToString(Modio::AuthenticationProvider Provider);
 
-			assert(false && "Invalid value to ToString(Modio::Provider)");
-			return "Unknown";
-		}
 	} // namespace Detail
 } // namespace Modio
 

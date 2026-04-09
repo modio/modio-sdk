@@ -9,13 +9,10 @@
  */
 
 #pragma once
-#include "modio/detail/ModioDefines.h"
 
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/entities/ModioList.h"
 #include "modio/core/entities/ModioPagedResult.h"
-#include "modio/detail/JsonWrapper.h"
-#include <vector>
 
 namespace Modio
 {
@@ -48,9 +45,6 @@ namespace Modio
 		{
 			InternalList.push_back(UserRatingData);
 		}
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::UserRatingList& Ratings);
 
 	};
 } // namespace Modio

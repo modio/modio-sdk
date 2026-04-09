@@ -10,13 +10,11 @@
 
 #pragma once
 
-#include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
-#include "modio/detail/serialization/ModioUserListSerialization.h"
-#include "modio/http/ModioHttpParams.h"
+#include "modio/detail/ModioJsonHelpers.h"
+#include "modio/core/entities/ModioUserList.h"
 
 #include <asio/yield.hpp>
-
 namespace Modio
 {
 	namespace Detail

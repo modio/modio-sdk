@@ -11,7 +11,6 @@
 #pragma once
 
 #include "modio/core/entities/ModioToken.h"
-
 #include "modio/detail/ModioJsonHelpers.h"
 
 namespace Modio
@@ -25,33 +24,62 @@ namespace Modio
 			Modio::Detail::ParseSafe(Json, AccessToken.DateExpires, "date_expires");
 		}
 
+		class OAuthTokenStateAccessor
+		{
+			Modio::Detail::OAuthToken& InToken;
+		public:
+			OAuthTokenStateAccessor(Modio::Detail::OAuthToken& InToken) : InToken(InToken) {}
+
+			/// @docinternal
+			/// @brief Optional here so that the accessors can return references to avoid memcpy, will always be set
+			Modio::Optional<std::string>& Token()
+			{
+				return InToken.Token;
+			}
+
+			/// @docinternal
+			/// @brief The date the token expires
+			Modio::Timestamp& ExpireDate()
+			{
+				return InToken.ExpireDate;
+			}
+
+			/// @docinternal
+			/// @brief The state of the token
+			OAuthTokenState& State()
+			{
+				return InToken.State;
+			}
+		};
+
 		inline void from_json(const nlohmann::json& Json, Modio::Detail::OAuthToken& InToken)
 		{
-			Detail::ParseSafe(Json, InToken.ExpireDate, "expiry");
-			Detail::ParseSafe(Json, InToken.State, "status");
+			OAuthTokenStateAccessor Token(InToken);
+			Detail::ParseSafe(Json, Token.ExpireDate(), "expiry");
+			Detail::ParseSafe(Json, Token.State(), "status");
 			std::string TokenString;
 
 			if (Detail::ParseSafe(Json, TokenString, "token"))
 			{
-				InToken.Token = TokenString;
+				Token.Token() = TokenString;
 			}
 			else
 			{
-				InToken.State = OAuthTokenState::Invalid;
+				Token.State() = OAuthTokenState::Invalid;
 			}
 		}
 
 		inline void to_json(nlohmann::json& Json, const Modio::Detail::OAuthToken& InToken)
 		{
-			if (InToken.State == OAuthTokenState::Valid && InToken.Token.has_value())
+			if (InToken.GetRawState() == OAuthTokenState::Valid && InToken.GetRawToken().has_value())
 			{
-				Json = nlohmann::json {{"expiry", InToken.ExpireDate},
-									   {"status", InToken.State},
-									   {"token", InToken.Token.value()}};
+				Json = nlohmann::json {{"expiry", InToken.GetExpireDate()},
+									   {"status", InToken.GetRawState()},
+									   {"token", InToken.GetRawToken().value()}};
 			}
 			else
 			{
-				Json = nlohmann::json {{"expiry", InToken.ExpireDate}, {"status", OAuthTokenState::Invalid}};
+				Json = nlohmann::json {{"expiry", InToken.GetExpireDate()}, {"status", OAuthTokenState::Invalid}};
 			}
 		}
 	} // namespace Detail

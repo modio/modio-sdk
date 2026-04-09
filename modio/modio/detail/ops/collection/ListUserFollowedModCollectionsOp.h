@@ -9,13 +9,14 @@
  */
 
 #pragma once
+
 #include "modio/cache/ModioCacheService.h"
 #include "modio/core/entities/ModioModCollection.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/serialization/ModioModCollectionInfoListSerialization.h"
 #include "modio/http/ModioHttpParams.h"
-#include <asio/yield.hpp>
 
+#include <asio/yield.hpp>
 namespace Modio
 {
 	namespace Detail

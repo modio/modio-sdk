@@ -8,6 +8,8 @@
  *  
  */
 
+#include "modio/core/ModioCreateModFileParams.h"
+#include "modio/core/ModioCreateSourceFileParams.h"
 #ifdef MODIO_SEPARATE_COMPILATION 
 #include "modio/compression/ModioCompressionService.h"
 #endif

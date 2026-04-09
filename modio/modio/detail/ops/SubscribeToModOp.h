@@ -9,16 +9,13 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioBuffer.h"
-#include "modio/core/ModioErrorCode.h"
-#include "modio/detail/serialization/ModioModCollectionEntrySerialization.h"
-#include "modio/core/ModioServices.h"
+#include "modio/detail/ModioJsonHelpers.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/SaveModCollectionToStorage.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
-#include "modio/file/ModioFileService.h"
 #include "modio/userdata/ModioUserDataService.h"
-#include <asio/coroutine.hpp>
 
 #include <asio/yield.hpp>
 namespace Modio

@@ -11,7 +11,6 @@
 #pragma once
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/compression/zip/CompressionImplementation.h"
-#include <memory>
 
 namespace Modio
 {

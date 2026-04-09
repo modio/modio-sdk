@@ -9,6 +9,7 @@
  */
 
 #pragma once
+
 #include "modio/core/entities/ModioList.h"
 #include "modio/detail/entities/ModioImage.h"
 
@@ -17,13 +18,7 @@ namespace Modio
 	/// @docpublic
 	/// @brief List subclass to contain, compare and transform images
 	class GalleryList : public Modio::List<std::vector, Modio::Detail::Image>
-	{
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GalleryList& GalleryList);
-		
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::GalleryList& GalleryList);
-		
+	{		
 		/// @docublic
 		/// @brief Comparator operator between GalleryLists, to first compare their internal list size,
 		/// then the elements contained in that list

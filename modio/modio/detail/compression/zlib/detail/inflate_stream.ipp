@@ -55,6 +55,7 @@
 #include "modio/core/ModioErrorCode.h"
 #include "modio/detail/ModioThrow.h"
 #include <array>
+#include <limits>
 
 namespace boost {
 namespace beast {

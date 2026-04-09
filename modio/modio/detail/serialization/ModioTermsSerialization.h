@@ -11,11 +11,17 @@
 #pragma once
 
 #include "modio/core/entities/ModioTerms.h"
-
 #include "modio/detail/ModioJsonHelpers.h"
 
 namespace Modio
 {
+	inline void from_json(const nlohmann::json& Json, Modio::Terms::Link& OutLink)
+	{
+		Detail::ParseSafe(Json, OutLink.Text, "text");
+		Detail::ParseSafe(Json, OutLink.URL, "url");
+		Detail::ParseSafe(Json, OutLink.bRequired, "required");
+	}
+
 	inline void from_json(const nlohmann::json& Json, Modio::Terms& OutTerms)
 	{
 		nlohmann::json ButtonsJson;
@@ -30,14 +36,9 @@ namespace Modio
 		Detail::ParseSubobjectSafe(Json, OutTerms.Links.Privacy, "links", "privacy");
 		Detail::ParseSubobjectSafe(Json, OutTerms.Links.Refund, "links", "refund");
 		Detail::ParseSubobjectSafe(Json, OutTerms.Links.Manage, "links", "manage");
+		Detail::ParseSubobjectSafe(Json, OutTerms.Links.Monetization, "links", "monetization");
 
 		Detail::ParseSafe(Json, OutTerms.TermsText, "plaintext");
 	}
 
-	inline void from_json(const nlohmann::json& Json, Modio::Terms::Link& OutLink)
-	{
-		Detail::ParseSafe(Json, OutLink.Text, "text");
-		Detail::ParseSafe(Json, OutLink.URL, "url");
-		Detail::ParseSafe(Json, OutLink.bRequired, "required");
-	}
 } // namespace Modio

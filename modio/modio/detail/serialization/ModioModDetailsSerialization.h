@@ -12,7 +12,6 @@
 
 #include "modio/core/entities/ModioModDetails.h"
 #include "modio/detail/serialization/ModioPagedResultSerialization.h"
-
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
 
@@ -23,6 +22,6 @@ namespace Modio
 	{
 		from_json(Json, static_cast<Modio::PagedResult&>(ModDetails));
 
-		Modio::Detail::ParseSafe(Json, ModDetails.InternalList, "data");
+		Modio::Detail::ParseSafe(Json, ModDetails.GetRawList(), "data");
 	}
 } // namespace Modio

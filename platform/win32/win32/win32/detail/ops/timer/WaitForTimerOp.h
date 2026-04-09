@@ -13,7 +13,6 @@
 #include "modio/detail/AsioWrapper.h"
 #include "timer/TimerImplementation.h"
 #include "win32/TimerSharedState.h"
-#include <memory>
 
 #include <asio/yield.hpp>
 class WaitForTimerOp

@@ -9,6 +9,7 @@
  */
 
 #pragma once
+#include "modio/core/ModioInitializeOptions.h"
 
 namespace Modio
 {

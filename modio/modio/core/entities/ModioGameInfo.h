@@ -16,10 +16,8 @@
 #include "modio/core/entities/ModioGameMonetization.h"
 #include "modio/core/entities/ModioGameStats.h"
 #include "modio/core/entities/ModioModTagOptions.h"
-#include "modio/detail/JsonWrapper.h"
 #include "modio/detail/entities/ModioIcon.h"
 #include "modio/detail/entities/ModioLogo.h"
-#include <string>
 
 namespace Modio
 {
@@ -43,9 +41,6 @@ namespace Modio
 	{
 		std::string Filename {};
 		std::string Original {};
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::HeaderImage& HeaderImage);
 	};
 
 	/// @docpublic
@@ -54,9 +49,6 @@ namespace Modio
 	{
 		std::string Label;
 		std::string Url;
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::OtherUrl& OtherUrl);
 	};
 
 	/// @docpublic
@@ -69,9 +61,6 @@ namespace Modio
 		std::string Success;
 		std::string Warning;
 		std::string Danger;
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Theme& Theme);
 	};
 
 	/// @docpublic
@@ -138,8 +127,5 @@ namespace Modio
 		std::vector<Modio::ModTagInfo> TagOptions {};
 		/// @brief Cloud Cooking status for this game
 		GameCloudCookingStatus CloudCookingStatus = GameCloudCookingStatus::Disabled;
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::GameInfo& GameInfo);
 	};
 } // namespace Modio

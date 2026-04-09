@@ -9,12 +9,9 @@
  */
 
 #pragma once
+
 #include "common/HttpCallback.h"
 #include "common/HttpSharedState.h"
-#include "modio/core/ModioErrorCode.h"
-#include "modio/detail/AsioWrapper.h"
-
-#include <winhttp.h>
 
 #include <asio/yield.hpp>
 class InitializeHttpOp

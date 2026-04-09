@@ -11,19 +11,11 @@
 #pragma once
 
 #include "modio/core/ModioLogger.h"
-#include "modio/detail/ModioSDKMultiplayerLibrary.h"
-#include "modio/detail/ModioSDKSessionData.h"
+#include "modio/core/ModioServerInitializeOptions.h"
 #include "modio/detail/ops/ServiceInitializationOp.h"
 #include "modio/detail/ops/Shutdown.h"
-#include "modio/detail/ops/auth/AuthenticateUserExternal.h"
-#include "modio/http/ModioHttpParams.h"
-#include "modio/detail/ModioConstants.h"
-#include "modio/core/ModioDefaultRequestParameters.h"
-#include <algorithm>
-#include <asio/coroutine.hpp>
-#include <asio/yield.hpp>
-#include "modio/impl/SDKPostAsync.h"
 
+#include <asio/yield.hpp>
 namespace Modio
 {
 	namespace Detail

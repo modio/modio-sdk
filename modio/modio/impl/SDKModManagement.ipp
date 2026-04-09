@@ -8,80 +8,32 @@
  *
  */
 
-#ifdef MODIO_SEPARATE_COMPILATION
-#include "modio/ModioSDK.h"
-#else
-#pragma once
-#endif
-
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioErrorCode.h"
-#include "modio/core/ModioModCollectionEntry.h"
-#include "modio/core/ModioServices.h"
+#include "modio/core/ModioLogger.h"
 #include "modio/core/ModioTemporaryModSet.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/FilesystemWrapper.h"
+#include "modio/core/ModioCreateSourceFileParams.h"
+#include "modio/impl/SDKPreconditionChecks.h"
+#include "modio/detail/serialization/ModioResponseErrorSerialization.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/AddOrUpdateModLogoOp.h"
 #include "modio/detail/ops/AddOrUpdateModGalleryImagesOp.h"
-#include "modio/detail/ops/ModManagementLoop.h"
+#include "modio/detail/ops/FetchExternalUpdates.h"
+#include "modio/detail/ops/PreviewExternalUpdatesOp.h"
 #include "modio/detail/ops/SubscribeToModOp.h"
 #include "modio/detail/ops/UnsubscribeFromMod.h"
+#include "modio/detail/ops/mod/SubmitNewModOp.h"
 #include "modio/detail/ops/mod/ArchiveModOp.h"
 #include "modio/detail/ops/mod/SubmitModChangesOp.h"
 #include "modio/detail/ops/mod/SubmitNewModFileOp.h"
-#include "modio/detail/ops/mod/SubmitNewModOp.h"
+#include "modio/detail/ops/modmanagement/InstallOrUpdateMod.h"
 #include "modio/detail/ops/modmanagement/ForceUninstallModOp.h"
-#include "modio/detail/serialization/ModioAvatarSerialization.h"
-#include "modio/detail/serialization/ModioFileMetadataSerialization.h"
-#include "modio/detail/serialization/ModioGalleryListSerialization.h"
-#include "modio/detail/serialization/ModioImageSerialization.h"
-#include "modio/detail/serialization/ModioModStatsSerialization.h"
-#include "modio/detail/serialization/ModioProfileMaturitySerialization.h"
-#include "modio/detail/serialization/ModioResponseErrorSerialization.h"
-#include "modio/file/ModioFileService.h"
-#include "modio/impl/SDKPreconditionChecks.h"
-#include "modio/userdata/ModioUserDataService.h"
-#include <queue>
+#include "modio/detail/serialization/ModioUploadSessionSerialization.h"
+
 
 namespace Modio
 {
-	Modio::ErrorCode EnableModManagement(std::function<void(Modio::ModManagementEvent)> ModManagementHandler)
-	{
-		{
-			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 
-			// TODO: double check if there's an easy way for us to safely read these variables so we can immediately
-			// return a value
-			if (!Modio::Detail::SDKSessionData::IsInitialized())
-			{
-				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core,
-					"SDK is not initialized. Cannot Enable Mod Management.");
-				return Modio::make_error_code(Modio::GenericError::SDKNotInitialized);
-			}
-			if (Modio::Detail::SDKSessionData::IsModManagementEnabled())
-			{
-				Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::Core, "Mod Management is already enabled");
-				return Modio::make_error_code(Modio::ModManagementError::ModManagementAlreadyEnabled);
-			}
-			Modio::Detail::SDKSessionData::SetUserModManagementCallback(ModManagementHandler);
-			Modio::Detail::SDKSessionData::AllowModManagement();
-		}
-
-		Modio::Detail::SDKSessionData::EnqueueTask([]() {
-			Modio::Detail::BeginModManagementLoopAsync([](Modio::ErrorCode ec) mutable {
-				if (ec)
-				{
-					Modio::Detail::Logger().Log(LogLevel::Info, Modio::LogCategory::Core,
-						"Mod Management Loop halted: status message {}", ec.message());
-				}
-				});
-			});
-
-		Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::ModManagement, "Enabled mod management.");
-
-		return {};
-	}
 	void DisableModManagement()
 	{
 		auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();

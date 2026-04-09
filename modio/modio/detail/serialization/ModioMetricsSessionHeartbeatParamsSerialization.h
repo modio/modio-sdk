@@ -11,6 +11,7 @@
 #pragma once
 
 #include "modio/core/entities/ModioMetricsSessionHeartbeatParams.h"
+#include "modio/detail/ModioJsonHelpers.h"
 
 namespace Modio
 {

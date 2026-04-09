@@ -13,7 +13,6 @@
 #include "modio/core/entities/ModioFileMetadata.h"
 #include "modio/core/entities/ModioList.h"
 #include "modio/core/entities/ModioPagedResult.h"
-#include <vector>
 
 namespace Modio
 {
@@ -21,8 +20,6 @@ namespace Modio
 	/// @brief Collection of FileMetadata objects representing mod file updates
 	class ModDetails : public PagedResult, public List<std::vector, FileMetadata>
 	{
-		/// @docnone
-		friend inline void from_json(const nlohmann::json& Json, Modio::ModDetails& ModDetails);
 	};
 
 } // namespace Modio

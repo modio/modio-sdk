@@ -8,17 +8,6 @@
  *
  */
 
-#ifdef MODIO_SEPARATE_COMPILATION
-	#include "modio/ModioSDK.h"
-#else
-	#pragma once
-#endif
-
-#include "modio/core/ModioStdTypes.h"
-#include "modio/core/entities/ModioModDetails.h"
-#include "modio/core/entities/ModioModInfo.h"
-#include "modio/core/entities/ModioModInfoList.h"
-#include "modio/core/entities/ModioModTagOptions.h"
 #include "modio/detail/ops/mod/GetModDependenciesOp.h"
 #include "modio/detail/ops/mod/GetModDetailsOp.h"
 #include "modio/detail/ops/mod/GetModInfoOp.h"
@@ -31,11 +20,7 @@
 #include "modio/detail/ops/mod/SubmitModRatingOp.h"
 #include "modio/detail/ops/mod/AddModDependenciesOp.h"
 #include "modio/detail/ops/mod/DeleteModDependenciesOp.h"
-#include "modio/detail/serialization/ModioFileMetadataSerialization.h"
-#include "modio/detail/serialization/ModioImageSerialization.h"
-#include "modio/detail/serialization/ModioModStatsSerialization.h"
-#include "modio/detail/serialization/ModioProfileMaturitySerialization.h"
-#include "modio/detail/serialization/ModioResponseErrorSerialization.h"
+#include "modio/detail/serialization/ModioModDependencySerialization.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 
 // Implementation header - do not include directly

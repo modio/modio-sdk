@@ -9,10 +9,10 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioSplitCompilation.h"
-#include "modio/detail/JsonWrapper.h"
 #include <string>
-#include <vector>
+#include <cstdint>
 
 namespace Modio
 {
@@ -35,12 +35,6 @@ namespace Modio
 		{
 			return (A.Id == B.Id);
 		}
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModMonetizationSKU& SKU);
-
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::ModMonetizationSKU& SKU);
 	};
 
 } // namespace Modio

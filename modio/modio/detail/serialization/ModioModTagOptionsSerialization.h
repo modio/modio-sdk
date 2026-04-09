@@ -10,8 +10,8 @@
 
 #pragma once
 
+#include "modio/detail/serialization/ModioPagedResultSerialization.h"
 #include "modio/core/entities/ModioModTagOptions.h"
-
 #include "modio/detail/ModioJsonHelpers.h"
 #include "modio/detail/ModioSDKSessionData.h"
 
@@ -42,7 +42,7 @@ namespace Modio
 				TagInfo.bAllowMultipleSelection = true;
 			}
 		}
-		TagInfo.Locale = Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetLocalLanguage());
+		TagInfo.SetLocale(Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetLocalLanguage()));
 
 		Modio::Detail::ParseSafe(Json, TagInfo.bHidden, "hidden");
 		Modio::Detail::ParseSafe(Json, TagInfo.bLocked, "locked");
@@ -51,7 +51,7 @@ namespace Modio
 	inline void from_json(const nlohmann::json& Json, Modio::ModTagOptions& Options)
 	{
 		from_json(Json, static_cast<Modio::PagedResult&>(Options));
-		Detail::ParseSafe(Json, Options.InternalList, "data");
+		Detail::ParseSafe(Json, Options.GetRawList(), "data");
 	}
 
 } // namespace Modio

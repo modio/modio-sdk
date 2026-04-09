@@ -12,13 +12,52 @@
 	#include "modio/core/ModioBuffer.h"
 #endif
 
+#include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioProfiling.h"
-#include <limits>
 
 namespace Modio
 {
 	namespace Detail
 	{
+		template<typename DestinationType>
+		DestinationType TypedBufferRead(Modio::Detail::DynamicBuffer& BufferToRead, std::uintmax_t Offset)
+		{
+			auto DesiredDataRange = BufferToRead.data(Offset, sizeof(DestinationType));
+			DestinationType Destination;
+			Modio::MutableBufferView MBV(&Destination, sizeof(Destination));
+			ModioAsio::buffer_copy(MBV, DesiredDataRange);
+			return Destination;
+		}
+
+
+		template<typename DestinationType>
+		DestinationType TypedBufferRead(Modio::Detail::Buffer& BufferToRead, std::uintmax_t Offset)
+		{
+			DestinationType Destination;
+			Modio::ConstBufferView SourceBufferView(BufferToRead.Data() + Offset, sizeof(DestinationType));
+			Modio::MutableBufferView DestBufferView(&Destination, sizeof(Destination));
+			ModioAsio::buffer_copy(DestBufferView, SourceBufferView);
+			return Destination;
+		}
+
+		template uint16_t TypedBufferRead<uint16_t>(Modio::Detail::Buffer&, std::uintmax_t);
+		template uint32_t TypedBufferRead<uint32_t>(Modio::Detail::Buffer&, std::uintmax_t);
+		template uint64_t TypedBufferRead<uint64_t>(Modio::Detail::Buffer&, std::uintmax_t);
+
+		template<typename SourceType>
+		TypedWriteHelper TypedBufferWrite(const SourceType& Source, Modio::Detail::Buffer& BufferToWrite,
+										  std::uintmax_t Offset)
+		{
+			Modio::ConstBufferView SourceBufferView(&Source, sizeof(SourceType));
+			Modio::MutableBufferView DestinationBufferView(BufferToWrite.Data() + Offset, sizeof(SourceType));
+			ModioAsio::buffer_copy(DestinationBufferView, SourceBufferView);
+			return {BufferToWrite, Offset + sizeof(SourceType)};
+		}
+
+		template TypedWriteHelper TypedBufferWrite<uint16_t>(const uint16_t&, Modio::Detail::Buffer&, std::uintmax_t);
+		template TypedWriteHelper TypedBufferWrite<uint32_t>(const uint32_t&, Modio::Detail::Buffer&, std::uintmax_t);
+		template TypedWriteHelper TypedBufferWrite<uint64_t>(const uint64_t&, Modio::Detail::Buffer&, std::uintmax_t);
+
 		std::size_t Buffer::GetAlignment() const
 		{
 			return Alignment;

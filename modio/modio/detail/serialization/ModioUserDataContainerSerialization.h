@@ -11,6 +11,12 @@
 #pragma once
 
 #include "modio/detail/userdata/ModioUserDataContainer.h"
+#include "modio/detail/ModioJsonHelpers.h"
+#include "modio/detail/ModioConstants.h"
+#include "modio/detail/serialization/ModioUserSubscriptionsListSerialization.h"
+#include "modio/detail/serialization/ModioTokenSerialization.h"
+#include "modio/detail/serialization/ModioUserSerialization.h"
+#include "modio/detail/serialization/ModioAvatarSerialization.h"
 
 namespace Modio
 {
@@ -37,10 +43,8 @@ namespace Modio
 		inline void from_json(const nlohmann::json& Json, Modio::Detail::UserDataContainer& UserData)
 		{
 			Modio::User AuthenticatedUser;
-			bool ParseStatus =
-				Modio::Detail::ParseSafe(Json, AuthenticatedUser, Modio::Detail::Constants::JSONKeys::UserProfile);
-			ParseStatus &=
-				Modio::Detail::ParseSafe(Json, AuthenticatedUser.Avatar, Modio::Detail::Constants::JSONKeys::Avatar);
+			bool ParseStatus = Modio::Detail::ParseSafe(Json, AuthenticatedUser, Modio::Detail::Constants::JSONKeys::UserProfile);
+			ParseStatus &= Modio::Detail::ParseSafe(Json, AuthenticatedUser.Avatar, Modio::Detail::Constants::JSONKeys::Avatar);
 			Modio::Detail::OAuthToken Token;
 			ParseStatus &= Modio::Detail::ParseSafe(Json, Token, Modio::Detail::Constants::JSONKeys::OAuth);
 			if (ParseStatus)

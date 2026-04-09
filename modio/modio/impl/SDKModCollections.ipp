@@ -8,14 +8,7 @@
  *
  */
 
-#ifdef MODIO_SEPARATE_COMPILATION
-	#include "modio/ModioSDK.h"
-#else
-	#pragma once
-#endif
-
-#include "modio/cache/ModioCacheService.h"
-#include "modio/impl/SDKPreconditionChecks.h"
+#include "modio/detail/serialization/ModioModCollectionInfoSerialization.h"
 #include "modio/detail/ops/collection/FollowModCollectionOp.h"
 #include "modio/detail/ops/collection/GetModCollectionInfoOp.h"
 #include "modio/detail/ops/collection/GetModCollectionModsOp.h"
@@ -27,9 +20,7 @@
 #include "modio/detail/ops/collection/GetModCollectionMediaLogoOp.h"
 #include "modio/detail/ops/collection/GetModCollectionMediaAvatarOp.h"
 #include "modio/detail/ops/collection/UnsubscribeFromModCollectionOp.h"
-#include "modio/detail/serialization/ModioModInfoSerialization.h"
-#include "modio/detail/serialization/ModioModInfoListSerialization.h"
-
+#include "modio/impl/SDKPreconditionChecks.h"
 
 namespace Modio
 {

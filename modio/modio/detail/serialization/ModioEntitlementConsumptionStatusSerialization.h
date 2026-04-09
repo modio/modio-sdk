@@ -11,7 +11,6 @@
 #pragma once
 
 #include "modio/core/entities/ModioEntitlementConsumptionStatus.h"
-
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
 

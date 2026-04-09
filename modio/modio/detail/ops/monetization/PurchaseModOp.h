@@ -9,15 +9,10 @@
  */
 
 #pragma once
-#include "modio/core/ModioBuffer.h"
-#include "modio/core/ModioErrorCode.h"
-#include "modio/core/ModioServices.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/ModioSDKSessionData.h"
+
 #include "modio/detail/ops/SaveModCollectionToStorage.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/serialization/ModioTransactionRecordSerialization.h"
-#include "modio/userdata/ModioUserDataService.h"
 
 namespace Modio
 {

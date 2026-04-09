@@ -62,4 +62,6 @@ enum class EModioErrorCondition: uint8
 	RequestInProgress = 49 UMETA(ToolTip="The asynchronous operation is already running. Please wait for it to complete before calling it again") ,
 	InvalidZipFile = 50 UMETA(ToolTip="The zip file submitted is invalid.") ,
 	CloudCookingDisabled = 51 UMETA(ToolTip="Cloud Cooking is disabled for this game.") ,
+	AlreadySubscribedToUser = 52 UMETA(ToolTip="The authenticated user is already subscribed to the user.") ,
+	CannotSubscribeToSelf = 53 UMETA(ToolTip="You cannot subscribe to yourself.") ,
 };

@@ -9,12 +9,11 @@
  */
 
 #pragma once
-#include "entities/ModioProfileMaturity.h"
+
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/ModioDefines.h"
+#include "modio/core/ModioSplitCompilation.h"
+#include "modio/core/entities/ModioProfileMaturity.h"
 #include <chrono>
-#include <string>
-#include <vector>
 
 namespace Modio
 {
@@ -202,13 +201,6 @@ namespace Modio
 		/// @docinternal
 		/// @brief Append a tag to the filter params
 		MODIO_IMPL FilterParams& AppendValue(std::vector<std::string>& Vector, std::string Tag);
-
-		/*template<typename... Args>
-		FilterParams& AppendValue(std::vector<std::string>& Vector, std::string Tag, Args... args)
-		{
-			AppendValue(Vector, Tag);
-			return AppendValue(Vector, args...);
-		}*/
 
 		SortFieldType SortField = SortFieldType::ID;
 		SortDirection Direction = SortDirection::Ascending;

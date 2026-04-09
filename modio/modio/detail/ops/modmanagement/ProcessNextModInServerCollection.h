@@ -11,12 +11,9 @@
 #pragma once
 
 #include "modio/core/ModioLogger.h"
+#include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioModCollectionEntry.h"
-#include "modio/core/ModioServices.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/ops/modmanagement/InstallOrUpdateMod.h"
-#include "modio/detail/ops/modmanagement/UninstallMod.h"
-#include "modio/userdata/ModioUserDataService.h"
+#include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ModioSDKMultiplayerLibrary.h"
 
 #include <asio/yield.hpp>

@@ -9,17 +9,11 @@
  */
 
 #pragma once
-#include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioErrorCode.h"
+
 #include "modio/core/ModioLogger.h"
-#include "modio/core/ModioStdTypes.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/ModioOperationQueue.h"
-#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/file/IFileObjectImplementation.h"
-#include <atomic>
-#include <chrono>
-#include <fileapi.h>
+#include "modio/detail/ModioOperationQueue.h"
+
 namespace Modio
 {
 	namespace Detail

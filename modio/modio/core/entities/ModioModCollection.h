@@ -11,10 +11,8 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioFilterParams.h"
 #include "modio/core/entities/ModioPagedResult.h"
 #include "modio/core/entities/ModioModInfo.h"
-#include "modio/core/entities/ModioModInfoList.h"
 
 namespace Modio
 {
@@ -101,9 +99,6 @@ namespace Modio
 		std::string ProfileDescription {};
 		/// @brief Detailed description in plaintext format
 		std::string ProfileDescriptionPlaintext {};
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ModCollectionInfo& ModCollection);
 	};
 
 	/// @docpublic
@@ -124,8 +119,6 @@ namespace Modio
 		{
 			InternalList.push_back(ModInfoData);
 		}
-
-		friend inline void from_json(const nlohmann::json& Json, Modio::ModCollectionInfoList& OutModInfoList);
 	};
 
 

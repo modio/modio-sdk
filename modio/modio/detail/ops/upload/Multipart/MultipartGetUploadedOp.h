@@ -12,10 +12,11 @@
 
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/serialization/ModioUploadPartSerialization.h"
-#include "modio/http/ModioHttpParams.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/ModioSDKSessionData.h"
+#include "modio/detail/entities/ModioUploadSession.h"
 
 MODIO_DIAGNOSTIC_PUSH
-
 MODIO_ALLOW_DEPRECATED_SYMBOLS
 
 #include <asio/yield.hpp>

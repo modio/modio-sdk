@@ -20,11 +20,10 @@
 #include "modio/detail/compression/zlib/inflate_stream.hpp"
 #include "modio/detail/compression/zlib/zlib.hpp"
 #include "modio/file/ModioFile.h"
+
 #include <asio/yield.hpp>
-#include <cstdint>
 
 MODIO_DIAGNOSTIC_PUSH
-
 MODIO_ALLOW_DEPRECATED_SYMBOLS
 
 namespace Modio

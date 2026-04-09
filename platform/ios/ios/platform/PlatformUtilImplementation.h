@@ -14,6 +14,7 @@
 #include <string_view>
 #endif
 #include <string>
+#include <random>
 
 namespace Modio
 {

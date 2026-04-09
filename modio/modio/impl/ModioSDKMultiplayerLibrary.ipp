@@ -10,7 +10,6 @@
 
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "modio/detail/ModioSDKMultiplayerLibrary.h"
-	#include "modio/ModioSDK.h"
 #else
 	#pragma once
 #endif

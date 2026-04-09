@@ -9,20 +9,13 @@
  */
 
 #pragma once
-#include "modio/core/ModioCoreTypes.h"
-#include "file/FileSystemImplementation.h"
-#include "modio/core/ModioBuffer.h"
-#include "modio/core/ModioLogEnum.h"
-#include "modio/core/ModioLogger.h"
+
 #include "modio/detail/AsioWrapper.h"
-#include "modio/detail/FmtWrapper.h"
-#include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioStringHelpers.h"
+#include "modio/detail/entities/ModioLogo.h"
 #include "modio/detail/entities/ModioAvatar.h"
 #include "modio/detail/entities/ModioImage.h"
-#include "modio/detail/entities/ModioLogo.h"
-#include <iostream>
-#include <memory>
+#include "file/FileSystemImplementation.h"
 #include <queue>
 
 namespace Modio

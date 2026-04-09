@@ -9,10 +9,9 @@
  */
 
 #pragma once
-#include "modio/core/ModioCoreTypes.h"
+
 #include "modio/core/ModioSplitCompilation.h"
-#include "modio/core/entities/ModioModInfo.h"
-#include "modio/detail/JsonWrapper.h"
+#include <string>
 
 namespace Modio
 {
@@ -25,8 +24,5 @@ namespace Modio
 
 		/// @brief The token that we got
 		std::string Token {};
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::UserDelegationToken& Token);
 	};
 } // namespace Modio

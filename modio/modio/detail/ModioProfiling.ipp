@@ -12,7 +12,6 @@
 	#include "modio/detail/ModioProfiling.h"
 #endif
 
-
 Modio::Detail::ScopedProfileEvent& Modio::Detail::ScopedProfileEvent::operator=(ScopedProfileEvent&& Other)
 {
 	if (this != &Other)

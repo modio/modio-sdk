@@ -17,7 +17,7 @@
 namespace Modio
 {
 	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::ModCollectionStats& ModStats) 
+	inline void from_json(const nlohmann::json& Json, Modio::ModCollectionStats& ModStats) 
 	{
 		Detail::ParseSafe(Json, ModStats.DownloadsToday, "downloads_today");
 		Detail::ParseSafe(Json, ModStats.DownloadsTotal, "downloads_total");
@@ -35,7 +35,7 @@ namespace Modio
 	}
 
 	/// @docnone
-	MODIO_IMPL void from_json(const nlohmann::json& Json, Modio::ModCollectionInfo& ModCollection) 
+	inline void from_json(const nlohmann::json& Json, Modio::ModCollectionInfo& ModCollection) 
 	{
 		Detail::ParseSafe(Json, ModCollection.Id, "id");
 		Detail::ParseSafe(Json, ModCollection.GameId, "game_id");

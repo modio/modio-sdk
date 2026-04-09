@@ -11,7 +11,6 @@
 #pragma once
 
 #include "modio/core/entities/ModioProfileMaturity.h"
-
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/ModioJsonHelpers.h"
 

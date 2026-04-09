@@ -9,10 +9,10 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/ModioJsonHelpers.h"
+#include "modio/core/entities/ModioList.h"
 #include "modio/core/entities/ModioPagedResult.h"
-#include <string>
 
 namespace Modio
 {
@@ -39,20 +39,12 @@ namespace Modio
 				return (A.UploadID == B.UploadID) && (A.PartNumber == B.PartNumber) && (A.PartSize == B.PartSize) &&
 					   (A.DateAdded == B.DateAdded);
 			}
-
-			/// @docnone
-			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::UploadSessionPart& Session);
-
-			/// @docnone
-			MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::Detail::UploadSessionPart& Session);
 		};
 
 		/// @docpublic
 		/// @brief Container for a collection of UploadSessionPart objects
 		class UploadSessionPartList : public PagedResult, public List<std::vector, UploadSessionPart>
 		{
-			/// @docnone
-			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Detail::UploadSessionPartList& List);
 		};
 
 	} // namespace Detail

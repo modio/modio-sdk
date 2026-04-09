@@ -11,7 +11,6 @@
 #pragma once
 
 #include "modio/core/entities/ModioUserDelegationToken.h"
-
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
 

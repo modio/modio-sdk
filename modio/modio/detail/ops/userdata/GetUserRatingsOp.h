@@ -11,9 +11,10 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
+#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/serialization/ModioUserRatingListSerialization.h"
-#include <asio/yield.hpp>
 
+#include <asio/yield.hpp>
 namespace Modio
 {
 	namespace Detail

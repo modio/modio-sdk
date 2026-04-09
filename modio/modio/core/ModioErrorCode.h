@@ -1104,12 +1104,14 @@ namespace Modio
 		APIKeyForTestOnly = 11017,
 		APIKeyHasNoGame = 11016,
 		AlreadySubscribed = 15004,
+		AlreadySubscribedToUser = 11134,
 		AlreadyUnsubscribed = 15005,
 		AuthenticatedAccountHasBeenDeleted = 11006,
 		BannedUserAccount = 11007,
 		BinaryFileCorrupted = 13001,
 		BinaryFileUnreadable = 13002,
 		CannotMuteYourself = 17039,
+		CannotSubscribeToSelf = 15091,
 		CannotVerifyExternalCredentials = 11032,
 		CloudCookingDisabled = 29700,
 		CrossOriginForbidden = 10001,
@@ -1202,6 +1204,9 @@ namespace Modio
 				case ApiError::AlreadySubscribed:
 						return "The authenticated user is already subscribed to the mod.";
 					break;
+				case ApiError::AlreadySubscribedToUser:
+						return "The authenticated user is already subscribed to the user.";
+					break;
 				case ApiError::AlreadyUnsubscribed:
 						return "The authenticated user is not subscribed to the mod.";
 					break;
@@ -1219,6 +1224,9 @@ namespace Modio
 					break;
 				case ApiError::CannotMuteYourself:
 						return "You cannot mute yourself.";
+					break;
+				case ApiError::CannotSubscribeToSelf:
+						return "You cannot subscribe to yourself.";
 					break;
 				case ApiError::CannotVerifyExternalCredentials:
 						return "mod.io was unable to verify the credentials against the external service provider.";
@@ -1705,7 +1713,11 @@ namespace Modio
 		/// @brief The zip file submitted is invalid.
 		InvalidZipFile = 50,
 		/// @brief Cloud Cooking is disabled for this game.
-		CloudCookingDisabled = 51
+		CloudCookingDisabled = 51,
+		/// @brief The authenticated user is already subscribed to the user.
+		AlreadySubscribedToUser = 52,
+		/// @brief You cannot subscribe to yourself.
+		CannotSubscribeToSelf = 53
 	};
 
 	/// @docnone
@@ -1870,6 +1882,12 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::CloudCookingDisabled:
 					return "Cloud Cooking is disabled for this game.";
+				break;
+				case ErrorConditionTypes::AlreadySubscribedToUser:
+					return "The authenticated user is already subscribed to the user.";
+				break;
+				case ErrorConditionTypes::CannotSubscribeToSelf:
+					return "You cannot subscribe to yourself.";
 				break;
 				default:
 					return "Unknown error condition";
@@ -2117,6 +2135,11 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::ApiError::CannotSubscribeToSelf)
+					{
+						return true;
+					}
+
 
 				break;
 				case ErrorConditionTypes::FilesystemError:
@@ -2234,6 +2257,11 @@ namespace Modio
 					}
 
 					if (ec == Modio::ApiError::MonetizationItemAlreadyOwned)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::AlreadySubscribedToUser)
 					{
 						return true;
 					}
@@ -3563,6 +3591,22 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::CloudCookingDisabled:
 					if (ec == Modio::ApiError::CloudCookingDisabled)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::AlreadySubscribedToUser:
+					if (ec == Modio::ApiError::AlreadySubscribedToUser)
+					{
+						return true;
+					}
+
+
+				break;
+				case ErrorConditionTypes::CannotSubscribeToSelf:
+					if (ec == Modio::ApiError::CannotSubscribeToSelf)
 					{
 						return true;
 					}

@@ -9,8 +9,9 @@
  */
 
 #pragma once
-#include "modio/core/ModioServices.h"
+
 #include "logging/LoggerImplementation.h"
+#include "modio/core/ModioServices.h"
 #include "modio/core/ModioLogBuffer.h"
 #include "modio/core/ModioLogEnum.h"
 #include "modio/detail/AsioWrapper.h"

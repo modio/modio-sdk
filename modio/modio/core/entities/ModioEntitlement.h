@@ -13,8 +13,6 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/entities/ModioList.h"
 #include "modio/core/entities/ModioPagedResult.h"
-#include "modio/detail/JsonWrapper.h"
-#include <string>
 
 namespace Modio
 {
@@ -22,15 +20,10 @@ namespace Modio
 	{
 		std::string SkuId;
 		Modio::EntitlementType Type;
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Entitlement& OutEntitlement);
 	};
 
 	class EntitlementList : public Modio::PagedResult, public Modio::List<std::vector, Modio::Entitlement>
 	{
 	public:
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, EntitlementList& OutEntitlementList);
 	};
 } // namespace Modio

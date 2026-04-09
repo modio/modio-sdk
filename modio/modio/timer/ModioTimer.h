@@ -10,11 +10,8 @@
 
 #pragma once
 
-#include "modio/core/ModioLogEnum.h"
-#include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/timer/ModioTimerService.h"
-#include <chrono>
 
 namespace Modio
 {

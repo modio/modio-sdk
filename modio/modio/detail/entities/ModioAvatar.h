@@ -9,8 +9,8 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioCoreTypes.h"
-#include <string>
 
 namespace Modio
 {
@@ -35,12 +35,6 @@ namespace Modio
 				return (A.Filename == B.Filename && A.Original == B.Original && A.Thumb50x50 == B.Thumb50x50 &&
 						A.Thumb100x100 == B.Thumb100x100);
 			}
-
-			/// @docnone
-			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Avatar& Avatar);
-
-			/// @docnone
-			MODIO_IMPL friend void to_json(nlohmann::json& Json, const Avatar& Avatar);
 		};
 
 		/// @docpublic

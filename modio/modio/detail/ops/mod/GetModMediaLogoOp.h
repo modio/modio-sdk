@@ -15,7 +15,6 @@
 #include "modio/detail/ops/ModioLogoImageType.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/serialization/ModioLogoSerialization.h"
-#include <asio/coroutine.hpp>
 
 namespace Modio
 {

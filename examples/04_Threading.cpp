@@ -14,6 +14,7 @@
 #include <future>
 #include <iostream>
 #include <thread>
+#include <sstream>
 
 /// This example demonstrates calling Modio::RunPendingHandlers() on a background thread. This can improve performance
 /// by decoupling the application's main loop from the frequency with which SDK work is performed.

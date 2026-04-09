@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioInitializeOptions.h"
 
 namespace Modio

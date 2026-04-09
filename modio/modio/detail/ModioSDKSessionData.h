@@ -9,24 +9,19 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioCoreTypes.h"
+#include "modio/core/ModioModCollectionEntry.h"
 #include "modio/core/ModioCreateModFileParams.h"
 #include "modio/core/ModioCreateSourceFileParams.h"
-#include "modio/core/ModioModCollectionEntry.h"
-#include "modio/core/entities/ModioModCollection.h"
-#include "modio/core/entities/ModioUser.h"
 #include "modio/detail/ConcurrentQueueWrapper.h"
+#include "modio/detail/FilesystemWrapper.h"
 #include "modio/detail/Function2Wrapper.h"
-#include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/userdata/ModioUserDataContainer.h"
-#include "modio/detail/userdata/ModioUserProfile.h"
-
-#include <chrono>
 #include <map>
-#include <memory>
 #include <queue>
 #include <shared_mutex>
-#include <vector>
+#include <unordered_map>
 
 namespace Modio
 {

@@ -9,11 +9,11 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioServices.h"
 #include "modio/core/entities/ModioMetricsSessionHeartbeatParams.h"
 #include "modio/detail/serialization/ModioMetricsSessionHeartbeatParamsSerialization.h"
-#include <asio/coroutine.hpp>
 
 #include <asio/yield.hpp>
 namespace Modio

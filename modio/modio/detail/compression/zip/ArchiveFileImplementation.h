@@ -9,11 +9,9 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/FilesystemWrapper.h"
-#include "modio/detail/AsioWrapper.h"
-#include <cstdint>
-#include <vector>
 
 namespace Modio
 {

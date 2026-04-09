@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io SDK.
  *
@@ -9,17 +9,17 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/detail/FilesystemWrapper.h"
-#include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioStringHash.h"
 #include "modio/detail/ModioStringHelpers.h"
 #include "modio/detail/http/ModioRequestBodyKVPContainer.h"
-#include <regex>
-#include <string>
+#include <string_view>
+
 #undef DELETE
 
 #ifndef MODIO_COMMIT_HASH
@@ -166,6 +166,10 @@ namespace Modio
 			MODIO_IMPL HttpRequestParams SetUserID(Modio::UserID ID) const;
 
 			MODIO_IMPL HttpRequestParams& SetUserID(Modio::UserID ID);
+
+			MODIO_IMPL HttpRequestParams SetTargetUserID(Modio::UserID ID) const;
+
+			MODIO_IMPL HttpRequestParams& SetTargetUserID(Modio::UserID ID);
 
 			MODIO_IMPL HttpRequestParams SetModCollectionID(Modio::ModCollectionID ID) const;
 
@@ -337,6 +341,7 @@ namespace Modio
 				  ModID(0),
 				  UserID(0),
 				  CollectionID(0),
+				  TargetUserID(0),
 				  CurrentOperationType(CurrentOperationType),
 				  CurrentAPIVersion(Modio::Detail::APIVersion::V1)
 			{}
@@ -348,6 +353,7 @@ namespace Modio
 				  ModID(0),
 				  UserID(0),
 				  CollectionID(0),
+				  TargetUserID(0),
 				  CurrentOperationType(CurrentOperationType),
 				  CurrentAPIVersion(Modio::Detail::APIVersion::V1)
 			{}
@@ -359,6 +365,7 @@ namespace Modio
 				  ModID(0),
 				  UserID(0),
 				  CollectionID(0),
+				  TargetUserID(0),
 				  CurrentOperationType(Modio::Detail::Verb::GET),
 				  CurrentAPIVersion(Modio::Detail::APIVersion::V1)
 			{}
@@ -401,6 +408,7 @@ namespace Modio
 			std::uint64_t ModID {};
 			std::uint64_t UserID {};
 			std::uint64_t CollectionID {};
+			std::uint64_t TargetUserID {};
 
 			// This should most likely be a ID into a separate payload store or
 			// let it be put as a different parameter

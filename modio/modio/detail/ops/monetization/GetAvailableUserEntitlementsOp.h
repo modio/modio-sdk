@@ -11,11 +11,8 @@
 #pragma once
 
 #include "modio/core/entities/ModioEntitlement.h"
-#include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/serialization/ModioEntitlementSerialization.h"
-#include "modio/http/ModioHttpParams.h"
-#include <memory>
 
 #include <asio/yield.hpp>
 namespace Modio

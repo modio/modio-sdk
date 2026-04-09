@@ -9,20 +9,14 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioLogger.h"
-#include "modio/core/ModioModCollectionEntry.h"
-#include "modio/core/ModioServices.h"
-#include "modio/core/ModioStdTypes.h"
+#include "modio/userdata/ModioUserDataService.h"
 #include "modio/detail/ops/SaveModCollectionToStorage.h"
 #include "modio/detail/ops/UnsubscribeFromMod.h"
 #include "modio/detail/ops/modmanagement/FetchUserSubscriptionsFromServer.h"
-#include "modio/file/ModioFileService.h"
-#include "modio/userdata/ModioUserDataService.h"
-#include <algorithm>
-#include <asio/coroutine.hpp>
-#include <asio/yield.hpp>
-#include <map>
 
+#include <asio/yield.hpp>
 namespace Modio
 {
 	namespace Detail

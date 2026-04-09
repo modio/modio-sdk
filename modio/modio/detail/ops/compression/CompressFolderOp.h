@@ -20,7 +20,6 @@
 #include "modio/file/ModioFile.h"
 #include "modio/file/ModioFileService.h"
 #include "modio/detail/ModioStringHash.h"
-#include <memory>
 #include "modio/detail/ModioSDKSessionData.h"
 
 MODIO_DIAGNOSTIC_PUSH

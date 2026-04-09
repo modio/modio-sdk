@@ -11,7 +11,6 @@
 #pragma once
 
 #include "modio/core/ModioSplitCompilation.h"
-#include "modio/detail/JsonWrapper.h"
 #include <cstdint>
 
 namespace Modio
@@ -62,9 +61,6 @@ namespace Modio
 		{
 			return ResultCount;
 		}
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::PagedResult& PagedResult);
 
 		/// @docnone
 		MODIO_IMPL friend void InitializePageResult(Modio::PagedResult& PagedResult, std::int32_t PageIndex,

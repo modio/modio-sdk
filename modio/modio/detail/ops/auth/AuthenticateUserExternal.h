@@ -11,6 +11,10 @@
 #pragma once
 
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/ModioConstants.h"
+#include "modio/detail/http/ResponseError.h"
+#include "modio/detail/serialization/ModioResponseErrorSerialization.h"
+#include "modio/detail/serialization/ModioTokenSerialization.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/ops/userdata/VerifyUserAuthenticationOp.h"
 #include "modio/http/ModioHttpParams.h"

@@ -10,15 +10,14 @@
 
 #pragma once
 
-#include "modio/core/ModioCoreTypes.h"
+#include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
-#include "modio/core/ModioServices.h"
+#include "modio/detail/ModioSDKSessionData.h"
 #include "modio/file/ModioFile.h"
 #include "modio/file/ModioFileService.h"
-#include "modio/userdata/ModioUserDataService.h"
+
 #include <asio/yield.hpp>
-#include <memory>
 namespace Modio
 {
 	namespace Detail

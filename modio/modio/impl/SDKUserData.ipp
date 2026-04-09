@@ -8,16 +8,9 @@
  *
  */
 
-// Implementation header - do not include directly
-#include "modio/core/ModioStdTypes.h"
-#ifdef MODIO_SEPARATE_COMPILATION
-	#include "modio/ModioSDK.h"
-#else
-	#pragma once
-#endif
-
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/ModioStringHelpers.h"
+#include "modio/detail/ModioSDKSessionData.h"
+#include "modio/detail/serialization/ModioUserSerialization.h"
 #include "modio/detail/ops/AuthenticateUserByEmailOp.h"
 #include "modio/detail/ops/RequestEmailAuthCodeOp.h"
 #include "modio/detail/ops/auth/AuthenticateUserByApple.h"
@@ -36,15 +29,10 @@
 #include "modio/detail/ops/auth/AuthenticateUserDelegatedToken.h"
 #include "modio/detail/ops/auth/ModioGetTermsOfUseOp.h"
 #include "modio/detail/ops/user/GetUserMediaOp.h"
-#include "modio/detail/ops/userdata/ListUserGamesOp.h"
 #include "modio/detail/ops/userdata/GetUserRatingsOp.h"
+#include "modio/detail/ops/userdata/ListUserGamesOp.h"
 #include "modio/detail/ops/userdata/RefreshUserDataOp.h"
-#include "modio/detail/ops/userdata/VerifyUserAuthenticationOp.h"
-#include "modio/detail/serialization/ModioResponseErrorSerialization.h"
-#include "modio/detail/serialization/ModioTermsSerialization.h"
-#include "modio/detail/serialization/ModioTokenSerialization.h"
 #include "modio/impl/SDKPreconditionChecks.h"
-#include "modio/userdata/ModioUserDataService.h"
 
 namespace Modio
 {

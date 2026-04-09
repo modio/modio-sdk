@@ -9,17 +9,14 @@
  */
 
 #pragma once
+
 #include "modio/detail/ModioSDKSessionData.h"
-#include "modio/detail/ops/FetchExternalUpdates.h"
-#include "modio/detail/ops/PreviewExternalUpdatesOp.h"
 #include "modio/detail/ops/modmanagement/ProcessNextModInUserCollection.h"
 #include "modio/detail/ops/modmanagement/ProcessNextModInTempModSet.h"
 #include "modio/detail/ops/modmanagement/ProcessNextModInServerCollection.h"
-#include "modio/detail/ModioSDKMultiplayerLibrary.h"
-#include "modio/detail/AsioWrapper.h"
 #include "modio/timer/ModioTimer.h"
+
 #include <asio/yield.hpp>
-#include <memory>
 namespace Modio
 {
 	namespace Detail

@@ -11,7 +11,6 @@
 #pragma once
 
 #include "modio/core/ModioBuffer.h"
-#include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/ModioOperationQueue.h"
 #include "modio/file/ModioFile.h"
 #include "modio/http/ModioHttpParams.h"

@@ -9,14 +9,15 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/http/ModioHttpParams.h"
-#include <asio/yield.hpp>
 
+#include <asio/yield.hpp>
 namespace Modio
 {
 	namespace Detail

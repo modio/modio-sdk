@@ -13,10 +13,8 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/serialization/ModioModDetailsSerialization.h"
-#include <asio/coroutine.hpp>
 
 #include <asio/yield.hpp>
-
 namespace Modio
 {
 	namespace Detail

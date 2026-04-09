@@ -11,12 +11,14 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioStdTypes.h"
+#include "modio/core/ModioErrorCode.h"
+#include "modio/detail/FilesystemWrapper.h"
+#include "modio/detail/ModioStringHelpers.h"
+#include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/ModioAvatarImageType.h"
 #include "modio/detail/ops/ModioDownloadImage.h"
-#include "modio/detail/serialization/ModioAvatarSerialization.h"
-#include <asio/yield.hpp>
 
+#include <asio/yield.hpp>
 namespace Modio
 {
 	namespace Detail

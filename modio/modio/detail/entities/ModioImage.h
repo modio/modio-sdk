@@ -11,9 +11,6 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/HedleyWrapper.h"
-#include "modio/detail/JsonWrapper.h"
-#include <string>
 
 namespace Modio
 {
@@ -37,12 +34,6 @@ namespace Modio
 			{
 				return (A.Filename == B.Filename && A.Original == B.Original && A.Thumb320x180 == B.Thumb320x180);
 			}
-
-			/// @docnone
-			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Image& Image);
-
-			/// @docnone
-			MODIO_IMPL friend void to_json(nlohmann::json& Json, const Image& Image);
 		};
 
 		// GetImmageURL() creates false "unused functions" warnings on certain platforms.

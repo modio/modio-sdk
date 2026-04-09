@@ -292,6 +292,12 @@
 		#define MODIO_DISABLE_WARNING_ZERO_AS_NULL_POINTER_CONSTANT
 	#endif
 
+	#if HEDLEY_HAS_WARNING("-Wshadow")
+		#define MODIO_DISABLE_WARNING_VARIABLE_SHADOWING MODIO_DISABLE_WARNING(-Wshadow)
+	#else
+		#define MODIO_DISABLE_WARNING_VARIABLE_SHADOWING
+	#endif
+
 #elif defined(_MSC_VER)
 	#define MODIO_DISABLE_WARNING_PUSH MODIO_DO_PRAGMA(warning(push))
 	#define MODIO_DISABLE_WARNING_POP MODIO_DO_PRAGMA(warning(pop))
@@ -322,6 +328,9 @@
 
     // Compiler warning (level 4) C4435	'class1' : Object layout under /vd2 will change due to virtual base 'class2'
 	#define MODIO_DISABLE_WARNING_OBJECT_LAYOUT MODIO_DISABLE_WARNING(4435)
+
+	// Compiler warning (level 4) C4459 : declaration of 'a' hides global declaration
+	#define MODIO_DISABLE_WARNING_VARIABLE_SHADOWING MODIO_DISABLE_WARNING(4459)
 
     // Compiler warning (level 4) C4505	'function': unreferenced local function has been removed
 	#define MODIO_DISABLE_WARNING_UNREFERENCED_FUNCTION MODIO_DISABLE_WARNING(4505)

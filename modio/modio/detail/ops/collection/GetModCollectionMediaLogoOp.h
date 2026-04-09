@@ -16,9 +16,8 @@
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/serialization/ModioLogoSerialization.h"
 #include "modio/detail/serialization/ModioModCollectionInfoSerialization.h"
-#include <asio/coroutine.hpp>
-#include <asio/yield.hpp>
 
+#include <asio/yield.hpp>
 namespace Modio
 {
 	namespace Detail

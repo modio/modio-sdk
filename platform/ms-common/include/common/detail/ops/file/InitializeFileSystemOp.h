@@ -9,14 +9,11 @@
  */
 
 #pragma once
+
 #include "common/file/StaticDirectoriesImplementation.h"
-#include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioInitializeOptions.h"
-#include "modio/core/ModioStdTypes.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/detail/FmtWrapper.h"
+#include "modio/core/ModioErrorCode.h"
 #include <ShlObj.h>
-#include <memory>
 
 #include <asio/yield.hpp>
 namespace Modio

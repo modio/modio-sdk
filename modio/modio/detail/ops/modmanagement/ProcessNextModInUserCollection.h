@@ -9,17 +9,15 @@
  */
 
 #pragma once
-#include "modio/core/ModioLogger.h"
-#include "modio/core/ModioModCollectionEntry.h"
-#include "modio/core/ModioServices.h"
-#include "modio/detail/AsioWrapper.h"
+
+#include "modio/core/ModioTemporaryModSet.h"
 #include "modio/detail/ModioSDKSessionData.h"
-#include "modio/detail/ops/SaveModCollectionToStorage.h"
 #include "modio/detail/ops/mod/SubmitNewModFileOp.h"
 #include "modio/detail/ops/mod/SubmitNewModSourceFileOp.h"
 #include "modio/detail/ops/modmanagement/InstallOrUpdateMod.h"
 #include "modio/detail/ops/modmanagement/UninstallMod.h"
-#include "modio/userdata/ModioUserDataService.h"
+#include "modio/detail/ops/FetchExternalUpdates.h"
+
 #include <asio/yield.hpp>
 namespace Modio
 {

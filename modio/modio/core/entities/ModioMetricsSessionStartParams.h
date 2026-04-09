@@ -11,10 +11,6 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/JsonWrapper.h"
-#include "modio/detail/ModioHashHelpers.h"
-
-#include <string>
 
 namespace Modio
 {
@@ -40,8 +36,5 @@ namespace Modio
 
 		/// @brief An incremental order Id for each request sent to the server.
 		uint64_t SessionOrderId = 0;
-
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::MetricsSessionStartParams& Params);
 	};
 } // namespace Modio

@@ -11,7 +11,6 @@
 #pragma once
 
 #include "modio/core/entities/ModioGameStats.h"
-
 #include "modio/detail/ModioJsonHelpers.h"
 
 namespace Modio

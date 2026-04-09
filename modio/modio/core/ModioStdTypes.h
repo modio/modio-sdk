@@ -9,16 +9,16 @@
  */
 
 #pragma once
+
+#include "modio/core/ModioSDKForwardDecls.h"
 #include "modio/core/ModioSplitCompilation.h"
 #include "modio/detail/ModioDefines.h"
-
 #include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/OptionalWrapper.h"
-#include <chrono>
-#include <cstdint>
 #include <memory>
 #include <string>
 #include <system_error>
+#include <cstdint>
 
 namespace ModioAsio
 {
@@ -44,13 +44,6 @@ namespace Modio
 		ErrorCode() : error_code() {}
 		using error_code::error_code;
 	};
-
-	/// @docpublic
-	/// @brief nullable wrapper around object of type T. Used by async functions that return values - empty on function
-	/// error/failure
-	/// @tparam T underlying type
-	template<typename T>
-	using Optional = tl::optional<T>;
 
 	using MutableBufferView = ModioAsio::mutable_buffer;
 	using ConstBufferView = ModioAsio::const_buffer;

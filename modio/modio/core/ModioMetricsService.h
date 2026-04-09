@@ -9,9 +9,8 @@
  */
 
 #pragma once
-#include "modio/core/ModioCoreTypes.h"
-#include "modio/core/ModioLogger.h"
 
+#include "modio/core/ModioCoreTypes.h"
 #include "modio/detail/AsioWrapper.h"
 
 namespace Modio
@@ -92,16 +91,7 @@ namespace Modio
 				return SessionStartTime;
 			}
 
-			time_t GetSessionDuration() const
-			{
-				if (!GetSessionIsActive())
-				{
-					Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::ModMetrics,
-												"Cannot get session duration when no session is active");
-					return 0;
-				}
-				return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) - SessionStartTime;
-			}
+			time_t GetSessionDuration() const;
 
 		private:
 			MODIO_IMPL void StartSession();

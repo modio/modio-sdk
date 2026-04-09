@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io SDK.
  *
@@ -10,11 +10,13 @@
 
 #pragma once
 
-#include "linux/LibUringWrapper.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioErrorCode.h"
+#include "modio/core/ModioLogger.h"
+#include "unistd.h"
 #include <map>
+#include <sys/param.h>
 
 namespace Modio
 {
@@ -22,147 +24,6 @@ namespace Modio
 	{
 		class FileSharedState
 		{
-			// may need to be public but we'll see
-			void UringHandlePendingCompletions()
-			{
-				io_uring_cqe* CompletionInfo = nullptr;
-
-				while (io_uring_peek_cqe(&UringState, &CompletionInfo) == 0)
-				{
-					int FileDescriptorVal = (int) (uintptr_t) (io_uring_cqe_get_data(CompletionInfo));
-					// When the value of IOResult is negative, it means uring had an error. A positive
-					// number refers to the number of bytes transacted
-					std::size_t IOResult = CompletionInfo->res;
-					auto IOStatus = PendingIO.find(FileDescriptorVal);
-					// Need to bail here if IOStatus == PendingIO.end();
-
-					if (IOStatus->second.DidFinish != true)
-					{
-						Modio::Optional<Modio::ErrorCode> Empty = {};
-						if (IOStatus->second.TransferDirection == PendingIOOperation::Direction::Read)
-						{
-							Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
-														"Read FileDescriptor: {}, Completion Info {}",
-														FileDescriptorVal, IOResult);
-
-							// Read may have only been partial, so make sure we record how much was read
-							if (IOResult > 0)
-							{
-								std::size_t ExpectedBytes = IOStatus->second.Data.GetSize();
-								std::size_t TotalBytes = IOResult + IOStatus->second.Offset;
-								IOStatus->second.NumBytesTransferred = Modio::FileSize(IOResult);
-
-								// The conditions to flag a "Finished" status are as follows:
-								// - The peek operation has transfered to the Buffer all the ExpectedBytes
-								// - The IOResult matches the number of ExpectedBytes.
-								// The last case could occur when a Read/write ocurrs with offset and the expected
-								// buffer is smaller than the TotalBytes.
-								IOStatus->second.DidFinish = TotalBytes == ExpectedBytes || IOResult == ExpectedBytes;
-								IOStatus->second.Result = Empty;
-
-								// if we had a partial read...
-								if (!IOStatus->second.DidFinish)
-								{
-									// Check if we read to the end of the file
-									if (IOStatus->second.CachedFileSize == Modio::FileSize(0))
-									{
-										struct stat FileStat;
-										if (fstat(FileDescriptorVal, &FileStat) == -1)
-										{
-											int CachedErrno = errno;
-											Modio::Detail::Logger().Log(
-												LogLevel::Error, LogCategory::File,
-												"Could not retrieve file size via fstat for fd {}, errno {}",
-												FileDescriptorVal, CachedErrno);
-										}
-										else
-										{
-											IOStatus->second.CachedFileSize = Modio::FileSize(FileStat.st_size);
-										}
-									}
-									//If the offset into the file plus the amount of bytes that we just read equals the size of the file, we're EOF
-									if (Modio::FileSize(TotalBytes) == IOStatus->second.CachedFileSize)
-									{
-										IOStatus->second.DidFinish = true;
-										IOStatus->second.Result = Modio::make_error_code(Modio::GenericError::EndOfFile);
-									}
-								}
-							}
-							else if (IOResult == 0)
-							{
-								Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::File,
-															"No bytes read for FileDescriptor {}",
-															IOResult, FileDescriptorVal);
-								IOStatus->second.DidFinish = true;
-								IOStatus->second.Result = Modio::make_error_code(Modio::GenericError::EndOfFile);
-							}
-							else
-							{
-								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-															"Error code {} during read of FileDescriptor {}", IOResult,
-															FileDescriptorVal);
-								IOStatus->second.DidFinish = true;
-								IOStatus->second.Result = Modio::make_error_code(Modio::FilesystemError::ReadError);
-							}
-						}
-						else
-						{
-							Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::File,
-														"Write FileDescriptor: {}, Completion Info {}",
-														FileDescriptorVal, IOResult);
-
-							if (IOResult < 0)
-							{
-								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-															"Error code {} during write of FileDescriptor {}", IOResult,
-															FileDescriptorVal);
-								IOStatus->second.DidFinish = true;
-								IOStatus->second.Result = Modio::make_error_code(Modio::FilesystemError::WriteError);
-							}
-							else if (IOResult == 0)
-							{
-								IOStatus->second.Result = Empty;
-								IOStatus->second.DidFinish = true;
-							}
-							else
-							{
-								// we didn't write the entire buffer out, so we issue another call
-								// Track bytes transferred and new offset
-								IOStatus->second.NumBytesTransferred += Modio::FileSize(IOResult);
-								IOStatus->second.Offset += Modio::FileOffset(IOResult);
-
-								// Reissue the write request with the new range
-								if (IOResult < IOStatus->second.Data.GetSize())
-								{
-									io_uring_sqe* NewOp = io_uring_get_sqe(&UringState);
-									if (!NewOp)
-									{
-										return; // Will need to return an errorcode
-									}
-									// Prep another write call, offsetting into our existing buffer so we don't have to
-									// reallocate
-									io_uring_prep_write(
-										NewOp, IOStatus->second.AssociatedDescriptor,
-										IOStatus->second.Data.Data() + IOStatus->second.NumBytesTransferred,
-										IOStatus->second.Data.GetSize() - IOStatus->second.NumBytesTransferred,
-										IOStatus->second.Offset);
-
-									io_uring_submit(&UringState);
-								}
-								else
-								{
-									IOStatus->second.Result = Empty;
-									IOStatus->second.DidFinish = true;
-								}
-							}
-						}
-					}
-
-					io_uring_cqe_seen(&UringState, CompletionInfo);
-					CompletionInfo = nullptr;
-				}
-			};
-
 			struct PendingIOOperation
 			{
 				enum class Direction
@@ -172,20 +33,17 @@ namespace Modio
 				};
 
 				Modio::Detail::Buffer Data;
-				int AssociatedDescriptor = 0;
+				int AssocFileDesc {};
 				bool DidFinish = false;
-				int OpTrials = 0;
-				Modio::FileSize CachedFileSize = Modio::FileSize(0);
 				Modio::Optional<Modio::ErrorCode> Result {};
-				/// @brief In theory we should be configuring uring to never perform partial writes but we definitely
-				/// need support for partial reads
 				Modio::FileSize NumBytesTransferred {};
 				Direction TransferDirection {};
 				Modio::FileOffset Offset {};
-				PendingIOOperation(Modio::Detail::Buffer Data, int AssociatedDescriptor, Direction TransferDirection,
+
+				PendingIOOperation(Modio::Detail::Buffer Data, int FileDescriptor, Direction TransferDirection,
 								   Modio::FileOffset Offset)
 					: Data(std::move(Data)),
-					  AssociatedDescriptor(AssociatedDescriptor),
+					  AssocFileDesc(FileDescriptor),
 					  Result {},
 					  NumBytesTransferred(0),
 					  TransferDirection(TransferDirection),
@@ -193,39 +51,127 @@ namespace Modio
 				{}
 			};
 
-			std::map<int, PendingIOOperation> PendingIO {};
+			void PerformPendingOperation(PendingIOOperation& FileOp)
+			{
+				if (FileOp.DidFinish == true)
+				{
+					return;
+				}
+
+				// Stores the number of bytes transfered as result of pwrite/pread
+				size_t Result = -1;
+				// A flag that checks if the number of bytes exceeds MAX_BYTES, in case
+				// it does, it will transfer MAX_BYTES at the time.
+				bool Overflow = FileOp.Data.GetSize() > MAX_BYTES;
+				// Shortcut to the buffer size
+				uint64_t BufferSize = FileOp.Data.GetSize();
+				// Number of bytes to transfer in this operation
+				size_t Bytes = Overflow ? MIN(MAX_BYTES, BufferSize - FileOp.NumBytesTransferred) : BufferSize;
+				// The File offset, which could change according to the Overflow
+				size_t AltFileOffset = FileOp.Offset;
+				unsigned char* DataPointer;
+				// In case we have an error, this will be retain the side where it occurred
+				Modio::ErrorCode Err;
+
+				// When an operation requires to move more than MAX_BYTES, the
+				// buffer is split in byte sections.
+				if (Overflow)
+				{
+					// In case the next operation happens, it needs to move the pointer
+					// by the number of bytes transferred las time
+					DataPointer = FileOp.Data.Data() + FileOp.NumBytesTransferred;
+					// Also the offset from the original location
+					AltFileOffset += FileOp.NumBytesTransferred;
+				}
+				else
+				{
+					DataPointer = FileOp.Data.Data();
+				}
+
+				if (FileOp.TransferDirection == PendingIOOperation::Direction::Write)
+				{
+					Result = pwrite(FileOp.AssocFileDesc, DataPointer, Bytes, AltFileOffset);
+					Err = Modio::make_error_code(Modio::FilesystemError::WriteError);
+				}
+				else if (FileOp.TransferDirection == PendingIOOperation::Direction::Read)
+				{
+					Result = pread(FileOp.AssocFileDesc, DataPointer, Bytes, AltFileOffset);
+					Err = Modio::make_error_code(Modio::FilesystemError::ReadError);
+				}
+
+				if (Result < 0)
+				{
+					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+												"Could not operate on file descriptor {}, response: {}",
+												FileOp.AssocFileDesc, Result);
+					FileOp.Result = Err;
+					FileOp.DidFinish = true;
+					return;
+				}
+				// This case could happen when the file operation goes outside of the file on disk
+				// bounds. Example: Read more bytes with a larger offset than the file size.
+				else if (Result > Bytes)
+				{
+					Modio::Detail::Logger().Log(
+						Modio::LogLevel::Error, Modio::LogCategory::File,
+						"Trying to operate on file descriptor {} with out-of-bounds response: {}", FileOp.AssocFileDesc,
+						Result);
+					FileOp.Result = Err;
+					FileOp.DidFinish = true;
+					return;
+				}
+
+				// It is necessary to keep track of the number of bytes transferred in the Pending Operation
+				FileOp.NumBytesTransferred += Modio::FileSize(Result);
+				// A "Result == 0" means that the file does not have any more bytes to read. This happens when
+				// an offset tries to read more bytes into a buffer than the actual file has on disk.
+				FileOp.DidFinish = (FileOp.NumBytesTransferred >= BufferSize) || (Result == 0);
+
+				return;
+			}
+
+			void HandlePendingTasks()
+			{
+				std::for_each(PendingIO.begin(), PendingIO.end(),
+							  [this](std::pair<const int, PendingIOOperation>& Element) {
+								  PendingIOOperation& PendingOp = Element.second;
+
+								  // The PendingOperation has finished, nothing else to do.
+								  if (PendingOp.DidFinish)
+								  {
+									  return;
+								  }
+
+								  uint64_t BytesTransfer = PendingOp.Data.GetSize() - PendingOp.NumBytesTransferred;
+
+								  // It means that the PedingOp has not transferred all bytes to the Buffer
+								  if (BytesTransfer > 0)
+								  {
+									  PerformPendingOperation(PendingOp);
+								  }
+								  else
+								  {
+									  PendingOp.Result = {};
+									  PendingOp.DidFinish = true;
+								  }
+							  });
+			};
+
+			std::map<int, PendingIOOperation> PendingIO;
+			const size_t MAX_BYTES = 1048575; // It operates in 1 MB chunks of data.
 
 		public:
-			io_uring UringState {};
 			bool bCancelRequested = false;
 
 			Modio::ErrorCode Initialize()
 			{
-				if (io_uring_queue_init(200, &UringState, 0))
-				{
-					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-												"FileSharedState::Initialize error code {}", errno);
-					return Modio::make_error_code(Modio::FilesystemError::NoPermission);
-				}
-				else
-				{
-					return {};
-				}
+				return {};
 			}
 
-			~FileSharedState()
-			{
-				// During testing, if the context is outside of normal execution, the UringState
-				// is invalid, then it breaks when trying to "exit"
-				if (UringState.sq.ring_ptr != NULL)
-				{
-					io_uring_queue_exit(&UringState);
-				}
-			}
+			~FileSharedState() {}
 
 			/// @brief Adaptor function for converting Modio specific data structures to the underlying liburing C
 			/// interface
-			/// @param SubmissionQueueEvent The SQE to associate with this IO request
 			/// @param FileDescriptor The file handle to read from
 			/// @param AmountOfData How much data to read
 			/// @param OffsetInFile The absolute offset in the file to read from
@@ -238,15 +184,6 @@ namespace Modio
 												"Invalid submit read with File Descriptor {} and {} data",
 												FileDescriptor, AmountOfData);
 					return Modio::make_error_code(Modio::GenericError::BadParameter);
-				}
-
-				io_uring_sqe* NewOp = io_uring_get_sqe(&UringState);
-				if (!NewOp)
-				{
-					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-												"Did not successfully submit read for File Descriptor {}",
-												FileDescriptor);
-					return Modio::make_error_code(Modio::GenericError::CouldNotCreateHandle);
 				}
 
 				auto ExistingOp = PendingIO.find(FileDescriptor);
@@ -264,20 +201,11 @@ namespace Modio
 				auto PendingOp = PendingIO.insert(std::make_pair(
 					FileDescriptor, PendingIOOperation(Modio::Detail::Buffer(AmountOfData), FileDescriptor,
 													   PendingIOOperation::Direction::Read, OffsetInFile)));
-				if (PendingOp.second)
+
+				if (PendingOp.second == true)
 				{
-					io_uring_prep_read(NewOp, FileDescriptor, PendingOp.first->second.Data.Data(), AmountOfData,
-									   OffsetInFile);
-					// Solve error: cast to 'void *' from smaller integer type 'int'
-					// With a cast to size_t
-					io_uring_sqe_set_data(NewOp, (void*) (size_t) FileDescriptor);
-					if (!io_uring_submit(&UringState))
-					{
-						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-													"Did not successfully submit read for File Descriptor {}",
-													FileDescriptor);
-						return Modio::make_error_code(Modio::GenericError::CouldNotCreateHandle);
-					}
+					PerformPendingOperation(PendingOp.first->second);
+					return PendingOp.first->second.Result;
 				}
 				else
 				{
@@ -299,15 +227,6 @@ namespace Modio
 					return Modio::make_error_code(Modio::GenericError::BadParameter);
 				}
 
-				io_uring_sqe* NewOp = io_uring_get_sqe(&UringState);
-				if (!NewOp)
-				{
-					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-												"Did not successfully submit write for File Descriptor {}",
-												FileDescriptor);
-					return Modio::make_error_code(Modio::GenericError::CouldNotCreateHandle);
-				}
-
 				// When a file is downloaded, multiple write request occur all with the same File Descriptor. Because
 				// a PendingIO is a dictionary, it keeps 1 FD for 1 PendingIOOperation.
 				auto IOStatus = PendingIO.find(FileDescriptor);
@@ -320,7 +239,8 @@ namespace Modio
 					{
 						IOStatus->second.DidFinish = false;
 						IOStatus->second.Offset = OffsetInFile;
-						IOStatus->second.OpTrials = 0;
+						IOStatus->second.NumBytesTransferred = Modio::FileSize(0);
+						IOStatus->second.Data = std::move(SourceData);
 					}
 					// It is possible that the last operation did not work, then report back that error to the caller
 					else if (IOStatus->second.Result.has_value())
@@ -337,37 +257,28 @@ namespace Modio
 						return {Modio::make_error_code(Modio::FilesystemError::FileLocked)};
 					}
 				}
-
-				// For some reason, running this on Ubuntu 21.04 + liburing-dev 0.7-3ubuntu1, writing files with sizes
-				// larger than 500KB would write suspicious bytes to the packages received from the internet. For that
-				// reason, the line below Clones the original buffer with a dedicated alignment of 256.
-				std::size_t Alignment = 256;
-				Modio::Detail::Buffer AlignedData = SourceData.Clone(Alignment);
-				// Calling this first so we don't have to worry about trying to access SourceData after we take
-				// ownership by move
-				io_uring_prep_write(NewOp, FileDescriptor, AlignedData.Data(), AlignedData.GetSize(), OffsetInFile);
-				io_uring_sqe_set_data(NewOp, (void*) (size_t) FileDescriptor);
-
-				if (InsidePendingIO == false)
-				{
-					PendingIO.insert(std::make_pair(
-						FileDescriptor, PendingIOOperation(std::move(AlignedData), FileDescriptor,
-														   PendingIOOperation::Direction::Write, OffsetInFile)));
-				}
 				else
 				{
-					// It is neccessary to move the AlignedData within the IOStatus to ensure the ownership of this
-					// aligned data remains after its execution. Previous data can be discarded because it is
-					// certain that the IO operation has finished.
-					IOStatus->second.Data = std::move(AlignedData);
-				}
+					// For some reason, running this on Ubuntu 21.04 + liburing-dev 0.7-3ubuntu1, writing files with
+					// sizes larger than 500KB would write suspicious bytes to the packages received from the internet.
+					// For that reason, the line below Clones the original buffer with a dedicated alignment of 256.
+					std::size_t Alignment = 256;
+					Modio::Detail::Buffer AlignedData = SourceData.Clone(Alignment);
 
-				if (!io_uring_submit(&UringState))
-				{
-					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-												"Did not successfully submit write for File Descriptor {}",
-												FileDescriptor);
-					return {Modio::make_error_code(Modio::GenericError::CouldNotCreateHandle)};
+					auto PendingOp = PendingIO.insert(std::make_pair(
+						FileDescriptor, PendingIOOperation(std::move(AlignedData), FileDescriptor,
+														   PendingIOOperation::Direction::Write, OffsetInFile)));
+
+					if (PendingOp.second == true)
+					{
+						PerformPendingOperation(PendingOp.first->second);
+						return PendingOp.first->second.Result;
+					}
+					else
+					{
+						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::File,
+													"File Descriptor {} already in queue with path", FileDescriptor);
+					}
 				}
 
 				return {};
@@ -375,7 +286,7 @@ namespace Modio
 
 			std::pair<bool, Modio::Optional<Modio::ErrorCode>> IOCompleted(int FileDescriptor)
 			{
-				UringHandlePendingCompletions();
+				HandlePendingTasks();
 				auto IOStatus = PendingIO.find(FileDescriptor);
 
 				if (IOStatus != PendingIO.end())
@@ -392,7 +303,7 @@ namespace Modio
 			Modio::Optional<Modio::Detail::Buffer> RetrieveReadBuffer(int FileDescriptor)
 			{
 				// Call this first to update any completions since we last checked
-				UringHandlePendingCompletions();
+				HandlePendingTasks();
 				auto IOStatus = PendingIO.find(FileDescriptor);
 
 				// The file descriptor is not present in the PendingIO dictionary
@@ -406,7 +317,7 @@ namespace Modio
 				if (IOStatus->second.Result.has_value())
 				{
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-												"Tried to retrieve read buffer for File Descriptor {} with "
+												"Buffer read for File Descriptor {} with "
 												"NumBytesTransferred {} but the request had error {}",
 												FileDescriptor, IOStatus->second.NumBytesTransferred,
 												IOStatus->second.Result.value().value());
@@ -454,7 +365,7 @@ namespace Modio
 			// returns error code if one happened, or an empty optional if still in progress?
 			Modio::Optional<Modio::ErrorCode> RetrieveWriteResult(int FileDescriptor)
 			{
-				UringHandlePendingCompletions();
+				HandlePendingTasks();
 				auto IOStatus = PendingIO.find(FileDescriptor);
 				if (IOStatus != PendingIO.end())
 				{

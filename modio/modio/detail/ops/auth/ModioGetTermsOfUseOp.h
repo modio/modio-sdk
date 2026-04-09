@@ -13,8 +13,10 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioDefaultRequestParameters.h"
 #include "modio/core/ModioStdTypes.h"
+#include "modio/core/entities/ModioTerms.h"
 #include "modio/detail/ModioJsonHelpers.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/serialization/ModioTermsSerialization.h"
 
 #include "modio/detail/AsioWrapper.h"
 

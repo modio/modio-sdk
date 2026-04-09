@@ -10,9 +10,7 @@
 
 #pragma once
 
-#include "modio/cache/ModioCacheService.h"
-#include "modio/detail/AsioWrapper.h"
-#include "modio/http/ModioHttpParams.h"
+#include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 
 #include <asio/yield.hpp>

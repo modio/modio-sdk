@@ -9,9 +9,10 @@
  */
 
 #pragma once
+
 #include "modio/core/ModioSplitCompilation.h"
-#include "modio/detail/JsonWrapper.h"
 #include <string>
+#include <cstdint>
 
 namespace Modio
 {
@@ -31,9 +32,6 @@ namespace Modio
 			std::string URL {};
 			/// @brief Is displaying this link mandatory?
 			bool bRequired = false;
-
-			/// @docnone
-			MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Terms::Link& OutLink);
 		};
 
 		/// @docpublic
@@ -60,6 +58,8 @@ namespace Modio
 			Link Refund {};
 			/// @brief Link to the mod.io Manage User Account page
 			Link Manage {};
+			/// @brief Link to the mod.io Monetization policy
+			Link Monetization {};
 		} Links;
 
 		/// @brief The plaintext version of the mod.io terms of use
@@ -76,7 +76,10 @@ namespace Modio
 				A.Links.Privacy.bRequired == B.Links.Privacy.bRequired && A.Links.Refund.Text == B.Links.Refund.Text &&
 				A.Links.Refund.URL == B.Links.Refund.URL && A.Links.Refund.bRequired == B.Links.Refund.bRequired &&
 				A.Links.Manage.Text == B.Links.Manage.Text && A.Links.Manage.URL == B.Links.Manage.URL &&
-				A.Links.Manage.bRequired == B.Links.Manage.bRequired &&	A.TermsText == B.TermsText)
+				A.Links.Manage.bRequired == B.Links.Manage.bRequired &&
+				A.Links.Monetization.Text == B.Links.Monetization.Text &&
+				A.Links.Monetization.URL == B.Links.Monetization.URL &&
+				A.Links.Monetization.bRequired == B.Links.Monetization.bRequired && A.TermsText == B.TermsText)
 			{
 				return true;
 			}
@@ -85,8 +88,5 @@ namespace Modio
 				return false;
 			}
 		}
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::Terms& OutTerms);
 	};
 } // namespace Modio

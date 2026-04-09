@@ -12,7 +12,6 @@
 
 #include "modio/core/ModioModDependency.h"
 #include "modio/detail/serialization/ModioPagedResultSerialization.h"
-
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
 
@@ -52,7 +51,7 @@ namespace Modio
 	inline void from_json(const nlohmann::json& Json, Modio::ModDependencyList& List)
 	{
 		from_json(Json, static_cast<Modio::PagedResult&>(List));
-		Modio::Detail::ParseSafe(Json, List.InternalList, "data");
+		Modio::Detail::ParseSafe(Json, List.GetRawList(), "data");
 
 		for (auto& dependency : List)
 		{

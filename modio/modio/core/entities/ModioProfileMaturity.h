@@ -9,8 +9,11 @@
  */
 
 #pragma once
+
+#include "modio/core/ModioSplitCompilation.h"
 #include "modio/core/ModioFlag.h"
-#include "modio/detail/JsonWrapper.h"
+#include <string>
+#include <cassert>
 
 namespace Modio
 {
@@ -65,12 +68,6 @@ namespace Modio
 		constexpr ProfileMaturity(const Modio::FlagImpl<MaturityOption>& InitialValue)
 			: Modio::FlagImpl<MaturityOption>(InitialValue)
 		{}
-
-		/// @docnone
-		MODIO_IMPL friend void from_json(const nlohmann::json& Json, Modio::ProfileMaturity& ProfileMaturity);
-
-		/// @docnone
-		MODIO_IMPL friend void to_json(nlohmann::json& Json, const Modio::ProfileMaturity& ProfileMaturity);
 	};
 	MODIO_DEFINE_FLAG_OPERATORS(MaturityOption, ProfileMaturity);
 

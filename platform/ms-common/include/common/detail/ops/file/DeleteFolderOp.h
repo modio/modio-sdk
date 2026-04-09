@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io SDK.
  *
@@ -11,9 +11,6 @@
 #pragma once
 
 #include "common/detail/ops/file/DeleteFileOp.h"
-#include "modio/core/ModioErrorCode.h"
-#include "modio/core/ModioLogger.h"
-#include "modio/detail/AsioWrapper.h"
 
 namespace
 {
@@ -62,7 +59,15 @@ public:
 				DirectoryIterator = Modio::filesystem::recursive_directory_iterator(FolderPath, ec);
 				if (ec)
 				{
-					Self.complete(ec);
+					if (ec.category() == std::system_category())
+					{
+						Self.complete(Modio::Detail::TranslateFilesystemError(
+							ec.value(), Modio::Detail::FilesystemErrorContext::Directory));
+					}
+					else
+					{
+						Self.complete(ec);
+					}
 					return;
 				}
 			}
@@ -84,7 +89,15 @@ public:
 					Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
 												"Delete File {} error: {}", DirectoryIterator->path().string(),
 												ec.message());
-					Self.complete(ec);
+					if (ec.category() == std::system_category())
+					{
+						Self.complete(Modio::Detail::TranslateFilesystemError(
+							ec.value(), Modio::Detail::FilesystemErrorContext::File));
+					}
+					else
+					{
+						Self.complete(ec);
+					}
 					return;
 				}
 
@@ -100,7 +113,15 @@ public:
 				Modio::filesystem::remove(Folder.first, ec);
 				if (ec)
 				{
-					Self.complete(ec);
+					if (ec.category() == std::system_category())
+					{
+						Self.complete(Modio::Detail::TranslateFilesystemError(
+							ec.value(), Modio::Detail::FilesystemErrorContext::Directory));
+					}
+					else
+					{
+						Self.complete(ec);
+					}
 					return;
 				}
 			}
@@ -109,7 +130,15 @@ public:
 			Modio::filesystem::remove(FolderPath, ec);
 			if (ec)
 			{
-				Self.complete(ec);
+				if (ec.category() == std::system_category())
+				{
+					Self.complete(Modio::Detail::TranslateFilesystemError(
+						ec.value(), Modio::Detail::FilesystemErrorContext::Directory));
+				}
+				else
+				{
+					Self.complete(ec);
+				}
 			}
 			else
 			{

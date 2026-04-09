@@ -9,11 +9,8 @@
  */
 
 #pragma once
+
 #include "modio/detail/AsioWrapper.h"
-
-#include <chrono>
-#include <memory>
-
 #include "modio/core/ModioStdTypes.h"
 
 #include <asio/yield.hpp>

@@ -11,15 +11,17 @@
 #pragma once
 
 #include "modio/detail/HedleyWrapper.h"
+#include "modio/detail/ModioCompilerMacros.h"
+#include <cstdio>
 
 // Stubs for Posix extensions that are not available on some platforms, used by parts of FMT we don't use anyways
 #ifdef MODIO_USE_FMT_POSIX_STUBS
 
-#pragma push_macro("FMT_FORCE_FALLBACK_FILE")
+#pragma push_macro("FMT_USE_FALLBACK_FILE")
 
-#ifndef FMT_FORCE_FALLBACK_FILE
-		#define FMT_FORCE_FALLBACK_FILE
-#endif
+#ifndef FMT_USE_FALLBACK_FILE
+		#define FMT_USE_FALLBACK_FILE 1
+	#endif
 
 inline void flockfile(FILE* fp)
 {
@@ -65,10 +67,9 @@ inline int putc_unlocked(int i, FILE* fp)
 		MODIO_DISABLE_WARNING_GLOBAL_CONSTRUCTORS
 		MODIO_DISABLE_WARNING_HAS_NON_TRIVIAL_DTOR
 		MODIO_DISABLE_WARNING_UNREACHABLE_CODE
+		MODIO_DISABLE_WARNING_VARIABLE_SHADOWING
 	#endif
 	#include <type_traits>
-	#pragma push_macro("_LIBCPP_VERSION")
-	#undef _LIBCPP_VERSION
 
 	#include "fmt/chrono.h"
 	#include "fmt/format.h"
@@ -78,7 +79,7 @@ inline int putc_unlocked(int i, FILE* fp)
 	#if PLATFORM_WINDOWS || PLATFORM_XBOXONEGDK || PLATFORM_XSX || PLATFORM_XB1
 		#pragma warning(pop)
 	#endif
-	#pragma pop_macro("_LIBCPP_VERSION")
+
 	#pragma pop_macro("check")
 	#include MODIO_UNREAL_PLATFORM_EPILOGUE
 
@@ -108,6 +109,7 @@ inline int putc_unlocked(int i, FILE* fp)
 	MODIO_DISABLE_WARNING_UNSAFE_BUFFER_USAGE
 	MODIO_DISABLE_WARNING_UNREACHABLE_CODE
 	MODIO_DISABLE_WARNING_UNUSED_FUNCTION
+	MODIO_DISABLE_WARNING_VARIABLE_SHADOWING
 	#pragma push_macro("_LIBCPP_VERSION")
 	#undef _LIBCPP_VERSION
 	#include "fmt/chrono.h"
@@ -125,6 +127,6 @@ inline int putc_unlocked(int i, FILE* fp)
 #endif
 
 #ifdef MODIO_USE_FMT_POSIX_STUBS
-	#pragma pop_macro("FMT_FORCE_FALLBACK_FILE")
+	#pragma pop_macro("FMT_USE_FALLBACK_FILE")
 #endif
 
