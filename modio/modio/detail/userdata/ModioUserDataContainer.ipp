@@ -23,7 +23,7 @@ namespace Modio
 			AuthenticatedProfile = {};
 		}
 
-		void UserDataContainer::InitializeForUser(Modio::User AuthenticatedUser, Modio::Detail::OAuthToken AuthToken)
+		void UserDataContainer::InitializeForUser(Modio::User AuthenticatedUser, Modio::OAuthToken AuthToken)
 		{
 			ResetUserData();
 			// We copy the token to the user struct for now. this will need a refactor of the authtoken
@@ -31,7 +31,7 @@ namespace Modio
 			AuthenticatedProfile = Modio::Detail::ProfileData(AuthenticatedUser, AuthToken);
 		}
 
-		void UserDataContainer::UpdateTokenForExistingUser(Modio::Detail::OAuthToken AuthToken)
+		void UserDataContainer::UpdateTokenForExistingUser(Modio::OAuthToken AuthToken)
 		{
 			AuthenticatedProfile = Modio::Detail::ProfileData(AuthenticatedProfile->GetUser(), AuthToken);
 		}
@@ -47,11 +47,11 @@ namespace Modio
 											   Modio::Optional<Modio::Detail::Avatar> {});
 		}
 
-		const Modio::Optional<Modio::Detail::OAuthToken> UserDataContainer::GetAuthenticationToken() const
+		const Modio::Optional<Modio::OAuthToken> UserDataContainer::GetAuthenticationToken() const
 		{
 			if (AuthenticatedProfile)
 			{
-				Modio::Optional<Modio::Detail::OAuthToken> Token = AuthenticatedProfile->GetToken();
+				Modio::Optional<Modio::OAuthToken> Token = AuthenticatedProfile->GetToken();
 				if (Token && Token->GetTokenState() == OAuthTokenState::Valid)
 				{
 					return Token;

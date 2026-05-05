@@ -40,8 +40,8 @@ namespace Modio
 				Modio::User User;
 				User.UserId = Modio::UserID(1);
 				User.Username = "Modio Dedicated Server";
-				Modio::Detail::OAuthToken AuthToken =
-					Modio::Detail::OAuthToken(InitOptions.Token, INT_MAX);
+				Modio::OAuthToken AuthToken =
+					Modio::OAuthToken(InitOptions.Token, INT_MAX);
 
 				reenter(CoroutineState)
 				{

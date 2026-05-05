@@ -17,18 +17,15 @@
 
 namespace Modio
 {
-	/// @brief Typedef a List<vector, string> into URLList
-	using URLList = List<std::vector, std::string>;
-
 	/// @docpublic
 	/// @brief A URLList subclass to match Youtube urls
-	class YoutubeURLList : public URLList
+	class YoutubeURLList : public Modio::List<std::vector, std::string>
 	{
 	};
 
 	/// @docpublic
 	/// @brief A URLList subclass to match Sketchfab urls
-	class SketchfabURLList : public URLList
+	class SketchfabURLList : public Modio::List<std::vector, std::string>
 	{
 	};
 

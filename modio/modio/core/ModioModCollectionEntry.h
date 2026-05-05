@@ -32,21 +32,21 @@ namespace Modio
 		UninstallPending
 	};
 
-	constexpr static const char* ModStateToString(ModState State)
+	constexpr static const char* ModStateToString(Modio::ModState State)
 	{
 		switch (State)
 		{
-			case ModState::InstallationPending:
+			case Modio::ModState::InstallationPending:
 				return "InstallationPending";
-			case ModState::Installed:
+			case Modio::ModState::Installed:
 				return "Installed";
-			case ModState::UpdatePending:
+			case Modio::ModState::UpdatePending:
 				return "UpdatePending";
-			case ModState::Downloading:
+			case Modio::ModState::Downloading:
 				return "Downloading";
-			case ModState::Extracting:
+			case Modio::ModState::Extracting:
 				return "Extracting";
-			case ModState::UninstallPending:
+			case Modio::ModState::UninstallPending:
 				return "UninstallPending";
 			default:
 				return "Unknown State";
@@ -58,9 +58,17 @@ namespace Modio
 	class ModCollectionEntryAccessor;
 	class ModCollectionEntryConstAccessor;
 
+	/// @docinternal
+	/// @brief If the conditions are met, it starts a transaction over the ModCollectionEntry
+	void BeginTransactionImpl(Modio::ModCollectionEntry& Entry);
+
+	/// @docinternal
+	/// @brief Set the CurrentState to the RollbackState status
+	void RollbackTransactionImpl(Modio::ModCollectionEntry& Entry);
+
 	/// @docpublic
 	/// @brief Class representing a mod which is installed locally
-	class ModCollectionEntry : public Modio::Detail::Transactional<ModCollectionEntry>
+	class ModCollectionEntry : public Modio::Detail::Transactional<Modio::ModCollectionEntry>
 	{
 		/// @brief The ID of the mod
 		Modio::ModID ID;
@@ -89,7 +97,7 @@ namespace Modio
 
 		Modio::ErrorCode LastErrorCode {};
 
-		uint8_t RetriesRemainingThisSession {};
+		std::uint8_t RetriesRemainingThisSession {};
 
 		/// @docnone
 		friend bool operator==(const Modio::ModCollectionEntry& A, const Modio::ModCollectionEntry& B)
@@ -121,36 +129,36 @@ namespace Modio
 		/// @brief Constructor creating a ModCollection entry for the specified mod profile. Sets the default state to
 		/// InstallationPending
 		/// @param ProfileData Mod profile to create a collection entry for
-		MODIO_IMPL ModCollectionEntry(ModInfo ProfileData, std::string CalculatedModPath);
+		MODIO_IMPL ModCollectionEntry(Modio::ModInfo ProfileData, std::string CalculatedModPath);
 
 		/// @docinternal
 		/// @brief ModCollectionEntry copy constructor
-		MODIO_IMPL ModCollectionEntry(const ModCollectionEntry& Other);
+		MODIO_IMPL ModCollectionEntry(const Modio::ModCollectionEntry& Other);
 
 		/// @docnone
-		MODIO_IMPL ModCollectionEntry& operator=(const ModCollectionEntry& Other);
+		MODIO_IMPL Modio::ModCollectionEntry& operator=(const Modio::ModCollectionEntry& Other);
 
 		/// @docinternal
 		/// @brief Gets the number of retries remaining this session
 		/// @returns Integer number of retries remaining
-		MODIO_IMPL uint8_t GetRetriesRemaining();
+		MODIO_IMPL std::uint8_t GetRetriesRemaining();
 
 		/// @docinternal
 		/// @brief Updates the associated profile data in the collection entry, marks the mod as requiring an update if
 		/// necessary
 		/// @param ProfileData New profile data
-		MODIO_IMPL void UpdateModProfile(ModInfo ProfileData);
+		MODIO_IMPL void UpdateModProfile(Modio::ModInfo ProfileData);
 
 		/// @docinternal
 		/// @brief Increases the local user subscription count for the associated mod
 		/// @return the new number of local user subscriptions
-		MODIO_IMPL uint8_t AddLocalUserSubscription(Modio::Optional<Modio::User> User);
+		MODIO_IMPL std::uint8_t AddLocalUserSubscription(Modio::Optional<Modio::User> User);
 
 		/// @docinternal
 		/// @brief Decrements the local user subscription count for the associated mod. Use with care - this
 		/// subscription count is used to determine if a mod requires uninstallation from local storage
 		/// @return The updated user subscription count
-		MODIO_IMPL uint8_t RemoveLocalUserSubscription(Modio::Optional<Modio::User> User);
+		MODIO_IMPL std::uint8_t RemoveLocalUserSubscription(Modio::Optional<Modio::User> User);
 
 		/// @docinternal
 		/// @brief Updates the state of the associated mod - this is used by the mod management subsystem to determine
@@ -231,11 +239,11 @@ namespace Modio
 
 		/// @docinternal
 		/// @brief If the conditions are met, it starts a transaction over the ModCollectionEntry
-		MODIO_IMPL friend void BeginTransactionImpl(ModCollectionEntry& Entry);
+		friend void Modio::BeginTransactionImpl(Modio::ModCollectionEntry& Entry);
 
 		/// @docinternal
 		/// @brief Set the CurrentState to the RollbackState status
-		MODIO_IMPL friend void RollbackTransactionImpl(ModCollectionEntry& Entry);
+		friend void Modio::RollbackTransactionImpl(Modio::ModCollectionEntry& Entry);
 	};
 
 	// TODO: @modio-core refactor ModProgressInfo to expose Total, Current, and State (hiding internal members)
@@ -260,7 +268,7 @@ namespace Modio
 		/// @docpublic
 		/// @brief Retrieves the state of the currently processing mod
 		/// @return Enum value indicating the current state
-		EModProgressState GetCurrentState() const
+		Modio::ModProgressInfo::EModProgressState GetCurrentState() const
 		{
 			return CurrentState;
 		}
@@ -271,7 +279,7 @@ namespace Modio
 		/// you a value equal to the total download size
 		/// @param State which state to query progress information for
 		/// @return Modio::FileSize for current progress in bytes
-		Modio::FileSize GetCurrentProgress(EModProgressState State) const
+		Modio::FileSize GetCurrentProgress(Modio::ModProgressInfo::EModProgressState State) const
 		{
 			switch (State)
 			{
@@ -294,7 +302,7 @@ namespace Modio
 		/// @brief Retrieves the total amount of progress required for the specified state.
 		/// @param State which state to query total progress for
 		/// @return Modio::FileSize for total progress in bytes
-		Modio::FileSize GetTotalProgress(EModProgressState State) const
+		Modio::FileSize GetTotalProgress(Modio::ModProgressInfo::EModProgressState State) const
 		{
 			switch (State)
 			{
@@ -346,7 +354,7 @@ namespace Modio
 		/// @docnone
 		Modio::FileSize UploadTotal {};
 		/// @docnone
-		EModProgressState CurrentState {};
+		Modio::ModProgressInfo::EModProgressState CurrentState {};
 
 		/// @docnone
 		friend MODIO_IMPL void SetState(Modio::ModProgressInfo& Info, Modio::ModProgressInfo::EModProgressState State);
@@ -366,6 +374,23 @@ namespace Modio
 												Modio::ModProgressInfo::EModProgressState State,
 												Modio::FileSize NewTotal);
 	};
+
+	/// @docnone
+	MODIO_IMPL void SetState(Modio::ModProgressInfo& Info, Modio::ModProgressInfo::EModProgressState State);
+
+	/// @docnone
+	MODIO_IMPL void SetCurrentProgress(Modio::ModProgressInfo& Info, Modio::FileSize NewValue);
+
+	/// @docnone
+	MODIO_IMPL void IncrementCurrentProgress(Modio::ModProgressInfo& Info, Modio::FileSize NewValue);
+
+	/// @docnone
+	MODIO_IMPL void CompleteProgressState(Modio::ModProgressInfo& Info,
+												 Modio::ModProgressInfo::EModProgressState State);
+
+	/// @docnone
+	MODIO_IMPL void SetTotalProgress(Modio::ModProgressInfo& Info,
+											Modio::ModProgressInfo::EModProgressState State, Modio::FileSize NewTotal);
 
 	class BaseModList
 	{
@@ -427,7 +452,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Class containing the mod IDs the current user is subscribed to
-	class UserSubscriptionList : public BaseModList
+	class UserSubscriptionList : public Modio::BaseModList
 	{
 	public:
 		/// @docpublic
@@ -441,17 +466,18 @@ namespace Modio
 		/// @param Updated The updated list of subscriptions
 		/// @return Map containing all CHANGED mod IDs, with ChangeType indicating if the change was an addition or
 		/// removal
-		MODIO_IMPL static std::map<Modio::ModID, ChangeType> CalculateChanges(const UserSubscriptionList& Original,
-																			  const UserSubscriptionList& Updated);
+		MODIO_IMPL static std::map<Modio::ModID, Modio::UserSubscriptionListChangeType> CalculateChanges(
+			const Modio::UserSubscriptionList& Original,
+			const Modio::UserSubscriptionList& Updated);
 
 		/// @docinternal
 		/// @brief Calculates updates between the ModInfoList and a ModCollection
 		/// @param Baseline List of mods comming from the mod.io service
 		/// @param Collection List of current subscriptions
 		/// @return Map containing all mod ID that have updates in their ModInfo
-		MODIO_IMPL static std::map<Modio::ModID, ChangeType> CalculateUpdates(const Modio::ModInfoList& Baseline,
-																			  const Modio::ModCollection& Collection);
-
+		MODIO_IMPL static std::map<Modio::ModID, Modio::UserSubscriptionListChangeType> CalculateUpdates(
+			const Modio::ModInfoList& Baseline,
+			const Modio::ModCollection& Collection);
 	};
 
 	// vector of these for the log
@@ -475,7 +501,7 @@ namespace Modio
 		};
 
 		/// @docnone
-		constexpr static const char* ModManagementEventToString(EventType Event)
+		constexpr static const char* ModManagementEventToString(Modio::ModManagementEvent::EventType Event)
 		{
 			switch (Event)
 			{
@@ -500,22 +526,22 @@ namespace Modio
 			}
 		}
 
-		/// @docnone
-		friend auto format_as(Modio::ModManagementEvent::EventType EnumValue)
-		{
-			//return static_cast<std::underlying_type_t<Modio::ModManagementEvent::EventType>>(EnumValue);
-			return ModManagementEventToString(EnumValue);
-		}
-
 		/// @brief ID for the mod that the event occurred on
 		Modio::ModID ID {};
 
 		/// @brief What type of event occurred
-		EventType Event {};
+		Modio::ModManagementEvent::EventType Event {};
 
 		/// @brief Empty if operation completed successfully, truthy/contains error code if operation failed
 		Modio::ErrorCode Status {};
 	};
+
+	/// @docnone
+	inline auto format_as(Modio::ModManagementEvent::EventType EnumValue)
+	{
+		// return static_cast<std::underlying_type_t<Modio::ModManagementEvent::EventType>>(EnumValue);
+		return ModManagementEvent::ModManagementEventToString(EnumValue);
+	}
 
 	/// @docpublic
 	/// @brief Container of multiple mods organized by Modio::ModID
@@ -534,7 +560,7 @@ namespace Modio
 		/// @brief Retrieve a ModCollection given a UserSubscriptionList
 		/// @param UserSubscriptions patterns that would entitle a filter
 		/// @return ModCollection filled with patterns from UserSubscriptions or empty if nothing is found
-		MODIO_IMPL const ModCollection FilterByUserSubscriptions(const UserSubscriptionList& UserSubscriptions) const;
+		MODIO_IMPL const Modio::ModCollection FilterByUserSubscriptions(const Modio::UserSubscriptionList& UserSubscriptions) const;
 
 		/// @docpublic
 		/// @brief Either inserts a mod into the collection or updates its associated profile
@@ -582,9 +608,6 @@ namespace Modio
 		/// @return Vector with ModCollectionEntry
 		MODIO_IMPL std::vector<std::shared_ptr<Modio::ModCollectionEntry>> SortEntriesByRetryPriority() const;
 
-	private:
-		std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> ModEntries;
-
 		/// @docnone
 		friend bool operator==(const Modio::ModCollection& A, const Modio::ModCollection& B)
 		{
@@ -609,6 +632,9 @@ namespace Modio
 			}
 			return true;
 		}
+
+	private:
+		std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> ModEntries;
 	};
 
 	/// @docpublic

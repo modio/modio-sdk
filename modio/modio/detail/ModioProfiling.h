@@ -32,19 +32,20 @@ extern "C"
 	/// @brief Increments an implementation-defined counter by one
 	/// @param Name Name of the counter to increment
 	/// @param Data Implementation-managed counter pointer
-	MODIO_WEAK(modio_profile_counter_increment) void modio_profile_counter_increment(const char* Name, uint64_t* Data) MODIO_WEAK_STUB_IMPL;
+	MODIO_WEAK(modio_profile_counter_increment)
+	void modio_profile_counter_increment(const char* Name, std::uint64_t* Data) MODIO_WEAK_STUB_IMPL;
 
 	/// @brief Decrements an implementation-defined counter by one
 	/// @param Name Name of the counter to decrement
 	/// @param Data Implementation-managed counter pointer
 	MODIO_WEAK(modio_profile_counter_decrement)
-	void modio_profile_counter_decrement(const char* Name, uint64_t* Data) MODIO_WEAK_STUB_IMPL;
+	void modio_profile_counter_decrement(const char* Name, std::uint64_t* Data) MODIO_WEAK_STUB_IMPL;
 
 	/// @brief Sets an implementation-defined counter
 	/// @param Name Name of the counter to decrement
 	/// @param Data New value of counter
 	MODIO_WEAK(modio_profile_counter_set)
-	void modio_profile_counter_set(const char* Name, uint64_t Data) MODIO_WEAK_STUB_IMPL;
+	void modio_profile_counter_set(const char* Name, std::uint64_t Data) MODIO_WEAK_STUB_IMPL;
 
 	/// @brief Begins a scoped profiling event
 	/// @param Scope Name of the scope to start

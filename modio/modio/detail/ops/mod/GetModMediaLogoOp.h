@@ -36,7 +36,7 @@ namespace Modio
 			{
 				Modio::Detail::DynamicBuffer ResponseBodyBuffer;
 				Modio::StableStorage<Modio::filesystem::path> DestinationPath;
-				Modio::Detail::Logo Logo;
+				Modio::Logo Logo;
 			} OpState;
 
 		public:

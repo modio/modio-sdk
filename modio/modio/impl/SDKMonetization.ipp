@@ -36,7 +36,7 @@
 
 namespace Modio
 {
-	void PurchaseModAsync(Modio::ModID ModID, Modio::Optional<uint64_t> ExpectedVirtualCurrencyPrice,
+	void PurchaseModAsync(Modio::ModID ModID, Modio::Optional<std::uint64_t> ExpectedVirtualCurrencyPrice,
 						  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([ModID, ExpectedVirtualCurrencyPrice,
@@ -281,7 +281,7 @@ namespace Modio
 		});
 	}
 
-	void GetUserWalletBalanceAsync(std::function<void(Modio::ErrorCode, Modio::Optional<uint64_t>)> Callback)
+	void GetUserWalletBalanceAsync(std::function<void(Modio::ErrorCode, Modio::Optional<std::uint64_t>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) &&

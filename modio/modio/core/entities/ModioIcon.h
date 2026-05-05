@@ -14,37 +14,39 @@
 
 namespace Modio
 {
+	/// @docinternal
+	/// @brief Structure with the file references to the icon of a game
+	struct Icon
+	{
+		/** Icon filename including extension. */
+		std::string Filename {};
+		/** URL to the full-sized icon. */
+		std::string Original {};
+		/** URL to the small icon thumbnail. */
+		std::string Thumb64x64 {};
+		/** URL to the medium icon thumbnail. */
+		std::string Thumb128x128 {};
+		/** URL to the large icon thumbnail. */
+		std::string Thumb256x256 {};
+
+		/// @docnone
+		friend bool operator==(const Modio::Icon& A, const Modio::Icon& B)
+		{
+			if ((A.Filename == B.Filename) && (A.Original == B.Original) && (A.Thumb64x64 == B.Thumb64x64) &&
+				(A.Thumb128x128 == B.Thumb128x128) && (A.Thumb256x256 == B.Thumb256x256))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	};
+
 	namespace Detail
 	{
-		/// @docinternal
-		/// @brief Structure with the file references to the icon of a game
-		struct Icon
-		{
-			/** Icon filename including extension. */
-			std::string Filename {};
-			/** URL to the full-sized icon. */
-			std::string Original {};
-			/** URL to the small icon thumbnail. */
-			std::string Thumb64x64 {};
-			/** URL to the medium icon thumbnail. */
-			std::string Thumb128x128 {};
-			/** URL to the large icon thumbnail. */
-			std::string Thumb256x256 {};
-
-			/// @docnone
-			friend bool operator==(const Modio::Detail::Icon& A, const Modio::Detail::Icon& B)
-			{
-				if ((A.Filename == B.Filename) && (A.Original == B.Original) && (A.Thumb64x64 == B.Thumb64x64) &&
-					(A.Thumb128x128 == B.Thumb128x128) && (A.Thumb256x256 == B.Thumb256x256))
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-		};
+		typedef Modio::Icon Icon;
 
 		/// @docpublic
 		/// @brief Retrieve the corresponding string according to a icon size

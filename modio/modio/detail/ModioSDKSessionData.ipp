@@ -163,19 +163,19 @@ namespace Modio
 			return Get().SystemModCollection.FilterByUserSubscriptions(Get().UserData.UserSubscriptions);
 		}
 
-		void SDKSessionData::InitializeForUser(Modio::User AuthenticatedUser, Modio::Detail::OAuthToken AuthToken)
+		void SDKSessionData::InitializeForUser(Modio::User AuthenticatedUser, Modio::OAuthToken AuthToken)
 		{
 			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 			Get().UserData.InitializeForUser(std::move(AuthenticatedUser), std::move(AuthToken));
 		}
 
-		void SDKSessionData::UpdateTokenForExistingUser(Modio::Detail::OAuthToken AuthToken)
+		void SDKSessionData::UpdateTokenForExistingUser(Modio::OAuthToken AuthToken)
 		{
 			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 			Get().UserData.UpdateTokenForExistingUser(std::move(AuthToken));
 		}
 
-		const Modio::Optional<Modio::Detail::OAuthToken> SDKSessionData::GetAuthenticationToken()
+		const Modio::Optional<Modio::OAuthToken> SDKSessionData::GetAuthenticationToken()
 		{
 			return Get().UserData.GetAuthenticationToken();
 		}

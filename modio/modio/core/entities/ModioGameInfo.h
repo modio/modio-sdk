@@ -16,8 +16,8 @@
 #include "modio/core/entities/ModioGameMonetization.h"
 #include "modio/core/entities/ModioGameStats.h"
 #include "modio/core/entities/ModioModTagOptions.h"
-#include "modio/detail/entities/ModioIcon.h"
-#include "modio/detail/entities/ModioLogo.h"
+#include "modio/core/entities/ModioIcon.h"
+#include "modio/core/entities/ModioLogo.h"
 
 namespace Modio
 {
@@ -91,9 +91,9 @@ namespace Modio
 		/// @brief Word used to describe user-generated content (mods, items, addons etc)
 		std::string UgcName;
 		/// @brief Contains media URLs to the icon for the game
-		Modio::Detail::Icon Icon {};
+		Modio::Icon Icon {};
 		/// @brief Contains media URLs to the logo for the game
-		Modio::Detail::Logo Logo {};
+		Modio::Logo Logo {};
 		/// @brief Contains media URLs to the preview header image for the game
 		Modio::HeaderImage HeaderImage {};
 		/// @brief Name of the game
@@ -126,6 +126,6 @@ namespace Modio
 		/// @brief Tags for this game
 		std::vector<Modio::ModTagInfo> TagOptions {};
 		/// @brief Cloud Cooking status for this game
-		GameCloudCookingStatus CloudCookingStatus = GameCloudCookingStatus::Disabled;
+		Modio::GameCloudCookingStatus CloudCookingStatus = GameCloudCookingStatus::Disabled;
 	};
 } // namespace Modio

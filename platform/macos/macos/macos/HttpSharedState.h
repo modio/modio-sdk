@@ -97,7 +97,14 @@ namespace Modio
 					CFReadStreamSetProperty(Request->ReadStream, kCFStreamPropertySocketSecurityLevel,
 											kCFStreamSocketSecurityLevelNegotiatedSSL);
 					CFWriteStreamSetProperty(Request->WriteStream, kCFStreamPropertySocketSecurityLevel,
-											 kCFStreamSocketSecurityLevelNegotiatedSSL);
+											 kCFStreamSocketSecurityLevelNegotiatedSSL);	
+					
+					// Ensure we set the request to respect any System Proxy settings that are configured
+					CFDictionaryRef proxyDict = CFNetworkCopySystemProxySettings();
+					CFWriteStreamSetProperty(Request->WriteStream, kCFStreamPropertyHTTPProxy, proxyDict);
+					CFReadStreamSetProperty(Request->ReadStream, kCFStreamPropertyHTTPProxy, proxyDict);
+					CFRelease(proxyDict);
+
 					// Release locally created objects
 					CFRelease(PayloadSize);
 					CFRelease(HostURL);
@@ -109,6 +116,11 @@ namespace Modio
 					// Automatically handle redirections
 					CFReadStreamSetProperty(Request->ReadStream, kCFStreamPropertyHTTPShouldAutoredirect,
 											kCFBooleanTrue);
+
+					// Ensure we set the request to respect any System Proxy settings that are configured
+					CFDictionaryRef proxyDict = CFNetworkCopySystemProxySettings();
+					CFReadStreamSetProperty(Request->ReadStream, kCFStreamPropertyHTTPProxy, proxyDict);
+					CFRelease(proxyDict);
 				}
 
 				Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Http, "Initializing {0} request for {1} {2}",

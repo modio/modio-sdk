@@ -54,7 +54,7 @@ namespace Modio
 	/// @docnone
 	/// @brief Convenience method to make a shared pointer
 	template<typename Object, class... Types>
-	StableStorage<Object> MakeStable(Types&&... Args)
+	Modio::StableStorage<Object> MakeStable(Types&&... Args)
 	{
 		return std::make_shared<Object>(std::forward<Types>(Args)...);
 	}

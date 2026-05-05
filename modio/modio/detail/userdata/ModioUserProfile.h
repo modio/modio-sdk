@@ -23,7 +23,7 @@ namespace Modio
 		{
 			/// @docpublic
 			/// @brief Constructor for ProfileData
-			ProfileData(Modio::User InUser, Modio::Detail::OAuthToken AccessToken) : User(InUser), Token(AccessToken) {}
+			ProfileData(Modio::User InUser, Modio::OAuthToken AccessToken) : User(InUser), Token(AccessToken) {}
 
 			/// @docpublic
 			/// @brief Get the user data
@@ -41,7 +41,7 @@ namespace Modio
 
 			/// @docinternal
 			/// @brief Get the OAuth token
-			const Modio::Detail::OAuthToken& GetToken() const
+			const Modio::OAuthToken& GetToken() const
 			{
 				return Token;
 			}
@@ -58,7 +58,7 @@ namespace Modio
 			Modio::User User {};
 
 			/// @brief The OAuth token
-			Modio::Detail::OAuthToken Token {};
+			Modio::OAuthToken Token {};
 
 			/// @docnone
 			friend bool operator==(const Modio::Detail::ProfileData& A, const Modio::Detail::ProfileData& B)

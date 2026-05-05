@@ -25,8 +25,8 @@ namespace Modio
 			return {};
 		}
 
-		EntitlementConsumptionStatusList RetryElements;
-		for (EntitlementConsumptionStatus Entitlement : InternalList)
+		Modio::EntitlementConsumptionStatusList RetryElements;
+		for (Modio::EntitlementConsumptionStatus Entitlement : InternalList)
 		{
 			if (Entitlement.EntitlementRequiresRetry() == true)
 			{

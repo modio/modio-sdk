@@ -49,15 +49,15 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief A strong type flag object to represent GameMonetizationOptions from a mod.io info.
-	struct GameMonetization : public Modio::FlagImpl<GameMonetizationOptions>
+	struct GameMonetization : public Modio::FlagImpl<Modio::GameMonetizationOptions>
 	{
-		using Modio::FlagImpl<GameMonetizationOptions>::FlagImpl;
+		using Modio::FlagImpl<Modio::GameMonetizationOptions>::FlagImpl;
 
 		/// @docnone
-		constexpr GameMonetization(const Modio::FlagImpl<GameMonetizationOptions>& InitialValue)
-			: Modio::FlagImpl<GameMonetizationOptions>(InitialValue)
+		constexpr GameMonetization(const Modio::FlagImpl<Modio::GameMonetizationOptions>& InitialValue)
+			: Modio::FlagImpl<Modio::GameMonetizationOptions>(InitialValue)
 		{}
 	};
-	MODIO_DEFINE_FLAG_OPERATORS(GameMonetizationOptions, GameMonetization);
+	MODIO_DEFINE_FLAG_OPERATORS(Modio::GameMonetizationOptions, Modio::GameMonetization);
 
 } // namespace Modio

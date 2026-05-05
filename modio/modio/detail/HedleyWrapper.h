@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <thread>
 #include "modio/detail/hedley.h"
 
 #ifndef MODIO_NODISCARD

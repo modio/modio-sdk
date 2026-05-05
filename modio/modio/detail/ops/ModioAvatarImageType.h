@@ -11,7 +11,7 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
-#include "modio/detail/entities/ModioAvatar.h"
+#include "modio/core/entities/ModioAvatar.h"
 #include "modio/file/ModioFileService.h"
 
 namespace Modio

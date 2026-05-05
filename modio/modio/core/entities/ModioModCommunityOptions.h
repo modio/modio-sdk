@@ -36,15 +36,15 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief A strong type flag object to represent ModCommunityOptions
-	struct ModCommunityOptionsFlags : public Modio::FlagImpl<ModCommunityOptions>
+	struct ModCommunityOptionsFlags : public Modio::FlagImpl<Modio::ModCommunityOptions>
 	{
-		using Modio::FlagImpl<ModCommunityOptions>::FlagImpl;
+		using Modio::FlagImpl<Modio::ModCommunityOptions>::FlagImpl;
 
 		/// @docnone
-		constexpr ModCommunityOptionsFlags(const Modio::FlagImpl<ModCommunityOptions>& InitialValue)
-			: Modio::FlagImpl<ModCommunityOptions>(InitialValue)
+		constexpr ModCommunityOptionsFlags(const Modio::FlagImpl<Modio::ModCommunityOptions>& InitialValue)
+			: Modio::FlagImpl<Modio::ModCommunityOptions>(InitialValue)
 		{}
 	};
-	MODIO_DEFINE_FLAG_OPERATORS(ModCommunityOptions, ModCommunityOptionsFlags);
+	MODIO_DEFINE_FLAG_OPERATORS(Modio::ModCommunityOptions, Modio::ModCommunityOptionsFlags);
 
 } // namespace Modio

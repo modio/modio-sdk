@@ -33,9 +33,9 @@ namespace Modio
 		public:
 			MODIO_IMPL void ResetUserData();
 
-			MODIO_IMPL void InitializeForUser(Modio::User AuthenticatedUser, Modio::Detail::OAuthToken AuthToken);
+			MODIO_IMPL void InitializeForUser(Modio::User AuthenticatedUser, Modio::OAuthToken AuthToken);
 			
-			MODIO_IMPL void UpdateTokenForExistingUser(Modio::Detail::OAuthToken AuthToken);
+			MODIO_IMPL void UpdateTokenForExistingUser(Modio::OAuthToken AuthToken);
 
 			// @todo: Making copy of user object
 			MODIO_IMPL const Modio::Optional<Modio::User> GetAuthenticatedUser() const;
@@ -43,7 +43,7 @@ namespace Modio
 			// @todo: Making copy of avatar object
 			MODIO_IMPL const Modio::Optional<Modio::Detail::Avatar> GetAuthenticatedUserAvatar() const;
 
-			MODIO_IMPL const Modio::Optional<Modio::Detail::OAuthToken> GetAuthenticationToken() const;
+			MODIO_IMPL const Modio::Optional<Modio::OAuthToken> GetAuthenticationToken() const;
 
 			MODIO_IMPL void InvalidateOAuthToken();
 

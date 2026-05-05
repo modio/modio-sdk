@@ -58,7 +58,7 @@ namespace Modio
 			MODIO_IMPL bool GetSessionIsActive() const;
 			MODIO_IMPL Modio::Guid GetSessionId() const;
 
-			MODIO_IMPL std::vector<ModID> GetModIds() const;
+			MODIO_IMPL std::vector<Modio::ModID> GetModIds() const;
 			MODIO_IMPL bool ContainsModId(Modio::ModID Id) const;
 
 			bool IsInitialized() const
@@ -98,7 +98,7 @@ namespace Modio
 			MODIO_IMPL void EndSession();
 			MODIO_IMPL void ResetMetricsData();
 
-			MODIO_IMPL void AddMods(const std::vector<ModID>& Ids);
+			MODIO_IMPL void AddMods(const std::vector<Modio::ModID>& Ids);
 
 			std::string SecretKey {};
 			Modio::Optional<Modio::Guid> SessionId {};
@@ -107,7 +107,7 @@ namespace Modio
 			std::string ModIdsString {};
 			std::vector<ModID> ModIds {};
 			time_t SessionStartTime = 0;
-			uint64_t CurrentSessionOrderId = 0;
+			std::uint64_t CurrentSessionOrderId = 0;
 
 			time_t LastHeartbeatPerformed = 0;
 

@@ -25,11 +25,14 @@ namespace Modio
 	protected:
 		using ListType = ContainerType<ValueType>;
 		ListType InternalList {};
+	public:
 
-		// operator==() Written for Test_JsonToAndFrom.cpp and Server Side tests, re-check functionality before using in actual code.
+		// operator==() Written for Test_JsonToAndFrom.cpp and Server Side tests, re-check functionality before using in
+		// actual code.
 		/// @docnone
-		friend bool operator==(const List& A, const List& B)
+		bool operator==(const Modio::List<ContainerType, ValueType>& B) const
 		{
+			const Modio::List<ContainerType, ValueType>& A = *this;
 			if (A.InternalList.size() != B.InternalList.size())
 			{
 				return false;
@@ -60,7 +63,6 @@ namespace Modio
 			}
 		}
 
-	public:
 		using iterator = typename ListType::iterator;
 		using const_iterator = typename ListType::const_iterator;
 

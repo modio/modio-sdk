@@ -23,7 +23,7 @@ namespace Modio
 		Modio::Guid SessionId {};
 
 		/// @brief Milliseconds since UNIX when this request was made
-		int64_t SessionTimestamp = 0;
+		std::int64_t SessionTimestamp = 0;
 
 		/// @brief Hashed value of the session timestamp, Id, nonce and the secret metrics key
 		std::string SessionHash {};
@@ -32,6 +32,6 @@ namespace Modio
 		Modio::Guid SessionNonce {};
 
 		/// @brief An incremental order Id for each request sent to the server.
-		uint64_t SessionOrderId = 0;
+		std::uint64_t SessionOrderId = 0;
 	};
 } // namespace Modio

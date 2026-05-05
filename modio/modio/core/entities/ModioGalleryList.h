@@ -11,13 +11,13 @@
 #pragma once
 
 #include "modio/core/entities/ModioList.h"
-#include "modio/detail/entities/ModioImage.h"
+#include "modio/core/entities/ModioImage.h"
 
 namespace Modio
 {
 	/// @docpublic
 	/// @brief List subclass to contain, compare and transform images
-	class GalleryList : public Modio::List<std::vector, Modio::Detail::Image>
+	class GalleryList : public Modio::List<std::vector, Modio::Image>
 	{		
 		/// @docublic
 		/// @brief Comparator operator between GalleryLists, to first compare their internal list size,

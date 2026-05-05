@@ -19,19 +19,19 @@ namespace Modio
 {
 	/// @docpublic
 	/// @brief Class representing a list of games that may be a page from a larger set of results
-	class GameInfoList : public PagedResult, public List<std::vector, Modio::GameInfo>
+	class GameInfoList : public Modio::PagedResult, public Modio::List<std::vector, Modio::GameInfo>
 	{
 	public:
 		/// @docpublic
 		/// @brief Insert GameInfoList to the end of this list
-		void Append(const GameInfoList& Other)
+		void Append(const Modio::GameInfoList& Other)
 		{
 			InternalList.insert(InternalList.end(), std::begin(Other.InternalList), std::end(Other.InternalList));
 		}
 
 		/// @docpublic
 		/// @brief Insert a GameInfo to the end of this list
-		void Append(const GameInfo& GameInfoData)
+		void Append(const Modio::GameInfo& GameInfoData)
 		{
 			InternalList.push_back(GameInfoData);
 		}

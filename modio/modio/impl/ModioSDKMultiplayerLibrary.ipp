@@ -45,7 +45,7 @@ namespace Modio
 		});
 	}
 
-	void InstallOrUpdateServerModsAsync(std::vector<ModID> Mods,
+	void InstallOrUpdateServerModsAsync(std::vector<Modio::ModID> Mods,
 		std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Mods, Callback = std::move(Callback)]() mutable {

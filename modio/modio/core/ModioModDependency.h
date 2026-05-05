@@ -14,7 +14,7 @@
 #include "modio/core/entities/ModioList.h"
 #include "modio/core/entities/ModioModInfo.h"
 #include "modio/core/entities/ModioPagedResult.h"
-#include "modio/detail/entities/ModioLogo.h"
+#include "modio/core/entities/ModioLogo.h"
 
 namespace Modio
 {
@@ -34,7 +34,7 @@ namespace Modio
 		/// relies on additional dependencies.
 		std::uint8_t DependencyDepth = 0;
 		/// @brief Media data related to the mod logo
-		Modio::Detail::Logo Logo {};
+		Modio::Logo Logo {};
 
 		/// @brief Information about the mod's most recent public release
 		Modio::Optional<Modio::FileMetadata> FileInfo {};
@@ -45,13 +45,13 @@ namespace Modio
 		Modio::ObjectVisibility Visibility = Modio::ObjectVisibility::Public;
 
 		/// @docnone
-		friend bool operator==(const ModDependency& A, const ModDependency& B)
+		friend bool operator==(const Modio::ModDependency&A, const Modio::ModDependency& B)
 		{
 			return A.ModID == B.ModID;
 		}
 
 		/// @docnone
-		friend bool operator!=(const ModDependency& A, const ModDependency& B)
+		friend bool operator!=(const Modio::ModDependency& A, const Modio::ModDependency& B)
 		{
 			return A.ModID != B.ModID;
 		}
@@ -59,17 +59,17 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Container for a collection of ModDependency objects
-	class ModDependencyList : public PagedResult, public List<std::vector, ModDependency>
+	class ModDependencyList : public Modio::PagedResult, public Modio::List<std::vector, Modio::ModDependency>
 	{
 	public:
 		
-		ModDependencyList() : PagedResult(), List<std::vector, ModDependency>()
+		ModDependencyList() : Modio::PagedResult(), Modio::List<std::vector, Modio::ModDependency>()
 		{
 		}
 		
 		/// @docpublic
 		/// @brief Insert the unique contents of a ModDependencyList to the end of this list
-		void AppendUnique(const ModDependencyList& Other)
+		void AppendUnique(const Modio::ModDependencyList& Other)
 		{
 			for (auto& dependency : Other)
 			{
@@ -79,7 +79,7 @@ namespace Modio
 
 		/// @docpublic
 		/// @brief Insert a unique ModDependency to the end of this list
-		void AppendUnique(const ModDependency& ModDependencyData)
+		void AppendUnique(const Modio::ModDependency& ModDependencyData)
 		{
 			if (std::find(InternalList.begin(), InternalList.end(), ModDependencyData) == InternalList.end())
 			{

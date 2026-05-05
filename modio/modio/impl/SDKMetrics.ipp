@@ -53,7 +53,7 @@ namespace Modio
 		});
 	}
 
-	void MetricsSessionSendHeartbeatAtIntervalAsync(uint32_t IntervalSeconds,
+	void MetricsSessionSendHeartbeatAtIntervalAsync(std::uint32_t IntervalSeconds,
 													std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([IntervalSeconds, Callback = std::move(Callback)]() mutable {

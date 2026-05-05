@@ -18,6 +18,12 @@ namespace Modio
 	{
 		/// @docinternal
 		class HttpRequestParams;
+
+		/// @docinternal
+		/// @brief returns the http request parameters for a report submission, with the payload data set
+		/// @param Params the report to submit
+		/// @return the request parameters for use with PerformRequestAndGetResponseAsync
+		MODIO_IMPL Modio::Detail::HttpRequestParams ToRequest(const Modio::ReportParams& Params);
 	} // namespace Detail
 
 	/// @docpublic
@@ -25,7 +31,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief The type of report being made
-	enum class ReportType : uint8_t
+	enum class ReportType : std::uint8_t
 	{
 		Generic = 0,
 		DMCA = 1,
@@ -94,29 +100,25 @@ namespace Modio
 		Modio::Optional<std::string> ReporterName {};
 		Modio::Optional<std::string> ReporterContact {};
 		std::string ReportDescription {};
-		enum class ResourceType : uint8_t
+		enum class ResourceType : std::uint8_t
 		{
 			Game,
 			Mod,
 			User,
 			Collection
 		};
-		ResourceType ReportedResourceType {};
+		Modio::ReportParams::ResourceType ReportedResourceType {};
 		/// @brief Type-erased storage for the underlying resource ID. NB if REST API changes ID types this will
 		/// need to be altered to match
 		std::int64_t ResourceID {};
 
-		ReportType Type {};
+		Modio::ReportType Type {};
 
-		MODIO_IMPL ReportParams(std::int64_t ResourceID, ResourceType ReportedResourceType, Modio::ReportType Type,
-								std::string ReportDescription, Modio::Optional<std::string> ReporterName,
+		MODIO_IMPL ReportParams(std::int64_t ResourceID, Modio::ReportParams::ResourceType ReportedResourceType,
+								Modio::ReportType Type, std::string ReportDescription, Modio::Optional<std::string> ReporterName,
 								Modio::Optional<std::string> ReporterContact);
-		/// @docinternal
-		/// @brief returns the http request parameters for a report submission, with the payload data set
-		/// @param Params the report to submit
-		/// @return the request parameters for use with PerformRequestAndGetResponseAsync
-		MODIO_IMPL friend Modio::Detail::HttpRequestParams ToRequest(const Modio::ReportParams& Params);
 
+		friend MODIO_IMPL Modio::Detail::HttpRequestParams Modio::Detail::ToRequest(const Modio::ReportParams& Params);
 	public:
 
 		/// @brief Checks the underlying ID for the reported Mod, Game, or User, is valid

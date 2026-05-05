@@ -460,7 +460,7 @@ namespace Modio
 				const Modio::filesystem::space_info SpaceInfo = Modio::filesystem::space(ValidDestination, ec);
 				if (!ec)
 				{
-					return FileSize(SpaceInfo.available);
+					return Modio::FileSize(SpaceInfo.available);
 				}
 
 				const DWORD LastError = GetLastError();

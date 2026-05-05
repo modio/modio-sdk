@@ -10,29 +10,26 @@
 
 #pragma once
 
-#include "modio/detail/entities/ModioLogo.h"
+#include "modio/core/entities/ModioLogo.h"
 #include "modio/detail/ModioJsonHelpers.h"
 
 namespace Modio
 {
-	namespace Detail
+	inline void from_json(const nlohmann::json& Json, Modio::Logo& ModLogo)
 	{
-		inline void from_json(const nlohmann::json& Json, Modio::Detail::Logo& ModLogo)
-		{
-			Detail::ParseSafe(Json, ModLogo.Filename, "filename");
-			Detail::ParseSafe(Json, ModLogo.Original, "original");
-			Detail::ParseSafe(Json, ModLogo.Thumb320x180, "thumb_320x180");
-			Detail::ParseSafe(Json, ModLogo.Thumb640x360, "thumb_640x360");
-			Detail::ParseSafe(Json, ModLogo.Thumb1280x720, "thumb_1280x720");
-		}
+		Detail::ParseSafe(Json, ModLogo.Filename, "filename");
+		Detail::ParseSafe(Json, ModLogo.Original, "original");
+		Detail::ParseSafe(Json, ModLogo.Thumb320x180, "thumb_320x180");
+		Detail::ParseSafe(Json, ModLogo.Thumb640x360, "thumb_640x360");
+		Detail::ParseSafe(Json, ModLogo.Thumb1280x720, "thumb_1280x720");
+	}
 
-		inline void to_json(nlohmann::json& Json, const Modio::Detail::Logo& ModLogo)
-		{
-			Json = {{"filename", ModLogo.Filename},
-					{"original", ModLogo.Original},
-					{"thumb_320x180", ModLogo.Thumb320x180},
-					{"thumb_640x360", ModLogo.Thumb640x360},
-					{"thumb_1280x720", ModLogo.Thumb1280x720}};
-		}
-	} // namespace Detail
+	inline void to_json(nlohmann::json& Json, const Modio::Logo& ModLogo)
+	{
+		Json = {{"filename", ModLogo.Filename},
+				{"original", ModLogo.Original},
+				{"thumb_320x180", ModLogo.Thumb320x180},
+				{"thumb_640x360", ModLogo.Thumb640x360},
+				{"thumb_1280x720", ModLogo.Thumb1280x720}};
+	}
 } // namespace Modio

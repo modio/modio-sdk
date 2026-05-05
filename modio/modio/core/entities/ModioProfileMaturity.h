@@ -60,15 +60,15 @@ namespace Modio
 	/// * Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to
 	/// * be labeled as mature. The value of this field will default to "Maturity Option None" unless the parent
 	/// * game allows to flag mature content.
-	struct ProfileMaturity : public Modio::FlagImpl<MaturityOption>
+	struct ProfileMaturity : public Modio::FlagImpl<Modio::MaturityOption>
 	{
-		using Modio::FlagImpl<MaturityOption>::FlagImpl;
+		using Modio::FlagImpl<Modio::MaturityOption>::FlagImpl;
 
 		/// @docnone
-		constexpr ProfileMaturity(const Modio::FlagImpl<MaturityOption>& InitialValue)
-			: Modio::FlagImpl<MaturityOption>(InitialValue)
+		constexpr ProfileMaturity(const Modio::FlagImpl<Modio::MaturityOption>& InitialValue)
+			: Modio::FlagImpl<Modio::MaturityOption>(InitialValue)
 		{}
 	};
-	MODIO_DEFINE_FLAG_OPERATORS(MaturityOption, ProfileMaturity);
+	MODIO_DEFINE_FLAG_OPERATORS(Modio::MaturityOption, Modio::ProfileMaturity);
 
 } // namespace Modio

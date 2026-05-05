@@ -21,7 +21,7 @@ namespace Modio
 													 Modio::UserHandleType LocalSessionIdentifier,
 													 std::string& ModsDirectory, std::string& Token,
 													 std::vector<Modio::ModID> Mods)
-		: InitializeOptions(GameID, APIKey, GameEnvironment, PortalInUse, LocalSessionIdentifier),
+		: Modio::InitializeOptions(GameID, APIKey, GameEnvironment, PortalInUse, LocalSessionIdentifier),
 		  ModsDirectory(ModsDirectory),
 		  Token(Token),
 		  Mods(Mods)

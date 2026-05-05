@@ -27,7 +27,7 @@ namespace Modio
 		nlohmann::json AvatarJsonData;
 		if (Detail::GetSubobjectSafe(Json, "avatar", AvatarJsonData))
 		{
-			Modio::Detail::from_json(AvatarJsonData, User.Avatar);
+			Modio::from_json(AvatarJsonData, User.Avatar);
 		}
 
 		Detail::ParseSafe(Json, User.DisplayNamePortal, "display_name_portal");

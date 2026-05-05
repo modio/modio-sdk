@@ -42,25 +42,33 @@ namespace Modio
 			std::string AgreeText {};
 			/// @brief Text to display on the negative/cancel button
 			std::string DisagreeText {};
-		} Buttons;
+		};
 
 		/// @docpublic
 		/// @brief Link structs to contain all related terms
 		struct TermsLinks
 		{
 			/// @brief Link to the mod.io website
-			Link Website {};
+			Modio::Terms::Link Website {};
 			/// @brief Link to the mod.io terms of use
-			Link Terms {};
+			Modio::Terms::Link Terms {};
 			/// @brief Link to the mod.io Privacy Policy
-			Link Privacy {};
+			Modio::Terms::Link Privacy {};
 			/// @brief Link to the mod.io Refund Policy
-			Link Refund {};
+			Modio::Terms::Link Refund {};
 			/// @brief Link to the mod.io Manage User Account page
-			Link Manage {};
+			Modio::Terms::Link Manage {};
 			/// @brief Link to the mod.io Monetization policy
-			Link Monetization {};
-		} Links;
+			Modio::Terms::Link Monetization {};
+		};
+
+		/// @docpublic
+		/// @brief It contains the text details for the terms
+		Modio::Terms::TermsButtons Buttons;
+
+		/// @docpublic
+		/// @brief Link structs to contain all related terms
+		Modio::Terms::TermsLinks Links;
 
 		/// @brief The plaintext version of the mod.io terms of use
 		std::string TermsText {};

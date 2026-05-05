@@ -47,9 +47,9 @@ namespace Modio
 		std::int64_t DateAdded = 0;
 		/// @brief Current virus scan status of the file. For newly added files that have yet to be scanned this field
 		/// will change frequently until a scan is complete
-		VirusScanStatus CurrentVirusScanStatus = Modio::FileMetadata::VirusScanStatus::NotScanned;
+		Modio::FileMetadata::VirusScanStatus CurrentVirusScanStatus = Modio::FileMetadata::VirusScanStatus::NotScanned;
 		/// @brief Was a virus detected?
-		VirusStatus CurrentVirusStatus = Modio::FileMetadata::VirusStatus::NoThreat;
+		Modio::FileMetadata::VirusStatus CurrentVirusStatus = Modio::FileMetadata::VirusStatus::NoThreat;
 		/// @brief Size of the file in bytes.
 		std::uint64_t Filesize = 0;
 		/// @brief Size of the uncompressed file in bytes.

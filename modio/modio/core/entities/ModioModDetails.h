@@ -18,7 +18,7 @@ namespace Modio
 {
 	/// @docpublic
 	/// @brief Collection of FileMetadata objects representing mod file updates
-	class ModDetails : public PagedResult, public List<std::vector, FileMetadata>
+	class ModDetails : public Modio::PagedResult, public Modio::List<std::vector, Modio::FileMetadata>
 	{
 	};
 

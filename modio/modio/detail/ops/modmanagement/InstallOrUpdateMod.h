@@ -27,7 +27,7 @@ namespace Modio
 {
 	namespace Detail
 	{
-		class InstallOrUpdateModOp : public Modio::Detail::BaseOperation<InstallOrUpdateModOp>
+		class InstallOrUpdateModOp : public Modio::Detail::BaseOperation<Modio::Detail::InstallOrUpdateModOp>
 		{
 		public:
 			InstallOrUpdateModOp(Modio::ModID Mod, bool IsTempMod) : Mod(Mod), IsTempMod(IsTempMod)
@@ -75,7 +75,7 @@ namespace Modio
 						return;
 					}
 
-					CollectionEntry->SetModState(ModState::Downloading);
+					CollectionEntry->SetModState(Modio::ModState::Downloading);
 
 					// TryMarshalResponse to get ModInfo object
 					if (Modio::Optional<Modio::ModInfo> ModInfoResponse =
@@ -122,12 +122,13 @@ namespace Modio
 					if (Modio::StorageInfo::GetQuota(Modio::StorageLocation::Local).has_value())
 					{
 						Modio::StorageInfo Storage = Modio::QueryStorageInfo();
-						if (ModInfoData.FileInfo->FilesizeUncompressed >
-							Storage.GetSpace(Modio::StorageLocation::Local, Modio::StorageUsage::Available))
+						Modio::FileSize AvailableSpace =
+							Storage.GetSpace(Modio::StorageLocation::Local, Modio::StorageUsage::Available);
+						if (ModInfoData.FileInfo->FilesizeUncompressed > AvailableSpace)
 						{
 							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-														"Installing mod {} would exceed the local mod storage quota",
-														ModInfoData.ModId);
+														"Installing mod {} would exceed the local mod storage quota ({} needed, {} available)",
+														ModInfoData.ModId, ModInfoData.FileInfo->FilesizeUncompressed, AvailableSpace);
 							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
 							Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
 							return;
@@ -160,8 +161,8 @@ namespace Modio
 							if (ModInfoData.FileInfo->FilesizeUncompressed > AvailableSpace)
 							{
 								Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-															"Installing mod {} would exceed the temp mod storage quota",
-															ModInfoData.ModId);
+															"Installing mod {} would exceed the temp mod storage quota ({} needed, {} available)",
+															ModInfoData.ModId, ModInfoData.FileInfo->FilesizeUncompressed, AvailableSpace);
 								Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
 								Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
 								return;
@@ -170,34 +171,52 @@ namespace Modio
 					}
 
 					// Is there room in the installation path for the extracted files?
-					if (!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CheckSpaceAvailable(
-							CollectionEntry->GetPath(), Modio::FileSize(ModInfoData.FileInfo->FilesizeUncompressed)))
 					{
-						Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
-						Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
-						return;
-					}
-
-					// Do we already have the file on disk?
-					if (Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().FileExists(
-							DownloadPath))
-					{
-						Modio::Detail::File DownloadedFile(DownloadPath, Modio::Detail::FileMode::ReadOnly);
-						// Is the downloaded file the correct size?
-						if (DownloadedFile.GetFileSize() == ModInfoData.FileInfo->Filesize)
+						bool HasSpaceAvailable =
+							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CheckSpaceAvailable(
+								CollectionEntry->GetPath(),
+								Modio::FileSize(ModInfoData.FileInfo->FilesizeUncompressed));
+						Modio::FileSize AvailableSpaceAtPath =
+							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().GetSpaceAvailable(
+								CollectionEntry->GetPath());
+						if (!HasSpaceAvailable)
 						{
-							bFileDownloadComplete = true;
+							Modio::Detail::Logger().Log(
+								Modio::LogLevel::Error, Modio::LogCategory::File,
+								"Installing mod {} would exceed the available space in the installation path ({} "
+								"needed, {} available)",
+								ModInfoData.ModId, ModInfoData.FileInfo->FilesizeUncompressed,
+								Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+									.GetSpaceAvailable(CollectionEntry->GetPath()));
+							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
+							Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
+							return;
 						}
-					}
-					// If we either don't have the file on disk or its size is wrong, check if we have enough space to
-					// download the file
-					if (!bFileDownloadComplete &&
-						!Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CheckSpaceAvailable(
-							DownloadPath, Modio::FileSize(ModInfoData.FileInfo->Filesize)))
-					{
-						Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
-						Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
-						return;
+
+						// Do we already have the file on disk?
+						if (Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().FileExists(
+								DownloadPath))
+						{
+							Modio::Detail::File DownloadedFile(DownloadPath, Modio::Detail::FileMode::ReadOnly);
+							// Is the downloaded file the correct size?
+							if (DownloadedFile.GetFileSize() == ModInfoData.FileInfo->Filesize)
+							{
+								bFileDownloadComplete = true;
+							}
+						}
+						// If we either don't have the file on disk or its size is wrong, check if we have enough space
+						// to download the file
+						if (!bFileDownloadComplete && !HasSpaceAvailable)
+						{
+							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+														"Downloading mod {} would exceed the available space in the "
+														"download path ({} needed, {} available)",
+														ModInfoData.ModId, ModInfoData.FileInfo->FilesizeUncompressed,
+														AvailableSpaceAtPath);
+							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
+							Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
+							return;
+						}
 					}
 
 					// this check may be redundant given the above check
@@ -238,7 +257,7 @@ namespace Modio
 						}
 					}
 
-					CollectionEntry->SetModState(ModState::Extracting);
+					CollectionEntry->SetModState(Modio::ModState::Extracting);
 
 					if (Modio::filesystem::exists(CollectionEntry->GetPath(), ec) && !ec)
 					{
@@ -277,7 +296,7 @@ namespace Modio
 					// TODO: @modio-core perhaps resolve the file path issue by storing the mod path on the entry
 					// here rather than dynamically calculating it elsewhere?
 					CollectionEntry->UpdateSizeOnDisk(ExtractedSize);
-					CollectionEntry->SetModState(ModState::Installed);
+					CollectionEntry->SetModState(Modio::ModState::Installed);
 					// ToDO: @modio-core invoke GetFolderSizeAsync here to store the value into the modstate?
 
 					if (Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DeleteFile(
@@ -304,7 +323,7 @@ namespace Modio
 			bool IsTempMod {};
 			std::shared_ptr<Modio::ModCollectionEntry> CollectionEntry {};
 			Modio::ModInfo ModInfoData {};
-			Modio::Detail::Transaction<Modio::ModCollectionEntry> Transaction {};
+			Modio::Transaction<Modio::ModCollectionEntry> Transaction {};
 			std::weak_ptr<Modio::ModProgressInfo> ModProgress {};
 			bool bFileDownloadComplete = false;
 		};

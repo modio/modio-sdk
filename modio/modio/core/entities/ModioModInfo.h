@@ -17,8 +17,8 @@
 #include "modio/core/entities/ModioProfileMaturity.h"
 #include "modio/core/entities/ModioUser.h"
 #include "modio/core/entities/ModioURLList.h"
-#include "modio/detail/entities/ModioGalleryList.h"
-#include "modio/detail/entities/ModioLogo.h"
+#include "modio/core/entities/ModioGalleryList.h"
+#include "modio/core/entities/ModioLogo.h"
 
 namespace Modio
 {
@@ -112,7 +112,7 @@ namespace Modio
 		/// @brief Stats and rating information for the mod
 		Modio::ModStats Stats {};
 		/// @brief Media data related to the mod logo
-		Modio::Detail::Logo ModLogo {};
+		Modio::Logo ModLogo {};
 		/// @brief The current ModInfo version. This property is updated when changes to the class happen.
 		/// This is NOT the version of the mod itself. Mod versioning is tied to FileInfo, not ModInfo.
 		std::string Version = "1.0";
@@ -122,7 +122,7 @@ namespace Modio
 		Modio::ObjectVisibility Visibility = Modio::ObjectVisibility::Public;
 
 		/// @brief Price of this mod
-		uint64_t Price = 0;
+		std::uint64_t Price = 0;
 
 		/// @brief SKU Mappings for this mod for monetization purposes
 		/// @experimental

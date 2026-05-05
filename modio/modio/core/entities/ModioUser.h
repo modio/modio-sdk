@@ -12,7 +12,7 @@
 
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/entities/ModioToken.h"
-#include "modio/detail/entities/ModioAvatar.h"
+#include "modio/core/entities/ModioAvatar.h"
 
 namespace Modio
 {
@@ -27,7 +27,7 @@ namespace Modio
 		std::string Username {};
 
 		/// @brief Authentification token of the user
-		Modio::Optional<Modio::Detail::OAuthToken> AuthToken {};
+		Modio::Optional<Modio::OAuthToken> AuthToken {};
 
 		/// @brief If the user has connected an email address to their account
 		bool Verified = false;
@@ -39,7 +39,7 @@ namespace Modio
 		std::string ProfileUrl {};
 
 		/// @brief Cached information about the user's avatar
-		Modio::Detail::Avatar Avatar {};
+		Modio::Avatar Avatar {};
 		
 		/// @brief The display name of the User for the given Portal that the mod search is coming from
 		/// * ie if the Portal is PSN, then this is the owning user's PSN profile name if accounts are linked.

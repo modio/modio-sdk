@@ -40,25 +40,25 @@ namespace Modio
 		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries)
 	{}
 
-	uint8_t ModCollectionEntry::GetRetriesRemaining()
+	std::uint8_t ModCollectionEntry::GetRetriesRemaining()
 	{
 		return RetriesRemainingThisSession;
 	}
 
-	void ModCollectionEntry::UpdateModProfile(ModInfo ProfileData)
+	void ModCollectionEntry::UpdateModProfile(Modio::ModInfo ProfileData)
 	{
 		// check version in metadata and set pending install if need be
 		if (ModProfile.FileInfo.has_value() && ProfileData.FileInfo.has_value())
 		{
 			if (ModProfile.FileInfo.value().MetadataId != ProfileData.FileInfo.value().MetadataId)
 			{
-				SetModState(ModState::UpdatePending);
+				SetModState(Modio::ModState::UpdatePending);
 			}
 		}
 		ModProfile = ProfileData;
 	}
 
-	uint8_t ModCollectionEntry::AddLocalUserSubscription(Modio::Optional<User> User)
+	std::uint8_t ModCollectionEntry::AddLocalUserSubscription(Modio::Optional<Modio::User> User)
 	{
 		if (User.has_value())
 		{
@@ -74,14 +74,14 @@ namespace Modio
 		return std::uint8_t(LocalUserSubscriptions.size());
 	}
 
-	uint8_t ModCollectionEntry::RemoveLocalUserSubscription(Modio::Optional<Modio::User> User)
+	std::uint8_t ModCollectionEntry::RemoveLocalUserSubscription(Modio::Optional<Modio::User> User)
 	{
 		if (User.has_value())
 		{
 			LocalUserSubscriptions.erase(User->UserId);
 			if (LocalUserSubscriptions.size() == 0)
 			{
-				CurrentState.store(ModState::UninstallPending);
+				SetModState(ModState::UninstallPending);
 				Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::ModManagement,
 											"Reference count for mod {} now 0, marking for uninstallation", ID);
 			}
@@ -93,11 +93,21 @@ namespace Modio
 	{
 		Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::ModManagement, "Setting mod {} state from {} to {}", GetID(),
 									Modio::ModStateToString(CurrentState), Modio::ModStateToString(NewState));
-		CurrentState = NewState;
-		if (CurrentState == Modio::ModState::Installed)
+		
+		if (NewState == Modio::ModState::Installed)
 		{
 			RetriesRemainingThisSession = Modio::Detail::Constants::Configuration::DefaultNumberOfRetries;
 		}
+
+		// If we transition from pending installation to pending uninstall,
+		// clear the no retry flag and error code so that we will attempt to uninstall
+		if (CurrentState == ModState::InstallationPending && NewState == ModState::UninstallPending)
+		{
+			ClearModNoRetry();
+			LastErrorCode = {};
+		}
+
+		CurrentState.store(NewState);
 	}
 
 	Modio::ErrorCode ModCollectionEntry::GetLastError() const
@@ -230,7 +240,7 @@ namespace Modio
 		PathOnDisk = NewPath;
 	}
 
-	void RollbackTransactionImpl(ModCollectionEntry& Entry)
+	void RollbackTransactionImpl(Modio::ModCollectionEntry& Entry)
 	{
 		if (!Entry.RollbackState.has_value())
 		{
@@ -245,7 +255,7 @@ namespace Modio
 		}
 	}
 
-	void BeginTransactionImpl(ModCollectionEntry& Entry)
+	void BeginTransactionImpl(Modio::ModCollectionEntry& Entry)
 	{
 		if (Entry.CurrentState == Modio::ModState::Downloading || Entry.CurrentState == Modio::ModState::Extracting ||
 			Entry.RollbackState.has_value())
@@ -262,7 +272,7 @@ namespace Modio
 		}
 	}
 
-	ModCollectionEntry& ModCollectionEntry::operator=(const ModCollectionEntry& Other)
+	Modio::ModCollectionEntry& ModCollectionEntry::operator=(const Modio::ModCollectionEntry& Other)
 	{
 		ID = Other.ID;
 		CurrentState.store(Other.CurrentState.load());
@@ -285,18 +295,18 @@ namespace Modio
 	{
 		switch (Info.CurrentState)
 		{
-			case ModProgressInfo::EModProgressState::Initializing:
+			case Modio::ModProgressInfo::EModProgressState::Initializing:
 				return;
-			case ModProgressInfo::EModProgressState::Downloading:
+			case Modio::ModProgressInfo::EModProgressState::Downloading:
 				Info.DownloadCurrent = NewValue;
 				return;
-			case ModProgressInfo::EModProgressState::Extracting:
+			case Modio::ModProgressInfo::EModProgressState::Extracting:
 				Info.ExtractCurrent = NewValue;
 				return;
-			case ModProgressInfo::EModProgressState::Uploading:
+			case Modio::ModProgressInfo::EModProgressState::Uploading:
 				Info.UploadCurrent = NewValue;
 				return;
-			case ModProgressInfo::EModProgressState::Compressing:
+			case Modio::ModProgressInfo::EModProgressState::Compressing:
 				Info.CompressCurrent = NewValue;
 				MODIO_FALL_THROUGH;
 			default:
@@ -308,18 +318,18 @@ namespace Modio
 	{
 		switch (Info.CurrentState)
 		{
-			case ModProgressInfo::EModProgressState::Initializing:
+			case Modio::ModProgressInfo::EModProgressState::Initializing:
 				return;
-			case ModProgressInfo::EModProgressState::Downloading:
+			case Modio::ModProgressInfo::EModProgressState::Downloading:
 				Info.DownloadCurrent += NewValue;
 				return;
-			case ModProgressInfo::EModProgressState::Extracting:
+			case Modio::ModProgressInfo::EModProgressState::Extracting:
 				Info.ExtractCurrent += NewValue;
 				return;
-			case ModProgressInfo::EModProgressState::Uploading:
+			case Modio::ModProgressInfo::EModProgressState::Uploading:
 				Info.UploadCurrent += NewValue;
 				return;
-			case ModProgressInfo::EModProgressState::Compressing:
+			case Modio::ModProgressInfo::EModProgressState::Compressing:
 				Info.CompressCurrent += NewValue;
 				MODIO_FALL_THROUGH;
 			default:
@@ -331,18 +341,18 @@ namespace Modio
 	{
 		switch (State)
 		{
-			case ModProgressInfo::EModProgressState::Initializing:
+			case Modio::ModProgressInfo::EModProgressState::Initializing:
 				return;
-			case ModProgressInfo::EModProgressState::Downloading:
+			case Modio::ModProgressInfo::EModProgressState::Downloading:
 				Info.DownloadCurrent = Info.DownloadTotal;
 				return;
-			case ModProgressInfo::EModProgressState::Extracting:
+			case Modio::ModProgressInfo::EModProgressState::Extracting:
 				Info.ExtractCurrent = Info.ExtractTotal;
 				return;
-			case ModProgressInfo::EModProgressState::Compressing:
+			case Modio::ModProgressInfo::EModProgressState::Compressing:
 				Info.CompressCurrent = Info.CompressTotal;
 				return;
-			case ModProgressInfo::EModProgressState::Uploading:
+			case Modio::ModProgressInfo::EModProgressState::Uploading:
 				Info.UploadCurrent = Info.UploadTotal;
 				return;
 			default:
@@ -355,18 +365,18 @@ namespace Modio
 	{
 		switch (State)
 		{
-			case ModProgressInfo::EModProgressState::Initializing:
+			case Modio::ModProgressInfo::EModProgressState::Initializing:
 				return;
-			case ModProgressInfo::EModProgressState::Downloading:
+			case Modio::ModProgressInfo::EModProgressState::Downloading:
 				Info.DownloadTotal = NewTotal;
 				return;
-			case ModProgressInfo::EModProgressState::Extracting:
+			case Modio::ModProgressInfo::EModProgressState::Extracting:
 				Info.ExtractTotal = NewTotal;
 				return;
-			case ModProgressInfo::EModProgressState::Uploading:
+			case Modio::ModProgressInfo::EModProgressState::Uploading:
 				Info.UploadTotal = NewTotal;
 				return;
-			case ModProgressInfo::EModProgressState::Compressing:
+			case Modio::ModProgressInfo::EModProgressState::Compressing:
 				Info.CompressTotal = NewTotal;
 				MODIO_FALL_THROUGH;
 			default:
@@ -403,9 +413,9 @@ namespace Modio
 	}
 
 	std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType> UserSubscriptionList::CalculateChanges(
-		const UserSubscriptionList& Original, const UserSubscriptionList& Updated)
+		const Modio::UserSubscriptionList& Original, const Modio::UserSubscriptionList& Updated)
 	{
-		std::map<Modio ::ModID, ChangeType> Diff;
+		std::map<Modio::ModID, Modio::UserSubscriptionListChangeType> Diff;
 
 		std::vector<Modio::ModID> ChangedMods;
 		// Get a vector of all ModIDs that only occur in either Original or Updated but not both
@@ -418,13 +428,13 @@ namespace Modio
 			// If the Mod ID not present in the original set, it must be an addition
 			if (Original.InternalList.find(ChangedModID) == Original.InternalList.end())
 			{
-				Diff[ChangedModID] = ChangeType::Added;
+				Diff[ChangedModID] = Modio::UserSubscriptionListChangeType::Added;
 			}
 			else
 			{
 				// if the mod ID was present in the original set, it must NOT be in the new set. Therefore it is a
 				// removal.
-				Diff[ChangedModID] = ChangeType::Removed;
+				Diff[ChangedModID] = Modio::UserSubscriptionListChangeType::Removed;
 			}
 		}
 
@@ -470,7 +480,7 @@ namespace Modio
 	const Modio::ModCollection ModCollection::FilterByUserSubscriptions(
 		const UserSubscriptionList& UserSubscriptions) const
 	{
-		ModCollection FilteredCollection;
+		Modio::ModCollection FilteredCollection;
 		for (Modio::ModID UserModID : UserSubscriptions.Get())
 		{
 			if (ModEntries.count(UserModID))
@@ -566,7 +576,7 @@ namespace Modio
 			else
 			{
 				Modio::Detail::Logger().Log(
-					LogLevel::Warning, LogCategory::ModManagement,
+					Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
 					"Failed to remove Mod {} from Mod Collection as its state is not UninstallPending", ModId);
 			}
 		}
@@ -595,9 +605,10 @@ namespace Modio
 
 	void ModEventLog::AddEntry(Modio::ModManagementEvent Entry)
 	{
-		Modio::Detail::Logger().Log(LogLevel::Info, LogCategory::ModManagement,
+		Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::ModManagement,
 									"Adding ModManagementEvent {} with status {} to ModEventLog for ModID {}",
-									ModManagementEvent::ModManagementEventToString(Entry.Event), Entry.Status.value(),
+									Modio::ModManagementEvent::ModManagementEventToString(Entry.Event),
+									Entry.Status.value(),
 									Entry.ID);
 		//									static_cast<std::uint8_t>(Entry.Event), Entry.Status.value(), Entry.ID);
 		InternalData.push_back(std::move(Entry));

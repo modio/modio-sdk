@@ -42,6 +42,9 @@ namespace Modio
 					while (
 						Modio::Detail::Services::GetGlobalService<Modio::Detail::MetricsService>().GetSessionIsActive())
 					{
+						Timer.ExpiresAfter(std::chrono::seconds(Interval));
+						yield Timer.WaitAsync(std::move(Self));
+
 						yield Modio::Detail::MetricsSessionSendHeartbeatOnceOpAsync(std::move(Self));
 
 						if (ec)
@@ -57,9 +60,6 @@ namespace Modio
 							Self.complete(ec);
 							return;
 						}
-
-						Timer.ExpiresAfter(std::chrono::seconds(Interval));
-						yield Timer.WaitAsync(std::move(Self));
 					}
 
 					Self.complete({});

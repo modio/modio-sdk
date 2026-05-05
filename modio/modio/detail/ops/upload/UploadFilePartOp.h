@@ -45,7 +45,7 @@ namespace Modio
 
 		public:
 			UploadFilePartOp(Modio::Detail::DynamicBuffer Response, Modio::Detail::HttpRequestParams BasicParams,
-				Modio::filesystem::path FilePath, int FilePart,
+				Modio::filesystem::path FilePath, std::int32_t FilePart,
 				std::shared_ptr<Modio::Detail::UploadSession> UploadSession,
 				Modio::Detail::OperationQueue::Ticket RequestTicket,
 				std::weak_ptr<Modio::ModProgressInfo> ProgressInfo)

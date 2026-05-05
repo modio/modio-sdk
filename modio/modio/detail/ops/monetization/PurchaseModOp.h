@@ -23,7 +23,7 @@ namespace Modio
 		{
 		public:
 			PurchaseModOp(Modio::GameID GameID, Modio::ApiKey ApiKey, Modio::ModID ModID,
-						  Modio::Optional<uint64_t> PriceInTokens)
+						  Modio::Optional<std::uint64_t> PriceInTokens)
 				: GameID(GameID),
 				  ApiKey(ApiKey),
 				  ModId(ModID),
@@ -165,7 +165,7 @@ namespace Modio
 			Modio::GameID GameID {};
 			Modio::ApiKey ApiKey {};
 			Modio::ModID ModId {};
-			Modio::Optional<uint64_t> PriceInTokens {};
+			Modio::Optional<std::uint64_t> PriceInTokens {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 			ModioAsio::coroutine CoroutineState {};
 			Modio::Optional<Modio::TransactionRecord> Record {};
@@ -174,7 +174,7 @@ namespace Modio
 #include <asio/unyield.hpp>
 
 		template<typename PurchaseCompleteCallback>
-		void PurchaseModAsync(Modio::ModID ModID, Modio::Optional<uint64_t> ExpectedVirtualCurrencyPrice,
+		void PurchaseModAsync(Modio::ModID ModID, Modio::Optional<std::uint64_t> ExpectedVirtualCurrencyPrice,
 							  PurchaseCompleteCallback&& OnPurchaseComplete)
 		{
 			return ModioAsio::async_compose<PurchaseCompleteCallback,

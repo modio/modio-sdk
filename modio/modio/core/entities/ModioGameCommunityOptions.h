@@ -49,15 +49,15 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief A strong type flag object to represent GameCommunityOptions from a mod.io info.
-	struct GameCommunityOptionsFlags : public Modio::FlagImpl<GameCommunityOptions>
+	struct GameCommunityOptionsFlags : public Modio::FlagImpl<Modio::GameCommunityOptions>
 	{
-		using Modio::FlagImpl<GameCommunityOptions>::FlagImpl;
+		using Modio::FlagImpl<Modio::GameCommunityOptions>::FlagImpl;
 
 		/// @docnone
-		constexpr GameCommunityOptionsFlags(const Modio::FlagImpl<GameCommunityOptions>& InitialValue)
-			: Modio::FlagImpl<GameCommunityOptions>(InitialValue)
+		constexpr GameCommunityOptionsFlags(const Modio::FlagImpl<Modio::GameCommunityOptions>& InitialValue)
+			: Modio::FlagImpl<Modio::GameCommunityOptions>(InitialValue)
 		{}
 
 	};
-	MODIO_DEFINE_FLAG_OPERATORS(GameCommunityOptions, GameCommunityOptions);
+	MODIO_DEFINE_FLAG_OPERATORS(Modio::GameCommunityOptions, Modio::GameCommunityOptions);
 } // namespace Modio

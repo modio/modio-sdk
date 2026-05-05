@@ -21,7 +21,7 @@ namespace Modio
 	struct ModMonetizationSKU
 	{
 		/// @brief Unique identifier for the SKU
-		uint8_t Id;
+		std::uint8_t Id;
 
 		/// @brief Name of the actual SKU pack
 		std::string Sku;

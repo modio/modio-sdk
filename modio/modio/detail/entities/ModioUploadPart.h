@@ -43,7 +43,8 @@ namespace Modio
 
 		/// @docpublic
 		/// @brief Container for a collection of UploadSessionPart objects
-		class UploadSessionPartList : public PagedResult, public List<std::vector, UploadSessionPart>
+		class UploadSessionPartList : public Modio::PagedResult,
+									  public Modio::List<std::vector, Modio::Detail::UploadSessionPart>
 		{
 		};
 

@@ -24,11 +24,11 @@ namespace Modio
 	/// @brief Serialisation helper class
 	class ModCollectionEntryConstAccessor
 	{
-		const ModCollectionEntry& Entry;
+		const Modio::ModCollectionEntry& Entry;
 
 	public:
 		/// @docinternal
-		ModCollectionEntryConstAccessor(const ModCollectionEntry& Entry) : Entry(Entry) {}
+		ModCollectionEntryConstAccessor(const Modio::ModCollectionEntry& Entry) : Entry(Entry) {}
 		
 		/// @docinternal
 		const std::atomic<Modio::ModState>& CurrentState() const
@@ -46,11 +46,11 @@ namespace Modio
 	/// @brief Serialisation helper class
 	class ModCollectionEntryAccessor
 	{
-		ModCollectionEntry& Entry;
+		Modio::ModCollectionEntry& Entry;
 
 	public:
 		/// @docinternal
-		ModCollectionEntryAccessor(ModCollectionEntry& Entry) : Entry(Entry) {}
+		ModCollectionEntryAccessor(Modio::ModCollectionEntry& Entry) : Entry(Entry) {}
 
 		/// @docinternal
 		/// @return Modio::ModState enum representing current state of the mod
@@ -104,7 +104,7 @@ namespace Modio
 		}
 	};
 
-	inline void to_json(nlohmann::json& j, const ModCollectionEntry& Entry)
+	inline void to_json(nlohmann::json& j, const Modio::ModCollectionEntry& Entry)
 	{
 		Modio::ModCollectionEntryConstAccessor Helper(Entry);
 		Modio::ModState EntryState = Helper.CurrentState().load();
@@ -140,7 +140,7 @@ namespace Modio
 			  Modio::Detail::ModioErrorCategoryID(Entry.GetNeverRetryReason().category())}});
 	}
 
-	inline void from_json(const nlohmann::json& j, ModCollectionEntry& Entry)
+	inline void from_json(const nlohmann::json& j, Modio::ModCollectionEntry& Entry)
 	{
 		Modio::ModCollectionEntryAccessor Helper(Entry);
 		Modio::Detail::ParseSafe(j, Helper.GetID(), Modio::Detail::Constants::JSONKeys::ModEntryID);

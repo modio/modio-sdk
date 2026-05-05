@@ -57,7 +57,7 @@ namespace Modio
 		std::map<std::string, std::string> TagGroupNameLocData {};
 
 		/// @brief Localization data for this tag category's values in all configured languages
-		std::vector<ModTagLocalizationData> TagGroupValueLocData {};
+		std::vector<Modio::ModTagLocalizationData> TagGroupValueLocData {};
 
 		/// @brief True if multiple tags from the group can be used simultaneously
 		bool bAllowMultipleSelection = false;
@@ -112,7 +112,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Container for a collection of ModTagInfo objects
-	class ModTagOptions : public PagedResult, public List<std::vector, ModTagInfo>
+	class ModTagOptions : public Modio::PagedResult, public Modio::List<std::vector, Modio::ModTagInfo>
 	{
 	};
 } // namespace Modio

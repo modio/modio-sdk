@@ -30,18 +30,18 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Object representing a mod.io user's ratings
-	struct UserRatingList : public PagedResult, public List<std::vector, Modio::UserRating>
+	struct UserRatingList : public Modio::PagedResult, public Modio::List<std::vector, Modio::UserRating>
 	{
 		/// @docpublic
 		/// @brief Insert ModInfoList to the end of this list
-		void Append(const UserRatingList& Other)
+		void Append(const Modio::UserRatingList& Other)
 		{
 			InternalList.insert(InternalList.end(), std::begin(Other.InternalList), std::end(Other.InternalList));
 		}
 
 		/// @docpublic
 		/// @brief Insert a ModInfo to the end of this list
-		void Append(const UserRating& UserRatingData)
+		void Append(const Modio::UserRating& UserRatingData)
 		{
 			InternalList.push_back(UserRatingData);
 		}

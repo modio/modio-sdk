@@ -22,10 +22,10 @@ namespace Modio
 		{
 		private:
 			/// @brief vector of ModIds who are in the Temp/System Collection
-			std::vector<ModID> ModIds {};
+			std::vector<Modio::ModID> ModIds {};
 
 			/// @brief vector of ModIds to collect ModInfo data before adding it to the TempModCollection
-			std::vector<ModID> TempModIdsToInstall {};
+			std::vector<Modio::ModID> TempModIdsToInstall {};
 
 		public:
 			/// @docinternal
@@ -40,9 +40,9 @@ namespace Modio
 
 			MODIO_IMPL void Remove(std::vector<Modio::ModID> vectorModIds);
 
-			MODIO_IMPL std::vector<ModID> GetTempModIdsToInstall() const;
+			MODIO_IMPL std::vector<Modio::ModID> GetTempModIdsToInstall() const;
 
-			MODIO_IMPL std::vector<ModID> GetModIds() const;
+			MODIO_IMPL std::vector<Modio::ModID> GetModIds() const;
 
 			MODIO_IMPL bool ContainsModId(Modio::ModID Id) const;
 

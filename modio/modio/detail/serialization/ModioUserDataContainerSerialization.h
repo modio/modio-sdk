@@ -35,8 +35,9 @@ namespace Modio
 			}
 			if (UserData.UserModDirectoryOverride)
 			{
+				auto MaybeU8String = UserData.UserModDirectoryOverride.value().generic_u8string();
 				Json[Modio::Detail::Constants::JSONKeys::RootLocalStoragePath] =
-					UserData.UserModDirectoryOverride.value().u8string();
+					std::string(MaybeU8String.begin(), MaybeU8String.end());
 			}
 		}
 
@@ -45,7 +46,7 @@ namespace Modio
 			Modio::User AuthenticatedUser;
 			bool ParseStatus = Modio::Detail::ParseSafe(Json, AuthenticatedUser, Modio::Detail::Constants::JSONKeys::UserProfile);
 			ParseStatus &= Modio::Detail::ParseSafe(Json, AuthenticatedUser.Avatar, Modio::Detail::Constants::JSONKeys::Avatar);
-			Modio::Detail::OAuthToken Token;
+			Modio::OAuthToken Token;
 			ParseStatus &= Modio::Detail::ParseSafe(Json, Token, Modio::Detail::Constants::JSONKeys::OAuth);
 			if (ParseStatus)
 			{
@@ -60,7 +61,9 @@ namespace Modio
 			Modio::Detail::ParseSafe(Json, TmpPath, Modio::Detail::Constants::JSONKeys::RootLocalStoragePath);
 			if (!TmpPath.empty())
 			{
-				UserData.UserModDirectoryOverride = Modio::filesystem::path(TmpPath);
+				decltype(std::declval<Modio::filesystem::path>().generic_u8string()) MaybeU8String {
+					TmpPath.begin(), TmpPath.end()};
+				UserData.UserModDirectoryOverride = Modio::filesystem::path(MaybeU8String);
 			}
 		}
 

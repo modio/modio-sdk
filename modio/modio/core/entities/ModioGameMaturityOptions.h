@@ -29,15 +29,15 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief A strong type flag object to represent GameMaturityOptions from a mod.io info.
-	struct GameMaturityOptionsFlags : public Modio::FlagImpl<GameMaturityOptions>
+	struct GameMaturityOptionsFlags : public Modio::FlagImpl<Modio::GameMaturityOptions>
 	{
-		using Modio::FlagImpl<GameMaturityOptions>::FlagImpl;
+		using Modio::FlagImpl<Modio::GameMaturityOptions>::FlagImpl;
 
 		/// @docnone
-		constexpr GameMaturityOptionsFlags(const Modio::FlagImpl<GameMaturityOptions>& InitialValue)
-			: Modio::FlagImpl<GameMaturityOptions>(InitialValue)
+		constexpr GameMaturityOptionsFlags(const Modio::FlagImpl<Modio::GameMaturityOptions>& InitialValue)
+			: Modio::FlagImpl<Modio::GameMaturityOptions>(InitialValue)
 		{}
 	};
-	MODIO_DEFINE_FLAG_OPERATORS(GameMaturityOptions, GameMaturityOptionsFlags);
+	MODIO_DEFINE_FLAG_OPERATORS(Modio::GameMaturityOptions, Modio::GameMaturityOptionsFlags);
 
 } // namespace Modio

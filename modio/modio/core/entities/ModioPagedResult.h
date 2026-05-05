@@ -15,6 +15,13 @@
 
 namespace Modio
 {
+	class PagedResult;
+
+	/// @docnone
+	MODIO_IMPL void InitializePageResult(Modio::PagedResult& PagedResult, std::int32_t PageIndex, std::int32_t PageSize,
+										 std::int32_t PageCount, std::int32_t TotalResultCount,
+										 std::int32_t ResultCount);
+
 	/// @docpublic
 	/// @brief Base class for all types that represent a page from a set of results
 	class PagedResult

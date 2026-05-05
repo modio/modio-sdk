@@ -30,7 +30,7 @@ namespace Modio
 	struct EntitlementConsumptionVirtualCurrencyDetails
 	{
 		/// @brief Amount of tokens that were issued for this specific entitlement consumption
-		int TokensAllocated = 0;
+		std::int32_t TokensAllocated = 0;
 	};
 
 	/// @docpublic

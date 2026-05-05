@@ -28,7 +28,7 @@ namespace Modio
 		public:
 			ReportContentOp(Modio::ReportParams Params)
 			{
-				Request = ToRequest(Params);
+				Request = Modio::Detail::ToRequest(Params);
 			}
 
 			template<typename CoroType>

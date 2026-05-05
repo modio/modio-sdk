@@ -84,7 +84,7 @@ namespace Modio
 					Local.ResponseBodyBuffer.Clear();
 
 					Modio::Detail::SDKSessionData::InitializeForUser(std::move(Local.NewlyAuthenticatedUser),
-																	 Modio::Detail::OAuthToken(Local.AuthResponse));
+																	 Modio::OAuthToken(Local.AuthResponse));
 
 					Detail::Services::GetGlobalService<Detail::CacheService>().ClearCache();
 					yield UserDataService.SaveUserDataToStorageAsync(std::move(Self));

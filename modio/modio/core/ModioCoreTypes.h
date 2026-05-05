@@ -311,9 +311,9 @@ namespace Modio
 
 		/// @docinternal
 		/// @brief Static function to an invalid API key
-		static const ApiKey& InvalidAPIKey()
+		static const Modio::ApiKey& InvalidAPIKey()
 		{
-			static ApiKey Invalid("");
+			static Modio::ApiKey Invalid("");
 
 			return Invalid;
 		}
@@ -332,7 +332,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Strong type for User IDs
-	struct UserID : public StrongInteger<std::int64_t>
+	struct UserID : public Modio::StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
 		/// @docinternal
@@ -348,7 +348,7 @@ namespace Modio
 
 		/// @docinternal
 		/// @brief Static function to an invalid UserID
-		static constexpr UserID InvalidUserID()
+		static constexpr Modio::UserID InvalidUserID()
 		{
 			constexpr UserID ID(-1);
 
@@ -362,12 +362,12 @@ namespace Modio
 	/// @return A statically casted underlying UserID value
 	inline auto format_as(Modio::UserID IdVal)
 	{
-		return static_cast<UserID::UnderlyingType>(IdVal);
+		return static_cast<Modio::UserID::UnderlyingType>(IdVal);
 	}
 
 	/// @docpublic
 	/// @brief Strong type for Mod IDs
-	struct ModID : public StrongInteger<std::int64_t>
+	struct ModID : public Modio::StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
 		/// @docinternal
@@ -383,9 +383,9 @@ namespace Modio
 
 		/// @docinternal
 		/// @brief Static function to an invalid ModID
-		static constexpr ModID InvalidModID()
+		static constexpr Modio::ModID InvalidModID()
 		{
-			constexpr ModID ID(-1);
+			constexpr Modio::ModID ID(-1);
 
 			return ID;
 		}
@@ -397,12 +397,12 @@ namespace Modio
 	/// @return A statically casted underlying ModID value
 	inline auto format_as(Modio::ModID IdVal)
 	{
-		return static_cast<ModID::UnderlyingType>(IdVal);
+		return static_cast<Modio::ModID::UnderlyingType>(IdVal);
 	}
 
 	/// @docpublic
 	/// @brief Strong type for Mod Collection IDs
-	struct ModCollectionID : public StrongInteger<std::int64_t>
+	struct ModCollectionID : public Modio::StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
 
@@ -419,9 +419,9 @@ namespace Modio
 
 		/// @docinternal
 		/// @brief Static function to an invalid ModCollectionID
-		static constexpr ModCollectionID InvalidCollectionID()
+		static constexpr Modio::ModCollectionID InvalidCollectionID()
 		{
-			constexpr ModCollectionID ID(-1);
+			constexpr Modio::ModCollectionID ID(-1);
 			return ID;
 		}
 	};
@@ -432,26 +432,26 @@ namespace Modio
 	/// @return A statically casted underlying ModCollectionID value
 	inline auto format_as(Modio::ModCollectionID IdVal)
 	{
-		return static_cast<ModCollectionID::UnderlyingType>(IdVal);
+		return static_cast<Modio::ModCollectionID::UnderlyingType>(IdVal);
 	}
 
 	/// @docpublic
 	/// @brief Strong type for File Metadata IDs
-	struct FileMetadataID : public StrongInteger<std::int64_t>
+	struct FileMetadataID : public Modio::StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
 	};
 
 	/// @docpublic
 	/// @brief Strong type for Media File ID
-	struct MediaFileID : public StrongInteger<std::int64_t>
+	struct MediaFileID : public Modio::StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
 	};
 
 	/// @docpublic
 	/// @brief Strong type for file offsets
-	struct FileOffset : public StrongInteger<std::uintmax_t>
+	struct FileOffset : public Modio::StrongInteger<std::uintmax_t>
 	{
 		using StrongInteger::StrongInteger;
 	};
@@ -460,14 +460,14 @@ namespace Modio
 	/// @brief Transform the FileOffset into the underlying type
 	/// @param OffsetVal FileOffset value
 	/// @return A statically casted underlying FileOffset value
-	inline auto format_as(FileOffset OffsetVal)
+	inline auto format_as(Modio::FileOffset OffsetVal)
 	{
-		return static_cast<FileOffset::UnderlyingType>(OffsetVal);
+		return static_cast<Modio::FileOffset::UnderlyingType>(OffsetVal);
 	}
 
 	/// @docpublic
 	/// @brief Strong type for file sizes
-	struct FileSize : public StrongInteger<std::uintmax_t>
+	struct FileSize : public Modio::StrongInteger<std::uintmax_t>
 	{
 		using StrongInteger::StrongInteger;
 	};
@@ -476,14 +476,14 @@ namespace Modio
 	/// @brief Transform the FileSize into the underlying type
 	/// @param SizeValue FileSize value
 	/// @return A statically casted underlying FileSize value
-	inline auto format_as(FileSize SizeVal)
+	inline auto format_as(Modio::FileSize SizeVal)
 	{
-		return static_cast<FileSize::UnderlyingType>(SizeVal);
+		return static_cast<Modio::FileSize::UnderlyingType>(SizeVal);
 	}
 
 	/// @docpublic
 	/// @brief Strong type for a game ID
-	struct GameID : public StrongInteger<std::int64_t>
+	struct GameID : public Modio::StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
 		/// @docinternal
@@ -499,9 +499,9 @@ namespace Modio
 
 		/// @docinternal
 		/// @brief Static function to an invalid GameID
-		static constexpr GameID InvalidGameID()
+		static constexpr Modio::GameID InvalidGameID()
 		{
-			constexpr GameID ID(-1);
+			constexpr Modio::GameID ID(-1);
 
 			return ID;
 		}
@@ -513,7 +513,7 @@ namespace Modio
 	/// @return A statically casted underlying GameID value
 	inline auto format_as(Modio::GameID IdVal)
 	{
-		return static_cast<GameID::UnderlyingType>(IdVal);
+		return static_cast<Modio::GameID::UnderlyingType>(IdVal);
 	}
 
 	/// @docpublic
@@ -527,14 +527,15 @@ namespace Modio
 		}
 
 		/// @docinternal
-		GuidV4(const uint8_t UUID[16])
+		/// @param UUID the 16byte UUID
+		GuidV4(const std::uint8_t* UUID)
 		{
 			std::memmove(Raw8, UUID, 16);
 			// assert(IsValid());
 		}
 
 		/// @docinternal
-		GuidV4(const GuidV4& UUID)
+		GuidV4(const Modio::GuidV4& UUID)
 		{
 			std::memmove(Raw8, UUID.Raw8, 16);
 			// assert(IsValid());
@@ -547,7 +548,7 @@ namespace Modio
 		}
 
 		/// @docinternal
-		GuidV4& operator=(const GuidV4& UUID)
+		Modio::GuidV4& operator=(const Modio::GuidV4& UUID)
 		{
 			std::memcpy(Raw8, UUID.Raw8, 16);
 			// assert(IsValid());
@@ -555,7 +556,7 @@ namespace Modio
 		}
 
 		/// @docinternal
-		GuidV4& operator=(const std::string& UUID)
+		Modio::GuidV4& operator=(const std::string& UUID)
 		{
 			Parse(UUID);
 			return *this;
@@ -584,9 +585,9 @@ namespace Modio
 
 		/// @docinternal
 		/// @brief Static function to generate an invalid Guid
-		static GuidV4 InvalidGuid()
+		static Modio::GuidV4 InvalidGuid()
 		{
-			return GuidV4();
+			return Modio::GuidV4();
 		}
 
 		/// @docinternal
@@ -608,7 +609,7 @@ namespace Modio
 		/// @brief Test for equality
 		/// @param Other the UUID to compare against
 		/// @return true if the GUIDs are equal
-		bool operator==(const GuidV4& Other) const
+		bool operator==(const Modio::GuidV4& Other) const
 		{
 			return Raw64[0] == Other.Raw64[0] && Raw64[1] == Other.Raw64[1];
 		}
@@ -616,7 +617,7 @@ namespace Modio
 		/// @brief test for inequality
 		/// @param Other the UUID to compare against
 		/// @return true if the GUIDs are equal
-		bool operator!=(const GuidV4& Other) const
+		bool operator!=(const Modio::GuidV4& Other) const
 		{
 			return !(*this == Other);
 		}
@@ -624,7 +625,7 @@ namespace Modio
 		/// @brief less that comparison for sorting
 		/// @param Other the UUID to compare against
 		/// @return true if this UUID is less than Other
-		bool operator<(const GuidV4& Other) const
+		bool operator<(const Modio::GuidV4& Other) const
 		{
 			if (Raw64[0] == Other.Raw64[0])
 				return Raw64[1] < Other.Raw64[1];
@@ -634,7 +635,7 @@ namespace Modio
 		/// @brief greater that comparison for sorting
 		/// @param Other
 		/// @return true if this UUID is greater than Other
-		bool operator>(const GuidV4& Other) const
+		bool operator>(const Modio::GuidV4& Other) const
 		{
 			if (Raw64[0] == Other.Raw64[0])
 				return Raw64[1] > Other.Raw64[1];
@@ -643,14 +644,14 @@ namespace Modio
 
 		/// @brief returns the raw bytes. Note, internally this is stored in MS binary format
 		/// @return pointer to the raw bytes in the GUID
-		uint8_t* Bytes()
+		std::uint8_t* Bytes()
 		{
 			return Raw8;
 		}
 
 		/// @brief returns the raw bytes. Note, internally this is stored in MS binary format
 		/// @return pointer to the raw bytes in the GUID
-		const uint8_t* Bytes() const
+		const std::uint8_t* Bytes() const
 		{
 			return Raw8;
 		}
@@ -658,8 +659,8 @@ namespace Modio
 	private:
 		union
 		{
-			uint8_t Raw8[16];
-			uint64_t Raw64[2];
+			std::uint8_t Raw8[16];
+			std::uint64_t Raw64[2];
 		};
 	};
 
@@ -675,7 +676,7 @@ namespace Modio
 		/// @brief Generates a new Guid.
 		/// NOTE: This is a minimalistic implementation of generating a Guid for metrics, an improved more robust
 		/// per-platform implementation is planned
-		MODIO_IMPL static Guid GenerateGuid();
+		MODIO_IMPL static Modio::Guid GenerateGuid();
 
 		/// @docpublic
 		/// @brief Explicit constructor
@@ -696,9 +697,9 @@ namespace Modio
 
 		/// @docinternal
 		/// @brief Static function to an invalid Guid
-		static Guid InvalidGuid()
+		static Modio::Guid InvalidGuid()
 		{
-			return Guid();
+			return Modio::Guid();
 		}
 
 		/// @docnone
@@ -713,7 +714,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Strong type wrapping a handle to an as-yet-uncreated mod
-	struct ModCreationHandle : public StrongInteger<std::int64_t>
+	struct ModCreationHandle : public Modio::StrongInteger<std::int64_t>
 	{
 		using StrongInteger::StrongInteger;
 	};
@@ -724,7 +725,7 @@ namespace Modio
 	/// @return A statically casted underlying ModCreationHandle value
 	inline auto format_as(Modio::ModCreationHandle IdVal)
 	{
-		return static_cast<ModCreationHandle::UnderlyingType>(IdVal);
+		return static_cast<Modio::ModCreationHandle::UnderlyingType>(IdVal);
 	}
 
 	// TODO: @Modio-core strong type for filesystem::paths that are directories?
@@ -833,7 +834,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief A rating for a mod.
-	enum class Rating : int8_t
+	enum class Rating : std::int8_t
 	{
 		Neutral = 0,
 		Positive = 1,
@@ -842,7 +843,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief The visibility of a mod.
-	enum class ObjectVisibility : int8_t
+	enum class ObjectVisibility : std::int8_t
 	{
 		Hidden = 0,
 		Public = 1
@@ -887,7 +888,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Where the storage has been written to
-	enum class StorageLocation : uint8_t
+	enum class StorageLocation : std::uint8_t
 	{
 		// Locally installed mods for this game, including temp mods and those installed by other users on this system
 		Local = 0,
@@ -897,11 +898,16 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief The type of storage usage
-	enum class StorageUsage : uint8_t
+	enum class StorageUsage : std::uint8_t
 	{
 		Consumed = 0,
 		Available = 1
 	};
+
+	/// @docnone
+	MODIO_IMPL void SetSpace(Modio::StorageInfo& Info, Modio::StorageLocation Location,
+							 Modio::StorageUsage Usage, Modio::FileSize Space);
+	
 
 	/// @docpublic
 	/// @brief Structure containing storage usage information including availability and consumption
@@ -934,13 +940,12 @@ namespace Modio
 		/// `Modio::StorageLocation`. Empty if no quota is set.
 		static MODIO_IMPL Modio::Optional<Modio::FileSize> GetQuota(Modio::StorageLocation Location);
 
-	private:
-		/// @docnone
-		std::map<std::tuple<Modio::StorageLocation, Modio::StorageUsage>, Modio::FileSize> StorageData;
-
 		/// @docnone
 		friend MODIO_IMPL void SetSpace(Modio::StorageInfo& Info, Modio::StorageLocation Location,
 										Modio::StorageUsage Usage, Modio::FileSize Space);
+	private:
+		/// @docnone
+		std::map<std::tuple<Modio::StorageLocation, Modio::StorageUsage>, Modio::FileSize> StorageData;
 	};
 } // namespace Modio
 

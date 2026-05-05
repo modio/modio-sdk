@@ -32,7 +32,12 @@ namespace Modio::Detail
 						.SetUserID(Modio::Detail::SDKSessionData::GetAuthenticatedUser().value().UserId)
 						.SetTargetUserID(ID),
 					Modio::Detail::CachedResponse::Disallow, std::move(Self));
-
+				// Treat an API error indicating a no-op as a success
+				if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::ApiErrorRefSuccess))
+				{
+					Self.complete({});
+					return;
+				}
 				Self.complete(ec);
 				return;
 			}

@@ -18,19 +18,19 @@ namespace Modio
 {
 	/// @docpublic
 	/// @brief Class representing a list of mods that may be a page from a larger set of results
-	class ModInfoList : public PagedResult, public List<std::vector, Modio::ModInfo>
+	class ModInfoList : public Modio::PagedResult, public Modio::List<std::vector, Modio::ModInfo>
 	{
 	public:
 		/// @docpublic
 		/// @brief Insert ModInfoList to the end of this list
-		void Append(const ModInfoList& Other)
+		void Append(const Modio::ModInfoList& Other)
 		{
 			InternalList.insert(InternalList.end(), std::begin(Other.InternalList), std::end(Other.InternalList));
 		}
 
 		/// @docpublic
 		/// @brief Insert a ModInfo to the end of this list
-		void Append(const ModInfo& ModInfoData)
+		void Append(const Modio::ModInfo& ModInfoData)
 		{
 			InternalList.push_back(ModInfoData);
 		}

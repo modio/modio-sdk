@@ -48,7 +48,7 @@ namespace Modio
 					}
 
 					{
-						Modio::Optional<uint64_t> UpdatedBalance = MarshalSubobjectResponse<uint64_t>(
+						Modio::Optional<std::uint64_t> UpdatedBalance = MarshalSubobjectResponse<uint64_t>(
 							Modio::Detail::Constants::JSONKeys::WalletBalance, ResponseBodyBuffer);
 						if (UpdatedBalance.has_value())
 						{
@@ -67,7 +67,8 @@ namespace Modio
 		template<typename GetBalanceCompleteCallback>
 		void GetUserWalletBalanceAsync(GetBalanceCompleteCallback&& OnGetBalanceComplete)
 		{
-			return ModioAsio::async_compose<GetBalanceCompleteCallback, void(Modio::ErrorCode, Modio::Optional<uint64_t>)>(
+			return ModioAsio::async_compose<GetBalanceCompleteCallback,
+											void(Modio::ErrorCode, Modio::Optional<std::uint64_t>)>(
 				Modio::Detail::GetUserWalletBalanceOp(Modio::Detail::SDKSessionData::CurrentGameID(),
 													  Modio::Detail::SDKSessionData::CurrentAPIKey()),
 				OnGetBalanceComplete,

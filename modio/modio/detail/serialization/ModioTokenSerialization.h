@@ -17,18 +17,12 @@ namespace Modio
 {
 	namespace Detail
 	{
-		inline void from_json(const nlohmann::json& Json, AccessTokenObject& AccessToken)
-		{
-			Modio::Detail::ParseSafe(Json, AccessToken.HttpResponseCode, "code");
-			Modio::Detail::ParseSafe(Json, AccessToken.AccessToken, "access_token");
-			Modio::Detail::ParseSafe(Json, AccessToken.DateExpires, "date_expires");
-		}
-
 		class OAuthTokenStateAccessor
 		{
-			Modio::Detail::OAuthToken& InToken;
+			Modio::OAuthToken& InToken;
+
 		public:
-			OAuthTokenStateAccessor(Modio::Detail::OAuthToken& InToken) : InToken(InToken) {}
+			OAuthTokenStateAccessor(Modio::OAuthToken& InToken) : InToken(InToken) {}
 
 			/// @docinternal
 			/// @brief Optional here so that the accessors can return references to avoid memcpy, will always be set
@@ -51,36 +45,44 @@ namespace Modio
 				return InToken.State;
 			}
 		};
+	}
 
-		inline void from_json(const nlohmann::json& Json, Modio::Detail::OAuthToken& InToken)
+	inline void from_json(const nlohmann::json& Json, Modio::AccessTokenObject& AccessToken)
+	{
+		Modio::Detail::ParseSafe(Json, AccessToken.HttpResponseCode, "code");
+		Modio::Detail::ParseSafe(Json, AccessToken.AccessToken, "access_token");
+		Modio::Detail::ParseSafe(Json, AccessToken.DateExpires, "date_expires");
+	}
+
+
+	inline void from_json(const nlohmann::json& Json, Modio::OAuthToken& InToken)
+	{
+		Modio::Detail::OAuthTokenStateAccessor Token(InToken);
+		Detail::ParseSafe(Json, Token.ExpireDate(), "expiry");
+		Detail::ParseSafe(Json, Token.State(), "status");
+		std::string TokenString;
+
+		if (Detail::ParseSafe(Json, TokenString, "token"))
 		{
-			OAuthTokenStateAccessor Token(InToken);
-			Detail::ParseSafe(Json, Token.ExpireDate(), "expiry");
-			Detail::ParseSafe(Json, Token.State(), "status");
-			std::string TokenString;
-
-			if (Detail::ParseSafe(Json, TokenString, "token"))
-			{
-				Token.Token() = TokenString;
-			}
-			else
-			{
-				Token.State() = OAuthTokenState::Invalid;
-			}
+			Token.Token() = TokenString;
 		}
-
-		inline void to_json(nlohmann::json& Json, const Modio::Detail::OAuthToken& InToken)
+		else
 		{
-			if (InToken.GetRawState() == OAuthTokenState::Valid && InToken.GetRawToken().has_value())
-			{
-				Json = nlohmann::json {{"expiry", InToken.GetExpireDate()},
-									   {"status", InToken.GetRawState()},
-									   {"token", InToken.GetRawToken().value()}};
-			}
-			else
-			{
-				Json = nlohmann::json {{"expiry", InToken.GetExpireDate()}, {"status", OAuthTokenState::Invalid}};
-			}
+			Token.State() = OAuthTokenState::Invalid;
 		}
-	} // namespace Detail
+	}
+
+	inline void to_json(nlohmann::json& Json, const Modio::OAuthToken& InToken)
+	{
+		if (InToken.GetRawState() == OAuthTokenState::Valid && InToken.GetRawToken().has_value())
+		{
+			Json = nlohmann::json {{"expiry", InToken.GetExpireDate()},
+									{"status", InToken.GetRawState()},
+									{"token", InToken.GetRawToken().value()}};
+		}
+		else
+		{
+			Json = nlohmann::json {{"expiry", InToken.GetExpireDate()}, {"status", OAuthTokenState::Invalid}};
+		}
+	}
 } // namespace Modio

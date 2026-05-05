@@ -88,7 +88,7 @@ namespace Modio
 		/// @brief Stats and rating information for the mod collection.
 		Modio::ModCollectionStats Stats {};
 		/// @brief Media data related to the mod collection logo
-		Modio::Detail::Logo Logo {};
+		Modio::Logo Logo {};
 		/// @brief Name of the mod collection
 		std::string ProfileName {};
 		/// @brief Name of the mod collection
@@ -103,106 +103,21 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Class representing a list of mods that may be a page from a larger set of results
-	class ModCollectionInfoList : public Modio::PagedResult, public List<std::vector, Modio::ModCollectionInfo>
+	class ModCollectionInfoList : public Modio::PagedResult, public Modio::List<std::vector, Modio::ModCollectionInfo>
 	{
 	public:
 		/// @docpublic
 		/// @brief Insert ModCollectionInfoList to the end of this list
-		void Append(const ModCollectionInfoList& Other)
+		void Append(const Modio::ModCollectionInfoList& Other)
 		{
 			InternalList.insert(InternalList.end(), std::begin(Other.InternalList), std::end(Other.InternalList));
 		}
 
 		/// @docpublic
 		/// @brief Insert a ModCollectionInfo to the end of this list
-		void Append(const ModCollectionInfo& ModInfoData)
+		void Append(const Modio::ModCollectionInfo& ModInfoData)
 		{
 			InternalList.push_back(ModInfoData);
 		}
 	};
-
-
-	/// @docpublic
-	/// @brief Class specifying the parameters to submit when creating a mod collection
-	struct CreateModCollectionParams
-	{
-		/// @docpublic
-		/// @brief Path to the logo for the mod collection . Must point to a valid file on disk or the mod will not be
-		/// created on the server.
-		std::string PathToLogoFile {};
-
-		/// @docpublic
-		/// @brief The name of the mod collection
-		std::string Name {};
-
-		/// @docpublic
-		/// @brief A brief summary of what the mod collection is
-		std::string Summary {};
-
-		/// @docpublic
-		/// @brief A category for the mod collection
-		std::string Category = {};
-
-		/// @docpublic
-		/// @brief Optional override for the mod collection's visibility status. Defaults to Public (1)
-		Modio::ObjectVisibility Visibility = Modio::ObjectVisibility::Public;
-
-		/// @docpublic
-		/// @brief Optional override for the list of contained mods
-		Modio::Optional<std::vector<Modio::ModID>> Mods {};
-
-		/// @docpublic
-		/// @brief Optional override for the name 'slug' in the mod collection 's URL
-		Modio::Optional<std::string> NamePath {};
-
-		/// @docpublic
-		/// @brief Optional long description of the mod collection
-		Modio::Optional<std::string> Description {};
-
-		/// @docpublic
-		/// @brief Optional list of mod collection tags. All tags must be supported by the parent game to be applied
-		Modio::Optional<std::vector<std::string>> Tags {};
-	};
-
-	/// @docpublic
-	/// @brief Class specifying fields to update for a mod collection
-	struct EditModCollectionParams
-	{
-		/// @docpublic
-		/// @brief Optional path to a new logo image
-		Modio::Optional<std::string> LogoPath {};
-
-		/// @docpublic
-		/// @brief The name of the mod collection
-		Modio::Optional<std::string> Name {};
-
-		/// @docpublic
-		/// @brief A brief summary of what the mod collection is
-		Modio::Optional<std::string> Summary {};
-
-		/// @docpublic
-		/// @brief A category for the mod collection
-		Modio::Optional<std::string> Category {};
-
-		/// @docpublic
-		/// @brief Optional override for the mod collection's visibility status. Defaults to Public (1)
-		Modio::Optional<Modio::ObjectVisibility> Visibility {};
-
-		/// @docpublic
-		/// @brief Optional override for the list of contained mods
-		Modio::Optional<std::vector<Modio::ModID>> Mods {};
-
-		/// @docpublic
-		/// @brief Optional override for the name 'slug' in the mod collection's URL
-		Modio::Optional<std::string> NamePath {};
-
-		/// @docpublic
-		/// @brief Optional long description of the mod collection
-		Modio::Optional<std::string> Description {};
-
-		/// @docpublic
-		/// @brief Optional tags vector for this mod collection
-		Modio::Optional<std::vector<std::string>> Tags {};
-	};
-
 } // namespace Modio

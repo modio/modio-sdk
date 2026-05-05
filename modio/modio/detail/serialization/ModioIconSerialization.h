@@ -10,20 +10,17 @@
 
 #pragma once
 
-#include "modio/detail/entities/ModioIcon.h"
+#include "modio/core/entities/ModioIcon.h"
 #include "modio/detail/ModioJsonHelpers.h"
 
 namespace Modio
 {
-	namespace Detail
+	inline void from_json(const nlohmann::json& Json, Modio::Icon& Icon)
 	{
-		inline void from_json(const nlohmann::json& Json, Modio::Detail::Icon& Icon)
-		{
-			Detail::ParseSafe(Json, Icon.Filename, "filename");
-			Detail::ParseSafe(Json, Icon.Original, "original");
-			Detail::ParseSafe(Json, Icon.Thumb64x64, "thumb_64x64");
-			Detail::ParseSafe(Json, Icon.Thumb128x128, "thumb_128x128");
-			Detail::ParseSafe(Json, Icon.Thumb256x256, "thumb_256x256");
-		}
-	} // namespace Detail
+		Detail::ParseSafe(Json, Icon.Filename, "filename");
+		Detail::ParseSafe(Json, Icon.Original, "original");
+		Detail::ParseSafe(Json, Icon.Thumb64x64, "thumb_64x64");
+		Detail::ParseSafe(Json, Icon.Thumb128x128, "thumb_128x128");
+		Detail::ParseSafe(Json, Icon.Thumb256x256, "thumb_256x256");
+	}
 } // namespace Modio

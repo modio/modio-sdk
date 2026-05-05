@@ -14,12 +14,9 @@
 
 namespace Modio
 {
-	namespace Detail
-	{
-		#ifdef MODIO_SEPARATE_COMPILATION
-		Modio::Optional<std::string> OAuthToken::NoToken {};
-		#endif
-	}
+	#ifdef MODIO_SEPARATE_COMPILATION
+	Modio::Optional<std::string> OAuthToken::NoToken {};
+	#endif
 }
 
  

@@ -127,11 +127,11 @@ namespace Modio
 						yield UserDataService.ClearUserDataAsync(std::move(Self), bShouldDisableModManagement);
 
 						Modio::Detail::SDKSessionData::InitializeForUser(
-							std::move(LocalState->AuthUser), Modio::Detail::OAuthToken(LocalState->AuthResponse));
+							std::move(LocalState->AuthUser), Modio::OAuthToken(LocalState->AuthResponse));
 					}
 					else 
 					{
-						Modio::Detail::SDKSessionData::UpdateTokenForExistingUser(Modio::Detail::OAuthToken(LocalState->AuthResponse));
+						Modio::Detail::SDKSessionData::UpdateTokenForExistingUser(Modio::OAuthToken(LocalState->AuthResponse));
 					}
 					
 

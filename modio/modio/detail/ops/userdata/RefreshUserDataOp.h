@@ -32,7 +32,7 @@ namespace Modio
 							Local.ResponseBodyBuffer,
 							Modio::Detail::GetAuthenticatedUserRequest.SetAuthTokenOverride(
 								Modio::Detail::SDKSessionData::GetAuthenticationToken().and_then(
-									&Modio::Detail::OAuthToken::GetToken).value()),
+									&Modio::OAuthToken::GetToken).value()),
 							Modio::Detail::CachedResponse::Disallow, std::move(Self));
 					}
 					else

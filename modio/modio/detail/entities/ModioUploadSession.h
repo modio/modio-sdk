@@ -13,7 +13,7 @@
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/entities/ModioPagedResult.h"
 #include "modio/core/entities/ModioList.h"
-#include "modio/detail/entities/ModioAvatar.h"
+#include "modio/core/entities/ModioAvatar.h"
 
 namespace Modio
 {
@@ -38,7 +38,7 @@ namespace Modio
 			/// @brief Last reported status of the upload session
 			Status UploadStatus = Status::Incomplete;
 
-			friend bool operator==(const UploadSession& A, const UploadSession& B)
+			friend bool operator==(const Modio::Detail::UploadSession& A, const Modio::Detail::UploadSession& B)
 			{
 				return (A.UploadID == B.UploadID);
 			}
@@ -46,7 +46,8 @@ namespace Modio
 
 		/// @docpublic
 		/// @brief Container for a collection of UploadSession objects
-		class UploadSessionList : public PagedResult, public List<std::vector, UploadSession>
+		class UploadSessionList : public Modio::PagedResult,
+								  public Modio::List<std::vector, Modio::Detail::UploadSession>
 		{
 		};
 

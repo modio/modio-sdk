@@ -14,27 +14,28 @@
 
 namespace Modio
 {
+	/// @docinternal
+	/// @brief Structure with the file references to the images of a mod
+	struct Image
+	{
+		/** Image filename including extension. */
+		std::string Filename {};
+		/** URL to the full-sized image. */
+		std::string Original {};
+		/** URL to the image thumbnail (320x180) */
+		std::string Thumb320x180 {};
+		/** URL to the image thumbnail (1280x720) */
+		std::string Thumb1280x720 {};
+
+		/// @docnone
+		friend bool operator==(const Modio::Image& A, const Modio::Image& B)
+		{
+			return (A.Filename == B.Filename && A.Original == B.Original && A.Thumb320x180 == B.Thumb320x180);
+		}
+	};
+
 	namespace Detail
 	{
-		/// @docinternal
-		/// @brief Structure with the file references to the images of a mod
-		struct Image
-		{
-			/** Image filename including extension. */
-			std::string Filename {};
-			/** URL to the full-sized image. */
-			std::string Original {};
-			/** URL to the image thumbnail (320x180) */
-			std::string Thumb320x180 {};
-			/** URL to the image thumbnail (1280x720) */
-			std::string Thumb1280x720 {};
-
-			/// @docnone
-			friend bool operator==(const Modio::Detail::Image& A, const Modio::Detail::Image& B)
-			{
-				return (A.Filename == B.Filename && A.Original == B.Original && A.Thumb320x180 == B.Thumb320x180);
-			}
-		};
 
 		// GetImmageURL() creates false "unused functions" warnings on certain platforms.
 		// Suppressing those warnings here.
@@ -65,7 +66,7 @@ namespace Modio
 		MODIO_DIAGNOSTIC_POP
 
 		/// @docinternal
-		/// @brief Transform an GallerySize to an std::string 
+		/// @brief Transform an GallerySize to an std::string
 		inline std::string ToString(Modio::GallerySize Size)
 		{
 			switch (Size)

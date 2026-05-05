@@ -845,7 +845,7 @@ namespace Modio
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @error GenericError::BadParameter|The supplied mod ID is invalid
 	MODIOSDK_API void PurchaseModAsync(
-		Modio::ModID ModID, Modio::Optional<uint64_t> ExpectedVirtualCurrencyPrice,
+		Modio::ModID ModID, Modio::Optional<std::uint64_t> ExpectedVirtualCurrencyPrice,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)> Callback);
 
 	/// @docpublic
@@ -888,7 +888,7 @@ namespace Modio
 	/// again.
 	MODIOSDK_API void RefreshUserEntitlementsAsync(
 		Modio::EntitlementParams Params,
-		std::function<void(Modio::ErrorCode, Modio::Optional<EntitlementConsumptionStatusList>)> Callback);
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)> Callback);
 
 	/// @docpublic
 	/// @brief Retrieves a list of the unconsumed entitlements that the mod.io user has available via the current
@@ -919,7 +919,7 @@ namespace Modio
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @error UserDataError::InvalidUser|No authenticated user
 	MODIOSDK_API
-	void GetUserWalletBalanceAsync(std::function<void(Modio::ErrorCode, Modio::Optional<uint64_t>)> Callback);
+	void GetUserWalletBalanceAsync(std::function<void(Modio::ErrorCode, Modio::Optional<std::uint64_t>)> Callback);
 
 	/// @brief Get the currently applied language
 	/// @return Modio::Language currently set
@@ -1048,7 +1048,7 @@ namespace Modio
 	/// Call MetricsSessionStartAsync before attempting to sending a heartbeat.
 	/// @premiumfeature Metrics
 	///	@experimental
-	MODIOSDK_API void MetricsSessionSendHeartbeatAtIntervalAsync(uint32_t IntervalSeconds,
+	MODIOSDK_API void MetricsSessionSendHeartbeatAtIntervalAsync(std::uint32_t IntervalSeconds,
 																 std::function<void(Modio::ErrorCode)> Callback);
 	/// @docpublic
 	/// @brief Ends a Metrics play session
@@ -1085,7 +1085,7 @@ namespace Modio
 	/// @param Mods the mods to get or update in addition to those indicated in the initialization options
 	/// @param Callback callback executed upon completion of all mods being validated and installed
 	/// @experimental
-	MODIOSDK_API void InstallOrUpdateServerModsAsync(std::vector<ModID> Mods,
+	MODIOSDK_API void InstallOrUpdateServerModsAsync(std::vector<Modio::ModID> Mods,
 													 std::function<void(Modio::ErrorCode)> Callback);
 
 	/// @docpublic

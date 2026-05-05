@@ -22,9 +22,9 @@
 #include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioSDKSessionData.h"
-#include "modio/detail/entities/ModioAvatar.h"
-#include "modio/detail/entities/ModioImage.h"
-#include "modio/detail/entities/ModioLogo.h"
+#include "modio/core/entities/ModioAvatar.h"
+#include "modio/core/entities/ModioImage.h"
+#include "modio/core/entities/ModioLogo.h"
 #include "modio/detail/file/IFileObjectImplementation.h"
 #include "modio/detail/file/IFileServiceImplementation.h"
 #include "modio/file/ModioFileService.h"
@@ -456,7 +456,7 @@ namespace Modio
 				const Modio::filesystem::space_info SpaceInfo = Modio::filesystem::space(ValidDestination, ec);
 				if (!ec)
 				{
-					return FileSize(SpaceInfo.available);
+					return Modio::FileSize(SpaceInfo.available);
 				}
 
 				Modio::Detail::Logger().Log(LogLevel::Error, LogCategory::File,

@@ -319,7 +319,7 @@ struct CModioEditModCollectionParams
 
 struct CModioIcon 
 {
-	Modio::Detail::Icon Impl;
+	Modio::Icon Impl;
 };
 
 struct CModioLogo 
@@ -516,7 +516,7 @@ struct CModioModCollectionEntry
 
 struct CModioImageList 
 {
-	Modio::List<std::vector, Modio::Detail::Image> Impl;
+	Modio::List<std::vector, Modio::Image> Impl;
 };
 
 struct CModioErrorCode 
@@ -541,7 +541,7 @@ struct CModioModCollectionInfo
 
 struct CModioImage 
 {
-	Modio::Detail::Image Impl;
+	Modio::Image Impl;
 };
 
 struct CModioCreateModCollectionParams 
@@ -571,7 +571,7 @@ struct CModioCreateModFileParams
 
 struct CModioAuthToken 
 {
-	Modio::Detail::OAuthToken Impl;
+	Modio::OAuthToken Impl;
 };
 
 struct CModioModID 
@@ -1389,7 +1389,7 @@ MODIODLL_EXPORT void SetModioEditModCollectionParamsTags(CModioEditModCollection
 
 MODIODLL_EXPORT CModioIcon* CreateModioIcon()
 {
-	return new CModioIcon{ Modio::Detail::Icon {} };
+	return new CModioIcon{ Modio::Icon {} };
 }
 
 MODIODLL_EXPORT void ReleaseModioIcon(CModioIcon* Item)
@@ -4219,7 +4219,7 @@ MODIODLL_EXPORT COptionalUInt64 GetModioModCollectionEntrySizeOnDisk(const CModi
 
 MODIODLL_EXPORT CModioImageList* CreateModioImageList()
 {
-	return new CModioImageList{ Modio::List<std::vector, Modio::Detail::Image> {} };
+	return new CModioImageList{ Modio::List<std::vector, Modio::Image> {} };
 }
 
 MODIODLL_EXPORT void ReleaseModioImageList(CModioImageList* Item)
@@ -4949,7 +4949,7 @@ MODIODLL_EXPORT void SetModioModCollectionInfoProfileDescription(CModioModCollec
 
 MODIODLL_EXPORT CModioImage* CreateModioImage()
 {
-	return new CModioImage{ Modio::Detail::Image {} };
+	return new CModioImage{ Modio::Image {} };
 }
 
 MODIODLL_EXPORT void ReleaseModioImage(CModioImage* Item)
@@ -5733,7 +5733,7 @@ MODIODLL_EXPORT void SetModioCreateModFileParamsPlatforms(CModioCreateModFilePar
 
 MODIODLL_EXPORT CModioAuthToken* CreateModioAuthToken()
 {
-	return new CModioAuthToken{ Modio::Detail::OAuthToken {} };
+	return new CModioAuthToken{ Modio::OAuthToken {} };
 }
 
 MODIODLL_EXPORT void ReleaseModioAuthToken(CModioAuthToken* Item)

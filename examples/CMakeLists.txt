@@ -7,7 +7,15 @@
 #   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
 # 
 
-set (CMAKE_CXX_STANDARD 17)
+if(MODIO_FORCE_CXX_20_MODE)
+	set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+	set(CMAKE_CXX_STANDARD 20)
+	set(CMAKE_CXX_STANDARD_REQUIRED ON)
+	set(CMAKE_CXX_EXTENSIONS OFF)
+	add_compile_definitions(_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS=1)
+else()
+	set(CMAKE_CXX_STANDARD 17)
+endif()
 
 
 function(add_example FileName)

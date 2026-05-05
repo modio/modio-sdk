@@ -24,10 +24,10 @@ namespace Modio
 		{
 		private:
 			ModioAsio::coroutine CoroutineState;
-			std::vector<ModID> Mods;
+			std::vector<Modio::ModID> Mods;
 
 		public:
-			RegisterClientModsWithServerOp(std::vector<ModID> InMods) : Mods(InMods) {};
+			RegisterClientModsWithServerOp(std::vector<Modio::ModID> InMods) : Mods(InMods) {};
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {}, Modio::Optional<Modio::ModInfoList> ModList = {})
@@ -35,7 +35,7 @@ namespace Modio
 				// Early out if the  mod list is empty
 				if (Mods.empty())
 				{
-					Self.complete({}, ModioServer::Get().GetClientMods());
+					Self.complete({}, Modio::ModioServer::Get().GetClientMods());
 					return;
 				}
 
@@ -48,14 +48,14 @@ namespace Modio
 					yield Modio::Detail::ListAllModsAsync(Filter, std::move(Self));
 					if (ec)
 					{
-						Self.complete(ec, ModioServer::Get().GetClientMods());
+						Self.complete(ec, Modio::ModioServer::Get().GetClientMods());
 						return;
 					}
 					else
 					{
 						if (ModList.value().Size() == Mods.size())
 						{
-							ModioServer::Get().AddClientMods(Mods);
+							Modio::ModioServer::Get().AddClientMods(Mods);
 						}
 						else
 						{
@@ -66,7 +66,7 @@ namespace Modio
 							{
 								Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
 															"Found no mods with given IDs.");
-								Self.complete({}, ModioServer::Get().GetClientMods());
+								Self.complete({}, Modio::ModioServer::Get().GetClientMods());
 								return;
 							}
 
@@ -89,12 +89,12 @@ namespace Modio
 								}
 							}
 
-							ModioServer::Get().AddClientMods(Mods);
+							Modio::ModioServer::Get().AddClientMods(Mods);
 						}
 
 						// Upon receiving this callback the developer should then pass the whole TempModSet to all
 						// connected clients.
-						Self.complete({}, ModioServer::Get().GetClientMods());
+						Self.complete({}, Modio::ModioServer::Get().GetClientMods());
 						return;
 					}
 				}
@@ -102,7 +102,8 @@ namespace Modio
 		};
 
 		template<typename RegisterDoneCallback>
-		auto RegisterClientModsWithServerAsync(std::vector<ModID>& Mods, RegisterDoneCallback&& OnRegisterComplete)
+		auto RegisterClientModsWithServerAsync(std::vector<Modio::ModID>& Mods,
+											   RegisterDoneCallback&& OnRegisterComplete)
 		{
 			return ModioAsio::async_compose<RegisterDoneCallback, void(Modio::ErrorCode, std::set<Modio::ModID>)>(
 				RegisterClientModsWithServerOp(Mods), OnRegisterComplete,

@@ -18,7 +18,7 @@ namespace Modio
 	/// @brief Structure with all initialization parameters needed to start the API in the context of a dedicated server
 	/// all fields need to be filled in for the SDK to properly initialize. Inherits from the base InitializeOptions.
 	/// @experimental
-	struct ServerInitializeOptions : public InitializeOptions
+	struct ServerInitializeOptions : public Modio::InitializeOptions
 	{
 		/// @docpublic
 		/// @brief Default constructor that sets all variables to an invalid base value

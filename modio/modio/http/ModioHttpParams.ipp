@@ -520,11 +520,16 @@ namespace Modio
 		Modio::FileSize HttpRequestParams::GetPayloadSize() const
 		{
 			MODIO_PROFILE_SCOPE(HttpRequestCalcPayloadSize);
+			if (CurrentContentType == ContentType::ApplicationJson)
+			{
+				return Modio::FileSize(Payload.value().length());
+			}
+
 			if (PayloadMembers.size() == 0)
 			{
 				return Modio::FileSize(0);
 			}
-
+			
 			if (CurrentContentType == ContentType::ApplicationXWwwFormUrlEncoded)
 			{
 				// Try to find a PayloadContent that has ContentSize != 0
@@ -837,7 +842,7 @@ namespace Modio
 
 			return AuthTokenOverride.has_value() ? AuthTokenOverride.value()
 												 : Modio::Detail::SDKSessionData::GetAuthenticationToken().and_then(
-													   &Modio::Detail::OAuthToken::GetToken);
+													   &Modio::OAuthToken::GetToken);
 		}
 
 		std::string HttpRequestParams::GetResolvedResourcePath() const

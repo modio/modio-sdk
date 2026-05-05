@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "modio/detail/entities/ModioGalleryList.h"
+#include "modio/core/entities/ModioGalleryList.h"
 #include "modio/detail/serialization/ModioImageSerialization.h"
 #include "modio/detail/ModioJsonHelpers.h"
 

@@ -20,25 +20,26 @@ namespace Modio
 	///	@brief Updated wallet balance from the sync entitlements call
 	struct EntitlementWalletBalance
 	{
-		uint64_t Balance = 0;
+		std::uint64_t Balance = 0;
 	};
 
 	/// @docpublic
 	/// @brief Class representing a list of mods that may be a page from a larger set of results
-	class EntitlementConsumptionStatusList : public PagedResult,
-											 public List<std::vector, Modio::EntitlementConsumptionStatus>
+	class EntitlementConsumptionStatusList : public Modio::PagedResult,
+											 public Modio::List<std::vector, Modio::EntitlementConsumptionStatus>
 	{
 	public:
+
 		/// @docpublic
 		/// @brief Insert ModioEntitlementConsumptionStatusList to the end of this list
-		void Append(const EntitlementConsumptionStatusList& Other)
+		void Append(const Modio::EntitlementConsumptionStatusList& Other)
 		{
 			InternalList.insert(InternalList.end(), std::begin(Other.InternalList), std::end(Other.InternalList));
 		}
 
 		/// @docpublic
 		/// @brief Insert a ModioEntitlementConsumptionStatus to the end of this list
-		void Append(const EntitlementConsumptionStatus& EntitlementConsumptionStatusData)
+		void Append(const Modio::EntitlementConsumptionStatus& EntitlementConsumptionStatusData)
 		{
 			InternalList.push_back(EntitlementConsumptionStatusData);
 		}
@@ -50,7 +51,7 @@ namespace Modio
 		/// @docpublic
 		/// @brief Filter elements that require a second request to confirm the entitlement
 		/// @return Optional list with the elements that need a retry, otherwise an empty object.
-		MODIO_IMPL Modio::Optional<EntitlementConsumptionStatusList> EntitlementsThatRequireRetry() const;
+		MODIO_IMPL Modio::Optional<Modio::EntitlementConsumptionStatusList> EntitlementsThatRequireRetry() const;
 	};
 
 } // namespace Modio

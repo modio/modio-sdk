@@ -12,9 +12,9 @@
 
 #include "modio/detail/AsioWrapper.h"
 #include "modio/detail/ModioStringHelpers.h"
-#include "modio/detail/entities/ModioLogo.h"
-#include "modio/detail/entities/ModioAvatar.h"
-#include "modio/detail/entities/ModioImage.h"
+#include "modio/core/entities/ModioLogo.h"
+#include "modio/core/entities/ModioAvatar.h"
+#include "modio/core/entities/ModioImage.h"
 #include "file/FileSystemImplementation.h"
 #include <queue>
 

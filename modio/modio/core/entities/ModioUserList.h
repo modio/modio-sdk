@@ -18,19 +18,19 @@ namespace Modio
 {
 	/// @docpublic
 	/// @brief Class representing a list of users
-	class UserList : public PagedResult, public List<std::vector, Modio::User>
+	class UserList : public Modio::PagedResult, public Modio::List<std::vector, Modio::User>
 	{
 	public:
 		/// @docpublic
 		/// @brief Insert UserList to the end of this list
-		void Append(const UserList& Other)
+		void Append(const Modio::UserList& Other)
 		{
 			InternalList.insert(InternalList.end(), std::begin(Other.InternalList), std::end(Other.InternalList));
 		}
 
 		/// @docpublic
 		/// @brief Insert a User to the end of this list
-		void Append(const User& UserData)
+		void Append(const Modio::User& UserData)
 		{
 			InternalList.push_back(UserData);
 		}

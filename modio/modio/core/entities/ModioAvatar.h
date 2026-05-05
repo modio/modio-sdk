@@ -14,32 +14,34 @@
 
 namespace Modio
 {
+	/// @docinternal
+	/// @brief Structure with the file references to the user's avatar
+	struct Avatar
+	{
+		/** Avatar filename including extension. */
+		std::string Filename {};
+		/** URL to the full-sized avatar. */
+		std::string Original {};
+		/** URL to the small avatar thumbnail. */
+		std::string Thumb50x50 {};
+		/** URL to the medium avatar thumbnail. */
+		std::string Thumb100x100 {};
+
+		/// @docnone
+		friend bool operator==(const Modio::Avatar& A, const Modio::Avatar& B)
+		{
+			return (A.Filename == B.Filename && A.Original == B.Original && A.Thumb50x50 == B.Thumb50x50 &&
+					A.Thumb100x100 == B.Thumb100x100);
+		}
+	};
+
 	namespace Detail
 	{
-		/// @docinternal
-		/// @brief Structure with the file references to the user's avatar
-		struct Avatar
-		{
-			/** Avatar filename including extension. */
-			std::string Filename {};
-			/** URL to the full-sized avatar. */
-			std::string Original {};
-			/** URL to the small avatar thumbnail. */
-			std::string Thumb50x50 {};
-			/** URL to the medium avatar thumbnail. */
-			std::string Thumb100x100 {};
-
-			/// @docnone
-			friend bool operator==(const Modio::Detail::Avatar& A, const Modio::Detail::Avatar& B)
-			{
-				return (A.Filename == B.Filename && A.Original == B.Original && A.Thumb50x50 == B.Thumb50x50 &&
-						A.Thumb100x100 == B.Thumb100x100);
-			}
-		};
+		typedef Modio::Avatar Avatar;
 
 		/// @docpublic
 		/// @brief Retrieve the corresponding string according to an avatar size
-		inline const std::string& GetAvatarURL(const Avatar& Avatar, Modio::AvatarSize Size)
+		inline const std::string& GetAvatarURL(const Modio::Avatar& Avatar, Modio::AvatarSize Size)
 		{
 			switch (Size)
 			{

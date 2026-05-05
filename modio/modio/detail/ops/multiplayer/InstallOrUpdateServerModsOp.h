@@ -23,11 +23,11 @@ namespace Modio
 		{
 		private:
 			ModioAsio::coroutine CoroutineState;
-			std::vector<ModID> Mods;
+			std::vector<Modio::ModID> Mods;
 			Modio::Optional<Modio::ModInfoList> ValidFoundMods;
 
 		public:
-			InstallOrUpdateServerModsOp(std::vector<ModID> InMods) : Mods(InMods) {};
+			InstallOrUpdateServerModsOp(std::vector<Modio::ModID> InMods) : Mods(InMods) {};
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {}, Modio::Optional<Modio::ModInfoList> ModList = {})
@@ -139,7 +139,7 @@ namespace Modio
 		};
 
 		template<typename InstallDoneCallback>
-		auto InstallOrUpdateServerModsAsync(std::vector<ModID>& Mods, InstallDoneCallback&& OnInstallComplete)
+		auto InstallOrUpdateServerModsAsync(std::vector<Modio::ModID>& Mods, InstallDoneCallback&& OnInstallComplete)
 		{
 			return ModioAsio::async_compose<InstallDoneCallback, void(Modio::ErrorCode)>(
 				InstallOrUpdateServerModsOp(Mods), OnInstallComplete,

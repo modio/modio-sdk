@@ -58,64 +58,65 @@ namespace Modio
 		/// @param ByField Field to sort with
 		/// @param ByDirection Direction to sort
 		/// @return *this
-		MODIO_IMPL FilterParams& SortBy(SortFieldType ByField, SortDirection ByDirection);
+		MODIO_IMPL Modio::FilterParams& SortBy(Modio::FilterParams::SortFieldType ByField,
+											   Modio::FilterParams::SortDirection ByDirection);
 
 		/// @docpublic
 		/// @brief Only include mods where the name contains the provided string
 		/// @param SearchString Search string
 		/// @return *this
-		MODIO_IMPL FilterParams& NameContains(std::string SearchString);
+		MODIO_IMPL Modio::FilterParams& NameContains(std::string SearchString);
 
 		/// @docpublic
 		/// @brief Only include mods where the name contains at least one of the provided strings (string1 OR string2 OR
 		/// stringN...)
 		/// @param SearchString First search string
 		/// @return *this
-		MODIO_IMPL FilterParams& NameContains(const std::vector<std::string>& SearchString);
+		MODIO_IMPL Modio::FilterParams& NameContains(const std::vector<std::string>& SearchString);
 
 		/// @docpublic
 		/// @brief Only include mods with the specified author User ID
 		/// @param UserId The User ID to filter on
 		/// @return *this
-		MODIO_IMPL FilterParams& MatchingAuthor(const Modio::UserID& UserId);
+		MODIO_IMPL Modio::FilterParams& MatchingAuthor(const Modio::UserID& UserId);
 
 		/// @docpublic
 		/// @brief Exclude mods with the specified author User ID
 		/// @param UserId The User ID to filter on
 		/// @return *this
-		MODIO_IMPL FilterParams& ExcludingAuthor(const Modio::UserID& UserId);
+		MODIO_IMPL Modio::FilterParams& ExcludingAuthor(const Modio::UserID& UserId);
 
 		/// @docpublic
 		/// @brief Only include mods with the specified author User IDs
 		/// @param UserIds The list of User IDs to filter on
 		/// @return *this
-		MODIO_IMPL FilterParams& MatchingAuthors(const std::vector<Modio::UserID>& UserIds);
+		MODIO_IMPL Modio::FilterParams& MatchingAuthors(const std::vector<Modio::UserID>& UserIds);
 
 		
 		/// @docpublic
 		/// @brief Exclude mods with the specified author User IDs
 		/// @param UserIds The list of User IDs to filter on
 		/// @return *this
-		MODIO_IMPL FilterParams& ExcludingAuthors(const std::vector<Modio::UserID>& UserIds);
+		MODIO_IMPL Modio::FilterParams& ExcludingAuthors(const std::vector<Modio::UserID>& UserIds);
 
 		/// @docpublic
 		/// @brief Only include mods with the specified IDs
 		/// @param IDSet The list of Mod IDs to filter on
 		/// @return *this
-		MODIO_IMPL FilterParams& MatchingIDs(const std::vector<Modio::ModID>& IDSet);
+		MODIO_IMPL Modio::FilterParams& MatchingIDs(const std::vector<Modio::ModID>& IDSet);
 
 		/// @docpublic
 		/// @brief Exclude mods with the specified IDs. This takes precedence over <<MatchingIDs>>.
 		/// @param IDSet The list of Mod IDs to exclude
 		/// @return *this
-		MODIO_IMPL FilterParams& ExcludingIDs(const std::vector<Modio::ModID>& IDSet);
+		MODIO_IMPL Modio::FilterParams& ExcludingIDs(const std::vector<Modio::ModID>& IDSet);
 
 		/// @docpublic
 		/// @brief Only include mods that were marked live (i.e released) after the specified date
 		/// @param LiveAfter Minimum date
 		/// @param If LiveAfter should be rounded to the nearest hour (for cacheability on the backend)
 		/// @return *this
-		MODIO_IMPL FilterParams& MarkedLiveAfter(std::chrono::system_clock::time_point LiveAfter,
+		MODIO_IMPL Modio::FilterParams& MarkedLiveAfter(std::chrono::system_clock::time_point LiveAfter,
 												 bool RoundToHour = true);
 
 		/// @docpublic
@@ -123,69 +124,69 @@ namespace Modio
 		/// @param LiveBefore Maximum date
 		/// @param If LiveBefore should be rounded to the nearest hour (for cacheability on the backend)
 		/// @return *this
-		MODIO_IMPL FilterParams& MarkedLiveBefore(std::chrono::system_clock::time_point LiveBefore,
+		MODIO_IMPL Modio::FilterParams& MarkedLiveBefore(std::chrono::system_clock::time_point LiveBefore,
 												  bool RoundToHour = true);
 
 		/// @docpublic
 		/// @brief Only include mods that have the specified tag
 		/// @param Tag Tag to include
 		/// @return *this
-		MODIO_IMPL FilterParams& WithTags(std::string Tag);
+		MODIO_IMPL Modio::FilterParams& WithTags(std::string Tag);
 
 		/// @docpublic
 		/// @brief Only include mods that have all the specified tags (tag1 AND tag2 AND tagN...)
 		/// @param NewTags The set of tags to filter on
 		/// @return *this
-		MODIO_IMPL FilterParams& WithTags(std::vector<std::string> NewTags);
+		MODIO_IMPL Modio::FilterParams& WithTags(std::vector<std::string> NewTags);
 
 		/// @docpublic
 		/// @brief Only include mods that do not have the specified tag
 		/// @param Tag Tag to exclude
 		/// @return *this
-		MODIO_IMPL FilterParams& WithoutTags(std::string Tag);
+		MODIO_IMPL Modio::FilterParams& WithoutTags(std::string Tag);
 
 		/// @docpublic
 		/// @brief Only include mods that do not have any of the specified tags ( NOT (tag1 OR tag2 OR tagN...))
 		/// @param NewTags Tags to exclude
 		/// @return *this
-		MODIO_IMPL FilterParams& WithoutTags(std::vector<std::string> NewTags);
+		MODIO_IMPL Modio::FilterParams& WithoutTags(std::vector<std::string> NewTags);
 
 		/// @docpublic
 		/// @brief Only include mods that contain a metadata blob that contains the specified string
 		/// @param SearchString String to search for
 		/// @return *this
-		MODIO_IMPL FilterParams& MetadataLike(std::string SearchString);
+		MODIO_IMPL Modio::FilterParams& MetadataLike(std::string SearchString);
 
 		/// @docpublic
 		/// @brief Returns a sub-range of query results from StartIndex to StartIndex + ResultCount
 		/// @param StartIndex Zero-based index of first result to return
 		/// @param ResultCount Number of results to return
 		/// @return *this
-		MODIO_IMPL FilterParams& IndexedResults(std::size_t StartIndex, std::size_t ResultCount);
+		MODIO_IMPL Modio::FilterParams& IndexedResults(std::size_t StartIndex, std::size_t ResultCount);
 
 		/// @docpublic
 		/// @brief Returns a sub-range of query results based on a specified page size and index
 		/// @param PageNumber Zero-based index of page to return
 		/// @param PageSize Number of results in a page
 		/// @return *this
-		MODIO_IMPL FilterParams& PagedResults(std::size_t PageNumber, std::size_t PageSize);
+		MODIO_IMPL Modio::FilterParams& PagedResults(std::size_t PageNumber, std::size_t PageSize);
 		
 		/// @docpublic
 		///	@brief Indicates results should be filtered by revenue options
 		///	@param ByRevenue Revenue filter to use
 		///	@return *this
-		MODIO_IMPL FilterParams& RevenueType(RevenueFilterType ByRevenue);
+		MODIO_IMPL Modio::FilterParams& RevenueType(Modio::FilterParams::RevenueFilterType ByRevenue);
 		
 		/// @docpublic
 		///	@brief Indicates results should exclude all mods which contain mature content
 		///	@return *this
-		MODIO_IMPL FilterParams& DisallowMatureContent();
+		MODIO_IMPL Modio::FilterParams& DisallowMatureContent();
 
 		/// @docpublic
 		///	@brief Indicates results should be filtered by maturity options
 		///	@param ByMaturity Maturity flags to filter by
 		///	@return *this
-		MODIO_IMPL FilterParams& WithMatureContentFlags(Modio::MaturityOption ByMaturity);
+		MODIO_IMPL Modio::FilterParams& WithMatureContentFlags(Modio::MaturityOption ByMaturity);
 
 		/// @docpublic
 		/// @brief Default FilterParams constructor. Sorts by mod ID in ascending order and returns 100 results (the
@@ -200,7 +201,7 @@ namespace Modio
 	private:
 		/// @docinternal
 		/// @brief Append a tag to the filter params
-		MODIO_IMPL FilterParams& AppendValue(std::vector<std::string>& Vector, std::string Tag);
+		MODIO_IMPL Modio::FilterParams& AppendValue(std::vector<std::string>& Vector, std::string Tag);
 
 		SortFieldType SortField = SortFieldType::ID;
 		SortDirection Direction = SortDirection::Ascending;

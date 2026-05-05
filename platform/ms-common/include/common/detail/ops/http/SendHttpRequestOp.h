@@ -87,6 +87,10 @@ public:
 
 					Self.complete(Modio::make_error_code(Modio::HttpError::CannotOpenConnection));
 					return;
+				} else
+				{
+					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+												"sending request body {}", Payload->c_str());
 				}
 			}
 			else

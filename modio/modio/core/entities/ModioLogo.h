@@ -14,37 +14,38 @@
 
 namespace Modio
 {
+	/// @docinternal
+	/// @brief Structure with the file references to the logos of a mod
+	struct Logo
+	{
+		/** Logo filename including extension. */
+		std::string Filename {};
+		/*URL to the full - sized logo. */
+		std::string Original {};
+		/** URL to the small logo thumbnail. */
+		std::string Thumb320x180 {};
+		/** URL to the medium logo thumbnail. */
+		std::string Thumb640x360 {};
+		/** URL to the large logo thumbnail. */
+		std::string Thumb1280x720 {};
+
+		/// @docnone
+		friend bool operator==(const Modio::Logo& A, const Modio::Logo& B)
+		{
+			if ((A.Filename == B.Filename) && (A.Original == B.Original) && (A.Thumb320x180 == B.Thumb320x180) &&
+				(A.Thumb640x360 == B.Thumb640x360) && (A.Thumb1280x720 == B.Thumb1280x720))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	};
 	namespace Detail
 	{
-		/// @docinternal
-		/// @brief Structure with the file references to the logos of a mod
-		struct Logo
-		{
-			/** Logo filename including extension. */
-			std::string Filename {};
-			/*URL to the full - sized logo. */
-			std::string Original {};
-			/** URL to the small logo thumbnail. */
-			std::string Thumb320x180 {};
-			/** URL to the medium logo thumbnail. */
-			std::string Thumb640x360 {};
-			/** URL to the large logo thumbnail. */
-			std::string Thumb1280x720 {};
-
-			/// @docnone
-			friend bool operator==(const Modio::Detail::Logo& A, const Modio::Detail::Logo& B)
-			{
-				if ((A.Filename == B.Filename) && (A.Original == B.Original) && (A.Thumb320x180 == B.Thumb320x180) &&
-					(A.Thumb640x360 == B.Thumb640x360) && (A.Thumb1280x720 == B.Thumb1280x720))
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-		};
+		typedef Modio::Logo Logo;
 
 		/// @docpublic
 		/// @brief Retrieve the corresponding string according to a logo size

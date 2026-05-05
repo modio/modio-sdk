@@ -174,13 +174,21 @@ namespace ghc
 		inline void to_json(nlohmann::json& Json, const Modio::filesystem::path& Path)
 		{
 			using nlohmann::to_json;
-			return to_json(Json, Path.u8string());
+			auto MaybeU8String = Path.generic_u8string();
+			
+			return to_json(Json, std::string(MaybeU8String.begin(), MaybeU8String.end()));
 		}
 
 		/// @docnone
 		inline void from_json(const nlohmann::json& Json, Modio::filesystem::path& Path)
 		{
-			Path = Modio::filesystem::path(Json.get<std::string>());
+			std::string TmpPath = Json.get<std::string>();
+			if (!TmpPath.empty())
+			{
+				decltype(std::declval<Modio::filesystem::path>().generic_u8string()) MaybeU8String {TmpPath.begin(),
+																								  TmpPath.end()};
+				Path = Modio::filesystem::path(MaybeU8String);
+			}
 		}
 	} // namespace filesystem
 } // namespace ghc

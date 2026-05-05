@@ -55,14 +55,14 @@ namespace Modio
 
 			MODIO_IMPL static void MarkAsRateLimited(int SecondsDelay);
 			MODIO_IMPL static bool IsRateLimited();
-			MODIO_IMPL static ModCollection& GetSystemModCollection();
-			MODIO_IMPL static ModCollection& GetTempModCollection();
+			MODIO_IMPL static Modio::ModCollection& GetSystemModCollection();
+			MODIO_IMPL static Modio::ModCollection& GetTempModCollection();
 			MODIO_IMPL static std::shared_ptr<Modio::Detail::TemporaryModSet> GetTemporaryModSet();
 
-			MODIO_IMPL static ModCollection FilterSystemModCollectionByUserSubscriptions();
-			MODIO_IMPL static void InitializeForUser(Modio::User User, Modio::Detail::OAuthToken AuthToken);
-			MODIO_IMPL static void UpdateTokenForExistingUser(Modio::Detail::OAuthToken AuthToken);
-			MODIO_IMPL static const Modio::Optional<Modio::Detail::OAuthToken> GetAuthenticationToken();
+			MODIO_IMPL static Modio::ModCollection FilterSystemModCollectionByUserSubscriptions();
+			MODIO_IMPL static void InitializeForUser(Modio::User User, Modio::OAuthToken AuthToken);
+			MODIO_IMPL static void UpdateTokenForExistingUser(Modio::OAuthToken AuthToken);
+			MODIO_IMPL static const Modio::Optional<Modio::OAuthToken> GetAuthenticationToken();
 
 			MODIO_IMPL static Modio::UserSubscriptionList& GetUserSubscriptions();
 
@@ -92,10 +92,10 @@ namespace Modio
 
 			MODIO_IMPL static void FlushModManagementLog();
 
-			MODIO_IMPL static ModEventLog& GetModManagementEventLog();
+			MODIO_IMPL static Modio::ModEventLog& GetModManagementEventLog();
 
-			MODIO_IMPL static void SetLastValidationError(std::vector<FieldError> ExtendedErrorInformation);
-			MODIO_IMPL static std::vector<FieldError> GetLastValidationError();
+			MODIO_IMPL static void SetLastValidationError(std::vector<Modio::FieldError> ExtendedErrorInformation);
+			MODIO_IMPL static std::vector<Modio::FieldError> GetLastValidationError();
 			MODIO_IMPL static void ClearLastValidationError();
 
 			MODIO_IMPL static void AddPendingModfileUpload(Modio::ModID ID, Modio::CreateModFileParams Params);
