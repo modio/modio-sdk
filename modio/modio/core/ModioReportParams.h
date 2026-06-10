@@ -56,7 +56,7 @@ namespace Modio
 		/// @param ReporterName Name of the submitting user. Recommended for DMCA reports, but may be empty
 		/// @param ReporterContact Contact details of the submitting user. Recommended for DMCA reports, but may be
 		/// empty
-		MODIO_IMPL ReportParams(Modio::GameID Game, Modio::ReportType Type, std::string ReportDescription,
+		MODIOSDK_API ReportParams(Modio::GameID Game, Modio::ReportType Type, std::string ReportDescription,
 								Modio::Optional<std::string> ReporterName,
 								Modio::Optional<std::string> ReporterContact);
 
@@ -68,7 +68,7 @@ namespace Modio
 		/// @param ReporterName Name of the submitting user. Recommended for DMCA reports, but may be empty
 		/// @param ReporterContact Contact details of the submitting user. Recommended for DMCA reports, but may be
 		/// empty
-		MODIO_IMPL ReportParams(Modio::UserID User, Modio::ReportType Type, std::string ReportDescription,
+		MODIOSDK_API ReportParams(Modio::UserID User, Modio::ReportType Type, std::string ReportDescription,
 								Modio::Optional<std::string> ReporterName,
 								Modio::Optional<std::string> ReporterContact);
 
@@ -80,7 +80,7 @@ namespace Modio
 		/// @param ReporterName Name of the submitting user. Recommended for DMCA reports, but may be empty
 		/// @param ReporterContact Contact details of the submitting user. Recommended for DMCA reports, but may be
 		/// empty
-		MODIO_IMPL ReportParams(Modio::ModID Mod, Modio::ReportType Type, std::string ReportDescription,
+		MODIOSDK_API ReportParams(Modio::ModID Mod, Modio::ReportType Type, std::string ReportDescription,
 								Modio::Optional<std::string> ReporterName,
 								Modio::Optional<std::string> ReporterContact);
 
@@ -92,7 +92,7 @@ namespace Modio
 		/// @param ReporterName Name of the submitting user. Recommended for DMCA reports, but may be empty
 		/// @param ReporterContact Contact details of the submitting user. Recommended for DMCA reports, but may be
 		/// empty
-		MODIO_IMPL ReportParams(Modio::ModCollectionID Mod, Modio::ReportType Type, std::string ReportDescription,
+		MODIOSDK_API ReportParams(Modio::ModCollectionID Mod, Modio::ReportType Type, std::string ReportDescription,
 								Modio::Optional<std::string> ReporterName,
 								Modio::Optional<std::string> ReporterContact);
 

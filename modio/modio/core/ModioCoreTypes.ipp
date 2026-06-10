@@ -18,7 +18,7 @@ namespace Modio
 {
 	namespace Detail
 	{
-		std::string ToString(Modio::PlatformStatus Status)
+		MODIOSDK_API std::string ToString(Modio::PlatformStatus Status)
 		{
 			switch (Status)
 			{
@@ -34,7 +34,7 @@ namespace Modio
 			return "Unknown";
 		}
 
-		std::string ToString(Modio::Language Locale)
+		MODIOSDK_API std::string ToString(Modio::Language Locale)
 		{
 			switch (Locale)
 			{
@@ -85,7 +85,7 @@ namespace Modio
 			return "Unknown";
 		}
 
-		std::string ToString(Modio::AuthenticationProvider Provider)
+		MODIOSDK_API std::string ToString(Modio::AuthenticationProvider Provider)
 		{
 			switch (Provider)
 			{

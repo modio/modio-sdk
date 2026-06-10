@@ -39,6 +39,8 @@ namespace Modio
 			std::size_t CalculateNumBytesToRead() const;
 			void WriteFinalPayloadBoundary();
 			void AppendRemainingResults();
+			void LogRequestDetails();
+			void LogResponseDetails();
 			Modio::ErrorCode MarshallResponse();
 
 		public:
@@ -83,6 +85,8 @@ namespace Modio
 						Self.complete(ec);
 						return;
 					}
+
+					LogRequestDetails();
 
 					yield Request->SendAsync(std::move(Self));
 
@@ -164,6 +168,8 @@ namespace Modio
 					}
 
 					yield Request->ReadResponseHeadersAsync(std::move(Self));
+
+					LogResponseDetails();
 
 					Modio::Detail::SDKSessionData::ClearLastValidationError();
 

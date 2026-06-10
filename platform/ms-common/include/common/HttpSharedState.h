@@ -15,6 +15,7 @@
 #include <Windows.h>
 #include <atomic>
 #include <memory>
+#include <mutex>
 #include <shared_mutex>
 #include <unordered_map>
 #include <winhttp.h>

@@ -12,6 +12,8 @@
 #include "modio/core/ModioStdTypes.h"
 #include "modio/http/ModioHttpParams.h"
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace Modio
 {
@@ -26,6 +28,7 @@ namespace Modio
 			virtual Modio::Optional<std::string> GetRedirectURL() = 0;
 			virtual Modio::Optional<std::uint32_t> GetRetryAfter() = 0;
 			virtual Modio::Optional<std::string> GetHeaderValue(std::string Key) = 0;
+			virtual std::vector<std::pair<std::string, std::string>> GetAllHeaders() = 0;
 		};
 	} // namespace Detail
 } // namespace Modio

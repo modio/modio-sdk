@@ -38,6 +38,8 @@ public:
 	MODIO_IMPL virtual Modio::Optional<std::uint32_t> GetRetryAfter() override;
 
 	MODIO_IMPL virtual Modio::Optional<std::string> GetHeaderValue(std::string Key) override;
+
+	MODIO_IMPL virtual std::vector<std::pair<std::string, std::string>> GetAllHeaders() override;
 };
 
 

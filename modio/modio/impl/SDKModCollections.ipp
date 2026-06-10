@@ -24,7 +24,7 @@
 
 namespace Modio
 {
-	void ListModCollectionsAsync(
+	MODIOSDK_API void ListModCollectionsAsync(
 		Modio::FilterParams Filter,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfoList>)> Callback)
 	{
@@ -38,7 +38,7 @@ namespace Modio
 			});
 	}
 
-	void ListUserFollowedModCollectionsAsync(
+	MODIOSDK_API void ListUserFollowedModCollectionsAsync(
 		Modio::FilterParams Filter,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfoList>)> Callback)
 	{
@@ -53,7 +53,7 @@ namespace Modio
 			});
 	}
 
-	void GetModCollectionInfoAsync(
+	MODIOSDK_API void GetModCollectionInfoAsync(
 		Modio::ModCollectionID ModCollectionID,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfo>)> Callback)
 	{
@@ -67,7 +67,7 @@ namespace Modio
 		});
 	}
 
-	void GetModCollectionModsAsync(
+	MODIOSDK_API void GetModCollectionModsAsync(
 		Modio::ModCollectionID ModCollectionID,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback)
 	{
@@ -81,7 +81,7 @@ namespace Modio
 		});
 	}
 
-	void SubmitModCollectionRatingAsync(Modio::ModCollectionID ModCollectionID, Modio::Rating Rating,
+	MODIOSDK_API void SubmitModCollectionRatingAsync(Modio::ModCollectionID ModCollectionID, Modio::Rating Rating,
 													 std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([ModCollectionID, Callback = std::move(Callback), Rating]() mutable {
@@ -94,7 +94,7 @@ namespace Modio
 		});
 	}
 
-	void SubscribeToModCollectionAsync(Modio::ModCollectionID ModCollectionToSubscribeTo,
+	MODIOSDK_API void SubscribeToModCollectionAsync(Modio::ModCollectionID ModCollectionToSubscribeTo,
 													std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask(
@@ -108,7 +108,7 @@ namespace Modio
 			});
 	}
 
-	void UnsubscribeFromModCollectionAsync(Modio::ModCollectionID ModCollectionToUnsubscribeFrom,
+	MODIOSDK_API void UnsubscribeFromModCollectionAsync(Modio::ModCollectionID ModCollectionToUnsubscribeFrom,
 														std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask(
@@ -122,7 +122,8 @@ namespace Modio
 			});
 	}
 
-	void FollowModCollectionAsync(Modio::ModCollectionID ModCollectionToFollow,
+	MODIOSDK_API void FollowModCollectionAsync(
+		Modio::ModCollectionID ModCollectionToFollow,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfo>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([ModCollectionToFollow, Callback = std::move(Callback)]() mutable {
@@ -135,7 +136,7 @@ namespace Modio
 			});
 	}
 
-	void UnfollowModCollectionAsync(Modio::ModCollectionID ModCollectionToUnfollow,
+	MODIOSDK_API void UnfollowModCollectionAsync(Modio::ModCollectionID ModCollectionToUnfollow,
 												 std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([ModCollectionToUnfollow, Callback = std::move(Callback)]() mutable {
@@ -148,7 +149,8 @@ namespace Modio
 			});
 	}
 
-	void GetModCollectionMediaAsync(Modio::ModCollectionID CollectionId, Modio::LogoSize LogoSize,
+	MODIOSDK_API void GetModCollectionMediaAsync(
+		Modio::ModCollectionID CollectionId, Modio::LogoSize LogoSize,
 		std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([CollectionId, LogoSize, Callback = std::move(Callback)]() mutable {
@@ -160,7 +162,8 @@ namespace Modio
 		});
 	}
 
-	void GetModCollectionMediaAsync(Modio::ModCollectionID CollectionId, Modio::AvatarSize AvatarSize,
+	MODIOSDK_API void GetModCollectionMediaAsync(
+		Modio::ModCollectionID CollectionId, Modio::AvatarSize AvatarSize,
 		std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask(

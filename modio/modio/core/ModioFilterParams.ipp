@@ -18,14 +18,14 @@
 
 namespace Modio
 {
-	Modio::FilterParams& FilterParams::SortBy(SortFieldType ByField, SortDirection ByDirection)
+	MODIOSDK_API Modio::FilterParams& FilterParams::SortBy(SortFieldType ByField, SortDirection ByDirection)
 	{
 		SortField = ByField;
 		Direction = ByDirection;
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::NameContains(const std::vector<std::string>& SearchString)
+	MODIOSDK_API Modio::FilterParams& FilterParams::NameContains(const std::vector<std::string>& SearchString)
 	{
 		// @todo: NameContains overloads behave differently. Take single arguments won't append empty values but this
 		// version will same seem to be correct of different functions
@@ -37,7 +37,7 @@ namespace Modio
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::NameContains(std::string SearchString)
+	MODIOSDK_API Modio::FilterParams& FilterParams::NameContains(std::string SearchString)
 	{
 		if (SearchString.size())
 		{
@@ -47,91 +47,91 @@ namespace Modio
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::MatchingAuthor(const Modio::UserID& UserId)
+	MODIOSDK_API Modio::FilterParams& FilterParams::MatchingAuthor(const Modio::UserID& UserId)
 	{
 		IncludedAuthorUserIds.clear();
 		IncludedAuthorUserIds.push_back(UserId);
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::ExcludingAuthor(const Modio::UserID& UserId)
+	MODIOSDK_API Modio::FilterParams& FilterParams::ExcludingAuthor(const Modio::UserID& UserId)
 	{
 		ExcludedAuthorUserIds.clear();
 		ExcludedAuthorUserIds.push_back(UserId);
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::MatchingAuthors(const std::vector<Modio::UserID>& UserIds)
+	MODIOSDK_API Modio::FilterParams& FilterParams::MatchingAuthors(const std::vector<Modio::UserID>& UserIds)
 	{
 		IncludedAuthorUserIds = UserIds;
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::ExcludingAuthors(const std::vector<Modio::UserID>& UserIds)
+	MODIOSDK_API Modio::FilterParams& FilterParams::ExcludingAuthors(const std::vector<Modio::UserID>& UserIds)
 	{
 		ExcludedAuthorUserIds = UserIds;
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::MatchingIDs(const std::vector<Modio::ModID>& IDSet)
+	MODIOSDK_API Modio::FilterParams& FilterParams::MatchingIDs(const std::vector<Modio::ModID>& IDSet)
 	{
 		IncludedIDs = IDSet;
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::ExcludingIDs(const std::vector<Modio::ModID>& IDSet)
+	MODIOSDK_API Modio::FilterParams& FilterParams::ExcludingIDs(const std::vector<Modio::ModID>& IDSet)
 	{
 		ExcludedIDs = IDSet;
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::MarkedLiveAfter(std::chrono::system_clock::time_point LiveAfter,
+	MODIOSDK_API Modio::FilterParams& FilterParams::MarkedLiveAfter(std::chrono::system_clock::time_point LiveAfter,
 													   bool RoundToHour)
 	{
 		DateRangeBegin = RoundToHour ? std::chrono::round<std::chrono::hours>(LiveAfter) : LiveAfter;
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::MarkedLiveBefore(std::chrono::system_clock::time_point LiveBefore,
+	MODIOSDK_API Modio::FilterParams& FilterParams::MarkedLiveBefore(std::chrono::system_clock::time_point LiveBefore,
 														bool RoundToHour)
 	{
 		DateRangeEnd = RoundToHour ? std::chrono::round<std::chrono::hours>(LiveBefore) : LiveBefore;
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::WithTags(std::vector<std::string> NewTags)
+	MODIOSDK_API Modio::FilterParams& FilterParams::WithTags(std::vector<std::string> NewTags)
 	{
 		Tags = std::move(NewTags);
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::WithTags(std::string Tag)
+	MODIOSDK_API Modio::FilterParams& FilterParams::WithTags(std::string Tag)
 	{
 		Tags.clear();
 		Tags.push_back(Tag);
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::WithoutTags(std::vector<std::string> NewTags)
+	MODIOSDK_API Modio::FilterParams& FilterParams::WithoutTags(std::vector<std::string> NewTags)
 	{
 		ExcludedTags = std::move(NewTags);
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::WithoutTags(std::string Tag)
+	MODIOSDK_API Modio::FilterParams& FilterParams::WithoutTags(std::string Tag)
 	{
 		ExcludedTags.clear();
 		ExcludedTags.push_back(Tag);
 		return *this;
 	}
 
-	Modio::FilterParams& Modio::FilterParams::MetadataLike(std::string SearchString)
+	MODIOSDK_API Modio::FilterParams& Modio::FilterParams::MetadataLike(std::string SearchString)
 	{
 		MetadataBlobSearchString = SearchString;
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::IndexedResults(std::size_t StartIndex, std::size_t ResultCount)
+	MODIOSDK_API Modio::FilterParams& FilterParams::IndexedResults(std::size_t StartIndex, std::size_t ResultCount)
 	{
 		IsPaged = false;
 		Index = std::max(std::size_t(0), StartIndex);
@@ -139,7 +139,7 @@ namespace Modio
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::PagedResults(std::size_t PageNumber, std::size_t PageSize)
+	MODIOSDK_API Modio::FilterParams& FilterParams::PagedResults(std::size_t PageNumber, std::size_t PageSize)
 	{
 		IsPaged = true;
 		Index = std::max(std::size_t(0), PageNumber);
@@ -147,25 +147,25 @@ namespace Modio
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::RevenueType(RevenueFilterType ByRevenue)
+	MODIOSDK_API Modio::FilterParams& FilterParams::RevenueType(RevenueFilterType ByRevenue)
 	{
 		Revenue = ByRevenue;
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::DisallowMatureContent()
+	MODIOSDK_API Modio::FilterParams& FilterParams::DisallowMatureContent()
 	{
 		Maturity = Modio::MaturityOption::None;
 		return *this;
 	}
 
-	Modio::FilterParams& FilterParams::WithMatureContentFlags(Modio::MaturityOption ByMaturity)
+	MODIOSDK_API Modio::FilterParams& FilterParams::WithMatureContentFlags(Modio::MaturityOption ByMaturity)
 	{
 		Maturity = ByMaturity;
 		return *this;
 	}
 
-	FilterParams::FilterParams()
+	MODIOSDK_API FilterParams::FilterParams()
 		: SortField(SortFieldType::ID),
 		  Direction(SortDirection::Ascending),
 		  IsPaged(false),
@@ -173,7 +173,7 @@ namespace Modio
 		  Count(100)
 	{}
 
-	std::map<std::string, std::string> Modio::FilterParams::ToQueryParamaters() const
+	MODIOSDK_API std::map<std::string, std::string> Modio::FilterParams::ToQueryParamaters() const
 	{
 		std::map<std::string, std::string> FilterFields;
 		std::string SortStr;

@@ -27,7 +27,7 @@
 
 namespace Modio
 {
-	void ListAllModsAsync(FilterParams Filter,
+	MODIOSDK_API void ListAllModsAsync(FilterParams Filter,
 						  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask(
@@ -39,7 +39,8 @@ namespace Modio
 			});
 	}
 
-	void ListUserCreatedModsAsync(FilterParams Filter,
+	MODIOSDK_API void ListUserCreatedModsAsync(
+		FilterParams Filter,
 								  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Filter = std::move(Filter),
@@ -52,7 +53,7 @@ namespace Modio
 		});
 	}
 
-	void GetModInfoAsync(Modio::ModID ModId,
+	MODIOSDK_API void GetModInfoAsync(Modio::ModID ModId,
 						 std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([ModId, Callback = std::move(Callback)]() mutable {
@@ -65,13 +66,14 @@ namespace Modio
 	}
 // Disabled
 #if (0)
-	void GetModFileDetailsAsync(Modio::ModID ModId,
+	MODIOSDK_API void GetModFileDetailsAsync(
+		Modio::ModID ModId,
 								std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDetails>)> Callback)
 	{
 		return Modio::Detail::GetModDetailsAsync(ModID, Callback);
 	}
 #endif
-	void GetModMediaAsync(Modio::ModID ModId, Modio::LogoSize LogoSize,
+	MODIOSDK_API void GetModMediaAsync(Modio::ModID ModId, Modio::LogoSize LogoSize,
 						  std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([ModId, LogoSize, Callback = std::move(Callback)]() mutable {
@@ -83,7 +85,7 @@ namespace Modio
 		});
 	}
 
-	void GetModMediaAsync(Modio::ModID ModId, Modio::AvatarSize AvatarSize,
+	MODIOSDK_API void GetModMediaAsync(Modio::ModID ModId, Modio::AvatarSize AvatarSize,
 						  std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([ModId, AvatarSize, Callback = std::move(Callback)]() mutable {
@@ -95,7 +97,7 @@ namespace Modio
 		});
 	}
 
-	void GetModMediaAsync(Modio::ModID ModId, Modio::GallerySize GallerySize, Modio::GalleryIndex Index,
+	MODIOSDK_API void GetModMediaAsync(Modio::ModID ModId, Modio::GallerySize GallerySize, Modio::GalleryIndex Index,
 						  std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask(
@@ -108,7 +110,8 @@ namespace Modio
 			});
 	}
 
-	void GetModTagOptionsAsync(std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)> Callback)
+	MODIOSDK_API void GetModTagOptionsAsync(
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
@@ -118,7 +121,8 @@ namespace Modio
 		});
 	}
 
-	void SubmitModRatingAsync(Modio::ModID ModID, Modio::Rating Rating, std::function<void(Modio::ErrorCode)> Callback)
+	MODIOSDK_API void SubmitModRatingAsync(Modio::ModID ModID, Modio::Rating Rating,
+										   std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([ModID, Rating, Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
@@ -130,7 +134,7 @@ namespace Modio
 		});
 	}
 
-	void GetModDependenciesAsync(
+	MODIOSDK_API void GetModDependenciesAsync(
 		Modio::ModID ModID, bool Recursive,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback)
 	{
@@ -143,7 +147,7 @@ namespace Modio
 		});
 	}
 
-	void AddModDependenciesAsync(Modio::ModID ModID, std::vector<Modio::ModID> Dependencies,
+	MODIOSDK_API void AddModDependenciesAsync(Modio::ModID ModID, std::vector<Modio::ModID> Dependencies,
 								 std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([ModID, Dependencies = std::move(Dependencies),
@@ -157,7 +161,7 @@ namespace Modio
 		});
 	}
 
-	void DeleteModDependenciesAsync(Modio::ModID ModID, std::vector<Modio::ModID> Dependencies,
+	MODIOSDK_API void DeleteModDependenciesAsync(Modio::ModID ModID, std::vector<Modio::ModID> Dependencies,
 												 std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([ModID, Dependencies = std::move(Dependencies),

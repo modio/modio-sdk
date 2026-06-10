@@ -94,7 +94,6 @@ if (MODIO_STATIC_LIB_SUFFIX)
 set_target_properties(${MODIO_TARGET_NAME}Static PROPERTIES SUFFIX ${MODIO_STATIC_LIB_SUFFIX})
 endif()
 
-
 install(
 	FILES ${CMAKE_BINARY_DIR}/generated/ModioGeneratedVariables.h
 	DESTINATION ${CMAKE_INSTALL_PREFIX}/static/inc/modio/detail
@@ -139,6 +138,8 @@ install(
 	DESTINATION ${CMAKE_INSTALL_PREFIX}/static/lib
 	COMPONENT static_library
 )
+
+
 
 install(
 	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/

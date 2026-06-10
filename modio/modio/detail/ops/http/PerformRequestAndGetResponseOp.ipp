@@ -33,6 +33,23 @@ namespace Modio
 			this->AllowCachedResponse = Request->Parameters().GetTypedVerb() == Modio::Detail::Verb::GET
 											? AllowCachedResponseValue
 											: Modio::Detail::CachedResponse::Disallow;
+
+			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+										"Creating {} request for {}{}",
+										Request->Parameters().GetVerb(),
+										Request->Parameters().GetServerAddress(),
+										Request->Parameters().GetFormattedResourcePath());
+
+			if (Request->Parameters().GetTypedVerb() != Modio::Detail::Verb::GET)
+			{
+				const Modio::Optional<std::string> UrlEncodedPayload =
+					Request->Parameters().GetUrlEncodedPayload();
+				if (UrlEncodedPayload.has_value())
+				{
+					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+												"Request payload: {}", UrlEncodedPayload.value());
+				}
+			}
 		}
 
 		bool PerformRequestAndGetResponseOp::CanUseCachedResponse(
@@ -118,6 +135,53 @@ namespace Modio
 					// In case the current buffer does not have a value, break the loop
 					break;
 				}
+			}
+		}
+
+		void PerformRequestAndGetResponseOp::LogRequestDetails()
+		{
+			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Http,
+											"Sending {} request to {}{}",
+											Request->Parameters().GetVerb(),
+											Request->Parameters().GetServerAddress(),
+											Request->Parameters().GetFormattedResourcePath());
+
+			for (const auto& Header : Request->Parameters().GetHeaders())
+			{
+				if (Header.first == "Authorization")
+				{
+					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http, "Request header Authorization : ******");
+				} 
+				else 
+				{
+					Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+												"Request header {} : {}", Header.first, Header.second);
+				}
+			}
+
+			if (Request->Parameters().ContainsFormData())
+			{
+				Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+												"Request content type: {}, payload size: {}",
+												Request->Parameters().GetContentType(),
+												Request->Parameters().GetPayloadSize());
+			}
+		}
+
+		void PerformRequestAndGetResponseOp::LogResponseDetails()
+		{
+			std::uint32_t ResponseCode = Request->GetResponseCode();
+
+			Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::Http,
+											"Received response code {} for {} {}",
+											ResponseCode,
+											Request->Parameters().GetVerb(),
+											Request->Parameters().GetFormattedResourcePath());
+
+			for (const auto& Header : Request->GetAllHeaders())
+			{
+				Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
+												"Response header {} : {}", Header.first, Header.second);
 			}
 		}
 

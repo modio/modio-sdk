@@ -116,6 +116,10 @@ namespace Modio
 							RequestParams = RequestParams.AppendPayloadValue(
 								fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::LinuxServer);
 							break;
+						case (Modio::ModfilePlatform::Switch2):
+							RequestParams = RequestParams.AppendPayloadValue(
+								fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::Switch2);
+							break;
 						default:
 							Modio::Detail::Logger().Log(LogLevel::Warning, LogCategory::File,
 														"Platform {} does not match any Modio::ModfilePlatform values. "

@@ -29,19 +29,18 @@ struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementat
 	std::size_t CurrentChunkSizeRemaining = 0;
 	Modio::Optional<std::size_t> GetContentLength()
 	{
-		for (httpparser::Response::HeaderItem& Hdr : ParsedResponseHeaders.headers)
+		Modio::Optional<std::string> Res = GetHeaderValue("Content-Length");
+		if (Res.has_value())
 		{
-			if (Modio::Detail::String::MatchesCaseInsensitive(Hdr.name, "Content-Length"))
-			{
-				return std::stoull(Hdr.value);
-			}
+			return std::stoull(Res.value());
 		}
+		
 		return {};
 	}
 
 	virtual ~HttpRequestImplementation() {}
 	// Common members
-	Modio::Detail::HttpRequestParams Parameters;
+	Modio::Detail::HttpRequestParams Parameters {};
 	bool HasBeenSent()
 	{
 		return false;
@@ -58,15 +57,7 @@ struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementat
 	}
 	virtual Modio::Optional<std::string> GetRedirectURL() override
 	{
-		for (httpparser::Response::HeaderItem& Hdr : ParsedResponseHeaders.headers)
-		{
-			if (Modio::Detail::String::MatchesCaseInsensitive(Hdr.name,"location"))
-			{
-				return Hdr.value;
-			}
-		}
-
-		return {};
+		return GetHeaderValue("location");
 	}
 
 	
@@ -92,5 +83,15 @@ struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementat
 		}
 
 		return {};
+	}
+
+	virtual std::vector<std::pair<std::string, std::string>> GetAllHeaders() override
+	{
+		std::vector<std::pair<std::string, std::string>> Result;
+		for (const httpparser::Response::HeaderItem& Hdr : ParsedResponseHeaders.headers)
+		{
+			Result.emplace_back(Hdr.name, Hdr.value);
+		}
+		return Result;
 	}
 };

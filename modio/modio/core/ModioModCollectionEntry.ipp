@@ -19,7 +19,7 @@
 
 namespace Modio
 {
-	ModCollectionEntry::ModCollectionEntry(ModInfo ProfileData, std::string CalculatedModPath)
+	MODIOSDK_API ModCollectionEntry::ModCollectionEntry(ModInfo ProfileData, std::string CalculatedModPath)
 		: ID(ProfileData.ModId),
 		  CurrentState(Modio::ModState::InstallationPending),
 		  ModProfile(ProfileData),
@@ -28,7 +28,7 @@ namespace Modio
 		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries)
 	{}
 
-	ModCollectionEntry::ModCollectionEntry(const ModCollectionEntry& Other)
+	MODIOSDK_API ModCollectionEntry::ModCollectionEntry(const ModCollectionEntry& Other)
 		: ID(Other.ID),
 		  CurrentState(Other.CurrentState.load()),
 		  ModProfile(Other.ModProfile),
@@ -40,12 +40,12 @@ namespace Modio
 		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries)
 	{}
 
-	std::uint8_t ModCollectionEntry::GetRetriesRemaining()
+	MODIOSDK_API std::uint8_t ModCollectionEntry::GetRetriesRemaining()
 	{
 		return RetriesRemainingThisSession;
 	}
 
-	void ModCollectionEntry::UpdateModProfile(Modio::ModInfo ProfileData)
+	MODIOSDK_API void ModCollectionEntry::UpdateModProfile(Modio::ModInfo ProfileData)
 	{
 		// check version in metadata and set pending install if need be
 		if (ModProfile.FileInfo.has_value() && ProfileData.FileInfo.has_value())
@@ -58,7 +58,7 @@ namespace Modio
 		ModProfile = ProfileData;
 	}
 
-	std::uint8_t ModCollectionEntry::AddLocalUserSubscription(Modio::Optional<Modio::User> User)
+	MODIOSDK_API std::uint8_t ModCollectionEntry::AddLocalUserSubscription(Modio::Optional<Modio::User> User)
 	{
 		if (User.has_value())
 		{
@@ -74,7 +74,7 @@ namespace Modio
 		return std::uint8_t(LocalUserSubscriptions.size());
 	}
 
-	std::uint8_t ModCollectionEntry::RemoveLocalUserSubscription(Modio::Optional<Modio::User> User)
+	MODIOSDK_API std::uint8_t ModCollectionEntry::RemoveLocalUserSubscription(Modio::Optional<Modio::User> User)
 	{
 		if (User.has_value())
 		{
@@ -89,7 +89,7 @@ namespace Modio
 		return std::uint8_t(LocalUserSubscriptions.size());
 	}
 
-	void ModCollectionEntry::SetModState(Modio::ModState NewState)
+	MODIOSDK_API void ModCollectionEntry::SetModState(Modio::ModState NewState)
 	{
 		Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::ModManagement, "Setting mod {} state from {} to {}", GetID(),
 									Modio::ModStateToString(CurrentState), Modio::ModStateToString(NewState));
@@ -110,17 +110,17 @@ namespace Modio
 		CurrentState.store(NewState);
 	}
 
-	Modio::ErrorCode ModCollectionEntry::GetLastError() const
+	MODIOSDK_API Modio::ErrorCode ModCollectionEntry::GetLastError() const
 	{
 		return LastErrorCode;
 	}
 
-	void ModCollectionEntry::MarkModNoRetryThisSession()
+	MODIOSDK_API void ModCollectionEntry::MarkModNoRetryThisSession()
 	{
 		ShouldNotRetry.store(true);
 	}
 
-	void ModCollectionEntry::SetLastError(Modio::ErrorCode Reason)
+	MODIOSDK_API void ModCollectionEntry::SetLastError(Modio::ErrorCode Reason)
 	{
 		// For uninstallations, defer immediately if the error indicates we should defer, else make a number of retry
 		// attempts then stop
@@ -172,38 +172,38 @@ namespace Modio
 		LastErrorCode = Reason;
 	}
 
-	void ModCollectionEntry::ClearModNoRetry()
+	MODIOSDK_API void ModCollectionEntry::ClearModNoRetry()
 	{
 		ShouldNotRetry.store(false);
 	}
 
-	bool ModCollectionEntry::ShouldRetry()
+	MODIOSDK_API bool ModCollectionEntry::ShouldRetry()
 	{
 		// Should only retry if we have don't have a never retry reason AND ShouldNotRetry is not set
 		return !NeverRetryReason && !ShouldNotRetry.load();
 	}
 
-	Modio::ModState ModCollectionEntry::GetModState() const
+	MODIOSDK_API Modio::ModState ModCollectionEntry::GetModState() const
 	{
 		return CurrentState.load();
 	}
 
-	Modio::ModID ModCollectionEntry::GetID() const
+	MODIOSDK_API Modio::ModID ModCollectionEntry::GetID() const
 	{
 		return ID;
 	}
 
-	const Modio::ModInfo& ModCollectionEntry::GetModProfile() const
+	MODIOSDK_API const Modio::ModInfo& ModCollectionEntry::GetModProfile() const
 	{
 		return ModProfile;
 	}
 
-	std::string ModCollectionEntry::GetPath() const
+	MODIOSDK_API std::string ModCollectionEntry::GetPath() const
 	{
 		return PathOnDisk;
 	}
 
-	Modio::Optional<Modio::FileSize> ModCollectionEntry::GetSizeOnDisk() const
+	MODIOSDK_API Modio::Optional<Modio::FileSize> ModCollectionEntry::GetSizeOnDisk() const
 	{
 		if (CurrentState == ModState::Installed)
 		{
@@ -215,27 +215,27 @@ namespace Modio
 		}
 	}
 
-	Modio::FileSize ModCollectionEntry::GetRawSizeOnDisk() const
+	MODIOSDK_API Modio::FileSize ModCollectionEntry::GetRawSizeOnDisk() const
 	{
 		return SizeOnDisk;
 	}
 
-	std::set<Modio::UserID> ModCollectionEntry::GetLocalUserSubscriptions() const
+	MODIOSDK_API std::set<Modio::UserID> ModCollectionEntry::GetLocalUserSubscriptions() const
 	{
 		return LocalUserSubscriptions;
 	}
 
-	Modio::ErrorCode ModCollectionEntry::GetNeverRetryReason() const
+	MODIOSDK_API Modio::ErrorCode ModCollectionEntry::GetNeverRetryReason() const
 	{
 		return NeverRetryReason;
 	}
 
-	void ModCollectionEntry::UpdateSizeOnDisk(Modio::FileSize NewSize)
+	MODIOSDK_API void ModCollectionEntry::UpdateSizeOnDisk(Modio::FileSize NewSize)
 	{
 		SizeOnDisk = NewSize;
 	}
 
-	void ModCollectionEntry::UpdateModPath(std::string NewPath)
+	MODIOSDK_API void ModCollectionEntry::UpdateModPath(std::string NewPath)
 	{
 		PathOnDisk = NewPath;
 	}
@@ -272,7 +272,7 @@ namespace Modio
 		}
 	}
 
-	Modio::ModCollectionEntry& ModCollectionEntry::operator=(const Modio::ModCollectionEntry& Other)
+	MODIOSDK_API Modio::ModCollectionEntry& ModCollectionEntry::operator=(const Modio::ModCollectionEntry& Other)
 	{
 		ID = Other.ID;
 		CurrentState.store(Other.CurrentState.load());
@@ -412,7 +412,7 @@ namespace Modio
 		return InternalList;
 	}
 
-	std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType> UserSubscriptionList::CalculateChanges(
+	MODIOSDK_API std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType> UserSubscriptionList::CalculateChanges(
 		const Modio::UserSubscriptionList& Original, const Modio::UserSubscriptionList& Updated)
 	{
 		std::map<Modio::ModID, Modio::UserSubscriptionListChangeType> Diff;
@@ -441,7 +441,7 @@ namespace Modio
 		return Diff;
 	}
 
-	std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType> UserSubscriptionList::CalculateUpdates(
+	MODIOSDK_API std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType> UserSubscriptionList::CalculateUpdates(
 		const Modio::ModInfoList& Baseline, const Modio::ModCollection& Collection)
 	{
 		std::map<Modio ::ModID, ChangeType> Diff;
@@ -469,7 +469,8 @@ namespace Modio
 		return Diff;
 	}
 
-	ModCollection::ModCollection(std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> Entries)
+	MODIOSDK_API ModCollection::ModCollection(
+		std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> Entries)
 	{
 		for (auto& ModEntry : Entries)
 		{
@@ -477,7 +478,7 @@ namespace Modio
 				std::make_pair(ModEntry.first, std::make_shared<Modio::ModCollectionEntry>(*ModEntry.second)));
 		}
 	}
-	const Modio::ModCollection ModCollection::FilterByUserSubscriptions(
+	MODIOSDK_API const Modio::ModCollection ModCollection::FilterByUserSubscriptions(
 		const UserSubscriptionList& UserSubscriptions) const
 	{
 		Modio::ModCollection FilteredCollection;
@@ -499,7 +500,7 @@ namespace Modio
 		return FilteredCollection;
 	}
 
-	bool ModCollection::AddOrUpdateMod(Modio::ModInfo ModToAdd, std::string CalculatedModPath)
+	MODIOSDK_API bool ModCollection::AddOrUpdateMod(Modio::ModInfo ModToAdd, std::string CalculatedModPath)
 	{
 		if (ModEntries.find(ModToAdd.ModId) == ModEntries.end())
 		{
@@ -513,7 +514,7 @@ namespace Modio
 		}
 	}
 
-	bool ModCollection::UpdateMod(Modio::ModInfo ModToUpdate, std::string CalculatedModPath)
+	MODIOSDK_API bool ModCollection::UpdateMod(Modio::ModInfo ModToUpdate, std::string CalculatedModPath)
 	{
 		auto ModEntry = ModEntries.find(ModToUpdate.ModId);
 		if (ModEntry == ModEntries.end())
@@ -528,7 +529,7 @@ namespace Modio
 		}
 	}
 
-	bool ModCollection::UpdateModPath(Modio::ModID ModToUpdate, std::string CalculatedModPath)
+	MODIOSDK_API bool ModCollection::UpdateModPath(Modio::ModID ModToUpdate, std::string CalculatedModPath)
 	{
 		auto ModEntry = ModEntries.find(ModToUpdate);
 		if (ModEntry == ModEntries.end())
@@ -542,17 +543,18 @@ namespace Modio
 		}
 	}
 
-	const std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& ModCollection::Entries() const
+	MODIOSDK_API const std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& ModCollection::Entries()
+		const
 	{
 		return ModEntries;
 	}
 
-	std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& ModCollection::Entries()
+	MODIOSDK_API std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& ModCollection::Entries()
 	{
 		return ModEntries;
 	}
 
-	Modio::Optional<Modio::ModCollectionEntry&> ModCollection::GetByModID(Modio::ModID ModId) const
+	MODIOSDK_API Modio::Optional<Modio::ModCollectionEntry&> ModCollection::GetByModID(Modio::ModID ModId) const
 	{
 		if (ModEntries.count(ModId))
 		{
@@ -564,7 +566,7 @@ namespace Modio
 		}
 	}
 
-	bool ModCollection::RemoveMod(Modio::ModID ModId, bool bForce)
+	MODIOSDK_API bool ModCollection::RemoveMod(Modio::ModID ModId, bool bForce)
 	{
 		if (ModEntries.count(ModId))
 		{
@@ -583,7 +585,8 @@ namespace Modio
 		return false;
 	}
 
-	std::vector<std::shared_ptr<Modio::ModCollectionEntry>> ModCollection::SortEntriesByRetryPriority() const
+	MODIOSDK_API std::vector<std::shared_ptr<Modio::ModCollectionEntry>> ModCollection::SortEntriesByRetryPriority()
+		const
 	{
 		std::vector<std::shared_ptr<Modio::ModCollectionEntry>> SortedEntries;
 		// Copy the entries to the vector
@@ -603,7 +606,7 @@ namespace Modio
 		return SortedEntries;
 	}
 
-	void ModEventLog::AddEntry(Modio::ModManagementEvent Entry)
+	MODIOSDK_API void ModEventLog::AddEntry(Modio::ModManagementEvent Entry)
 	{
 		Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::ModManagement,
 									"Adding ModManagementEvent {} with status {} to ModEventLog for ModID {}",

@@ -89,7 +89,7 @@ namespace Modio
 			AlignmentOffset = std::size_t( reinterpret_cast<unsigned char*>(RawBufferPtr) - InternalData.get());
 		}
 
-		Buffer::~Buffer()
+		MODIOSDK_API Buffer::~Buffer()
 		{
 			MODIO_PROFILE_SCOPE(BufferDestructor);
 			InternalData.reset();

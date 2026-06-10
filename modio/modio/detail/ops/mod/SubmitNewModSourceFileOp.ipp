@@ -110,6 +110,10 @@ namespace Modio
 								RequestParams = RequestParams.AppendPayloadValue(
 									fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::Source);
 								break;
+							case (Modio::ModfilePlatform::Switch2):
+								RequestParams = RequestParams.AppendPayloadValue(
+									fmt::format("platforms[{}]", i), Modio::Detail::Constants::PlatformNames::Switch2);
+								break;
 							default:
 								Modio::Detail::Logger().Log(
 									LogLevel::Warning, LogCategory::File,

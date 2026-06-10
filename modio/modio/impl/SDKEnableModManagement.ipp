@@ -8,6 +8,8 @@
  *
  */
 
+#define MODIO_SDK_PROTOTYPES_ONLY
+#include "modio/ModioSDK.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
@@ -16,7 +18,8 @@
 
 namespace Modio
 {
-	Modio::ErrorCode EnableModManagement(std::function<void(Modio::ModManagementEvent)> ModManagementHandler)
+	MODIOSDK_API Modio::ErrorCode EnableModManagement(
+		std::function<void(Modio::ModManagementEvent)> ModManagementHandler)
 	{
 		{
 			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
@@ -51,5 +54,10 @@ namespace Modio
 		Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::ModManagement, "Enabled mod management.");
 
 		return {};
+	}
+
+	MODIOSDK_API bool IsModManagementEnabled() 
+	{
+		return Modio::Detail::SDKSessionData::IsModManagementEnabled();
 	}
 } // namespace Modio

@@ -116,6 +116,7 @@ namespace Modio
 				constexpr const char* Source = "source";
 				constexpr const char* WindowsServer = "windowsserver";
 				constexpr const char* LinuxServer = "linuxserver";
+				constexpr const char* Switch2 = "switch2";
 			} // namespace PlatformNames
 		} // namespace Constants
 		MODIO_DISABLE_WARNING_POP

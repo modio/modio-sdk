@@ -65,7 +65,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Cloud Cooking status for this game
-	enum class GameCloudCookingStatus : uint16_t
+	enum class GameCloudCookingStatus : std::uint16_t
 	{
 		Disabled = 0,
 		Initializing = 1,

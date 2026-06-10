@@ -12,8 +12,8 @@
 
 #include "modio/core/ModioSDKForwardDecls.h"
 #include "modio/core/ModioSplitCompilation.h"
+#include "modio/detail/ModioLibraryConfigurationHelpers.h"
 #include "modio/detail/ModioDefines.h"
-#include "modio/detail/HedleyWrapper.h"
 #include "modio/detail/OptionalWrapper.h"
 #include <memory>
 #include <string>

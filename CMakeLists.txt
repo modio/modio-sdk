@@ -39,6 +39,11 @@ set(ModioGeneratedHeaderPath "${CMAKE_BINARY_DIR}/generated" CACHE INTERNAL "")
 set (MODIO_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
 set (MODIO_VERSION "v2.0.0" CACHE STRING "Version number for the packaged version")
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_DEFAULT 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 
 #Global definition of the library target name so it can be referenced in platform tests, etc, and to ease renaming if it becomes necessary
 set (MODIO_TARGET_NAME modio CACHE STRING "")
@@ -54,6 +59,8 @@ project(${MODIO_TARGET_NAME} C CXX )
 modio_platform_init()
 
 message(STATUS "CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+
+
 
 set (MODIO_FORCE_CXX_20_MODE OFF CACHE BOOL "Force C++20 mode"  )
 

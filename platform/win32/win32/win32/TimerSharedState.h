@@ -15,6 +15,7 @@
 #include "modio/core/ModioServices.h"
 #include "modio/detail/Function2Wrapper.h"
 #include "modio/detail/AsioWrapper.h"
+#include "modio/detail/FmtWrapper.h"
 #include "modio/detail/ModioProfiling.h"
 #include <algorithm>
 #include <memory>
@@ -39,8 +40,7 @@ public:
 		// insert wait ID, packaged function into second container
 
 		static uint64_t TimerCount = 0;
-		char buf[255] = {0};
-		snprintf(buf, 128, "Timer%Ii", TimerCount);
+		std::string TimerNameBuf = fmt::format("Timer{}", TimerCount);
 		std::chrono::steady_clock::duration TimerDuration = TimerToStart->GetTimerDuration();
 		fu2::unique_function<void(Modio::ErrorCode)> WrappedCallback {
 			[Token = std::move(Token)](Modio::ErrorCode ec) mutable {
@@ -52,7 +52,7 @@ public:
 			}};
 		TimerToStart->CalculatedExpiryTime = TimerDuration + std::chrono::steady_clock::now();
 		PendingTimers.insert({TimerToStart->CalculatedExpiryTime, std::move(WrappedCallback)});
-		Modio::Detail::ScopedProfileEvent starttimer(buf);
+		Modio::Detail::ScopedProfileEvent starttimer(TimerNameBuf.c_str());
 		// std::cout << TimerToStart->ThreadPoolTimer << "start "
 		//		  << std::chrono::steady_clock::now().time_since_epoch().count() << std::endl;
 		TimerCount++;

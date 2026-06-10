@@ -55,7 +55,7 @@ namespace Modio
 		
 		/// @docpublic
 		/// @brief Bitwise mask of flags indicating mature content
-		Modio::Optional<Modio::MaturityOption> MaturityRating {};
+		Modio::Optional<Modio::ProfileMaturity> MaturityRating {};
 
 		/// @docpublic
 		/// @brief Community options for the mod

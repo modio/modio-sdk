@@ -9,6 +9,8 @@
  */
 
 #ifdef MODIO_SEPARATE_COMPILATION
+	#define MODIO_SDK_PROTOTYPES_ONLY
+	#include "modio/ModioSDK.h"
 	#include "modio/userdata/ModioUserDataService.h"
 #endif
 
@@ -16,12 +18,9 @@
 
 namespace Modio
 {
-	void DisableModManagement();
-	Modio::Optional<Modio::ModProgressInfo> QueryCurrentModUpdate();
-
 	namespace Detail
 	{
-		void UserDataService::ClearUserData(bool bShouldDisableModManagement)
+		MODIOSDK_API void UserDataService::ClearUserData(bool bShouldDisableModManagement)
 		{
 			ModCollection FilteredModCollection =
 				Modio::Detail::SDKSessionData::FilterSystemModCollectionByUserSubscriptions();

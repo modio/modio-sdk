@@ -38,28 +38,28 @@ namespace Modio
 			{}
 			MetricsService(MetricsService&&) = delete;
 
-			MODIO_IMPL void Shutdown() {}
+			MODIOSDK_API void Shutdown() {}
 
-			MODIO_IMPL void InitMetricsSession(const std::string& SecretKeyString);
-			MODIO_IMPL std::string GetSecretKey() const;
+			MODIOSDK_API void InitMetricsSession(const std::string& SecretKeyString);
+			MODIOSDK_API std::string GetSecretKey() const;
 
-			MODIO_IMPL void StartSessionAsync(Modio::MetricsSessionParams Params,
+			MODIOSDK_API void StartSessionAsync(Modio::MetricsSessionParams Params,
 											  std::function<void(Modio::ErrorCode)> Callback);
-			MODIO_IMPL void SendHeartbeatOnceAsync(std::function<void(Modio::ErrorCode)> Callback);
-			MODIO_IMPL void SendHeartbeatAtIntervalAsync(uint32_t IntervalSeconds,
+			MODIOSDK_API void SendHeartbeatOnceAsync(std::function<void(Modio::ErrorCode)> Callback);
+			MODIOSDK_API void SendHeartbeatAtIntervalAsync(uint32_t IntervalSeconds,
 														 std::function<void(Modio::ErrorCode)> Callback);
-			MODIO_IMPL void EndSessionAsync(std::function<void(Modio::ErrorCode)> Callback);
+			MODIOSDK_API void EndSessionAsync(std::function<void(Modio::ErrorCode)> Callback);
 
-			MODIO_IMPL MetricsSessionStartParams GenerateSessionStartParams();
-			MODIO_IMPL MetricsSessionHeartbeatParams GenerateSessionHeartbeatParams();
-			MODIO_IMPL MetricsSessionEndParams GenerateSessionEndParams();
+			MODIOSDK_API MetricsSessionStartParams GenerateSessionStartParams();
+			MODIOSDK_API MetricsSessionHeartbeatParams GenerateSessionHeartbeatParams();
+			MODIOSDK_API MetricsSessionEndParams GenerateSessionEndParams();
 
-			MODIO_IMPL void SetSessionIsActive(bool bActive);
-			MODIO_IMPL bool GetSessionIsActive() const;
-			MODIO_IMPL Modio::Guid GetSessionId() const;
+			MODIOSDK_API void SetSessionIsActive(bool bActive);
+			MODIOSDK_API bool GetSessionIsActive() const;
+			MODIOSDK_API Modio::Guid GetSessionId() const;
 
-			MODIO_IMPL std::vector<Modio::ModID> GetModIds() const;
-			MODIO_IMPL bool ContainsModId(Modio::ModID Id) const;
+			MODIOSDK_API std::vector<Modio::ModID> GetModIds() const;
+			MODIOSDK_API bool ContainsModId(Modio::ModID Id) const;
 
 			bool IsInitialized() const
 			{
@@ -91,12 +91,12 @@ namespace Modio
 				return SessionStartTime;
 			}
 
-			time_t GetSessionDuration() const;
+			MODIOSDK_API time_t GetSessionDuration() const;
 
 		private:
-			MODIO_IMPL void StartSession();
-			MODIO_IMPL void EndSession();
-			MODIO_IMPL void ResetMetricsData();
+			void StartSession();
+			void EndSession();
+			void ResetMetricsData();
 
 			MODIO_IMPL void AddMods(const std::vector<Modio::ModID>& Ids);
 

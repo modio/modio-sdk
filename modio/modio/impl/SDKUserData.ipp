@@ -36,7 +36,8 @@
 
 namespace Modio
 {
-	void RequestEmailAuthCodeAsync(Modio::EmailAddress EmailAddress, std::function<void(Modio::ErrorCode)> Callback)
+	MODIOSDK_API void RequestEmailAuthCodeAsync(Modio::EmailAddress EmailAddress,
+												std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([EmailAddress, Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
@@ -46,7 +47,8 @@ namespace Modio
 		});
 	}
 
-	void GetTermsOfUseAsync(std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms> Terms)> Callback)
+	MODIOSDK_API void GetTermsOfUseAsync(
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::Terms> Terms)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback))
@@ -56,7 +58,8 @@ namespace Modio
 		});
 	}
 
-	void AuthenticateUserExternalAsync(Modio::AuthenticationParams User, Modio::AuthenticationProvider Provider,
+	MODIOSDK_API void AuthenticateUserExternalAsync(Modio::AuthenticationParams User,
+													Modio::AuthenticationProvider Provider,
 									   std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([User, Provider, Callback = std::move(Callback)]() mutable {
@@ -122,7 +125,9 @@ namespace Modio
 		// Return immediately if the SDK is not initialized or the API rate limit is reached
 	}
 
-	void AuthenticateUserDelegatedTokenAsync(Modio::AuthenticationParams User, std::function<void(Modio::ErrorCode)> Callback){
+	MODIOSDK_API void AuthenticateUserDelegatedTokenAsync(Modio::AuthenticationParams User,
+														  std::function<void(Modio::ErrorCode)> Callback)
+	{
 		Modio::Detail::SDKSessionData::EnqueueTask([User, Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
 			{
@@ -132,7 +137,7 @@ namespace Modio
 		});
 	}
 
-	void AuthenticateUserEmailAsync(Modio::EmailAuthCode AuthenticationCode,
+	MODIOSDK_API void AuthenticateUserEmailAsync(Modio::EmailAuthCode AuthenticationCode,
 									std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([AuthenticationCode, Callback = std::move(Callback)]() mutable {
@@ -143,7 +148,7 @@ namespace Modio
 		});
 	}
 
-	void ClearUserDataAsync(std::function<void(Modio::ErrorCode)> Callback)
+	MODIOSDK_API void ClearUserDataAsync(std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) &&
@@ -155,7 +160,7 @@ namespace Modio
 		});
 	}
 
-	void VerifyUserAuthenticationAsync(std::function<void(Modio::ErrorCode)> Callback)
+	MODIOSDK_API void VerifyUserAuthenticationAsync(std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
@@ -166,7 +171,7 @@ namespace Modio
 		});
 	}
 
-	void RefreshUserDataAsync(std::function<void(Modio::ErrorCode)> Callback)
+	MODIOSDK_API void RefreshUserDataAsync(std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
@@ -177,7 +182,7 @@ namespace Modio
 		});
 	}
 
-	Modio::Optional<Modio::User> QueryUserProfile()
+	MODIOSDK_API Modio::Optional<Modio::User> QueryUserProfile()
 	{
 		auto Lock = Modio::Detail::SDKSessionData::GetReadLock();
 		if (Modio::Detail::SDKSessionData::IsInitialized())
@@ -187,7 +192,7 @@ namespace Modio
 		return {};
 	}
 
-	void GetUserMediaAsync(Modio::AvatarSize AvatarSize,
+	MODIOSDK_API void GetUserMediaAsync(Modio::AvatarSize AvatarSize,
 						   std::function<void(Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([AvatarSize, Callback = std::move(Callback)]() mutable {
@@ -199,7 +204,8 @@ namespace Modio
 		});
 	}
 
-	void ListUserGamesAsync(Modio::FilterParams Filter,
+	MODIOSDK_API void ListUserGamesAsync(
+		Modio::FilterParams Filter,
 							std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Filter = std::move(Filter),
@@ -212,7 +218,8 @@ namespace Modio
 		});
 	}
 
-	void GetUserRatingsAsync(std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserRatingList>)> Callback)
+	MODIOSDK_API void GetUserRatingsAsync(
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserRatingList>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&

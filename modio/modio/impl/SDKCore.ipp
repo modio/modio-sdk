@@ -29,7 +29,8 @@
 
 namespace Modio
 {
-	void InitializeAsync(Modio::InitializeOptions InitOptions, std::function<void(Modio::ErrorCode)> OnInitComplete)
+	MODIOSDK_API void InitializeAsync(Modio::InitializeOptions InitOptions,
+									 std::function<void(Modio::ErrorCode)> OnInitComplete)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([InitOptions, OnInitComplete = std::move(OnInitComplete)]() mutable {
 			if (Modio::Detail::RequireValidInitParams(InitOptions, OnInitComplete))
@@ -41,7 +42,7 @@ namespace Modio
 		});
 	}
 
-	void RunPendingHandlers()
+	MODIOSDK_API void RunPendingHandlers()
 	{
 		// Static atomic flag to track if the function is already running
 		static std::atomic_flag bIsRunning = ATOMIC_FLAG_INIT;
@@ -100,11 +101,11 @@ namespace Modio
 
 #ifndef MODIO_SEPARATE_COMPILATION
 	// Forward declaration
-	void DisableModManagement();
+	MODIOSDK_API void DisableModManagement();
 #endif
 
 	// This might need a timeout parameter
-	void ShutdownAsync(std::function<void(Modio::ErrorCode)> OnShutdownComplete)
+	MODIOSDK_API void ShutdownAsync(std::function<void(Modio::ErrorCode)> OnShutdownComplete)
 	{
 		auto ShutdownLock = Modio::Detail::SDKSessionData::GetShutdownLock();
 		if (Modio::Detail::RequireSDKIsInitialized(OnShutdownComplete))
@@ -136,28 +137,28 @@ namespace Modio
 		}
 	}
 
-	void SetLogLevel(Modio::LogLevel Level)
+	MODIOSDK_API void SetLogLevel(Modio::LogLevel Level)
 	{
 		auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 
 		Modio::Detail::LogService::SetGlobalLogLevel(Level);
 	}
 
-	void SetLogCallback(std::function<void(Modio::LogLevel Level, const std::string& Message)> LogCallback)
+	MODIOSDK_API void SetLogCallback(std::function<void(Modio::LogLevel Level, const std::string& Message)> LogCallback)
 	{
 		auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
 
 		Modio::Detail::LogService::SetLogCallback(LogCallback);
 	}
 
-	std::vector<Modio::FieldError> GetLastValidationError()
+	MODIOSDK_API std::vector<Modio::FieldError> GetLastValidationError()
 	{
 		auto Lock = Modio::Detail::SDKSessionData::GetReadLock();
 
 		return Modio::Detail::SDKSessionData::GetLastValidationError();
 	}
 
-	void ReportContentAsync(Modio::ReportParams Report, std::function<void(Modio::ErrorCode)> Callback)
+	MODIOSDK_API void ReportContentAsync(Modio::ReportParams Report, std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask(
 			[Report = std::move(Report), Callback = std::move(Callback)]() mutable {
@@ -169,7 +170,7 @@ namespace Modio
 			});
 	}
 
-	void MuteUserAsync(Modio::UserID UserID, std::function<void(Modio::ErrorCode)> Callback)
+	MODIOSDK_API void MuteUserAsync(Modio::UserID UserID, std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([UserID, Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
@@ -181,7 +182,7 @@ namespace Modio
 		});
 	}
 
-	void UnmuteUserAsync(Modio::UserID UserID, std::function<void(Modio::ErrorCode)> Callback)
+	MODIOSDK_API void UnmuteUserAsync(Modio::UserID UserID, std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([UserID, Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
@@ -193,7 +194,8 @@ namespace Modio
 		});
 	}
 
-	void GetMutedUsersAsync(std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)> Callback)
+	MODIOSDK_API void GetMutedUsersAsync(
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserList>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
@@ -204,7 +206,7 @@ namespace Modio
 		});
 	}
 
-	void GetGameInfoAsync(Modio::GameID GameID,
+	MODIOSDK_API void GetGameInfoAsync(Modio::GameID GameID,
 						  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::GameInfo>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([GameID, Callback = std::move(Callback)]() mutable {
@@ -216,7 +218,7 @@ namespace Modio
 		});
 	}
 
-	void SetLanguage(Modio::Language Locale)
+	MODIOSDK_API void SetLanguage(Modio::Language Locale)
 	{
 		bool bLanguageChanged = false;
 		Modio::Language CurrentLanguage = Modio::Language::English;
@@ -241,7 +243,7 @@ namespace Modio
 		}
 	}
 
-	Modio::Language GetLanguage()
+	MODIOSDK_API Modio::Language GetLanguage()
 	{
 		auto Lock = Modio::Detail::SDKSessionData::GetReadLock();
 		return Modio::Detail::SDKSessionData::GetLocalLanguage();

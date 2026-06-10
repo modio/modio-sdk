@@ -16,7 +16,7 @@
 
 namespace Modio
 {
-	void MetricsSessionStartAsync(Modio::MetricsSessionParams Params, std::function<void(Modio::ErrorCode)> Callback)
+	MODIOSDK_API void MetricsSessionStartAsync(Modio::MetricsSessionParams Params, std::function<void(Modio::ErrorCode)> Callback)
 	{
 		if (!Params.SessionId.has_value() || !Params.SessionId.value().IsValid())
 		{
@@ -39,7 +39,7 @@ namespace Modio
 		});
 	}
 
-	void MetricsSessionSendHeartbeatOnceAsync(std::function<void(Modio::ErrorCode)> Callback)
+	MODIOSDK_API void MetricsSessionSendHeartbeatOnceAsync(std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
@@ -53,7 +53,7 @@ namespace Modio
 		});
 	}
 
-	void MetricsSessionSendHeartbeatAtIntervalAsync(std::uint32_t IntervalSeconds,
+	MODIOSDK_API void MetricsSessionSendHeartbeatAtIntervalAsync(std::uint32_t IntervalSeconds,
 													std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([IntervalSeconds, Callback = std::move(Callback)]() mutable {
@@ -68,7 +68,7 @@ namespace Modio
 		});
 	}
 
-	void MetricsSessionEndAsync(std::function<void(Modio::ErrorCode)> Callback)
+	MODIOSDK_API void MetricsSessionEndAsync(std::function<void(Modio::ErrorCode)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&

@@ -55,11 +55,11 @@ namespace Modio
 
 			MODIO_IMPL static void MarkAsRateLimited(int SecondsDelay);
 			MODIO_IMPL static bool IsRateLimited();
-			MODIO_IMPL static Modio::ModCollection& GetSystemModCollection();
+			MODIOSDK_API static Modio::ModCollection& GetSystemModCollection();
 			MODIO_IMPL static Modio::ModCollection& GetTempModCollection();
 			MODIO_IMPL static std::shared_ptr<Modio::Detail::TemporaryModSet> GetTemporaryModSet();
 
-			MODIO_IMPL static Modio::ModCollection FilterSystemModCollectionByUserSubscriptions();
+			MODIOSDK_API static Modio::ModCollection FilterSystemModCollectionByUserSubscriptions();
 			MODIO_IMPL static void InitializeForUser(Modio::User User, Modio::OAuthToken AuthToken);
 			MODIO_IMPL static void UpdateTokenForExistingUser(Modio::OAuthToken AuthToken);
 			MODIO_IMPL static const Modio::Optional<Modio::OAuthToken> GetAuthenticationToken();
@@ -212,7 +212,7 @@ namespace Modio
 			MODIO_IMPL static void DecrementModManagementEventQueued();
 
 		private:
-			enum class InitializationState
+			enum class InitializationState : std::int32_t
 			{
 				NotInitialized,
 				Initializing,

@@ -17,7 +17,9 @@
 
 namespace Modio
 {
-	ReportParams::ReportParams(std::int64_t ResourceID, Modio::ReportParams::ResourceType ReportedResourceType, Modio::ReportType Type,
+	ReportParams::ReportParams(std::int64_t ResourceID,
+											Modio::ReportParams::ResourceType ReportedResourceType,
+											Modio::ReportType Type,
 							   std::string ReportDescription, Modio::Optional<std::string> ReporterName,
 							   Modio::Optional<std::string> ReporterContact)
 		: ReporterName(ReporterName),
@@ -28,22 +30,23 @@ namespace Modio
 		  Type(Type)
 	{}
 
-	ReportParams::ReportParams(Modio::GameID Game, Modio::ReportType Type, std::string ReportDescription,
+	MODIOSDK_API ReportParams::ReportParams(Modio::GameID Game, Modio::ReportType Type, std::string ReportDescription,
 							   Modio::Optional<std::string> ReporterName, Modio::Optional<std::string> ReporterContact)
 		: ReportParams(Game, ResourceType::Game, Type, ReportDescription, ReporterName, ReporterContact)
 	{}
 
-	ReportParams::ReportParams(Modio::ModID Mod, Modio::ReportType Type, std::string ReportDescription,
+	MODIOSDK_API ReportParams::ReportParams(Modio::ModID Mod, Modio::ReportType Type, std::string ReportDescription,
 							   Modio::Optional<std::string> ReporterName, Modio::Optional<std::string> ReporterContact)
 		: ReportParams(Mod, ResourceType::Mod, Type, ReportDescription, ReporterName, ReporterContact)
 	{}
 
-	ReportParams::ReportParams(Modio::UserID User, Modio::ReportType Type, std::string ReportDescription,
+	MODIOSDK_API ReportParams::ReportParams(Modio::UserID User, Modio::ReportType Type, std::string ReportDescription,
 							   Modio::Optional<std::string> ReporterName, Modio::Optional<std::string> ReporterContact)
 		: ReportParams(User, ResourceType::User, Type, ReportDescription, ReporterName, ReporterContact)
 	{}
 
-	ReportParams::ReportParams(Modio::ModCollectionID Mod, Modio::ReportType Type, std::string ReportDescription,
+	MODIOSDK_API ReportParams::ReportParams(Modio::ModCollectionID Mod, Modio::ReportType Type,
+											std::string ReportDescription,
 							   Modio::Optional<std::string> ReporterName, Modio::Optional<std::string> ReporterContact)
 		: ReportParams(Mod, ResourceType::Collection, Type, ReportDescription, ReporterName, ReporterContact)
 	{}

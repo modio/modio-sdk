@@ -44,8 +44,8 @@
     (zlib format), rfc1951 (deflate format) and rfc1952 (gzip format).
 */
 
-#ifndef BOOST_BEAST_ZLIB_DETAIL_DEFLATE_STREAM_IPP
-#define BOOST_BEAST_ZLIB_DETAIL_DEFLATE_STREAM_IPP
+#ifndef MODIO_ZLIB_DETAIL_DEFLATE_STREAM_IPP
+#define MODIO_ZLIB_DETAIL_DEFLATE_STREAM_IPP
 
 
 #include "modio/detail/ModioCompilerMacros.h"
@@ -66,9 +66,9 @@ MODIO_DISABLE_WARNING_SPECTRE_MITIGATION
 #include <stdexcept>
 #include <cassert>
 
-namespace boost {
-namespace beast {
-namespace zlib {
+namespace Modio {
+namespace Detail {
+namespace Zlib {
 namespace detail {
 
 /*
@@ -402,7 +402,7 @@ doWrite(z_params& zs, Modio::Optional<Flush> flush, Modio::ErrorCode& ec)
              * but this is not an error situation so make sure we
              * return OK instead of BUF_ERROR at next call of deflate:
              */
-            last_flush_ = boost::beast::zlib::Flush::none;
+            last_flush_ = Modio::Detail::Zlib::Flush::none;
             return;
         }
     }
@@ -458,7 +458,7 @@ doWrite(z_params& zs, Modio::Optional<Flush> flush, Modio::ErrorCode& ec)
         {
             if(zs.avail_out == 0)
             {
-                last_flush_ = boost::beast::zlib::Flush::none; /* avoid BUF_ERROR next call, see above */
+                last_flush_ = Modio::Detail::Zlib::Flush::none; /* avoid BUF_ERROR next call, see above */
             }
             return;
             /*  If flush != Flush::none && avail_out == 0, the next call
@@ -496,7 +496,7 @@ doWrite(z_params& zs, Modio::Optional<Flush> flush, Modio::ErrorCode& ec)
             flush_pending(zs);
             if(zs.avail_out == 0)
             {
-                last_flush_ = boost::beast::zlib::Flush::none; /* avoid BUF_ERROR at next call, see above */
+                last_flush_ = Modio::Detail::Zlib::Flush::none; /* avoid BUF_ERROR at next call, see above */
                 return;
             }
         }
@@ -2327,9 +2327,9 @@ f_huff(z_params& zs, Flush flush) ->
 }
 
 } // detail
-} // zlib
-} // beast
-} // boost
+} // Zlib
+} // Detail
+} // Modio
 
 MODIO_DISABLE_WARNING_POP
 #endif

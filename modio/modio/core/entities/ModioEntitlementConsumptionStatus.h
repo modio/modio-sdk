@@ -17,7 +17,7 @@ namespace Modio
 {
 	/// @docpublic
 	/// @brief State of an entitlement consumption transaction
-	enum class EntitlementConsumptionState
+	enum class EntitlementConsumptionState : std::int32_t
 	{
 		Failed = 0,
 		Pending = 1,

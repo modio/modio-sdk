@@ -44,15 +44,15 @@
     (zlib format), rfc1951 (deflate format) and rfc1952 (gzip format).
 */
 
-#ifndef BOOST_BEAST_ZLIB_DETAIL_RANGES_HPP
-#define BOOST_BEAST_ZLIB_DETAIL_RANGES_HPP
+#ifndef MODIO_ZLIB_DETAIL_RANGES_HPP
+#define MODIO_ZLIB_DETAIL_RANGES_HPP
 
 #include <cstdint>
 #include <type_traits>
 
-namespace boost {
-namespace beast {
-namespace zlib {
+namespace Modio {
+namespace Detail {
+namespace Zlib {
 namespace detail {
 
 struct ranges
@@ -105,8 +105,8 @@ U clamp(U u, V v)
 }
 
 } // detail
-} // zlib
-} // beast
-} // boost
+} // Zlib
+} // Detail
+} // Modio
 
 #endif

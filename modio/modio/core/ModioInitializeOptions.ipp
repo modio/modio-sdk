@@ -14,9 +14,10 @@
 
 namespace Modio
 {
-	InitializeOptions::InitializeOptions() {}
+	MODIOSDK_API InitializeOptions::InitializeOptions() {}
 
-	InitializeOptions::InitializeOptions(Modio::GameID GameID, Modio::ApiKey APIKey, Modio::Environment GameEnvironment,
+	MODIOSDK_API InitializeOptions::InitializeOptions(Modio::GameID GameID, Modio::ApiKey APIKey,
+													 Modio::Environment GameEnvironment,
 										 Modio::Portal PortalInUse, Modio::UserHandleType LocalSessionIdentifier)
 		: GameID(GameID),
 		  APIKey(APIKey),

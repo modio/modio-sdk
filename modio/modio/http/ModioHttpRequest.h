@@ -39,6 +39,8 @@ namespace Modio
 
 			MODIO_IMPL Modio::Optional<std::string> GetHeaderValue(std::string HeaderKey);
 
+			MODIO_IMPL std::vector<std::pair<std::string, std::string>> GetAllHeaders();
+
 			/// @brief Sends a request to the server. Assumes that any payload data is stored in its entirety on this
 			/// HttpRequest already - if you want to stream data to the server please use
 			/// BeginWriteAsync/WriteSomeAsync.

@@ -20,7 +20,7 @@ namespace Modio
 	///	* 0 = Don't allow mature content in mods (default)
 	///	* 1 = This game allows mods containing mature content
 	///	* 2 = This game is for mature audiences only
-	enum class GameMaturityOptions : uint32_t
+	enum class GameMaturityOptions : std::uint32_t
 	{
 		None = 0,
 		MatureModsAllowed = 1,

@@ -45,8 +45,8 @@ namespace Modio
 				Modio::Detail::File DestinationFile;
 				Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo {};
 
-				boost::beast::zlib::inflate_stream ZStream {};
-				boost::beast::zlib::z_params ZState {};
+				Modio::Detail::Zlib::inflate_stream ZStream {};
+				Modio::Detail::Zlib::z_params ZState {};
 				Modio::ErrorCode DeflateStatus {};
 				Modio::Optional<Modio::Detail::Buffer> DecompressedData {};
 			};
@@ -142,7 +142,7 @@ namespace Modio
 							Impl->ZState.avail_out = Impl->DecompressedData->GetSize();
 							Impl->ZState.total_out = 0;
 
-							Impl->ZStream.write(Impl->ZState, boost::beast::zlib::Flush::none, Impl->DeflateStatus);
+							Impl->ZStream.write(Impl->ZState, Modio::Detail::Zlib::Flush::none, Impl->DeflateStatus);
 							if (!Impl->DeflateStatus || Impl->DeflateStatus == Modio::ZlibError::EndOfStream)
 							{
 								// Copy the required range out of the pre-allocated buffer

@@ -84,4 +84,14 @@ struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementat
 
 		return {};
 	}
+
+	virtual std::vector<std::pair<std::string, std::string>> GetAllHeaders() override
+	{
+		std::vector<std::pair<std::string, std::string>> Result;
+		for (const httpparser::Response::HeaderItem& Hdr : ParsedResponseHeaders.headers)
+		{
+			Result.emplace_back(Hdr.name, Hdr.value);
+		}
+		return Result;
+	}
 };

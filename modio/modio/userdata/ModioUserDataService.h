@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "modio/core/ModioErrorCode.h"
+#include "modio/detail/ModioLibraryConfigurationHelpers.h"
 #include "modio/detail/ops/userdata/SaveUserDataToStorageOp.h"
 #include "modio/detail/ops/userdata/InitializeUserDataOp.h"
 
@@ -27,10 +29,7 @@ namespace Modio
 			}
 			UserDataService(UserDataService&&) = delete;
 
-			void Shutdown()
-			{
-				
-			}
+			void Shutdown() {}
 
 			template<typename CompletionHandlerType>
 			auto InitializeAsync(CompletionHandlerType&& Handler)
@@ -54,10 +53,10 @@ namespace Modio
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 
-			MODIO_IMPL Modio::ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string> MODIO_UNUSED_ARGUMENT(Overrides)) { return {};}
+			Modio::ErrorCode ApplyGlobalConfigOverrides(const std::map<std::string, std::string> MODIO_UNUSED_ARGUMENT(Overrides)) { return {};}
 
 		private:
-			void ClearUserData(bool bShouldDisableModManagement = true);
+			MODIOSDK_API void ClearUserData(bool bShouldDisableModManagement = true);
 		};
 	} // namespace Detail
 } // namespace Modio

@@ -69,5 +69,10 @@ namespace Modio
 		{
 			return get_implementation()->GetHeaderValue(HeaderKey);
 		}
+
+		std::vector<std::pair<std::string, std::string>> HttpRequest::GetAllHeaders()
+		{
+			return get_implementation()->GetAllHeaders();
+		}
 	} // namespace Detail
 } // namespace Modio

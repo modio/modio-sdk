@@ -17,7 +17,7 @@
 
 namespace Modio
 {
-	enum class HttpError
+	enum class HttpError : std::int32_t
 	{
 		CannotOpenConnection = 20481,
 		DownloadNotPermitted = 20482,
@@ -124,7 +124,7 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
-	enum class FilesystemError
+	enum class FilesystemError : std::int32_t
 	{
 		DirectoryNotEmpty = 20737,
 		DirectoryNotFound = 20738,
@@ -219,7 +219,7 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
-	enum class UserAuthError
+	enum class UserAuthError : std::int32_t
 	{
 		AlreadyAuthenticated = 20993,
 		EmailLoginCodeExpired = 20994,
@@ -298,7 +298,7 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
-	enum class UserDataError
+	enum class UserDataError : std::int32_t
 	{
 		BlobMissing = 21249,
 		InvalidUser = 21250
@@ -357,7 +357,7 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
-	enum class ArchiveError
+	enum class ArchiveError : std::int32_t
 	{
 		InvalidHeader = 21505,
 		UnsupportedCompression = 21506
@@ -416,7 +416,7 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
-	enum class GenericError
+	enum class GenericError : std::int32_t
 	{
 		BadParameter = 21761,
 		CouldNotCreateHandle = 21762,
@@ -511,7 +511,7 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
-	enum class SystemError
+	enum class SystemError : std::int32_t
 	{
 		UnknownSystemError = 22017
 	};
@@ -566,7 +566,7 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
-	enum class ZlibError
+	enum class ZlibError : std::int32_t
 	{
 		EndOfStream = 22273,
 		IncompleteLengthSet = 22274,
@@ -673,7 +673,7 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
-	enum class ModManagementError
+	enum class ModManagementError : std::int32_t
 	{
 		AlreadySubscribed = 22529,
 		InstallOrUpdateCancelled = 22530,
@@ -756,7 +756,7 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
-	enum class ModValidationError
+	enum class ModValidationError : std::int32_t
 	{
 		ModDirectoryNotFound = 22785,
 		NoFilesFoundForMod = 22786
@@ -815,7 +815,7 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
-	enum class MonetizationError
+	enum class MonetizationError : std::int32_t
 	{
 		AccountLacksEntitlement = 23041,
 		DisplayPriceIncorrect = 23042,
@@ -918,7 +918,7 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
-	enum class ParentalControlRestriction
+	enum class ParentalControlRestriction : std::int32_t
 	{
 		ParentalControlRestriction = 23297
 	};
@@ -973,7 +973,7 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
-	enum class MetricsError
+	enum class MetricsError : std::int32_t
 	{
 		NoModsInSession = 23553,
 		SessionAlreadyInitialized = 23554,
@@ -1044,7 +1044,7 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
-	enum class PremiumFeaturesError
+	enum class PremiumFeaturesError : std::int32_t
 	{
 		FeatureNotEnabled = 23809
 	};
@@ -1099,7 +1099,7 @@ namespace Modio
 		return ec == RawErrorValue;
 	}
 
-	enum class ApiError
+	enum class ApiError : std::int32_t
 	{
 		APIKeyForTestOnly = 11017,
 		APIKeyHasNoGame = 11016,

@@ -44,17 +44,17 @@
     (zlib format), rfc1951 (deflate format) and rfc1952 (gzip format).
 */
 
-#ifndef BOOST_BEAST_ZLIB_DETAIL_BITSTREAM_HPP
-#define BOOST_BEAST_ZLIB_DETAIL_BITSTREAM_HPP
+#ifndef MODIO_ZLIB_DETAIL_BITSTREAM_HPP
+#define MODIO_ZLIB_DETAIL_BITSTREAM_HPP
 
 
 #include <cstdint>
 #include <iterator>
 #include <cassert>
 
-namespace boost {
-namespace beast {
-namespace zlib {
+namespace Modio {
+namespace Detail {
+namespace Zlib {
 namespace detail {
 
 class bitstream
@@ -205,8 +205,8 @@ rewind(BidirIt& it)
 }
 
 } // detail
-} // zlib
-} // beast
-} // boost
+} // Zlib
+} // Detail
+} // Modio
 
 #endif

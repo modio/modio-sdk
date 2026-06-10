@@ -22,7 +22,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Enum representing the current state of a mod
-	enum class ModState
+	enum class ModState : std::int32_t
 	{
 		InstallationPending,
 		Installed,
@@ -129,113 +129,113 @@ namespace Modio
 		/// @brief Constructor creating a ModCollection entry for the specified mod profile. Sets the default state to
 		/// InstallationPending
 		/// @param ProfileData Mod profile to create a collection entry for
-		MODIO_IMPL ModCollectionEntry(Modio::ModInfo ProfileData, std::string CalculatedModPath);
+		MODIOSDK_API ModCollectionEntry(Modio::ModInfo ProfileData, std::string CalculatedModPath);
 
 		/// @docinternal
 		/// @brief ModCollectionEntry copy constructor
-		MODIO_IMPL ModCollectionEntry(const Modio::ModCollectionEntry& Other);
+		MODIOSDK_API ModCollectionEntry(const Modio::ModCollectionEntry& Other);
 
 		/// @docnone
-		MODIO_IMPL Modio::ModCollectionEntry& operator=(const Modio::ModCollectionEntry& Other);
+		MODIOSDK_API Modio::ModCollectionEntry& operator=(const Modio::ModCollectionEntry& Other);
 
 		/// @docinternal
 		/// @brief Gets the number of retries remaining this session
 		/// @returns Integer number of retries remaining
-		MODIO_IMPL std::uint8_t GetRetriesRemaining();
+		MODIOSDK_API std::uint8_t GetRetriesRemaining();
 
 		/// @docinternal
 		/// @brief Updates the associated profile data in the collection entry, marks the mod as requiring an update if
 		/// necessary
 		/// @param ProfileData New profile data
-		MODIO_IMPL void UpdateModProfile(Modio::ModInfo ProfileData);
+		MODIOSDK_API void UpdateModProfile(Modio::ModInfo ProfileData);
 
 		/// @docinternal
 		/// @brief Increases the local user subscription count for the associated mod
 		/// @return the new number of local user subscriptions
-		MODIO_IMPL std::uint8_t AddLocalUserSubscription(Modio::Optional<Modio::User> User);
+		MODIOSDK_API std::uint8_t AddLocalUserSubscription(Modio::Optional<Modio::User> User);
 
 		/// @docinternal
 		/// @brief Decrements the local user subscription count for the associated mod. Use with care - this
 		/// subscription count is used to determine if a mod requires uninstallation from local storage
 		/// @return The updated user subscription count
-		MODIO_IMPL std::uint8_t RemoveLocalUserSubscription(Modio::Optional<Modio::User> User);
+		MODIOSDK_API std::uint8_t RemoveLocalUserSubscription(Modio::Optional<Modio::User> User);
 
 		/// @docinternal
 		/// @brief Updates the state of the associated mod - this is used by the mod management subsystem to determine
 		/// if a mod requires install/uninstall/update
 		/// @param NewState The new state the mod should have
-		MODIO_IMPL void SetModState(Modio::ModState NewState);
+		MODIOSDK_API void SetModState(Modio::ModState NewState);
 
 		/// @docinternal
 		/// @brief Marks the mod as having encountered an error that means installation or updates should not be
 		/// reattempted this session
-		MODIO_IMPL void MarkModNoRetryThisSession();
+		MODIOSDK_API void MarkModNoRetryThisSession();
 
 		/// @docinternal
 		/// @brief Updates the error status on this mod and internal variables determining if the mod should have the
 		/// relevant operation retried
-		MODIO_IMPL void SetLastError(Modio::ErrorCode Reason);
+		MODIOSDK_API void SetLastError(Modio::ErrorCode Reason);
 
 		/// @docinternal
 		/// @brief Clears the no retry flag - this probably won't ever get called but may if we want to retry everything
 		/// after free space has been made or something similar
 		/// We could probably do something cleaner with logic about which types of errors occurred and more selectively
 		/// clear flags, but that can wait until the error code overhaul.
-		MODIO_IMPL void ClearModNoRetry();
+		MODIOSDK_API void ClearModNoRetry();
 
 		/// @docinternal
 		/// @brief Fetches the retry flag for this mod
 		/// @return if the mod's last error was one that permits retries
-		MODIO_IMPL bool ShouldRetry();
+		MODIOSDK_API bool ShouldRetry();
 
 		/// @docinternal
 		/// @return Modio::ModState enum representing current state of the mod
-		MODIO_IMPL Modio::ModState GetModState() const;
+		MODIOSDK_API Modio::ModState GetModState() const;
 
 		/// @docinternal
 		/// @return Mod ID
-		MODIO_IMPL Modio::ModID GetID() const;
+		MODIOSDK_API Modio::ModID GetID() const;
 
 		/// @docinternal
 		/// @return Modio::ModInfo containing mod profile data
-		MODIO_IMPL const Modio::ModInfo& GetModProfile() const;
+		MODIOSDK_API const Modio::ModInfo& GetModProfile() const;
 
 		/// @docinternal
 		/// @return Path to the mod's installation folder on disk
 		/// NOTE: If the mod is not yet installed this path may not yet exist. Check
 		/// @doc_xref{ModCollectionEntry::GetModState} before trying to load files in this location
-		MODIO_IMPL std::string GetPath() const;
+		MODIOSDK_API std::string GetPath() const;
 
 		/// @docinternal
 		/// @return Size on disk of the mod
-		MODIO_IMPL Modio::FileSize GetRawSizeOnDisk() const;
+		MODIOSDK_API Modio::FileSize GetRawSizeOnDisk() const;
 
 		/// @docinternal
 		/// @return Size on disk if the mod has been installed, or empty optional if installation is in progress
-		MODIO_IMPL Modio::Optional<Modio::FileSize> GetSizeOnDisk() const;
+		MODIOSDK_API Modio::Optional<Modio::FileSize> GetSizeOnDisk() const;
 
 		/// @docinternal
 		/// @return The local user subscriptions
-		MODIO_IMPL std::set<Modio::UserID> GetLocalUserSubscriptions() const;
+		MODIOSDK_API std::set<Modio::UserID> GetLocalUserSubscriptions() const;
 
 		/// @docinternal
 		/// @return The reason for never retrying
-		MODIO_IMPL Modio::ErrorCode GetNeverRetryReason() const;
+		MODIOSDK_API Modio::ErrorCode GetNeverRetryReason() const;
 
 		/// @docinternal
 		/// @brief Updates the size of the mod on disk in the collection entry. Called by the archive extraction code on
 		/// successful extraction/installation
 		/// @param NewSize The total size on disk of all files in the mod
-		MODIO_IMPL void UpdateSizeOnDisk(Modio::FileSize NewSize);
+		MODIOSDK_API void UpdateSizeOnDisk(Modio::FileSize NewSize);
 
 		/// @docinternal
 		/// @brief Updates the path of the mod on disk in the collection entry. 
 		/// @param NewPath The new path for the mod
-		MODIO_IMPL void UpdateModPath(std::string NewPath);
+		MODIOSDK_API void UpdateModPath(std::string NewPath);
 
 		/// @docinternal
 		/// @return Modio::ErrorCode The last error that occurred for this mod
-		MODIO_IMPL Modio::ErrorCode GetLastError() const;
+		MODIOSDK_API Modio::ErrorCode GetLastError() const;
 
 		/// @docinternal
 		/// @brief If the conditions are met, it starts a transaction over the ModCollectionEntry
@@ -256,7 +256,7 @@ namespace Modio
 
 		/// @docpublic
 		/// @brief Enum representing which state the currently processing mod is in
-		enum class EModProgressState
+		enum class EModProgressState : std::int32_t
 		{
 			Initializing, // Download information is being retrieved from mod.io servers
 			Downloading, // Mod archive is downloading from mod.io servers
@@ -397,36 +397,36 @@ namespace Modio
 	public:
 		/// @docinternal
 		/// @brief Constructs an empty subscription list
-		MODIO_IMPL BaseModList();
+		MODIOSDK_API BaseModList();
 
 		/// @docinternal
 		/// @brief Constructs a User subscription list by copying Mod IDs from the provided vector
 		/// @param NewIDs The source Mod IDs to use
-		MODIO_IMPL BaseModList(std::vector<Modio::ModID> NewIDs);
+		MODIOSDK_API BaseModList(std::vector<Modio::ModID> NewIDs);
 
 		/// @docinternal
 		/// @brief Constructs a User subscription list by consuming Mod IDs from the provided vector
 		/// @param NewIDs The source Mod IDs to use
-		MODIO_IMPL BaseModList(std::vector<Modio::ModID>&& NewIDs);
+		MODIOSDK_API BaseModList(std::vector<Modio::ModID>&& NewIDs);
 
 		/// @docinternal
 		/// @brief Adds a new mod to the subscription list
 		/// @param Mod Mod info object to add
 		/// @return True if the mod was added, false if already in the list
-		MODIO_IMPL bool AddMod(Modio::ModInfo Mod);
+		MODIOSDK_API bool AddMod(Modio::ModInfo Mod);
 
 		/// @docinternal
 		/// @brief Removes a mod from the subscription list
 		/// @param Mod Mod ID to remove from the list
-		MODIO_IMPL void RemoveMod(Modio::ModID Mod);
+		MODIOSDK_API void RemoveMod(Modio::ModID Mod);
 
 		/// @docinternal
 		/// @brief Retrieve a set of ModID
-		MODIO_IMPL const std::set<Modio::ModID>& Get() const;
+		MODIOSDK_API const std::set<Modio::ModID>& Get() const;
 
 		/// @docinternal
 		/// @brief Retrieve a set of ModID
-		MODIO_IMPL std::set<Modio::ModID>& Get();
+		MODIOSDK_API std::set<Modio::ModID>& Get();
 
 		/// @docnone
 		friend bool operator==(const Modio::BaseModList& A, const Modio::BaseModList& B)
@@ -443,7 +443,7 @@ namespace Modio
 	/// @docpublic
 	/// @brief Enum indicating if a mod was added or removed when calculating the difference of two user
 	/// subscription lists
-	enum class UserSubscriptionListChangeType
+	enum class UserSubscriptionListChangeType : std::int32_t
 	{
 		Added,
 		Removed,
@@ -466,7 +466,7 @@ namespace Modio
 		/// @param Updated The updated list of subscriptions
 		/// @return Map containing all CHANGED mod IDs, with ChangeType indicating if the change was an addition or
 		/// removal
-		MODIO_IMPL static std::map<Modio::ModID, Modio::UserSubscriptionListChangeType> CalculateChanges(
+		MODIOSDK_API static std::map<Modio::ModID, Modio::UserSubscriptionListChangeType> CalculateChanges(
 			const Modio::UserSubscriptionList& Original,
 			const Modio::UserSubscriptionList& Updated);
 
@@ -475,7 +475,7 @@ namespace Modio
 		/// @param Baseline List of mods comming from the mod.io service
 		/// @param Collection List of current subscriptions
 		/// @return Map containing all mod ID that have updates in their ModInfo
-		MODIO_IMPL static std::map<Modio::ModID, Modio::UserSubscriptionListChangeType> CalculateUpdates(
+		MODIOSDK_API static std::map<Modio::ModID, Modio::UserSubscriptionListChangeType> CalculateUpdates(
 			const Modio::ModInfoList& Baseline,
 			const Modio::ModCollection& Collection);
 	};
@@ -551,62 +551,62 @@ namespace Modio
 		/// @docinternal
 		/// @brief Cloning constructor
 		/// @param Entries Raw entries from another mod collection
-		MODIO_IMPL ModCollection(std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> Entries);
+		MODIOSDK_API ModCollection(std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> Entries);
 
 		/// @docinternal
 		/// @brief Default constructor
-		MODIO_IMPL ModCollection() : ModEntries() {}
+		MODIOSDK_API ModCollection() : ModEntries() {}
 		/// @docpublic
 		/// @brief Retrieve a ModCollection given a UserSubscriptionList
 		/// @param UserSubscriptions patterns that would entitle a filter
 		/// @return ModCollection filled with patterns from UserSubscriptions or empty if nothing is found
-		MODIO_IMPL const Modio::ModCollection FilterByUserSubscriptions(const Modio::UserSubscriptionList& UserSubscriptions) const;
+		MODIOSDK_API const Modio::ModCollection FilterByUserSubscriptions(const Modio::UserSubscriptionList& UserSubscriptions) const;
 
 		/// @docpublic
 		/// @brief Either inserts a mod into the collection or updates its associated profile
 		/// @param ModToAdd The mod to insert or update
 		/// @param CalculatedModPath The new path to the mod on disk
 		/// @return True of mod was inserted, false if mod was updated
-		MODIO_IMPL bool AddOrUpdateMod(Modio::ModInfo ModToAdd, std::string CalculatedModPath);
+		MODIOSDK_API bool AddOrUpdateMod(Modio::ModInfo ModToAdd, std::string CalculatedModPath);
 
 		/// @docpublic
 		/// @brief Updates a mod in the collection if it exists, otherwise does nothing
 		/// @param ModToUpdate The mod to update
 		/// @param CalculatedModPath The new path to the mod on disk
 		/// @return True of mod was updated, false if mod was not present
-		MODIO_IMPL bool UpdateMod(Modio::ModInfo ModToUpdate, std::string CalculatedModPath);
+		MODIOSDK_API bool UpdateMod(Modio::ModInfo ModToUpdate, std::string CalculatedModPath);
 
 		/// @docpublic
 		/// @brief Updates the mod path in the mod collection if it exists, otherwise does nothing
 		/// @param ModToUpdate The mod to update
 		/// @param CalculatedModPath The new path to the mod on disk
 		/// @return True of mod was updated, false if mod was not present
-		MODIO_IMPL bool UpdateModPath(Modio::ModID ModToUpdate, std::string CalculatedModPath);
+		MODIOSDK_API bool UpdateModPath(Modio::ModID ModToUpdate, std::string CalculatedModPath);
 
 		/// @docpublic
 		/// @brief Retrieve a dictionary of ModID - ModCollectionEntry stored in this ModCollection
 		/// @return Dictionary where keys are ModID and values are ModCollectionEntry
-		MODIO_IMPL const std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& Entries() const;
+		MODIOSDK_API const std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& Entries() const;
 
 		/// @docpublic
 		/// @brief Retrieve a dictionary of ModID - ModCollectionEntry stored in this ModCollection
 		/// @return Dictionary where keys are ModID and values are ModCollectionEntry
-		MODIO_IMPL std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& Entries();
+		MODIOSDK_API std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& Entries();
 
 		/// @docpublic
 		/// @brief Retrieve a single ModCollectionEntry if one is found using a ModID
 		/// @return A ModCollectionEntry when the ModCollection finds it using a ModID, otherwise empty
-		MODIO_IMPL Modio::Optional<Modio::ModCollectionEntry&> GetByModID(Modio::ModID ModId) const;
+		MODIOSDK_API Modio::Optional<Modio::ModCollectionEntry&> GetByModID(Modio::ModID ModId) const;
 
 		/// @docpublic
 		/// @brief Remove a ModCollectionEntry inside the ModCollection indexed by ModID
 		/// @return True when the mod was found and removed, otherwise false
-		MODIO_IMPL bool RemoveMod(Modio::ModID ModId, bool bForce = false);
+		MODIOSDK_API bool RemoveMod(Modio::ModID ModId, bool bForce = false);
 
 		/// @docpublic
 		/// @brief Retrieved a sorted ModCollectionEntry vector by priority
 		/// @return Vector with ModCollectionEntry
-		MODIO_IMPL std::vector<std::shared_ptr<Modio::ModCollectionEntry>> SortEntriesByRetryPriority() const;
+		MODIOSDK_API std::vector<std::shared_ptr<Modio::ModCollectionEntry>> SortEntriesByRetryPriority() const;
 
 		/// @docnone
 		friend bool operator==(const Modio::ModCollection& A, const Modio::ModCollection& B)
@@ -647,13 +647,7 @@ namespace Modio
 		/// @brief Adds a new entry to the event log. If a given mod ID has an existing entry, this replaces it,
 		/// effectively updating it.
 		/// @param Entry The entry to add
-		MODIO_IMPL void AddEntry(Modio::ModManagementEvent Entry);
-
-		/// @docpublic
-		/// @brief Updates the error/status code for a given Mod ID in the log
-		/// @param ID The mod to update
-		/// @param ec The new status code
-		void UpdateStatusCode(Modio::ModID ID, Modio::ErrorCode ec);
+		MODIOSDK_API void AddEntry(Modio::ModManagementEvent Entry);
 
 		/// @docpublic
 		/// @brief Clears the log of events

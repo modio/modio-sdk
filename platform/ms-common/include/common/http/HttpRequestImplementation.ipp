@@ -72,3 +72,13 @@ Modio::Optional<std::string> HttpRequestImplementation::GetHeaderValue(std::stri
 
 	return {};
 }
+
+std::vector<std::pair<std::string, std::string>> HttpRequestImplementation::GetAllHeaders()
+{
+	std::vector<std::pair<std::string, std::string>> Result;
+	for (const auto& Hdr : ResponseHeaders)
+	{
+		Result.emplace_back(Hdr.first, Hdr.second);
+	}
+	return Result;
+}

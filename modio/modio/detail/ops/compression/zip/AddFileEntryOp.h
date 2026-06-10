@@ -51,7 +51,7 @@ namespace Modio
 					std::make_unique<Modio::Detail::File>(SourceFilePath, Modio::Detail::FileMode::ReadOnly, false);
 				OutputFile = std::make_unique<Modio::Detail::File>(ArchiveFile->FilePath,
 																   Modio::Detail::FileMode::ReadWrite, false);
-				CompressionStream = std::make_unique<boost::beast::zlib::deflate_stream>();
+				CompressionStream = std::make_unique<Modio::Detail::Zlib::deflate_stream>();
 				FileName = Modio::ToModioString(PathInsideArchive.generic_u8string());
 				InputFileSize = InputFile->GetFileSize();
 				IsZip64 = InputFileSize >= (UINT32_MAX - 1);
@@ -141,7 +141,7 @@ namespace Modio
 							CompressedOutputBuffer = Modio::Detail::Buffer(MaxBytesToRead + 100);
 							CompressionState.avail_out = CompressedOutputBuffer.GetSize();
 							CompressionState.next_out = CompressedOutputBuffer.Data();
-							CompressionStream->write(CompressionState, boost::beast::zlib::Flush::none, ec);
+							CompressionStream->write(CompressionState, Modio::Detail::Zlib::Flush::none, ec);
 							if (ec && ec != Modio::ZlibError::EndOfStream)
 							{
 								Self.complete(ec);
@@ -221,7 +221,7 @@ namespace Modio
 						CompressedOutputBuffer = Modio::Detail::Buffer(ChunkOfBytes);
 						CompressionState.avail_out = CompressedOutputBuffer.GetSize();
 						CompressionState.next_out = CompressedOutputBuffer.Data();
-						CompressionStream->write(CompressionState, boost::beast::zlib::Flush::finish, ec);
+						CompressionStream->write(CompressionState, Modio::Detail::Zlib::Flush::finish, ec);
 						if (ec && ec != Modio::ZlibError::EndOfStream)
 						{
 							Self.complete(ec);
@@ -329,8 +329,8 @@ namespace Modio
 			}
 
 		private:
-			boost::beast::zlib::z_params CompressionState;
-			std::unique_ptr<boost::beast::zlib::deflate_stream> CompressionStream;
+			Modio::Detail::Zlib::z_params CompressionState;
+			std::unique_ptr<Modio::Detail::Zlib::deflate_stream> CompressionStream;
 			std::shared_ptr<Modio::Detail::ArchiveFileImplementation> ArchiveFile;
 			std::unique_ptr<Modio::Detail::File> InputFile;
 			std::unique_ptr<Modio::Detail::File> OutputFile;

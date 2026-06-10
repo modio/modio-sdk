@@ -15,6 +15,7 @@
 #include "modio/core/entities/ModioModInfo.h"
 #include "modio/core/entities/ModioPagedResult.h"
 #include "modio/core/entities/ModioLogo.h"
+#include <algorithm>
 
 namespace Modio
 {

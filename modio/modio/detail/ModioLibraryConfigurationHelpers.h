@@ -10,8 +10,14 @@
 
 #pragma once
 
+#include "modio/detail/HedleyWrapper.h"
+
 #ifndef MODIO_SEPARATE_COMPILATION
 	#define MODIOSDK_API inline
+#elif defined(MODIO_DLL_EXPORT)
+	#define MODIOSDK_API HEDLEY_PUBLIC
+#elif defined(MODIO_DLL_IMPORT)
+	#define MODIOSDK_API HEDLEY_IMPORT
 #else
 	#define MODIOSDK_API
 #endif

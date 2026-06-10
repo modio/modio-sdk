@@ -142,7 +142,7 @@ namespace Modio
 			return Get().bRateLimited;
 		}
 
-		Modio::ModCollection& SDKSessionData::GetSystemModCollection()
+		MODIOSDK_API Modio::ModCollection& SDKSessionData::GetSystemModCollection()
 		{
 			return Get().SystemModCollection;
 		}
@@ -157,7 +157,7 @@ namespace Modio
 			return Get().TempModSet;
 		}
 
-		Modio::ModCollection SDKSessionData::FilterSystemModCollectionByUserSubscriptions()
+		MODIOSDK_API Modio::ModCollection SDKSessionData::FilterSystemModCollectionByUserSubscriptions()
 		{
 			MODIO_PROFILE_SCOPE(FilterSystemModsByUserSubs);
 			return Get().SystemModCollection.FilterByUserSubscriptions(Get().UserData.UserSubscriptions);

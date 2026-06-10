@@ -36,7 +36,7 @@ namespace Modio
 	{
 		/// @docinternal
 		/// @brief Enum with HTTP verbs
-		enum class Verb
+		enum class Verb : std::int32_t
 		{
 			GET,
 			POST,
@@ -47,7 +47,7 @@ namespace Modio
 
 		/// @docinternal
 		/// @brief Enum for HTTP content types
-		enum class ContentType
+		enum class ContentType : std::int32_t
 		{
 			None, // Represents no content type specified
 			ApplicationJson, // application/json
@@ -96,7 +96,7 @@ namespace Modio
 
 		/// @docinternal
 		/// @brief Enum with the API version in use
-		enum class APIVersion
+		enum class APIVersion : std::int32_t
 		{
 			V1
 		};

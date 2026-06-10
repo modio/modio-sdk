@@ -198,6 +198,11 @@ namespace Modio
 	/// @brief Checks if the automatic management process is currently installing or removing mods
 	/// @return True if automatic management is currently performing an operation
 	MODIOSDK_API bool IsModManagementBusy();
+	
+	/// @docpublic
+	/// @brief Checks to see if the automatic management process is currently enabled
+	/// @return True if automatic management is currently enabled
+	MODIOSDK_API bool IsModManagementEnabled();
 
 	/// @docpublic
 	/// @brief Prioritizes the specified mod for upload, install, or update.  The priority mod will be processed

@@ -44,16 +44,16 @@
     (zlib format), rfc1951 (deflate format) and rfc1952 (gzip format).
 */
 
-#ifndef BOOST_BEAST_ZLIB_INFLATE_STREAM_HPP
-#define BOOST_BEAST_ZLIB_INFLATE_STREAM_HPP
+#ifndef MODIO_ZLIB_INFLATE_STREAM_HPP
+#define MODIO_ZLIB_INFLATE_STREAM_HPP
 
 
 #include "modio/detail/compression/zlib/detail/inflate_stream.hpp"
 #include "modio/detail/ModioProfiling.h"
 
-namespace boost {
-namespace beast {
-namespace zlib {
+namespace Modio {
+namespace Detail {
+namespace Zlib {
 
 /** Raw deflate stream decompressor.
 
@@ -224,8 +224,8 @@ public:
     }
 };
 
-} // zlib
-} // beast
-} // boost
+} // Zlib
+} // Detail
+} // Modio
 
 #endif

@@ -12,6 +12,7 @@
 
 #include <thread>
 #include "modio/detail/hedley.h"
+#include <thread>
 
 #ifndef MODIO_NODISCARD
 	#define MODIO_NODISCARD HEDLEY_WARN_UNUSED_RESULT
@@ -45,7 +46,7 @@
 	#if MODIO_DISABLE_ALL_DEPRECATIONS
 		#define MODIO_DEPRECATED(...)
 	#else
-		#define MODIO_DEPRECATED(Since, Replacement) HEDLEY_DEPRECATED_FOR(Since,Replacement)
+		#define MODIO_DEPRECATED(Since, Replacement) HEDLEY_DEPRECATED_FOR(Since, Replacement)
 	#endif
 #endif
 

@@ -36,16 +36,16 @@ namespace Modio
 		public:
 			/// @docinternal
 			/// @brief Default constructor
-			MODIO_IMPL explicit LogService(ModioAsio::io_context& IOService);
+			MODIOSDK_API explicit LogService(ModioAsio::io_context& IOService);
 			LogService(LogService&&) = delete;
 
 			using implementation_type = std::shared_ptr<Modio::Detail::LoggerImplementation>;
 
-			MODIO_IMPL void construct(implementation_type& Implementation);
-			MODIO_IMPL void destroy(implementation_type& Implementation);
+			MODIOSDK_API void construct(implementation_type& Implementation);
+			MODIOSDK_API void destroy(implementation_type& Implementation);
 
 			/// @brief Turn off the log service
-			MODIO_IMPL void Shutdown();
+			MODIOSDK_API void Shutdown();
 
 			/// @brief Change the LogLevel of the log service
 			MODIO_IMPL void SetLogLevel(LogLevel Level);

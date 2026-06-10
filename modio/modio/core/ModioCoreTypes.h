@@ -19,7 +19,7 @@ namespace Modio
 {
 	/// @docpublic
 	/// @brief Enum representing what environment your game is deployed in
-	enum class Environment
+	enum class Environment : std::int32_t
 	{
 		Test,
 		Live
@@ -36,7 +36,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Enum representing the store or service your game is being distributed through
-	enum class Portal
+	enum class Portal : std::int32_t
 	{
 		None,
 		Apple,
@@ -62,7 +62,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Enum representing the platform(s) that a modfile is enabled for
-	enum class ModfilePlatform
+	enum class ModfilePlatform : std::int32_t
 	{
 		Windows,
 		Mac,
@@ -77,7 +77,8 @@ namespace Modio
 		Oculus,
 		Source,
 		WindowsServer,
-		LinuxServer
+		LinuxServer,
+		Switch2
 	};
 
 	/// @docnone
@@ -752,7 +753,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Enum representing the languages mod.io support responses in
-	enum class Language
+	enum class Language : std::int32_t
 	{
 		English,
 		Bulgarian,
@@ -779,7 +780,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Simple struct to encapsulate data passed to external authentication systems
-	enum class AuthenticationProvider
+	enum class AuthenticationProvider : std::int32_t
 	{
 		XboxLive,
 		Steam,
@@ -808,7 +809,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief Degree of severity for the log output
-	enum class LogLevel
+	enum class LogLevel : std::int32_t
 	{
 		Trace = 0, ///< Detailed low-level debugging output. Not intended for general use
 		Detailed = 1, ///< Detailed but not low-level. Generally useful for some mid-level information for debugging.
@@ -819,7 +820,7 @@ namespace Modio
 
 	/// @docpublic
 	/// @brief The category of the log message (usually the internal service the message is originating from)
-	enum class LogCategory
+	enum class LogCategory : std::int32_t
 	{
 		Core,
 		File,
@@ -851,7 +852,7 @@ namespace Modio
 
 	///	@brief File approval status to filter by. Passed in ExtendedInitializationParameters for the duration of a
 	/// session.
-	enum class PlatformStatus
+	enum class PlatformStatus : std::int32_t
 	{
 		LiveAndPending,
 		PendingOnly,
@@ -868,7 +869,7 @@ namespace Modio
 
 	/// @docpublic
 	///	@brief Type of entitlement
-	enum class EntitlementType
+	enum class EntitlementType : std::int32_t
 	{
 		VirtualCurrency = 0,
 		SKU = 1
@@ -938,7 +939,7 @@ namespace Modio
 		/// @param Location The type of storage to get the quota for.
 		/// @return `Modio::Optional<Modio::FileSize>` of the storage quota in bytes for the specified
 		/// `Modio::StorageLocation`. Empty if no quota is set.
-		static MODIO_IMPL Modio::Optional<Modio::FileSize> GetQuota(Modio::StorageLocation Location);
+		static MODIOSDK_API Modio::Optional<Modio::FileSize> GetQuota(Modio::StorageLocation Location);
 
 		/// @docnone
 		friend MODIO_IMPL void SetSpace(Modio::StorageInfo& Info, Modio::StorageLocation Location,
@@ -955,7 +956,7 @@ namespace Modio
 	{
 		/// @docinternal
 		/// @brief The read/write access of a file
-		enum class FileMode
+		enum class FileMode : std::int32_t
 		{
 			ReadOnly,
 			ReadWrite
@@ -963,16 +964,16 @@ namespace Modio
 
 		/// @docnone
 		///	@brief Transform the PlatformStatus to its query parameter string for appending to requests
-		std::string ToString(Modio::PlatformStatus Status);
+		MODIOSDK_API std::string ToString(Modio::PlatformStatus Status);
 
 		/// @docnone
 		/// @brief Transform a Language to its two letter string representation
-		std::string ToString(Modio::Language Locale);
+		MODIOSDK_API std::string ToString(Modio::Language Locale);
 
 		/// @docinternal
 		/// @brief Transform an Authentication Provider to its string representation which
 		/// match the backend list of supported platforms
-		std::string ToString(Modio::AuthenticationProvider Provider);
+		MODIOSDK_API std::string ToString(Modio::AuthenticationProvider Provider);
 
 	} // namespace Detail
 } // namespace Modio

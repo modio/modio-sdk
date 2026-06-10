@@ -44,16 +44,16 @@
     (zlib format), rfc1951 (deflate format) and rfc1952 (gzip format).
 */
 
-#ifndef BOOST_BEAST_ZLIB_DETAIL_WINDOW_HPP
-#define BOOST_BEAST_ZLIB_DETAIL_WINDOW_HPP
+#ifndef MODIO_ZLIB_DETAIL_WINDOW_HPP
+#define MODIO_ZLIB_DETAIL_WINDOW_HPP
 
 #include <cstdint>
 #include <cstring>
 #include <memory>
 
-namespace boost {
-namespace beast {
-namespace zlib {
+namespace Modio {
+namespace Detail {
+namespace Zlib {
 namespace detail {
 
 class window
@@ -152,8 +152,8 @@ public:
 };
 
 } // detail
-} // zlib
-} // beast
-} // boost
+} // Zlib
+} // Detail
+} // Modio
 
 #endif

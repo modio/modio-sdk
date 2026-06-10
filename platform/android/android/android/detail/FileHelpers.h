@@ -20,7 +20,7 @@ namespace Modio
 	{
 		/// @docinternal
 		/// @brief Used to give context when translating android error codes to differentiate shared codes
-		enum class FilesystemErrorContext
+		enum class FilesystemErrorContext : std::int32_t
 		{
 			File,
 			Directory

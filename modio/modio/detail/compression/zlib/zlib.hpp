@@ -44,15 +44,15 @@
     (zlib format), rfc1951 (deflate format) and rfc1952 (gzip format).
 */
 
-#ifndef BOOST_BEAST_ZLIB_ZLIB_HPP
-#define BOOST_BEAST_ZLIB_ZLIB_HPP
+#ifndef MODIO_ZLIB_ZLIB_HPP
+#define MODIO_ZLIB_ZLIB_HPP
 
 #include <cstdint>
 #include <cstdlib>
 
-namespace boost {
-namespace beast {
-namespace zlib {
+namespace Modio {
+namespace Detail {
+namespace Zlib {
 
 #if !defined(__MACTYPES__)
 using Byte = unsigned char; // 8 bits
@@ -184,9 +184,9 @@ enum class Strategy
     fixed
 };
 
-} // zlib
-} // beast
-} // boost
+} // Zlib
+} // Detail
+} // Modio
 
 #endif
 

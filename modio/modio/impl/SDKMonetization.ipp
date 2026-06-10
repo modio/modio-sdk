@@ -36,7 +36,8 @@
 
 namespace Modio
 {
-	void PurchaseModAsync(Modio::ModID ModID, Modio::Optional<std::uint64_t> ExpectedVirtualCurrencyPrice,
+	MODIOSDK_API void PurchaseModAsync(
+		Modio::ModID ModID, Modio::Optional<std::uint64_t> ExpectedVirtualCurrencyPrice,
 						  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([ModID, ExpectedVirtualCurrencyPrice,
@@ -49,7 +50,7 @@ namespace Modio
 		});
 	}
 
-	void PurchaseModWithEntitlementAsync(
+	MODIOSDK_API void PurchaseModWithEntitlementAsync(
 		Modio::ModID ModID, Modio::EntitlementParams Params,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)> Callback)
 	{
@@ -127,7 +128,7 @@ namespace Modio
 		});
 	}
 
-	void RefreshUserEntitlementsAsync(
+	MODIOSDK_API void RefreshUserEntitlementsAsync(
 		Modio::EntitlementParams Params,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)> Callback)
 	{
@@ -204,7 +205,7 @@ namespace Modio
 		});
 	}
 
-	void GetAvailableUserEntitlementsAsync(
+	MODIOSDK_API void GetAvailableUserEntitlementsAsync(
 		Modio::EntitlementParams Params,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)> Callback)
 	{
@@ -281,7 +282,8 @@ namespace Modio
 		});
 	}
 
-	void GetUserWalletBalanceAsync(std::function<void(Modio::ErrorCode, Modio::Optional<std::uint64_t>)> Callback)
+	MODIOSDK_API void GetUserWalletBalanceAsync(
+		std::function<void(Modio::ErrorCode, Modio::Optional<std::uint64_t>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) &&
@@ -292,7 +294,7 @@ namespace Modio
 		});
 	}
 
-	void FetchUserPurchasesAsync(std::function<void(Modio::ErrorCode)> OnFetchDone)
+	MODIOSDK_API void FetchUserPurchasesAsync(std::function<void(Modio::ErrorCode)> OnFetchDone)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([OnFetchDone = std::move(OnFetchDone)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(OnFetchDone) &&
@@ -304,7 +306,7 @@ namespace Modio
 		});
 	}
 
-	std::map<Modio::ModID, Modio::ModInfo> QueryUserPurchasedMods()
+	MODIOSDK_API std::map<Modio::ModID, Modio::ModInfo> QueryUserPurchasedMods()
 	{
 		auto Lock = Modio::Detail::SDKSessionData::GetReadLock();
 		if (Modio::Detail::SDKSessionData::IsInitialized())
@@ -319,7 +321,7 @@ namespace Modio
 		}
 	}
 
-	void GetUserDelegationTokenAsync(std::function<void(Modio::ErrorCode, std::string)> Callback)
+	MODIOSDK_API void GetUserDelegationTokenAsync(std::function<void(Modio::ErrorCode, std::string)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) &&

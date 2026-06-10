@@ -20,7 +20,7 @@ namespace Modio
 		class ArchiveFileImplementation
 		{
 		public:
-			enum class CompressionMethod : uint16_t
+			enum class CompressionMethod : std::uint16_t
 			{
 				Store = 0,
 				Deflate = 8

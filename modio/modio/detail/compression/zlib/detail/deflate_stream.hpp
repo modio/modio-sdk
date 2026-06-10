@@ -44,8 +44,8 @@
 	(zlib format), rfc1951 (deflate format) and rfc1952 (gzip format).
 */
 
-#ifndef BOOST_BEAST_ZLIB_DETAIL_DEFLATE_STREAM_HPP
-#define BOOST_BEAST_ZLIB_DETAIL_DEFLATE_STREAM_HPP
+#ifndef MODIO_ZLIB_DETAIL_DEFLATE_STREAM_HPP
+#define MODIO_ZLIB_DETAIL_DEFLATE_STREAM_HPP
 
 #include "modio/detail/ModioCompilerMacros.h"
 MODIO_DISABLE_WARNING_PUSH
@@ -61,12 +61,12 @@ MODIO_DISABLE_WARNING_UNSAFE_BUFFER_USAGE
 #include <cstring>
 #include <memory>
 
-namespace boost
+namespace Modio
 {
-	namespace beast
-	{
-		namespace zlib
-		{
+namespace Detail
+{
+namespace Zlib
+{
 			namespace detail
 			{
 
@@ -678,9 +678,9 @@ namespace boost
 				}
 
 			} // namespace detail
-		} // namespace zlib
-	} // namespace beast
-} // namespace boost
+} // namespace Zlib
+} // namespace Detail
+} // namespace Modio
 
 MODIO_DISABLE_WARNING_POP
 

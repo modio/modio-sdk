@@ -35,7 +35,7 @@ namespace Modio
 			MODIO_IMPL std::size_t GetAlignment() const;
 
 			MODIO_IMPL Buffer(std::size_t Size, std::size_t Alignment = 1);
-			MODIO_IMPL ~Buffer();
+			MODIOSDK_API ~Buffer();
 			Buffer(Buffer&& Source) noexcept
 				: InternalData(std::move(Source.InternalData)),
 				  Alignment(std::move(Source.Alignment)),

@@ -30,7 +30,7 @@ namespace Modio
 	///	* 512 = Allow mods to be edited on web
 	///	* 1024 = Allow mod dependencies
 	///	* 2048 = Allow comments on guides
-	enum class GameCommunityOptions : uint32_t
+	enum class GameCommunityOptions : std::uint32_t
 	{
 		None = 0,
 		EnableComments = 1,

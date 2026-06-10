@@ -17,19 +17,19 @@
 // Official repository: https://github.com/boostorg/beast
 //
 
-#ifndef BOOST_BEAST_ZLIB_DEFLATE_STREAM_HPP
-#define BOOST_BEAST_ZLIB_DEFLATE_STREAM_HPP
+#ifndef MODIO_ZLIB_DEFLATE_STREAM_HPP
+#define MODIO_ZLIB_DEFLATE_STREAM_HPP
 
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/compression/zlib/detail/deflate_stream.hpp"
 #include <cstring>
 
-namespace boost
+namespace Modio
 {
-	namespace beast
-	{
-		namespace zlib
-		{
+namespace Detail
+{
+namespace Zlib
+{
 
 			// This is a derivative work based on Zlib, copyright below:
 			/*
@@ -374,8 +374,8 @@ namespace boost
 				return bytes + ((bytes + 7) >> 3) + ((bytes + 63) >> 6) + 5 + 6;
 			}
 
-		} // namespace zlib
-	} // namespace beast
-} // namespace boost
+} // namespace Zlib
+} // namespace Detail
+} // namespace Modio
 
 #endif

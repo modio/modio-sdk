@@ -12,11 +12,12 @@
 
 #include "modio/core/ModioTemporaryModSet.h"
 #include "modio/detail/ModioSDKSessionData.h"
+#include "modio/detail/ops/FetchExternalUpdates.h"
 #include "modio/detail/ops/mod/SubmitNewModFileOp.h"
 #include "modio/detail/ops/mod/SubmitNewModSourceFileOp.h"
 #include "modio/detail/ops/modmanagement/InstallOrUpdateMod.h"
+#include "modio/detail/ops/modmanagement/PromoteTempModOp.h"
 #include "modio/detail/ops/modmanagement/UninstallMod.h"
-#include "modio/detail/ops/FetchExternalUpdates.h"
 
 #include <asio/yield.hpp>
 namespace Modio
@@ -56,13 +57,7 @@ namespace Modio
 								{
 									if (ModEntry->ShouldRetry())
 									{
-										// Dont uninstall mod yet if it is still in TempModSet
-										if ((Modio::Detail::SDKSessionData::GetTemporaryModSet() != nullptr &&
-											 Modio::Detail::SDKSessionData::GetTemporaryModSet()->ContainsModId(
-												 ModEntry->GetID())) == false)
-										{
-											EntryToProcess = ModEntry;
-										}
+										EntryToProcess = ModEntry;
 									}
 								}
 							}
@@ -153,8 +148,8 @@ namespace Modio
 								{
 									Modio::ModState CurrentState = ModEntry->GetModState();
 
-
-									Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::ModManagement,
+									Modio::Detail::Logger().Log(Modio::LogLevel::Trace,
+																Modio::LogCategory::ModManagement,
 																"Checking {} state: {}", ModEntry->GetID(),
 																Modio::ModStateToString(CurrentState));
 
@@ -164,7 +159,7 @@ namespace Modio
 										if (ModEntry->ShouldRetry())
 										{
 											EntryToProcess = ModEntry;
-											//break;
+											// break;
 										}
 									}
 								}
@@ -188,6 +183,43 @@ namespace Modio
 														   ? Modio::ModManagementEvent::EventType::BeginInstall
 														   : Modio::ModManagementEvent::EventType::BeginUpdate,
 													   {}});
+
+						// Check if the mod is a temp mod for promotion
+						if (Modio::Detail::SDKSessionData::GetTemporaryModSet() &&
+							Modio::Detail::SDKSessionData::GetTemporaryModSet()->ContainsModId(
+								EntryToProcess->GetID()) &&
+							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().DirectoryExists(
+								Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+									.GetTempModRootInstallationPath() /
+								std::to_string(EntryToProcess->GetID())))
+						{
+							yield Modio::Detail::PromoteTempModAsync(EntryToProcess->GetID(), false, std::move(Self));
+							if (ec)
+							{
+								EntryToProcess->SetLastError(ec);
+								Self.complete(ec);
+								return;
+							}
+
+							EntryToProcess->SetModState(Modio::ModState::Installed);
+
+							Modio::Detail::SDKSessionData::GetModManagementEventLog().AddEntry(
+								Modio::ModManagementEvent {EntryToProcess->GetID(),
+														   PendingModState.value() ==
+																   Modio::ModState::InstallationPending
+															   ? Modio::ModManagementEvent::EventType::Installed
+															   : Modio::ModManagementEvent::EventType::Updated,
+														   {}});
+
+							Modio::Detail::Logger().Log(Modio::LogLevel::Info, Modio::LogCategory::ModManagement,
+														"Mod {} promoted from temp mod set, skipping download",
+														EntryToProcess->GetID());
+
+							yield Modio::Detail::SaveModCollectionToStorageAsync(std::move(Self));
+
+							Self.complete({});
+							return;
+						}
 						// Does this need to be a separate operation or could we provide a parameter to specify
 						// we only want to update if it's already installed or something?
 						yield Modio::Detail::InstallOrUpdateModAsync(EntryToProcess->GetID(), IsTempModSelected,

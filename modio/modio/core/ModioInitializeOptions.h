@@ -21,7 +21,7 @@ namespace Modio
 	{
 		/// @docpublic
 		/// @brief Default constructor that sets all variables to an invalid base value
-		MODIO_IMPL InitializeOptions();
+		MODIOSDK_API InitializeOptions();
 
 		/// @docpublic
 		/// @brief Explicit and preferred constructor with the necessary variables to store
@@ -30,7 +30,7 @@ namespace Modio
 		/// @param GameEnvironment The mod.io environment to use, listed in the enumeration Modio::Environment
 		/// @param PortalInUse The service portal to use, listed in the enumeration Modio::Portal
 		/// @param LocalSessionIdentifier A unique identifier for the local session. This local session can have a single mod.io user account associated with it.
-		MODIO_IMPL explicit InitializeOptions(Modio::GameID GameID, Modio::ApiKey APIKey,
+		MODIOSDK_API explicit InitializeOptions(Modio::GameID GameID, Modio::ApiKey APIKey,
 											  Modio::Environment GameEnvironment, Modio::Portal PortalInUse,
 											  Modio::UserHandleType LocalSessionIdentifier);
 

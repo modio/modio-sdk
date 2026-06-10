@@ -43,7 +43,8 @@ namespace Modio
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer,
 						Modio::Detail::SubscribeToModRequest.SetGameID(GameID).SetModID(ModId).AddQueryParamRaw(
-							Modio::Detail::Constants::QueryParamStrings::IncludeDependecies, (IncludeDependencies ? "true" : "false")),
+							Modio::Detail::Constants::QueryParamStrings::IncludeDependecies,
+							(IncludeDependencies ? "true" : "false")),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 
 					if (Modio::ErrorCodeMatches(ec, Modio::ErrorConditionTypes::UserNotAuthenticatedError))
@@ -80,9 +81,9 @@ namespace Modio
 						Services::GetGlobalService<CacheService>().AddToCache(ProfileData.value());
 						Modio::Detail::SDKSessionData::GetSystemModCollection().AddOrUpdateMod(
 							ProfileData.value(),
-							Modio::ToModioString(
-								Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
-									.MakeModPath(ProfileData->ModId).u8string()));
+							Modio::ToModioString(Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+													 .MakeModPath(ProfileData->ModId)
+													 .u8string()));
 						// Returns true if this is a new subscription for the user
 						if (Modio::Detail::SDKSessionData::GetUserSubscriptions().AddMod(ProfileData.value()))
 						{
@@ -111,8 +112,9 @@ namespace Modio
 														"Already subscribed to mod {}", ModId);
 						}
 					}
+
 					yield Modio::Detail::SaveModCollectionToStorageAsync(std::move(Self));
-					// probably should be in the true branch of the if statement above
+					//  probably should be in the true branch of the if statement above
 					yield Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>()
 						.SaveUserDataToStorageAsync(std::move(Self));
 					// No need to check return from SaveUserData, because the subscription is successful regardless of
@@ -137,8 +139,8 @@ namespace Modio
 		{
 			return ModioAsio::async_compose<SubscribeCompleteCallback, void(Modio::ErrorCode)>(
 				Modio::Detail::SubscribeToModOp(Modio::Detail::SDKSessionData::CurrentGameID(),
-												Modio::Detail::SDKSessionData::CurrentAPIKey(),
-												ModToSubscribeTo, IncludeDependencies),
+												Modio::Detail::SDKSessionData::CurrentAPIKey(), ModToSubscribeTo,
+												IncludeDependencies),
 				OnSubscribeComplete, Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	} // namespace Detail

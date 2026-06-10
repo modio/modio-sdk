@@ -23,7 +23,7 @@ namespace Modio
 	///	* 1024 = Allow mod dependencies
 	///	* 8192 = Enable Collections
 	///	* 16384 = Enable Collection Comments
-	enum class ModCommunityOptions : uint32_t
+	enum class ModCommunityOptions : std::uint32_t
 	{
 		None = 0,
 		EnableComments = 1,

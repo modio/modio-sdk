@@ -17,7 +17,7 @@ namespace Modio
 {
 	struct InitializeOptions;
 	class MODIO_NODISCARD ErrorCode;
-	enum class LogLevel;
+	enum class LogLevel : std::int32_t;
 	struct ModID;
 	struct GameID;
 	struct ModCollectionID;
@@ -29,7 +29,7 @@ namespace Modio
 	class ModCollectionEntry;
 	struct User;
 	struct AuthenticationParams;
-	enum class AuthenticationProvider;
+	enum class AuthenticationProvider : std::int32_t;
 	struct Terms;
 	struct ModCreationHandle;
 	class CreateModParams;
@@ -50,7 +50,7 @@ namespace Modio
 	struct GameInfo;
 	class GameInfoList;
 	class UserList;
-	enum class Language;
+	enum class Language : std::int32_t;
 
 	struct UserRatingList;
 	struct TransactionRecord;
@@ -61,11 +61,11 @@ namespace Modio
 	struct ServerInitializeOptions;
 	class ModCollectionInfoList;
 	struct ModCollectionInfo;
-	enum class UserSubscriptionListChangeType;
+	enum class UserSubscriptionListChangeType : std::int32_t;
 	enum class AvatarSize : std::uint8_t;
 	enum class LogoSize : std::uint8_t;
 	enum class GallerySize : std::uint8_t;
-	enum class Rating : int8_t;
+	enum class Rating : std::int8_t;
 
 	/// @docpublic
 	/// @brief nullable wrapper around object of type T. Used by async functions that return values - empty on function

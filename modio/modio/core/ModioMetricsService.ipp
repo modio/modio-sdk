@@ -27,13 +27,13 @@ namespace Modio
 {
 	namespace Detail
 	{
-		void MetricsService::InitMetricsSession(const std::string& SecretKeyString)
+		MODIOSDK_API void MetricsService::InitMetricsSession(const std::string& SecretKeyString)
 		{
 			SecretKey = SecretKeyString;
 			bIsInitialized = true;
 		}
 
-		void MetricsService::StartSessionAsync(Modio::MetricsSessionParams Params,
+		MODIOSDK_API void MetricsService::StartSessionAsync(Modio::MetricsSessionParams Params,
 											   std::function<void(Modio::ErrorCode)> Callback)
 		{
 			SessionId = Params.SessionId;
@@ -42,23 +42,23 @@ namespace Modio
 			Modio::Detail::MetricsSessionStartOpAsync(Callback);
 		}
 
-		void MetricsService::SendHeartbeatOnceAsync(std::function<void(Modio::ErrorCode)> Callback)
+		MODIOSDK_API void MetricsService::SendHeartbeatOnceAsync(std::function<void(Modio::ErrorCode)> Callback)
 		{
 			Modio::Detail::MetricsSessionSendHeartbeatOnceOpAsync(Callback);
 		}
 
-		void MetricsService::SendHeartbeatAtIntervalAsync(uint32_t IntervalSeconds,
+		MODIOSDK_API void MetricsService::SendHeartbeatAtIntervalAsync(uint32_t IntervalSeconds,
 														  std::function<void(Modio::ErrorCode)> Callback)
 		{
 			Modio::Detail::MetricsSessionSendHeartbeatAtIntervalOpAsync(IntervalSeconds, Callback);
 		}
 
-		void MetricsService::EndSessionAsync(std::function<void(Modio::ErrorCode)> Callback)
+		MODIOSDK_API void MetricsService::EndSessionAsync(std::function<void(Modio::ErrorCode)> Callback)
 		{
 			Modio::Detail::MetricsSessionEndOpAsync(Callback);
 		}
 
-		void MetricsService::SetSessionIsActive(bool bActive)
+		MODIOSDK_API void MetricsService::SetSessionIsActive(bool bActive)
 		{
 			Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::ModMetrics,
 										"Setting metrics session to {}", (bActive ? "active" : "inactive"));
@@ -107,12 +107,12 @@ namespace Modio
 			ModIdsString.shrink_to_fit();
 		}
 
-		bool MetricsService::GetSessionIsActive() const
+		MODIOSDK_API bool MetricsService::GetSessionIsActive() const
 		{
 			return bIsSessionActive;
 		}
 
-		Modio::Guid MetricsService::GetSessionId() const
+		MODIOSDK_API Modio::Guid MetricsService::GetSessionId() const
 		{
 			if (!SessionId.has_value())
 			{
@@ -121,22 +121,22 @@ namespace Modio
 			return SessionId.value();
 		}
 
-		std::vector<Modio::ModID> MetricsService::GetModIds() const
+		MODIOSDK_API std::vector<Modio::ModID> MetricsService::GetModIds() const
 		{
 			return ModIds;
 		}
 
-		std::string MetricsService::GetSecretKey() const
+		MODIOSDK_API std::string MetricsService::GetSecretKey() const
 		{
 			return SecretKey;
 		}
 
-		bool MetricsService::ContainsModId(Modio::ModID Id) const
+		MODIOSDK_API bool MetricsService::ContainsModId(Modio::ModID Id) const
 		{
 			return std::find(ModIds.begin(), ModIds.end(), Id) != ModIds.end();
 		}
 
-		MetricsSessionStartParams MetricsService::GenerateSessionStartParams()
+		MODIOSDK_API MetricsSessionStartParams MetricsService::GenerateSessionStartParams()
 		{
 			MetricsSessionStartParams Request;
 
@@ -160,7 +160,7 @@ namespace Modio
 			return Request;
 		}
 
-		MetricsSessionHeartbeatParams MetricsService::GenerateSessionHeartbeatParams()
+		MODIOSDK_API MetricsSessionHeartbeatParams MetricsService::GenerateSessionHeartbeatParams()
 		{
 			MetricsSessionHeartbeatParams Request;
 			CurrentSessionOrderId++;
@@ -178,7 +178,7 @@ namespace Modio
 			return Request;
 		}
 
-		MetricsSessionEndParams MetricsService::GenerateSessionEndParams()
+		MODIOSDK_API MetricsSessionEndParams MetricsService::GenerateSessionEndParams()
 		{
 			CurrentSessionOrderId++;
 
@@ -198,7 +198,7 @@ namespace Modio
 			return Request;
 		}
 
-		time_t MetricsService::GetSessionDuration() const
+		MODIOSDK_API time_t MetricsService::GetSessionDuration() const
 		{
 			if (!GetSessionIsActive())
 			{

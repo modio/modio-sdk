@@ -44,8 +44,8 @@
     (zlib format), rfc1951 (deflate format) and rfc1952 (gzip format).
 */
 
-#ifndef BOOST_BEAST_ZLIB_DETAIL_INFLATE_STREAM_IPP
-#define BOOST_BEAST_ZLIB_DETAIL_INFLATE_STREAM_IPP
+#ifndef MODIO_ZLIB_DETAIL_INFLATE_STREAM_IPP
+#define MODIO_ZLIB_DETAIL_INFLATE_STREAM_IPP
 
 #ifdef MODIO_SEPARATE_COMPILATION
 #include "modio/detail/compression/zlib/detail/inflate_stream.hpp"
@@ -57,9 +57,9 @@
 #include <array>
 #include <limits>
 
-namespace boost {
-namespace beast {
-namespace zlib {
+namespace Modio {
+namespace Detail {
+namespace Zlib {
 namespace detail {
 
 void
@@ -1135,8 +1135,8 @@ inflate_fast(ranges& r, Modio::ErrorCode& ec)
 }
 
 } // detail
-} // zlib
-} // beast
-} // boost
+} // Zlib
+} // Detail
+} // Modio
 
 #endif

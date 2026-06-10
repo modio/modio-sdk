@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *  
+ *
  */
 
 //
@@ -44,15 +44,12 @@
     (zlib format), rfc1951 (deflate format) and rfc1952 (gzip format).
 */
 
-#ifndef BOOST_BEAST_ZLIB_ERROR_HPP
-#define BOOST_BEAST_ZLIB_ERROR_HPP
+#ifndef MODIO_ZLIB_ERROR_HPP
+#define MODIO_ZLIB_ERROR_HPP
 
-#include <boost/beast/core/detail/config.hpp>
-#include <boost/beast/core/error.hpp>
-
-namespace boost {
-namespace beast {
-namespace zlib {
+namespace Modio {
+namespace Detail {
+namespace Zlib {
 
 /** Error codes returned by the deflate codecs.
 */
@@ -138,11 +135,8 @@ enum class error
     general
 };
 
-} // zlib
-} // beast
-} // boost
-
-#include <boost/beast/zlib/impl/error.hpp>
+} // Zlib
+} // Detail
+} // Modio
 
 #endif
-

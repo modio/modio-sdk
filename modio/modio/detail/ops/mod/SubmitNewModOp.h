@@ -61,7 +61,7 @@ namespace Modio
 				if (Params.MaturityRating)
 				{
 					SubmitParams = SubmitParams.AppendPayloadValue(
-						"maturity_option", fmt::format("{}", static_cast<std::uint8_t>(Params.MaturityRating.value())));
+						"maturity_option", fmt::format("{}", Params.MaturityRating.value().RawValue()));
 				}
 
 				if (Params.CommunityOptions)
