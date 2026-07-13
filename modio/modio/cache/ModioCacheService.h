@@ -100,7 +100,6 @@ namespace Modio
 				std::unordered_map<std::int64_t, Modio::ModCollectionInfo> ModCollectionInfoCache;
 				std::unordered_map<std::int64_t, Modio::GameInfo> GameInfoCache;
 				std::unordered_map<std::int64_t, std::vector<Modio::ModID>> ModInfoListCache;
-				std::unordered_map<std::int64_t, std::vector<Modio::ModCollectionID>> ModCollectionInfoListCache;
 				std::unordered_map<std::int64_t, ModDependencyFilesizeEntry> ModDependenciesFilesize;
 			};
 

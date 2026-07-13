@@ -99,6 +99,21 @@ You must add `MODIO_SEPARATE_COMPILATION` to your project's compiler definitions
 
 Add the `inc` directory inside `static` to your `include` and link against the static binary in the `lib` folder.  You must add `MODIO_SEPARATE_COMPILATION` to your project's compiler definitions. Then, in `your_project` source file add `#include "modio/ModioSDK.h"`
 
+##### Dynamic library mode (unsupported)
+
+The SDK can optionally be built as a dynamic/shared library (`modioShared`) that exports the C++ API. This is **not** a supported integration path and is **disabled by default** - header-only, separate compilation, and static library modes remain the recommended ways to consume the SDK.
+
+:::warning
+The dynamic library carries **no API or ABI stability guarantees** whatsoever. The exported interface is the C++ API, which is sensitive to the compiler, compiler version, standard library, and build settings used. A binary built from one SDK version (or toolchain) is not guaranteed to be compatible with any other. Use at your own risk.
+:::
+
+To opt in, pass `-DMODIO_BUILD_DYNAMIC_LIBRARY=ON` at configure time, then build the `modioShared` target explicitly (it is excluded from the default build):
+
+```zsh
+cmake -S <modio-sdk folder> --preset=win -DMODIO_BUILD_DYNAMIC_LIBRARY=ON
+cmake --build <modio-sdk folder>/out/build/win --target modioShared
+```
+
 ### Other Build Systems
 
 If you use a different build system or wish to generate project files for inclusion in an existing Visual Studio solution, you can override the default CMake generator. For example, it is possible to use an MSBuild-based Visual Studio Solution via `make -S <modio-sdk folder> --preset=win -G "Visual Studio 17 2022"`. This will produce a VS Solution file in `out\build\win`.

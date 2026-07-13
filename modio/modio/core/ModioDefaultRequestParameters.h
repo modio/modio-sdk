@@ -64,6 +64,7 @@ namespace Modio
         static const HttpRequestParams GetCollectionModsRequest { Modio::Detail::Verb::GET, "/games/{game-id}/collections/{collection-id}/mods" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams UnsubscribeFromCollectionModsRequest { Modio::Detail::Verb::DELETE, "/games/{game-id}/collections/{collection-id}/subscriptions" }; 
         static const HttpRequestParams SubscribeToCollectionModsRequest { Modio::Detail::Verb::POST, "/games/{game-id}/collections/{collection-id}/subscriptions" }; 
+        static const HttpRequestParams GetCookRunnersRequest { Modio::Detail::Verb::GET, "/games/{game-id}/cook-runners" }; 
         static const HttpRequestParams BrowseGameCooksRequest { Modio::Detail::Verb::GET, "/games/{game-id}/cooks" }; 
         static const HttpRequestParams GetGuidesRequest { Modio::Detail::Verb::GET, "/games/{game-id}/guides" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AddGuideRequest { Modio::Detail::Verb::POST, "/games/{game-id}/guides" , GetContentTypeEnum("multipart/form-data") }; 
@@ -177,6 +178,8 @@ namespace Modio
         static const HttpRequestParams S2sTransactionCommitRequest { Modio::Detail::Verb::POST, "/s2s/transactions/commit" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams S2sTransactionIntentRequest { Modio::Detail::Verb::POST, "/s2s/transactions/intent" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetUserPublicProfileRequest { Modio::Detail::Verb::GET, "/users/{user-id}" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
+        static const HttpRequestParams UnblockAUserRequest { Modio::Detail::Verb::DELETE, "/users/{user-id}/block" }; 
+        static const HttpRequestParams BlockAUserRequest { Modio::Detail::Verb::POST, "/users/{user-id}/block" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetUserProfileCollectionsRequest { Modio::Detail::Verb::GET, "/users/{user-id}/collections" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetUserFollowersRequest { Modio::Detail::Verb::GET, "/users/{user-id}/followers" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams BulkUnfollowUsersRequest { Modio::Detail::Verb::DELETE, "/users/{user-id}/following" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 

@@ -192,33 +192,33 @@ namespace Modio
 		/// @return Modio::ModState enum representing current state of the mod
 		MODIOSDK_API Modio::ModState GetModState() const;
 
-		/// @docinternal
+		/// @docpublic
 		/// @return Mod ID
 		MODIOSDK_API Modio::ModID GetID() const;
 
-		/// @docinternal
+		/// @docpublic
 		/// @return Modio::ModInfo containing mod profile data
 		MODIOSDK_API const Modio::ModInfo& GetModProfile() const;
 
-		/// @docinternal
+		/// @docpublic
 		/// @return Path to the mod's installation folder on disk
 		/// NOTE: If the mod is not yet installed this path may not yet exist. Check
-		/// @doc_xref{ModCollectionEntry::GetModState} before trying to load files in this location
+		/// @doc_xref\{ModCollectionEntry::GetModState} before trying to load files in this location
 		MODIOSDK_API std::string GetPath() const;
 
-		/// @docinternal
+		/// @docpublic
 		/// @return Size on disk of the mod
 		MODIOSDK_API Modio::FileSize GetRawSizeOnDisk() const;
 
-		/// @docinternal
+		/// @docpublic
 		/// @return Size on disk if the mod has been installed, or empty optional if installation is in progress
 		MODIOSDK_API Modio::Optional<Modio::FileSize> GetSizeOnDisk() const;
 
-		/// @docinternal
+		/// @docpublic
 		/// @return The local user subscriptions
 		MODIOSDK_API std::set<Modio::UserID> GetLocalUserSubscriptions() const;
 
-		/// @docinternal
+		/// @docpublic
 		/// @return The reason for never retrying
 		MODIOSDK_API Modio::ErrorCode GetNeverRetryReason() const;
 
@@ -233,7 +233,7 @@ namespace Modio
 		/// @param NewPath The new path for the mod
 		MODIOSDK_API void UpdateModPath(std::string NewPath);
 
-		/// @docinternal
+		/// @docpublic
 		/// @return Modio::ErrorCode The last error that occurred for this mod
 		MODIOSDK_API Modio::ErrorCode GetLastError() const;
 

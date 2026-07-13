@@ -69,6 +69,36 @@ else ()
 	target_link_libraries(${MODIO_TARGET_NAME} INTERFACE fmt-header-only)
 endif()
 
+# Unsupported dynamic/shared library build.(enable with -DMODIO_BUILD_DYNAMIC_LIBRARY=ON).
+# The public dynamic library exports the C++ API only and makes no API/ABI
+# stability guarantees.
+if (MODIO_BUILD_DYNAMIC_LIBRARY)
+#only create the shared library target if it wasn't already created by a toolchain file in order to set toolchain-specific properties
+if (NOT TARGET ${MODIO_TARGET_NAME}Shared)
+	add_library(${MODIO_TARGET_NAME}Shared SHARED EXCLUDE_FROM_ALL ${CMAKE_CURRENT_LIST_DIR}/modio/detail/ModioSDKSharedLibrary.cpp)
+else()
+	target_sources(${MODIO_TARGET_NAME}Shared PRIVATE ${CMAKE_CURRENT_LIST_DIR}/modio/detail/ModioSDKSharedLibrary.cpp)
+endif()
+
+
+set_target_properties(${MODIO_TARGET_NAME}Shared PROPERTIES LINKER_LANGUAGE CXX)
+
+add_modio_implementation_to_target(${MODIO_TARGET_NAME}Shared)
+target_compile_definitions(${MODIO_TARGET_NAME}Shared PUBLIC -DMODIO_SEPARATE_COMPILATION=1 -DMODIO_NO_HEADER_ONLY -DMODIO_DLL_IMPORT=1)
+#Suppress internal deprecations
+target_compile_definitions(${MODIO_TARGET_NAME}Shared PRIVATE -DMODIO_DISABLE_ALL_DEPRECATIONS -DMODIO_DLL_EXPORT=1)
+
+target_link_libraries(${MODIO_TARGET_NAME}Shared PUBLIC ${MODIO_TARGET_NAME})
+get_target_property(modio_headers ${MODIO_TARGET_NAME} PUBLIC_HEADER)
+set_property(TARGET ${MODIO_TARGET_NAME}Shared PROPERTY PUBLIC_HEADER ${modio_headers})
+#install (TARGETS ${MODIO_TARGET_NAME}Shared ARCHIVE RUNTIME PUBLIC_HEADER DESTINATION include)
+
+
+if (MODIO_DYNAMIC_LIB_SUFFIX)
+message(STATUS "Setting dynamic lib suffix")
+set_target_properties(${MODIO_TARGET_NAME}Shared PROPERTIES SUFFIX ${MODIO_DYNAMIC_LIB_SUFFIX})
+endif()
+endif()
 
 add_library(${MODIO_TARGET_NAME}Static STATIC)
 

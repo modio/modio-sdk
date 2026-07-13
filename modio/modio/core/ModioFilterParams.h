@@ -221,9 +221,9 @@ namespace Modio
 		std::vector<Modio::ModID> IncludedIDs {};
 		std::vector<Modio::ModID> ExcludedIDs {};
 
-		Modio::Optional<RevenueFilterType> Revenue {};
+		Modio::Optional<Modio::FilterParams::RevenueFilterType> Revenue {};
 
-		Modio::Optional<MaturityOption> Maturity {};
+		Modio::Optional<Modio::MaturityOption> Maturity {};
 
 		Modio::Optional<std::string> MetadataBlobSearchString {};
 

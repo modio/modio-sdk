@@ -11,11 +11,8 @@
 #pragma once
 
 #include "macos/HttpSharedState.h"
-#include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/detail/AsioWrapper.h"
-#include "modio/file/ModioFile.h"		
-#include "modio/file/ModioFileService.h"
 #include <memory>
 #include <string>
 
@@ -27,22 +24,23 @@ namespace Modio
 		class InitializeHttpOp
 		{
 		public:
-			InitializeHttpOp(std::string UserAgentString, std::shared_ptr<Modio::Detail::HttpSharedState> SharedState)
+			InitializeHttpOp(std::string UserAgentString,
+							 std::shared_ptr<Modio::Detail::HttpSharedState> SharedState)
 				: SharedState(SharedState)
-			{}
+			{
+				this->SharedState->UserAgentString = std::move(UserAgentString);
+			}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
 				reenter(CoroutineState)
 				{
-					Modio::ErrorCode SharedInitStatus = SharedState->Initialize();
-					if (SharedInitStatus)
+					if (Modio::ErrorCode InitStatus = SharedState->Initialize())
 					{
-						Self.complete(Modio::make_error_code(Modio::HttpError::HttpNotInitialized));
+						Self.complete(InitStatus);
 						return;
 					}
-
 					Self.complete({});
 				}
 			}

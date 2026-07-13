@@ -48,6 +48,19 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #Global definition of the library target name so it can be referenced in platform tests, etc, and to ease renaming if it becomes necessary
 set (MODIO_TARGET_NAME modio CACHE STRING "")
 
+# Opt-in, UNSUPPORTED dynamic/shared library build (modioShared). Off by default.
+# Enable with -DMODIO_BUILD_DYNAMIC_LIBRARY=ON. The dynamic library exports the
+# C++ API only and carries NO API/ABI stability guarantees across SDK versions,
+# compilers, or compiler settings. modioStatic and the header-only build remain
+# the supported integration paths.
+option(MODIO_BUILD_DYNAMIC_LIBRARY "Build the unsupported modioShared dynamic library (no API/ABI stability guarantees)" OFF)
+
+set(MODIO_BUILD_DYNAMIC_LIBRARY ON)
+
+if(MODIO_BUILD_TESTS)
+	add_subdirectory(tests EXCLUDE_FROM_ALL)
+endif()
+
 
 include(cmake/initialise-platform.cmake)
 

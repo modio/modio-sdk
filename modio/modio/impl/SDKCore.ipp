@@ -29,6 +29,11 @@
 
 namespace Modio
 {
+	MODIOSDK_API bool ErrorCodeMatches(const Modio::ErrorCode& ec, Modio::ErrorConditionTypes Type)
+	{
+		return ec == make_error_condition(Type);
+	}
+
 	MODIOSDK_API void InitializeAsync(Modio::InitializeOptions InitOptions,
 									 std::function<void(Modio::ErrorCode)> OnInitComplete)
 	{

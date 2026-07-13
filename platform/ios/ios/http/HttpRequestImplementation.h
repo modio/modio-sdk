@@ -11,60 +11,35 @@
 #pragma once
 
 #include "httpparser/response.h"
+#include "ios/AppleHttpRequest.h"
 #include "modio/detail/ModioStringHelpers.h"
 #include "modio/detail/http/IHttpRequestImplementation.h"
 #include "modio/http/ModioHttpParams.h"
 
-#include <CFNetwork/CFNetwork.h>
-#include <CoreFoundation/CoreFoundation.h>
+#include <memory>
 
 struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementation
 {
 	std::uint32_t ResponseCode = 0;
-	/// @brief Temporary buffer for response body data to enable us to handle chunked encoding transparently
-	Modio::Detail::DynamicBuffer ResponseDataBuffer {};
 	httpparser::Response ParsedResponseHeaders {};
 	std::size_t ResponseBodyReceivedLength = 0;
-	std::size_t CurrentChunkSizeRemaining = 0;
 	Modio::Detail::HttpRequestParams Parameters {};
 
-	CFReadStreamRef ReadStream;
-	CFWriteStreamRef WriteStream;
-	CFDataRef HTTPRequestData;
+	// Created by HttpSharedState::InitializeRequest. Holds the NSURLSessionTask
+	// and all Obj-C state. Destructor cancels the task if it's still running.
+	std::unique_ptr<Modio::Detail::Apple::HttpRequest> AppleRequest;
 
 	Modio::Optional<std::size_t> GetContentLength()
 	{
 		Modio::Optional<std::string> Res = GetHeaderValue("Content-Length");
-        
 		if (Res.has_value())
 		{
 			return std::stoull(Res.value());
 		}
-
 		return {};
 	}
 
-	virtual ~HttpRequestImplementation()
-	{
-		if (ReadStream != NULL)
-		{
-			CFReadStreamClose(ReadStream);
-			CFRelease(ReadStream);
-			ReadStream = NULL;
-		}
-
-		if (WriteStream != NULL)
-		{
-			CFWriteStreamClose(WriteStream);
-			CFRelease(WriteStream);
-			WriteStream = NULL;
-		}
-	}
-
-	bool HasBeenSent()
-	{
-		return false;
-	}
+	virtual ~HttpRequestImplementation() = default;
 
 	std::uint32_t GetResponseCode() override
 	{
@@ -88,7 +63,6 @@ struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementat
 		{
 			return Modio::Detail::String::ParseDateOrInt(Res.value());
 		}
-
 		return {};
 	}
 
@@ -101,7 +75,6 @@ struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementat
 				return Hdr.value;
 			}
 		}
-
 		return {};
 	}
 
@@ -115,44 +88,4 @@ struct HttpRequestImplementation : public Modio::Detail::IHttpRequestImplementat
 		return Result;
 	}
 
-	// A boolean to signal if the stream has bytes available to read
-	bool ReadStreamHasBytes()
-	{
-		if (ReadStream == NULL)
-		{
-			return false;
-		}
-
-		return CFReadStreamHasBytesAvailable(ReadStream);
-	}
-
-	CFStreamStatus ReadStreamStatus()
-	{
-		if (ReadStream == NULL)
-		{
-			return kCFStreamStatusNotOpen;
-		}
-
-		return CFReadStreamGetStatus(ReadStream);
-	}
-
-	bool WriteStreamAcceptsBytes()
-	{
-		if (WriteStream == NULL)
-		{
-			return false;
-		}
-
-		return CFWriteStreamCanAcceptBytes(WriteStream);
-	}
-
-	CFStreamStatus WriteStreamStatus()
-	{
-		if (WriteStream == NULL)
-		{
-			return kCFStreamStatusNotOpen;
-		}
-
-		return CFWriteStreamGetStatus(WriteStream);
-	}
 };

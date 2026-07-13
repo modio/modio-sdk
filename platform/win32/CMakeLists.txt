@@ -18,6 +18,14 @@ if(MODIO_PLATFORM STREQUAL "WIN")
 
 	add_subdirectory(win32)
 
+	if (MODIO_BUILD_DYNAMIC_LIBRARY)
+		if (NOT TARGET ${MODIO_TARGET_NAME}Shared)
+			add_library(${MODIO_TARGET_NAME}Shared SHARED EXCLUDE_FROM_ALL)
+		endif()
+		target_compile_definitions(${MODIO_TARGET_NAME}Shared PUBLIC  -DMODIO_DLL_IMPORT=1)
+		target_compile_definitions(${MODIO_TARGET_NAME}Shared PRIVATE -DMODIO_DLL_EXPORT=1)
+		target_link_libraries(${MODIO_TARGET_NAME}Shared PUBLIC "$<$<CONFIG:DEBUG>:msvcrtd.lib>" "$<$<CONFIG:RELEASE>:msvcrt.lib>")
+	endif()
 	
 	
 	add_subdirectory(../ms-common ../ms-common)

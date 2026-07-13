@@ -36,6 +36,7 @@ namespace Modio
 			Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo {};
 
 			Modio::Optional<std::uint64_t> ExpectedFilesize {};
+			Modio::filesystem::path DestinationPath;
 
 			struct DownloadFileImpl
 			{
@@ -57,11 +58,10 @@ namespace Modio
 						   Modio::Detail::OperationQueue::Ticket DownloadTicket,
 						   Modio::Optional<std::weak_ptr<Modio::ModProgressInfo>> ProgressInfo,
 							Modio::Optional<std::uint64_t> Filesize)
-				: ProgressInfo(ProgressInfo)
+				: ProgressInfo(ProgressInfo),
+				  DestinationPath(DestinationPath)
 			{
 				ExpectedFilesize = Filesize;
-				File = std::make_shared<Modio::Detail::File>(DestinationPath += Modio::filesystem::path(".download"),
-															 Modio::Detail::FileMode::ReadWrite, false);
 				// Initialize CurrentFilePosition to 0 - we'll set the actual value after truncate
 				CurrentFilePosition = std::make_shared<std::uintmax_t>(0ULL);
 				// Initialize the request without range header - we'll update it after setting the position
@@ -109,6 +109,9 @@ namespace Modio
 
 				reenter(Coroutine)
 				{
+					File = std::make_shared<Modio::Detail::File>(DestinationPath += Modio::filesystem::path(".download"),
+															  Modio::Detail::FileMode::ReadWrite, false);
+
 					// Initialize file position and perform truncate/seek operations
 					*CurrentFilePosition = File->GetFileSize() - (File->GetFileSize() % (static_cast<std::int64_t>(1024) * 1024));
 

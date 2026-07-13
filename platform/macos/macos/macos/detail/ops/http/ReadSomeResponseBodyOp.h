@@ -11,16 +11,14 @@
 #pragma once
 
 #include "http/HttpRequestImplementation.h"
+#include "macos/AppleHttpRequest.h"
 #include "macos/HttpSharedState.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
 #include "modio/core/ModioServices.h"
 #include "modio/detail/AsioWrapper.h"
-#include "modio/detail/ModioJsonHelpers.h"
-#include <cstdlib>
 #include <memory>
-#include <vector>
 
 namespace Modio
 {
@@ -33,10 +31,6 @@ namespace Modio
 			std::shared_ptr<HttpRequestImplementation> Request {};
 			std::weak_ptr<HttpSharedState> SharedState {};
 			Modio::Detail::DynamicBuffer ResponseBuffer {};
-			// The max size of the temp buffer "ReadChunk"
-			constexpr static signed long ReadChunkSize = 512 * 1024;
-			// A temporal buffer that reads from the CFStream
-			Modio::Detail::Buffer ReadChunk;
 
 		public:
 			ReadSomeResponseBodyOp(std::shared_ptr<HttpRequestImplementation> Request,
@@ -44,23 +38,22 @@ namespace Modio
 								   std::weak_ptr<HttpSharedState> SharedState)
 				: Request(Request),
 				  SharedState(SharedState),
-				  ResponseBuffer(ResponseBuffer),
-				  ReadChunk(ReadChunkSize)
+				  ResponseBuffer(ResponseBuffer)
 			{}
 
 			ReadSomeResponseBodyOp(ReadSomeResponseBodyOp&& Other)
 				: CoroutineState(std::move(Other.CoroutineState)),
 				  Request(std::move(Other.Request)),
 				  SharedState(std::move(Other.SharedState)),
-				  ResponseBuffer(std::move(Other.ResponseBuffer)),
-				  ReadChunk(std::move(Other.ReadChunk))
+				  ResponseBuffer(std::move(Other.ResponseBuffer))
 			{}
 
 			template<typename CoroType>
-			void operator()(CoroType& Self, Modio::ErrorCode ec = {}, std::size_t BytesLastRead = 0)
+			void operator()(CoroType& Self, Modio::ErrorCode ec = {}, std::size_t /*BytesLastRead*/ = 0)
 			{
-				std::shared_ptr<HttpSharedState> PinnedState = SharedState.lock();
+				using State = Modio::Detail::Apple::HttpRequest::State;
 
+				std::shared_ptr<HttpSharedState> PinnedState = SharedState.lock();
 				if (PinnedState == nullptr || PinnedState->IsClosing())
 				{
 					Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
@@ -69,71 +62,41 @@ namespace Modio
 
 				reenter(CoroutineState)
 				{
-					yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(), std::move(Self));
-					/*Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::Http,
-												"Reading response body",
-												Request->GetParameters().GetFormattedResourcePath());*/
+					yield ModioAsio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+										  std::move(Self));
 
-					// Clear out the destination buffer
 					ResponseBuffer.Clear();
 
-					// In case some data remained within Request->ResponseDataBuffer, return those bytes first
-					if (Request->ResponseDataBuffer.size())
+					// Drain up to 512KB at a time
 					{
-						Request->ResponseBodyReceivedLength = Request->ResponseDataBuffer.size();
-						// While we have any prebuffered response data from when we were looking for the response
-						// headers, stuff that data into the response
-
-						while (Modio::Optional<Buffer> PrebufferedResponseData =
-								   Request->ResponseDataBuffer.TakeInternalBuffer())
-						{
-							ResponseBuffer.AppendBuffer(PrebufferedResponseData.take().value());
-						}
+						static constexpr std::size_t MaxDrainBytes = 512 * 1024;
+						std::size_t Drained = Request->AppleRequest->DrainResponseBody(ResponseBuffer, MaxDrainBytes);
+						Request->ResponseBodyReceivedLength += Drained;
 					}
-					// In some cases, it is possible that the ReadStream has not "ended" but the Stream
-					// remains open. If the CFReadStreamRead is called without bytes, it would wait for
-					// a looooong time
-					else if (Request->ReadStreamHasBytes() == true)
-					{
-						// Read bytes into the ResponseDataBuffer
-						CFIndex ReadBytes = CFReadStreamRead(Request->ReadStream, ReadChunk.Data(), ReadChunkSize);
 
-						if (ReadBytes < 0)
+					{
+						State CurrentState = Request->AppleRequest->GetState();
+						if (CurrentState == State::Failed)
 						{
-							Modio::Detail::Logger().Log(
-								Modio::LogLevel::Error, Modio::LogCategory::Http,
-								"ReadSomeResponseBodyOp stream could not be read or an error has ocurred");
-							Self.complete(Modio::make_error_code(Modio::HttpError::RequestError));
+							Modio::ErrorCode Err = Request->AppleRequest->GetError();
+							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::Http,
+														"ReadSomeResponseBodyOp failure: {}", Err.message());
+							Self.complete(Err);
 							return;
 						}
-						// It is possible to read "0" bytes from the Stream, just warn about it but do nothing
-						// as the error below should signal the end of the stream or possibly at the moment
-						// there are no more bytes to read
-						else if (ReadBytes == 0)
+						if (CurrentState == State::Cancelled)
 						{
-							Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Http,
-														"ReadSomeResponseBodyOp stream read 0 bytes");
+							Self.complete(Modio::make_error_code(Modio::GenericError::OperationCanceled));
+							return;
 						}
-						// Only append if it has read more than 1 byte
-						else
+						// EOF: task complete AND nothing left buffered. Signal end-of-file
+						// so the calling code knows the body is fully consumed.
+						if (CurrentState == State::Complete &&
+							!Request->AppleRequest->HasBufferedBody())
 						{
-							BytesLastRead = ReadBytes;
-							Request->ResponseBodyReceivedLength += ReadBytes;
-							ResponseBuffer.AppendBuffer(ReadChunk.CopyRange(0, BytesLastRead));
+							Self.complete(Modio::make_error_code(Modio::GenericError::EndOfFile));
+							return;
 						}
-					}
-
-					// We need to know signal to SDK's upper layers that there are no more bytes available
-					// in the ResponseBody. Using this method, we avoid using the function "HandleChunkedEncoding"
-					if (Request->ReadStreamStatus() == kCFStreamStatusAtEnd)
-					{
-						ec = Modio::make_error_code(Modio::GenericError::EndOfFile);
-					}
-
-					if (ec)
-					{
-						Self.complete(ec);
-						return;
 					}
 
 					Self.complete({});

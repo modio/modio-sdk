@@ -32,7 +32,7 @@ namespace Modio
 			auto ParamIterator = Params.ExtendedParameters.find("service_label");
 			if (ParamIterator != Params.ExtendedParameters.end())
 			{
-				RequestParams = RequestParams.AppendPayloadValue("service_label", ParamIterator->second);
+				RequestParams = RequestParams.AppendPayloadValue("psn_service_label", ParamIterator->second);
 			}
 
 			return ModioAsio::async_compose<

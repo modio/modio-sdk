@@ -1,0 +1,8559 @@
+---
+id: refdocs
+title: C++ Reference Docs
+slug: /cppsdk/refdocs
+sidebar_position: 100
+---
+
+
+## Functions
+
+
+
+
+
+### ToString
+
+
+
+
+
+```cpp
+inline std::string ToString(Modio::MaturityOption option)
+```
+
+Transform an MaturityOption to an std::string
+
+
+
+
+
+
+
+
+
+
+
+### ErrorCodeMatches
+
+
+
+
+
+```cpp
+bool ErrorCodeMatches(const Modio::ErrorCode &ec, Modio::ErrorConditionTypes Type)
+```
+
+Checks to see if the error code matches one of the error condition types (e.g. Network error, Auth Error, etc)
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ec|the error code| 
+|Type|the error category| 
+</RefTable>
+
+#### Returns
+
+true if this error code matches the category
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### InitializeAsync
+
+
+
+
+
+```cpp
+void InitializeAsync(Modio::InitializeOptions InitOptions, std::function<void (Modio::ErrorCode)> OnInitComplete)
+```
+
+Initializes the SDK for the given user. Loads the state of mods installed on the system as well as the set of mods the specified user has installed on this device
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|InitOptions|Parameters to the function packed as a struct where all members needs to be initialized for the call to succeed| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKAlreadyInitialized|SDK already initialized
+|NetworkError|Couldn't connect to the mod.io servers
+|FilesystemError|Couldn't create the user data or common data folders
+|ConfigurationError|InitOptions contains an invalid value - inspect ec.value() to determine what was incorrect
+</RefTable>
+
+
+
+
+
+
+### SetLogLevel
+
+
+
+
+
+```cpp
+void SetLogLevel(Modio::LogLevel Level)
+```
+
+Sets the global logging level - messages with a log level below the specified value will not be displayed
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Level|Value indicating which priority of messages should be included in the log output| 
+</RefTable>
+
+
+
+
+
+### SetLogCallback
+
+
+
+
+
+```cpp
+void SetLogCallback(std::function<void (Modio::LogLevel, const std::string &)> LogCallback)
+```
+
+Provide a callback to handle log messages emitted by the SDK.
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|LogCallback|Callback invoked by the SDK during [`Modio::RunPendingHandlers`](#runpendinghandlers) for each log emitted during that invocation| 
+</RefTable>
+
+
+
+
+
+### RunPendingHandlers
+
+
+
+
+
+```cpp
+void RunPendingHandlers()
+```
+
+Runs any pending SDK work on the calling thread, including invoking any callbacks passed to asynchronous operations. NOTE: This should be called while [`Modio::InitializeAsync`](#initializeasync) and [`Modio::ShutdownAsync`](#shutdownasync) are running, as they both utilize the internal event loop for functionality. NOTE: `RunPendingHandlers` should never be called inside a callback you provide to the SDK. This will result in a deadlock.
+
+
+
+
+
+
+
+### ShutdownAsync
+
+
+
+
+
+```cpp
+void ShutdownAsync(std::function<void (Modio::ErrorCode)> OnShutdownComplete)
+```
+
+Cancels any running internal operations and invokes any pending callbacks with Modio::GenericError::OperationCanceled. This function does not block; you should keep calling Modio::RunPendingHandlers until the callback you provide to this function is invoked. NOTE: `ShutdownAsync` should *never* be called inside a callback you provide to the SDK. This will result in a deadlock.
+
+#### Requirements
+
+* _initialized-sdk_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|OnShutdownComplete|| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+</RefTable>
+
+
+
+
+
+
+### SubscribeToModAsync
+
+
+
+
+
+```cpp
+void SubscribeToModAsync(Modio::ModID ModToSubscribeTo, bool IncludeDependencies, std::function<void (Modio::ErrorCode)> OnSubscribeComplete)
+```
+
+Sends a request to the mod.io server to add the specified mod to the user's list of subscriptions, and marks the mod for local installation by the SDK
+
+#### Requirements
+
+* _initialized-sdk_
+* _authenticated-user_
+* _no-rate-limiting_
+* _management-enabled_
+* _mod-not-pending-uninstall_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModToSubscribeTo|Mod ID of the mod requiring a subscription.| 
+|IncludeDependencies|If this mod has any dependencies, all of those will also be subscribed to.| 
+|OnSubscribeComplete|Callback invoked when the subscription request is completed.| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|ModManagementError::ModBeingProcessed|Specified mod is pending uninstall. Wait until the uninstall process is complete before subscribing again.
+|GenericError::BadParameter|The supplied mod ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod does not exist or was deleted
+</RefTable>
+
+
+
+
+
+
+### UnsubscribeFromModAsync
+
+
+
+
+
+```cpp
+void UnsubscribeFromModAsync(Modio::ModID ModToUnsubscribeFrom, std::function<void (Modio::ErrorCode)> OnUnsubscribeComplete)
+```
+
+Sends a request to the mod.io server to remove the specified mod from the user's list of subscriptions. If no other local users are subscribed to the specified mod this function will also mark the mod for uninstallation by the SDK.
+
+#### Requirements
+
+* _initialized-sdk_
+* _authenticated-user_
+* _no-rate-limiting_
+* _management-enabled_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModToUnsubscribeFrom|Mod ID of the mod requiring unsubscription.| 
+|OnUnsubscribeComplete|Callback invoked when the unsubscription request is completed.| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod does not exist or was deleted
+</RefTable>
+
+
+
+
+
+
+### FetchExternalUpdatesAsync
+
+
+
+
+
+```cpp
+void FetchExternalUpdatesAsync(std::function<void (Modio::ErrorCode)> OnFetchDone)
+```
+
+Synchronises the local list of the current user's subscribed mods with the server. Any mods that have been externally subscribed will be automatically marked for installation, and mods that have been externally removed from the user's subscriptions may be uninstalled if no other local users have a current subscription. Calling this before you call QueryUserSubscriptions, QueryUserInstallations orQuerySystemInstallations will ensure that if the system mod directory has been moved or relocated, those functions will still return correct values.
+
+#### Requirements
+
+* _initialized-sdk_
+* _authenticated-user_
+* _no-rate-limiting_
+* _management-enabled_
+* _fetch-external-updates-not-running_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|OnFetchDone|Callback invoked when the external state has been retrieved and merged with the local data| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::RequestInProgress|FetchExternalUpdates operation is already running.
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### PreviewExternalUpdatesAsync
+
+
+
+
+
+```cpp
+void PreviewExternalUpdatesAsync(std::function<void (Modio::ErrorCode, std::map<Modio::ModID, Modio::UserSubscriptionListChangeType>)> OnPreviewDone)
+```
+
+Retrieve a list of updates between the users local mod state, and the server-side state. This allows you to identify which mods will be modified by the next call to FetchExternalUpdatesAsync in order to perform any content management (such as unloading files) that might be required.
+
+#### Requirements
+
+* _initialized-sdk_
+* _authenticated-user_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|OnPreviewDone|Callback invoked when the external state has been retrieved. It contains a dictionary with ModID as keys and changes as values. Empty when there are no differences between local and the mod.io API service| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### EnableModManagement
+
+
+
+
+
+```cpp
+Modio::ErrorCode EnableModManagement(std::function<void (Modio::ModManagementEvent)> ModManagementHandler)
+```
+
+Enables the automatic management of installed mods on the system based on the user's subscriptions. Does nothing if mod management is currently enabled. Note: this function does not behave like other \"async\" methods, given that its name does not include the word async.
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModManagementHandler|This callback handler will be invoked with a ModManagementEvent for each mod operation performed by the SDK| 
+</RefTable>
+
+#### Returns
+
+Modio::ErrorCode indicating if mod management was enabled successfully
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|ModManagementError::ModManagementAlreadyEnabled|Mod management was already enabled. The mod management callback has not been changed
+</RefTable>
+
+
+
+
+
+
+### DisableModManagement
+
+
+
+
+
+```cpp
+void DisableModManagement()
+```
+
+Disables automatic installation or uninstallation of mods based on the user's subscriptions. Allows currently processing installation to complete; will cancel any pending operations when called.
+
+
+
+
+
+
+
+### IsModManagementBusy
+
+
+
+
+
+```cpp
+bool IsModManagementBusy()
+```
+
+Checks if the automatic management process is currently installing or removing mods
+
+
+
+#### Returns
+
+True if automatic management is currently performing an operation
+
+
+
+
+
+### IsModManagementEnabled
+
+
+
+
+
+```cpp
+bool IsModManagementEnabled()
+```
+
+Checks to see if the automatic management process is currently enabled
+
+
+
+#### Returns
+
+True if automatic management is currently enabled
+
+
+
+
+
+### PrioritizeTransferForMod
+
+
+
+
+
+```cpp
+Modio::ErrorCode PrioritizeTransferForMod(Modio::ModID IDToPrioritize)
+```
+
+Prioritizes the specified mod for upload, install, or update.  The priority mod will be processed immediately after the current upload or install completes (if applicable). Only one mod ID can be prioritized at a time.
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|IDToPrioritize|The ID for the mod to prioritize. This mod must be pending upload, install, or update.| 
+</RefTable>
+
+#### Returns
+
+Error code indicating there is no pending upload, install, or update associated with the provided priority mod ID.
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::BadParameter|The supplied mod ID is invalid or not present in the list of pending operations
+</RefTable>
+
+
+
+
+
+
+### QueryCurrentModUpdate
+
+
+
+
+
+```cpp
+Modio::Optional<Modio::ModProgressInfo> QueryCurrentModUpdate()
+```
+
+Provides progress information for a mod installation or update operation if one is currently in progress.
+
+
+
+#### Returns
+
+Optional ModProgressInfo object containing information regarding the progress of the installation operation.
+
+
+
+
+
+### QueryUserSubscriptions
+
+
+
+
+
+```cpp
+std::map<Modio::ModID, Modio::ModCollectionEntry> QueryUserSubscriptions()
+```
+
+Fetches the local view of the user's subscribed mods, including mods that are subscribed but not yet installed
+
+
+
+#### Returns
+
+std::map using Mod IDs as keys and ModCollectionEntry objects providing information about the subscribed mods
+
+
+
+
+
+### QueryUserInstallations
+
+
+
+
+
+```cpp
+std::map<Modio::ModID, Modio::ModCollectionEntry> QueryUserInstallations(bool bIncludeOutdatedMods)
+```
+
+Fetches the subset of the user's subscribed mods that are installed and therefore ready for loading
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|bIncludeOutdatedMods|Include subscribed mods that are installed but have an updated version on the server that has not yet been installed| 
+</RefTable>
+
+#### Returns
+
+std::map using Mod IDs as keys and ModCollectionEntry objects providing information about the subscribed mods
+
+
+
+
+
+### QuerySystemInstallations
+
+
+
+
+
+```cpp
+std::map<Modio::ModID, Modio::ModCollectionEntry> QuerySystemInstallations()
+```
+
+Fetches all mods installed on the system such that a consuming application can present the information in a UI in order to free up space by uninstalling mods
+
+
+
+#### Returns
+
+std::map using Mod IDs as keys and ModCollectionEntry objects providing information about mods installed on the system regardless of which user installed them
+
+
+
+
+
+### QueryStorageInfo
+
+
+
+
+
+```cpp
+Modio::StorageInfo QueryStorageInfo()
+```
+
+Retrieves a snapshot of current storage related information such as space consumed by mod installations and total available space
+
+
+
+#### Returns
+
+Structure containing storage information
+
+
+
+
+
+### ForceUninstallModAsync
+
+
+
+
+
+```cpp
+void ForceUninstallModAsync(Modio::ModID ModToRemove, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Forcibly uninstalls a mod from the system. This is intended for use when a host application requires more room for a mod that the user wants to install, and as such will return an error if the current user is subscribed to the mod. To remove a mod the current user is subscribed to, use [`Modio::UnsubscribeFromModAsync`](#unsubscribefrommodasync).
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModToRemove|The ID for the mod to force remove.| 
+|Callback|Callback invoked when the uninstallation is successful, or if it failed because the current user remains subscribed.| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|ModManagementError::AlreadySubscribed|User is still subscribed to the specified mod
+|GenericError::BadParameter|The supplied mod ID is invalid
+</RefTable>
+
+
+
+
+
+
+### VerifyUserAuthenticationAsync
+
+
+
+
+
+```cpp
+void VerifyUserAuthenticationAsync(std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Queries the server to verify the state of the currently authenticated user if there is one present. An empty ErrorCode passed to the callback indicates successful verification, i.e. the mod.io server was contactable and the user's authentication remains valid.
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _authenticated-user_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Callback|Callback invoked once the server-side state has been queried| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### RefreshUserDataAsync
+
+
+
+
+
+```cpp
+void RefreshUserDataAsync(std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Queries the server to update the user data. An empty ErrorCode passed to the callback indicates successful verification, i.e. the mod.io server was contactable and the user's data got updated.
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _authenticated-user_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Callback|Callback invoked once the server-side state has been queried| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### QueryUserProfile
+
+
+
+
+
+```cpp
+Modio::Optional<Modio::User> QueryUserProfile()
+```
+
+Fetches the currently authenticated mod.io user profile if there is one associated with the current platform user
+
+
+
+#### Returns
+
+Optional Modio::User object containing profile information
+
+
+
+
+
+### AuthenticateUserExternalAsync
+
+
+
+
+
+```cpp
+void AuthenticateUserExternalAsync(Modio::AuthenticationParams User, Modio::AuthenticationProvider Provider, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Uses platform-specific authentication to associate a mod.io user account with the current platform user
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _no-authenticated-user_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|User|Authentication payload data to submit to the provider. Any AuthToken string that contains special characters (ex. \"+, /, =\") requires the boolean \"bURLEncodeAuthToken\" set as \"True\" to encode the text accordingly| 
+|Provider|The provider to use to perform the authentication| 
+|Callback|Callback invoked once the authentication request has been made| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+|ConfigurationError|The SDK's configuration is not valid
+|InvalidArgsError|The arguments passed to the function have failed validation
+|UserTermsOfUseError|The user has not yet accepted the mod.io Terms of Use
+</RefTable>
+
+
+
+
+
+
+### AuthenticateUserDelegatedTokenAsync
+
+
+
+
+
+```cpp
+void AuthenticateUserDelegatedTokenAsync(Modio::AuthenticationParams User, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Authenticates a user from a mod.io-supplied Delegated Token provided by our Device Login flow or generated via the mod.io user control panel.
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|User|Authentication data to submit to the mod.io API. The AuthToken member should be set to contain the Delegated Token as a string.| 
+|Callback|Callback invoked once the authentication request has been made| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+|ConfigurationError|The SDK's configuration is not valid
+|InvalidArgsError|The arguments passed to the function have failed validation
+|UserTermsOfUseError|The user has not yet accepted the mod.io Terms of Use
+</RefTable>
+
+
+
+
+
+
+### GetTermsOfUseAsync
+
+
+
+
+
+```cpp
+void GetTermsOfUseAsync(std::function<void (Modio::ErrorCode, Modio::Optional<Modio::Terms>)> Callback)
+```
+
+This function retrieves the information required for a game to display the mod.io terms of use to a player who wishes to create a mod.io account
+
+#### Requirements
+
+* _initialized-sdk_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Callback|Callback invoked with the terms of use data once retrieved from the server| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### GetModCreationHandle
+
+
+
+
+
+```cpp
+Modio::ModCreationHandle GetModCreationHandle()
+```
+
+Returns a handle for use with SubmitNewModAsync
+
+
+
+#### Returns
+
+The handle to use in a call to SubmitNewModAsync
+
+
+
+
+
+### SubmitNewModAsync
+
+
+
+
+
+```cpp
+void SubmitNewModAsync(Modio::ModCreationHandle Handle, Modio::CreateModParams Params, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::ModID>)> Callback)
+```
+
+Requests a new mod be created with the specified properties
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _authenticated-user_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Handle|Handle returned by [`Modio::GetModCreationHandle`](#getmodcreationhandle). Each successful call to SubmitNewModAsync requires a new ModCreationHandle.| 
+|Params|Information about the mod to be created| 
+|Callback|Callback invoked with the ID of the created mod once the parameters are validated by the server and the mod is created| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|NetworkError|Couldn't connect to mod.io servers
+|InvalidArgsError|Some of the information in the CreateModParams did not pass validation
+</RefTable>
+
+
+
+
+
+
+### SubmitModChangesAsync
+
+
+
+
+
+```cpp
+void SubmitModChangesAsync(Modio::ModID Mod, Modio::EditModParams Params, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)> Callback)
+```
+
+Edits the parameters of a mod, by updating any fields set in the Params object to match the passed-in values. Fields left empty on the Params object will not be updated. If no fields are populated, will return an error.
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _authenticated-user_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Mod|The mod to edit| 
+|Params|Descriptor containing optional fields indicating what properties should be updated| 
+|Callback|Callback invoked with the updated mod profile on success| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|GenericError::BadParameter|No fields selected for modification in Params, or the supplied mod ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|InvalidArgsError|Some of the information in the EditModParams did not pass validation
+</RefTable>
+
+
+
+
+
+
+### SubmitNewModFileForMod
+
+
+
+
+
+```cpp
+void SubmitNewModFileForMod(Modio::ModID Mod, Modio::CreateModFileParams Params)
+```
+
+Queues the upload of a new modfile release for the specified mod using the submitted parameters. This function takes a Modio::CreateModFileParams object specifying a path to the root folder of the new modfile. The SDK will compress the folder's contents into a .zip archive and queue the result for upload. When the upload completes, a Mod Management Event will be triggered. Note the SDK is also responsible for decompressing the archive upon its installation at a later point in time.
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _authenticated-user_
+* _management-enabled_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Mod|The mod to attach the modfile to| 
+|Params|Descriptor containing information regarding the modfile| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::BadParameter|The supplied mod ID is invalid
+</RefTable>
+
+
+
+
+
+
+### SubmitNewModSourceFile
+
+
+
+
+
+```cpp
+void SubmitNewModSourceFile(Modio::ModID Mod, Modio::CreateSourceFileParams Params)
+```
+
+Queues the upload of source files for a modfile to defined platforms. This function takes a Modio::CreateSourceFileParams struct that defines the options needed to upload the source files. The files present in the root folder defined in the params will be compressed to a .zip archive and uploaded.
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _authenticated-user_
+* _management-enabled_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Mod|The mod to upload source files for| 
+|Params|Descriptor containing information regarding the modfile| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::BadParameter|The supplied mod ID is invalid
+</RefTable>
+
+
+
+
+
+
+### ListAllModsAsync
+
+
+
+
+
+```cpp
+void ListAllModsAsync(Modio::FilterParams Filter, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback)
+```
+
+Provides a list of mods for the current game, that match the parameters specified in the filter
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Filter|Modio::FilterParams object containing any filters that should be applied to the query| 
+|Callback|Callback invoked with a status code and an optional ModInfoList providing mod profiles| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### GetModInfoAsync
+
+
+
+
+
+```cpp
+void GetModInfoAsync(Modio::ModID ModId, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)> Callback)
+```
+
+Fetches detailed information about the specified mod, including description and file metadata for the most recent release
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModId|Mod ID of the mod to fetch data| 
+|Callback|Callback providing a status code and an optional Modio::ModInfo object with the mod's extended information| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod does not exist or was deleted
+</RefTable>
+
+
+
+
+
+
+### GetModMediaAsync
+
+
+
+
+
+```cpp
+void GetModMediaAsync(Modio::ModID ModId, Modio::LogoSize LogoSize, std::function<void (Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
+```
+
+Downloads the logo for the specified mod. Will use existing file if it is already present on disk
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModId|Mod ID for use in logo retrieval| 
+|LogoSize|Parameter indicating the size of logo that's required| 
+|Callback|Callback providing a status code and an optional path object pointing to the location of the downloaded image| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|FilesystemError::InsufficientSpace|Not enough space for the file
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod media does not exist or was deleted
+</RefTable>
+
+
+
+
+
+
+### GetModMediaAsync
+
+
+
+
+
+```cpp
+void GetModMediaAsync(Modio::ModID ModId, Modio::GallerySize GallerySize, Modio::GalleryIndex Index, std::function<void (Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
+```
+
+Get a gallery image for the specified mod ID. If it already exists on disk the file will be reused unless it is outdated
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModId|The mod you want to retrieve an image for| 
+|GallerySize|Size of the image you want to retrieve| 
+|Index|The zero-based index of the image you want to retrieve| 
+|Callback|Callback containing a status code and an Optional containing a path to the image file on disk| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|FilesystemError::InsufficientSpace|Not enough space for the file
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod media does not exist or was deleted
+</RefTable>
+
+
+
+
+
+
+### GetModMediaAsync
+
+
+
+
+
+```cpp
+void GetModMediaAsync(Modio::ModID ModId, Modio::AvatarSize AvatarSize, std::function<void (Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
+```
+
+Downloads the creator avatar for a specified mod. Will use existing file if it is already present on disk and not outdated
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModId|ID of the mod the creator avatar will be retrieved for| 
+|AvatarSize|Parameter indicating the size of avatar image that's required| 
+|Callback|Callback providing a status code and an optional path object pointing to the location of the downloaded image| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|FilesystemError::InsufficientSpace|Not enough space for the file
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod media does not exist or was deleted
+</RefTable>
+
+
+
+
+
+
+### SubmitModRatingAsync
+
+
+
+
+
+```cpp
+void SubmitModRatingAsync(Modio::ModID ModID, Modio::Rating Rating, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Submits a rating for a mod on behalf of the currently authenticated user.
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _authenticated-user_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModID|The mod to submit a rating for| 
+|Rating|The rating to submit  NOTE: To clear a rating for a mod, submit a rating of Rating::Neutral.| 
+|Callback|Callback providing a status code to indicate the rating was submitted successfully| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod could not be found
+</RefTable>
+
+
+
+
+
+
+### GetModTagOptionsAsync
+
+
+
+
+
+```cpp
+void GetModTagOptionsAsync(std::function<void (Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)> Callback)
+```
+
+Fetches the available tags used on mods for the current game. These tags can them be used in conjunction with the FilterParams passed to ListAllMods
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Callback|Callback providing a status code and an optional ModTagOptions object containing the available tags| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### GetModDependenciesAsync
+
+
+
+
+
+```cpp
+void GetModDependenciesAsync(Modio::ModID ModID, bool Recursive, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList>)> Callback)
+```
+
+For a given Mod ID, fetches a list of any mods that the creator has marked as dependencies
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModID|The mod to retrieve dependencies for| 
+|Recursive|Include child dependencies in a recursive manner.  NOTE: Recursion supports a maximum depth of 5.| 
+|Callback|Callback providing a status code and an optional [`Modio::ModDependencyList`](#ModDependencyList)| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### AddModDependenciesAsync
+
+
+
+
+
+```cpp
+void AddModDependenciesAsync(Modio::ModID ModID, std::vector<Modio::ModID> Dependencies, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Adds dependencies to a specified mod, linking it with other mods that are required for it to function
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _authenticated-user_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModID|The mod to add dependencies to| 
+|Dependencies|List of mod dependencies to add| 
+|Callback|Callback providing a status code to indicate if the dependencies were added successfully| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod could not be found
+</RefTable>
+
+
+
+
+
+
+### DeleteModDependenciesAsync
+
+
+
+
+
+```cpp
+void DeleteModDependenciesAsync(Modio::ModID ModID, std::vector<Modio::ModID> Dependencies, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Deletes dependencies from a specified mod, unlinking it from other mods that are no longer required.
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _authenticated-user_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModID|The mod to delete dependencies from| 
+|Dependencies|List of mod IDs to delete as dependencies| 
+|Callback|Callback providing a status code to indicate if the dependencies were deleted successfully| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod IDs are invalid
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### RequestEmailAuthCodeAsync
+
+
+
+
+
+```cpp
+void RequestEmailAuthCodeAsync(Modio::EmailAddress EmailAddress, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Begins email authentication for the current session by requesting a one-time code be sent to the specified email address if it is associated with a mod.io account
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _no-authenticated-user_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|EmailAddress|The email address to send the code to| 
+|Callback|Callback providing a status code indicating the outcome of the request| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserAuthError::AlreadyAuthenticated|Authenticated user already signed-in. Call ClearUserDataAsync to de-authenticate the old user, then Shutdown() and reinitialize the SDK first.
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### AuthenticateUserEmailAsync
+
+
+
+
+
+```cpp
+void AuthenticateUserEmailAsync(Modio::EmailAuthCode AuthenticationCode, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Completes email authentication for the current session by submitting the one-time code sent to the user's email address
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _no-authenticated-user_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|AuthenticationCode|User's authentication code| 
+|Callback|Callback providing a status code indicating if authentication was successful or not| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserAuthError::AlreadyAuthenticated|Authenticated user already signed-in. Call ClearUserDataAsync to de-authenticate the old user, then Shutdown() and reinitialize the SDK first.
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### ClearUserDataAsync
+
+
+
+
+
+```cpp
+void ClearUserDataAsync(std::function<void (Modio::ErrorCode)> Callback)
+```
+
+De-authenticates the current mod.io user for the current session, and clears all user-specific data stored on the current device. Any subscribed mods that are installed but do not have other local users subscribed will be marked for uninstallation. This method also disables mod management.
+
+#### Requirements
+
+* _initialized-sdk_
+* _authenticated-user_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Callback|Callback providing a status code indicating the outcome of clearing the user data. Error codes returned by this function are informative only - it will always succeed.| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+</RefTable>
+
+
+
+
+
+
+### GetUserMediaAsync
+
+
+
+
+
+```cpp
+void GetUserMediaAsync(Modio::AvatarSize AvatarSize, std::function<void (Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
+```
+
+Downloads the avatar of the currently authenticated user. Will only perform a download if there is no local cache of the avatar or if that cached copy is out-of-date.
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _authenticated-user_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|AvatarSize|Parameter specifying the size of avatar image to download| 
+|Callback|Callback providing a status code for the download and an optional path to the downloaded image| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### GetLastValidationError
+
+
+
+
+
+```cpp
+std::vector<Modio::FieldError> GetLastValidationError()
+```
+
+If the last request to the mod.io servers returned a validation failure, this function returns extended information describing the fields that failed validation.
+
+#### Requirements
+
+* _initialized-sdk_
+
+
+#### Returns
+
+Collection of Modio::FieldError objects, or empty collection if there was no validation failures
+
+
+
+
+
+### ReportContentAsync
+
+
+
+
+
+```cpp
+void ReportContentAsync(Modio::ReportParams Report, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Sends a content report to mod.io. When using this function, please inform your users that if they provide their contact name or details in the Report parameter, that those may be shared with the person responsible for the content being reported. For more information on what data in a report will be shared with whom, please see link: [our website's report form](https://mod.io/report) for more information.
+
+#### Requirements
+
+* _initialized-sdk_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Report|Information about the content being reported and a description of the report.| 
+|Callback|Callback providing a status code to indicate successful submission of the report.| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The mod ID, game ID, or user ID supplied to ReportParams is invalid
+|NetworkError|Couldn't Connect to mod.io servers
+|InvalidArgsError|Required information in the report did not pass validation
+</RefTable>
+
+
+
+
+
+
+### AddOrUpdateModLogoAsync
+
+
+
+
+
+```cpp
+void AddOrUpdateModLogoAsync(Modio::ModID ModID, std::string LogoPath, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Submit a new logo for an existing mod, overriding any existing image currently stored on the server. The logo must be gif, jpg, or png format and cannot exceed 8MB in filesize. Dimensions must be at least 512x288. We recommended you supply a high resolution image with a 16:9 ratio. mod.io will use this logo to create three thumbnails with the dimensions of 320x180, 640x360 and 1280x720.
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _authenticated-user_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModID|ID of the mod whose logo will be added or updated| 
+|LogoPath|Path to the new image file of the logo to be uploaded.| 
+|Callback|Callback providing a status code indicating the outcome of the request| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod ID is invalid
+</RefTable>
+
+
+
+
+
+
+### AddOrUpdateModGalleryImagesAsync
+
+
+
+
+
+```cpp
+void AddOrUpdateModGalleryImagesAsync(Modio::ModID ModID, std::vector<std::string> ImagePaths, bool SyncGallery, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Add or update images in the gallery for an existing mod. Images must be gif, jpg, or png format and cannot exceed 8MB in filesize.
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _authenticated-user_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModID|ID of the mod whose gallery images will be added or updated| 
+|ImagePaths|Vector of paths to the image files to be uploaded| 
+|SyncGallery|If true, existing gallery images will be replaced; if false, new images will be appended| 
+|Callback|Callback providing a status code indicating the outcome of the request| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod ID is invalid
+</RefTable>
+
+
+
+
+
+
+### ArchiveModAsync
+
+
+
+
+
+```cpp
+void ArchiveModAsync(Modio::ModID ModID, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Archives a mod. This mod will no longer be able to be viewed or retrieved via the SDK, but it will still exist should you choose to restore it at a later date. Archiving is restricted to team managers and administrators only. Note that restoration and permanent deletion of a mod is possible only via web interface.
+
+#### Requirements
+
+* _authenticated-user_
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModID|The mod to be archived.| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|ApiError::InsufficientPermission|The authenticated user does not have permission to archive this mod. This action is restricted to team managers and administrators only.
+|GenericError::SDKNotInitialized|SDK not initialized
+|GenericError::BadParameter|The supplied mod ID is invalid
+|APIError::CannotArchiveModWithDependents|This mod is a dependency of other mods and as such cannot be archived
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod does not exist or was deleted
+</RefTable>
+
+
+
+
+
+
+### ListUserCreatedModsAsync
+
+
+
+
+
+```cpp
+void ListUserCreatedModsAsync(Modio::FilterParams Filter, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback)
+```
+
+Provides a list of mods that the user has submitted, or is a team member for, for the current game, applying the parameters specified in the filter
+
+#### Requirements
+
+* _authenticated-user_
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Filter|Modio::FilterParams object containing any filters that should be applied to the query| 
+|Callback|Callback invoked with a status code and an optional ModInfoList providing mod profiles| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### GetBaseModInstallationDirectories
+
+
+
+
+
+```cpp
+std::vector<std::string> GetBaseModInstallationDirectories()
+```
+
+Returns a list of base mod installation directories. Under normal circumstances, this will return a single directory, which is the base directory that all mods are installed to for the current user.
+
+#### Requirements
+
+* _initialized-sdk_
+
+
+#### Returns
+
+List of base mod installation directories
+
+
+
+
+
+### GetDefaultModInstallationDirectory
+
+
+
+
+
+```cpp
+std::string GetDefaultModInstallationDirectory(Modio::GameID GameID)
+```
+
+Returns the default mod installation directory for this game and platform, ignoring overrides and without requiring the SDK to be initialized.
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|GameID|The Modio::GameID of the game we're fetching the default mod installation directory for.| 
+</RefTable>
+
+#### Returns
+
+The default mod installation directory for the specified game on the current platform
+
+
+
+
+
+### MuteUserAsync
+
+
+
+
+
+```cpp
+void MuteUserAsync(Modio::UserID UserID, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Mute a user. This will prevent mod.io from returning mods authored by the muted user.	when performing searches.
+
+#### Requirements
+
+* _authenticated-user_
+* _initialized-sdk_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|UserID|ID of the User to mute| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|GenericError::BadParameter|The supplied user ID is invalid
+</RefTable>
+
+
+
+
+
+
+### UnmuteUserAsync
+
+
+
+
+
+```cpp
+void UnmuteUserAsync(Modio::UserID UserID, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Unmute a user. This will allow mod.io to mods authored by the previously muted user.	when performing searches.
+
+#### Requirements
+
+* _authenticated-user_
+* _initialized-sdk_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|UserID|ID of the User to unmute| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|GenericError::BadParameter|The supplied user ID is invalid
+</RefTable>
+
+
+
+
+
+
+### GetMutedUsersAsync
+
+
+
+
+
+```cpp
+void GetMutedUsersAsync(std::function<void (Modio::ErrorCode, Modio::Optional<Modio::UserList>)> Callback)
+```
+
+List all the users that have been muted by the current user.
+
+#### Requirements
+
+* _authenticated-user_
+* _initialized-sdk_
+
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+</RefTable>
+
+
+
+
+
+
+### GetGameInfoAsync
+
+
+
+
+
+```cpp
+void GetGameInfoAsync(Modio::GameID GameID, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::GameInfo>)> Callback)
+```
+
+Fetches detailed information about the specified game
+
+#### Requirements
+
+* _initialized-sdk_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|GameID|Game ID of the game data to fetch| 
+|Callback|Callback providing a status code and an optional Modio::GameInfo object to store the games's extended information| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|UserDataError::InvalidUser|No authenticated user
+|GenericError::BadParameter|The supplied game ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified game does not exist
+</RefTable>
+
+
+
+
+
+
+### ListUserGamesAsync
+
+
+
+
+
+```cpp
+void ListUserGamesAsync(Modio::FilterParams Filter, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::GameInfoList>)> Callback)
+```
+
+Provides a list of games for the current user, that match the parameters specified in the filter
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _user-authenticated_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Filter|Modio::FilterParams object containing any filters that should be applied to the query| 
+|Callback|Callback invoked with a status code and an optional GameInfoList providing game infos| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### GetUserRatingsAsync
+
+
+
+
+
+```cpp
+void GetUserRatingsAsync(std::function<void (Modio::ErrorCode, Modio::Optional<Modio::UserRatingList>)> Callback)
+```
+
+Provides a list of mod ratings for the current user
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _user-authenticated_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Callback|Callback invoked with a status code and an optional UserRatingList providing ratings for each mod| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+
+### PurchaseModAsync
+
+
+
+
+
+```cpp
+void PurchaseModAsync(Modio::ModID ModID, Modio::Optional<std::uint64_t> ExpectedVirtualCurrencyPrice, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)> Callback)
+```
+
+Attempts to purchase a specified mod with an expected price. Purchasing a mod will add a subscription to it
+
+#### Requirements
+
+* _initialized-sdk_
+* _authenticated-user_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModID|The ID for the mod the user is trying to purchase| 
+|ExpectedVirtualCurrencyPrice|The price that was displayed to the user, if using the Virtual Currency-based purchasing flow.| 
+|Callback|Callback providing a status code and optional transaction confirmation if the purchase was successful. If the expected price that was displayed to the end user is no longer correct, for example if the price was increased or decreased by the mod creator since the price was displayed, an error will be returned. If this is the case you should refresh your user interface with the updated price and the user can retry the purchase at the new value.| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|MonetizationError|Problems during purchase transaction
+|UserNotAuthenticatedError|No authenticated user
+</RefTable>
+
+
+
+
+
+
+### PurchaseModWithEntitlementAsync
+
+
+
+
+
+```cpp
+void PurchaseModWithEntitlementAsync(Modio::ModID ModID, Modio::EntitlementParams Params, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)> Callback)
+```
+
+Attempts to purchase a specified mod by consuming an existing, un-consumed entitlement that the user has from the current portal. Purchasing a mod will add a subscription to it. If the user does not have an existing entitlement, the purchase will fail. It is recommended to call GetAvailableUserEntitlementsAsync to query if the current user has an available entitlement prior to this call.
+
+#### Requirements
+
+* _initialized-sdk_
+* _authenticated-user_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModID|The ID for the mod the user is trying to purchase| 
+|Portal-specific|additional parameters| 
+|Callback|Callback providing a status code and optional transaction confirmation if the purchase was successful. If the user does not have an available entitlement of the correct type, the purchase will fail.| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod ID is invalid
+|MonetizationError::AccountLacksEntitlement|The user lacks a matching entitlement to make the purchase
+|NetworkError|Couldn't connect to mod.io servers
+|MonetizationError|Problems during purchase transaction
+|UserNotAuthenticatedError|No authenticated user
+</RefTable>
+
+
+
+
+
+
+### RefreshUserEntitlementsAsync
+
+
+
+
+
+```cpp
+void RefreshUserEntitlementsAsync(Modio::EntitlementParams Params, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)> Callback)
+```
+
+Requests mod.io consume available entitlements for the current authenticated user purchased through the current portal.
+
+#### Requirements
+
+* _initialized-sdk_
+* _authenticated-user_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Params|Additional parameters| 
+|Callback|Callback providing an error code indicating success or failure of the refresh operation| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|UserDataError::InvalidUser|No authenticated user
+|MonetizationError::RetryEntitlements|Some entitlements could not be verified. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+|MonetizationError|Problems during purchase transaction
+</RefTable>
+
+
+
+
+
+
+### GetAvailableUserEntitlementsAsync
+
+
+
+
+
+```cpp
+void GetAvailableUserEntitlementsAsync(Modio::EntitlementParams Params, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)> Callback)
+```
+
+Retrieves a list of the unconsumed entitlements that the mod.io user has available via the current portal. Will not consume entitlements.
+
+#### Requirements
+
+* _initialized-sdk_
+* _authenticated-user_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Params|Additional parameters specific to the portal in use| 
+|Callback|Callback providing an error code indicating success or failure of the retrieval operation| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|UserDataError::InvalidUser|No authenticated user
+|NetworkError|Couldn't connect to mod.io servers
+|MonetizationError|Problems during purchase transaction
+</RefTable>
+
+
+
+
+
+
+
+
+### FetchUserPurchasesAsync
+
+
+
+
+
+```cpp
+void FetchUserPurchasesAsync(std::function<void (Modio::ErrorCode)> OnFetchDone)
+```
+
+Fetches a list of all purchases that a User has made. Query the list using QueryUserPurchasedMods after a successful call.
+
+#### Requirements
+
+* _initialized-sdk_
+* _authenticated-user_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|OnFetchDone|Callback invoked with a status code for whether the fetch was successful| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|UserDataError::InvalidUser|No authenticated user
+|NetworkError|Couldn't connect to mod.io servers
+|MonetizationError|Problems during purchase transaction
+</RefTable>
+
+
+
+
+
+
+### QueryUserPurchasedMods
+
+
+
+
+
+```cpp
+std::map<Modio::ModID, Modio::ModInfo> QueryUserPurchasedMods()
+```
+
+Fetches the locally cached view of the user's purchased mods, populated fromGetModPurchases
+
+
+
+#### Returns
+
+std::map using Mod IDs as keys and ModInfo objects providing information about the mod that was purchased. mods
+
+
+
+
+
+### GetUserDelegationTokenAsync
+
+
+
+
+
+```cpp
+void GetUserDelegationTokenAsync(std::function<void (Modio::ErrorCode, std::string)> Callback)
+```
+
+Gets a UserDelegationToken that can be used by a backend serve for S2S functionality.
+
+#### Requirements
+
+* _initialized-sdk_
+* _authenticated-user_
+* _no-rate-limiting_
+
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|UserDataError::InvalidUser|No authenticated user
+|NetworkError|Couldn't connect to mod.io servers
+|MonetizationError|Problems during purchase transaction
+</RefTable>
+
+
+
+
+
+
+### InitTempModSet
+
+
+
+
+
+```cpp
+Modio::ErrorCode InitTempModSet(std::vector<Modio::ModID> ModIds)
+```
+
+Initialize a Temp Mod Set, installing every specified mod given in the param if they are not already subbed.
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModIds|vector of ModID to install as temp mod| 
+</RefTable>
+
+#### Returns
+
+Modio::ErrorCode indicating if temp mod correctly started
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|ModManagementError::ModManagementDisabled|Mod Management need to be enabled
+</RefTable>
+
+
+
+
+
+
+### AddToTempModSet
+
+
+
+
+
+```cpp
+Modio::ErrorCode AddToTempModSet(std::vector<Modio::ModID> ModIds)
+```
+
+Add mods to an already created Temp Mod Session, install every temp mod given in the param if they already subbed or already in Temp Mod Set
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModIds|vector of ModID to install as temp mod| 
+</RefTable>
+
+#### Returns
+
+Modio::ErrorCode indicating if temp mod correctly started
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|ModManagementError::ModManagementDisabled|Mod Management need to be enabled
+|ModManagementError::TempModSetNotInitialized|Temp Mod Set is not initialize, call InitTempModSet.
+</RefTable>
+
+
+
+
+
+
+### RemoveFromTempModSet
+
+
+
+
+
+```cpp
+Modio::ErrorCode RemoveFromTempModSet(std::vector<Modio::ModID> ModIds)
+```
+
+Delete mods to an already created Temp Mod Session, delete every temp mods given in the param if they already subbed mod, it will not delete them.
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModIds|vector of ModID to install as temp mod| 
+</RefTable>
+
+#### Returns
+
+Modio::ErrorCode indicating if temp mod correctly started
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|ModManagementError::ModManagementDisabled|Mod Management need to be enabled
+|ModManagementError::TempModSetNotInitialized|Temp Mod Set is not initialize, call InitTempModSet.
+</RefTable>
+
+
+
+
+
+
+### CloseTempModSet
+
+
+
+
+
+```cpp
+Modio::ErrorCode CloseTempModSet()
+```
+
+Close a Temp Mod Session,  delete all temp mods
+
+
+
+#### Returns
+
+Modio::ErrorCode indicating if temp mod correctly started
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|ModManagementError::ModManagementDisabled|Mod Management need to be enabled
+|ModManagementError::TempModSetNotInitialized|Temp Mod Set is not initialize, call InitTempModSet.
+</RefTable>
+
+
+
+
+
+
+### QueryTempModSet
+
+
+
+
+
+```cpp
+std::map<Modio::ModID, Modio::ModCollectionEntry> QueryTempModSet()
+```
+
+Fetches the temp mod added to Temp Mod Set
+
+
+
+#### Returns
+
+std::map using Mod IDs as keys and ModCollectionEntry objects providing information about the mods added to temp mod set
+
+
+
+
+
+### MetricsSessionStartAsync
+
+:::info[Premium Feature]
+This functionality requires the Metrics premium feature. Sign up to one of our [advanced service tiers](https://mod.io/pricing) to activate it, or contact us at developers@mod.io for more information.
+:::
+
+
+:::warning[Experimental Feature]
+This function is part of an experimental feature and is subject to change. 
+:::
+
+
+
+
+```cpp
+void MetricsSessionStartAsync(Modio::MetricsSessionParams Params, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Start a Metrics play session
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Params|Modio::MetricsServiceParams object containing information of what and how to start a metrics session| 
+|Callback|Callback providing an error code indicating success or failure of the session start operation| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|UserDataError::InvalidUser|No authenticated user
+|MetricsError::SessionNotInitialized|Metrics session has not yet been initialized
+|MetricsError::SessionIsActive|Metrics session is currently active and running
+|GenericError::BadParameter|One or more values in the Metric Session Parameters are invalid
+</RefTable>
+
+
+
+
+
+
+### MetricsSessionSendHeartbeatOnceAsync
+
+:::info[Premium Feature]
+This functionality requires the Metrics premium feature. Sign up to one of our [advanced service tiers](https://mod.io/pricing) to activate it, or contact us at developers@mod.io for more information.
+:::
+
+
+:::warning[Experimental Feature]
+This function is part of an experimental feature and is subject to change. 
+:::
+
+
+
+
+```cpp
+void MetricsSessionSendHeartbeatOnceAsync(std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Sends a single heartbeat to the mod.io server to indicate a session is still active
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Callback|Callback providing an error code indicating success or failure of the session heartbeat operation| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|MetricsError::SessionNotInitialized|Metrics session has not yet been initialized
+|MetricsError::SessionIsNotActive|Metrics session is not currently running. Call MetricsSessionStartAsync before attempting to sending a heartbeat.
+</RefTable>
+
+
+
+
+
+
+### MetricsSessionSendHeartbeatAtIntervalAsync
+
+:::info[Premium Feature]
+This functionality requires the Metrics premium feature. Sign up to one of our [advanced service tiers](https://mod.io/pricing) to activate it, or contact us at developers@mod.io for more information.
+:::
+
+
+:::warning[Experimental Feature]
+This function is part of an experimental feature and is subject to change. 
+:::
+
+
+
+
+```cpp
+void MetricsSessionSendHeartbeatAtIntervalAsync(std::uint32_t IntervalSeconds, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Sends a constant heartbeat at a given interval to the mod.io server to indicate a session is still active
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|IntervalSeconds|The frequency in seconds to send a heartbeat to the mod.io server| 
+|Callback|Callback providing an error code indicating success or failure of the session heartbeat operation| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|MetricsError::SessionNotInitialized|Metrics session has not yet been initialized
+|MetricsError::SessionIsNotActive|Metrics session is not currently running. Call MetricsSessionStartAsync before attempting to sending a heartbeat.
+</RefTable>
+
+
+
+
+
+
+### MetricsSessionEndAsync
+
+:::info[Premium Feature]
+This functionality requires the Metrics premium feature. Sign up to one of our [advanced service tiers](https://mod.io/pricing) to activate it, or contact us at developers@mod.io for more information.
+:::
+
+
+:::warning[Experimental Feature]
+This function is part of an experimental feature and is subject to change. 
+:::
+
+
+
+
+```cpp
+void MetricsSessionEndAsync(std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Ends a Metrics play session
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Callback|Callback providing an error code indicating success or failure of the session end operation| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|UserDataError::InvalidUser|No authenticated user
+|MetricsError::SessionNotInitialized|Metrics session has not yet been initialized
+|MetricsError::SessionIsNotActive|Metrics session is not currently running. Call MetricsSessionStartAsync before attempting to end a session.
+</RefTable>
+
+
+
+
+
+
+### InitializeModioServerAsync
+
+
+:::warning[Experimental Feature]
+This function is part of an experimental feature and is subject to change. 
+:::
+
+
+
+
+```cpp
+void InitializeModioServerAsync(Modio::ServerInitializeOptions InitOptions, std::function<void (Modio::ErrorCode)> OnInitComplete)
+```
+
+Initializes the SDK for in the context of a dedicated Server. Optionally gets/updates all mods listed in InitOptions.
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|InitOptions|Parameters to the function packed as a struct where all members needs to be initialized for the call to succeed| 
+|OnInitComplete|Callback for completion of the init process| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKAlreadyInitialized|SDK already initialized
+|NetworkError|Couldn't connect to the mod.io servers
+|FilesystemError|Couldn't create the user data or common data folders
+|ConfigurationError|InitOptions contains an invalid value - inspect ec.value() to determine what was incorrect
+</RefTable>
+
+
+
+
+
+
+### InstallOrUpdateServerModsAsync
+
+
+:::warning[Experimental Feature]
+This function is part of an experimental feature and is subject to change. 
+:::
+
+
+
+
+```cpp
+void InstallOrUpdateServerModsAsync(std::vector<Modio::ModID> Mods, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Gets and/or updates all of the indicated mods for this server, assuming you have provided a valid OAuth token
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Mods|the mods to get or update in addition to those indicated in the initialization options| 
+|Callback|callback executed upon completion of all mods being validated and installed| 
+</RefTable>
+
+
+
+
+
+### RegisterClientModsWithServerAsync
+
+
+:::warning[Experimental Feature]
+This function is part of an experimental feature and is subject to change. 
+:::
+
+
+
+
+```cpp
+void RegisterClientModsWithServerAsync(std::vector<Modio::ModID> ModIDs, std::function<void (Modio::ErrorCode, std::set<Modio::ModID>)> Callback)
+```
+
+Adds the provided Mods to the Server's list of client mods. Intended to be called on the server
+
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModIDs|a list of mods that the joining client has| 
+|OnComplete|callback upon completion of adding the mods to the Server's list. Contains a set of all registered client mods.| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|NetworkError|Couldn't connect to the mod.io servers
+</RefTable>
+
+
+
+
+
+
+### ClearRegisteredClientMods
+
+
+:::warning[Experimental Feature]
+This function is part of an experimental feature and is subject to change. 
+:::
+
+
+
+
+```cpp
+void ClearRegisteredClientMods()
+```
+
+Clears the server's list of client mods. Intended only to be called when the Server safely flush its list of client mods, if you want to minimize the number of mods you send to clients/remove mods no longer needed.
+
+
+
+
+
+
+
+### GetRegisteredClientMods
+
+
+:::warning[Experimental Feature]
+This function is part of an experimental feature and is subject to change. 
+:::
+
+
+
+
+```cpp
+std::set<Modio::ModID> GetRegisteredClientMods()
+```
+
+Returns the full list of mods that have been registered with the server via RegisterClientModsWithServerAsync
+
+
+
+#### Returns
+
+A std::set of ModIDs representing the Mods registered with the server.
+
+
+
+
+
+### ListModCollectionsAsync
+
+
+
+
+
+```cpp
+void ListModCollectionsAsync(Modio::FilterParams Filter, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfoList>)> Callback)
+```
+
+Provides a list of mod collections for the current game, that match the parameters specified in the filter
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Filter|Modio::FilterParams object containing any filters that should be applied to the query| 
+|Callback|Callback invoked with a status code and an optional ModCollectionInfoList providing mod profiles| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### GetModCollectionInfoAsync
+
+
+
+
+
+```cpp
+void GetModCollectionInfoAsync(Modio::ModCollectionID ModCollectionId, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfo>)> Callback)
+```
+
+Fetches detailed information about the specified mod collection, including description and file metadata for the most recent release
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModCollectionId|Mod Collection ID of the mod colection to fetch data| 
+|Callback|Callback providing a status code and an optional Modio::ModCollectionInfo object with the mod collections's extended information| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod collection ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod does not exist or was deleted
+</RefTable>
+
+
+
+
+
+
+### GetModCollectionModsAsync
+
+
+
+
+
+```cpp
+void GetModCollectionModsAsync(Modio::ModCollectionID ModCollectionId, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback)
+```
+
+Get a list of Mods contained within the specified mod collection
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModCollectionId|Mod Collection ID of the mod colection to fetch data| 
+|Callback|Callback providing a status code and an optional Modio::ModInfoList object with the mods contained within the mod collections| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod collection ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod does not exist or was deleted
+</RefTable>
+
+
+
+
+
+
+### SubmitModCollectionRatingAsync
+
+
+
+
+
+```cpp
+void SubmitModCollectionRatingAsync(Modio::ModCollectionID ModCollectionId, Modio::Rating Rating, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Submits a rating for a mod collection on behalf of the currently authenticated user.
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+* _authenticated-user_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModCollectionId|The mod collection to submit a rating for| 
+|Rating|The rating to submit  NOTE: To clear a rating for a mod collection, submit a rating of Rating::Neutral.| 
+|Callback|Callback providing a status code to indicate the rating was submitted successfully| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod collection ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod collection could not be found
+</RefTable>
+
+
+
+
+
+
+### SubscribeToModCollectionAsync
+
+
+
+
+
+```cpp
+void SubscribeToModCollectionAsync(Modio::ModCollectionID ModCollectionToSubscribeTo, std::function<void (Modio::ErrorCode)> OnSubscribeComplete)
+```
+
+Sends a request to the mod.io server to add the specified mod collection to the user's list of subscriptions. NOTE: Unlike SubscribeToModAsync, SubscribeToModeCollectionAsync does not automatically trigger installation of new subscriptions arising from a successful request. Call FetchExternalUpdatesAsync after this function succeeds in order to initiate installation.
+
+#### Requirements
+
+* _initialized-sdk_
+* _authenticated-user_
+* _no-rate-limiting_
+* _management-enabled_
+* _mod-not-pending-uninstall_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModCollectionToSubscribeTo|Mod Collection ID of the mod collection requiring a subscription.| 
+|OnSubscribeComplete|Callback invoked when the subscription request is completed.| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|ModManagementError::ModBeingProcessed|Specified mod is pending uninstall. Wait until the uninstall process is complete before subscribing again.
+|GenericError::BadParameter|The supplied mod collection ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod does not exist or was deleted
+</RefTable>
+
+
+
+
+
+
+### UnsubscribeFromModCollectionAsync
+
+
+
+
+
+```cpp
+void UnsubscribeFromModCollectionAsync(Modio::ModCollectionID ModCollectionToUnsubscribeFrom, std::function<void (Modio::ErrorCode)> OnUnsubscribeComplete)
+```
+
+Sends a request to the mod.io server to remove the specified mod collection from the user's list of subscriptions. If no other local users are subscribed to the mods in the specified collection, this function will also mark the mods in the collection for uninstallation by the SDK.
+
+#### Requirements
+
+* _initialized-sdk_
+* _authenticated-user_
+* _no-rate-limiting_
+* _management-enabled_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModCollectionToUnsubscribeFrom|Mod Collection ID of the mod collection requiring unsubscription.| 
+|OnUnsubscribeComplete|Callback invoked when the unsubscription request is completed.| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod collection ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod collection does not exist or was deleted
+</RefTable>
+
+
+
+
+
+
+### FollowModCollectionAsync
+
+
+
+
+
+```cpp
+void FollowModCollectionAsync(Modio::ModCollectionID ModCollectionToFollow, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfo>)> OnFollowComplete)
+```
+
+Sends a request to the mod.io server to add the specified mod collection to the user's list of followed collections.
+
+#### Requirements
+
+* _initialized-sdk_
+* _authenticated-user_
+* _no-rate-limiting_
+* _management-enabled_
+* _mod-not-pending-uninstall_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModCollectionToFollow|Mod Collection ID of the mod collection requiring a subscription.| 
+|OnFollowComplete|Callback invoked when the follow request is completed.| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|ModManagementError::ModBeingProcessed|Specified mod is pending uninstall. Wait until the uninstall process is complete before subscribing again.
+|GenericError::BadParameter|The supplied mod collection ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod does not exist or was deleted
+</RefTable>
+
+
+
+
+
+
+### UnfollowModCollectionAsync
+
+
+
+
+
+```cpp
+void UnfollowModCollectionAsync(Modio::ModCollectionID ModCollectionToUnfollow, std::function<void (Modio::ErrorCode)> OnUnfollowComplete)
+```
+
+Sends a request to the mod.io server to remove the specified mod collection from the user's list of followed collections.
+
+#### Requirements
+
+* _initialized-sdk_
+* _authenticated-user_
+* _no-rate-limiting_
+* _management-enabled_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModCollectionToUnfollow|Mod Collection ID of the mod collection to unfollow.| 
+|OnUnsubscribeComplete|Callback invoked when the unfollow request is completed.| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod collection ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod collection does not exist or was deleted
+</RefTable>
+
+
+
+
+
+
+### ListUserFollowedModCollectionsAsync
+
+
+
+
+
+```cpp
+void ListUserFollowedModCollectionsAsync(Modio::FilterParams Filter, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfoList>)> Callback)
+```
+
+Provides a list of followed mod collections for the current game, that match the parameters specified in the filter.
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Filter|Modio::FilterParams object containing any filters that should be applied to the query| 
+|Callback|Callback invoked with a status code and an optional ModCollectionInfoList providing mod collection profiles| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|NetworkError|Couldn't connect to mod.io servers
+</RefTable>
+
+
+
+
+
+
+### GetModCollectionMediaAsync
+
+
+
+
+
+```cpp
+void GetModCollectionMediaAsync(Modio::ModCollectionID CollectionId, Modio::LogoSize LogoSize, std::function<void (Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
+```
+
+Downloads the logo for the specified mod collection. Will use existing file if it is already present on disk
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModId|Mod Collection ID for use in logo retrieval| 
+|LogoSize|Parameter indicating the size of logo that's required| 
+|Callback|Callback providing a status code and an optional path object pointing to the location of the downloaded image| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|FilesystemError::InsufficientSpace|Not enough space for the file
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod collection ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod collection media does not exist or was deleted
+</RefTable>
+
+
+
+
+
+
+### GetModCollectionMediaAsync
+
+
+
+
+
+```cpp
+void GetModCollectionMediaAsync(Modio::ModCollectionID CollectionId, Modio::AvatarSize AvatarSize, std::function<void (Modio::ErrorCode, Modio::Optional<std::string>)> Callback)
+```
+
+Downloads the creator avatar for a specified mod collection. Will use existing file if it is already present on disk and not outdated
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|CollectionId|ID of the mod collection the creator avatar will be retrieved for| 
+|AvatarSize|Parameter indicating the size of avatar image that's required| 
+|Callback|Callback providing a status code and an optional path object pointing to the location of the downloaded image| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|FilesystemError::InsufficientSpace|Not enough space for the file
+|HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+|GenericError::BadParameter|The supplied mod collection ID is invalid
+|NetworkError|Couldn't connect to mod.io servers
+|EntityNotFoundError|Specified mod media does not exist or was deleted
+</RefTable>
+
+
+
+
+
+
+### GetUserFollowersAsync
+
+
+:::warning[Experimental Feature]
+This function is part of an experimental feature and is subject to change. 
+:::
+
+
+
+
+```cpp
+void GetUserFollowersAsync(Modio::UserID UserID, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::UserList>)> Callback)
+```
+
+Gets a list of users following the given user.
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|UserID|The ID of the user to get the followers of| 
+|Callback|A Callback providing a status code and an optional user list of the users who are following the given user| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|GenericError::BadParameter|The supplied user ID is invalid
+</RefTable>
+
+
+
+
+
+
+### GetUserFollowingAsync
+
+
+:::warning[Experimental Feature]
+This function is part of an experimental feature and is subject to change. 
+:::
+
+
+
+
+```cpp
+void GetUserFollowingAsync(Modio::UserID UserID, std::function<void (Modio::ErrorCode, Modio::Optional<Modio::UserList>)> Callback)
+```
+
+Gets a list of users the given user is following
+
+#### Requirements
+
+* _initialized-sdk_
+* _no-rate-limiting_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|UserID|The ID of the user in question| 
+|Callback|A Callback providing a status code and an optional user list of the users who the given user follows| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|GenericError::BadParameter|The supplied user ID is invalid
+</RefTable>
+
+
+
+
+
+
+### FollowUserAsync
+
+
+:::warning[Experimental Feature]
+This function is part of an experimental feature and is subject to change. 
+:::
+
+
+
+
+```cpp
+void FollowUserAsync(Modio::UserID UserID, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Follows the given user for the currently authenticated user
+
+#### Requirements
+
+* _authenticated-user_
+* _initialized-sdk_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|UserID|ID of the User to follow| 
+|Callback|A Callback returning an error code indicated the result of the operation| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|GenericError::BadParameter|The supplied user ID is invalid
+</RefTable>
+
+
+
+
+
+
+### UnfollowUserAsync
+
+
+:::warning[Experimental Feature]
+This function is part of an experimental feature and is subject to change. 
+:::
+
+
+
+
+```cpp
+void UnfollowUserAsync(Modio::UserID UserID, std::function<void (Modio::ErrorCode)> Callback)
+```
+
+Unfollows a given user for the currently authenticated user.
+
+#### Requirements
+
+* _authenticated-user_
+* _initialized-sdk_
+
+#### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|UserID|ID of the User to unfollow| 
+|Callback|A Callback returning an error code indicated the result of the operation| 
+</RefTable>
+
+#### Error Values
+
+<RefTable colWidths={['30%']} stripes="odd">
+| | |
+|-|-|
+|GenericError::SDKNotInitialized|SDK not initialized
+|UserDataError::InvalidUser|No authenticated user
+|GenericError::BadParameter|The supplied user ID is invalid
+</RefTable>
+
+
+
+
+
+
+
+
+
+## Classes
+
+
+### ErrorCode {#ErrorCode} 
+
+
+
+Trivial wrapper around link:https://en.cppreference.com/w/cpp/error/error_code[std::error_code]. Implemented as a class instead of a type alias to allow it to be forward-declared in wrappers, eg the UE4 plugin.
+
+
+
+#### Functions
+
+
+##### ErrorCode
+
+
+
+
+
+```cpp
+ErrorCode(std::error_code ec)
+```
+
+Error code constructor using std::error_code
+
+
+
+
+
+
+##### ErrorCode
+
+
+
+
+
+```cpp
+ErrorCode()
+```
+
+Error code constructor using an empty value
+
+
+
+
+
+
+
+
+
+### FlagImpl {#FlagImpl} 
+
+
+
+Helper class to strongly type bitfield operations
+
+
+
+#### Functions
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`StorageType`](#_2459529672160) | Internal |  |
+</RefTable>
+
+
+
+### List {#List} 
+
+
+
+Templated helper class to wrap a dynamic collection of elements
+
+
+
+#### Functions
+
+
+##### GetRawList
+
+
+
+
+
+```cpp
+const ListType &GetRawList() const
+```
+
+Retrieve the raw list as a const reference
+
+
+
+
+
+
+##### GetRawList
+
+
+
+
+
+```cpp
+ListType &GetRawList()
+```
+
+Retrieve the raw list as a reference
+
+
+
+
+
+
+##### Size
+
+
+
+
+
+```cpp
+std::size_t Size() const
+```
+
+Retrieve the size of the internal list
+
+
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`ListType`](#_2459558431024) | InternalList |  |
+</RefTable>
+
+
+
+### YoutubeURLList {#YoutubeURLList} 
+
+
+
+A URLList subclass to match Youtube urls
+
+
+
+
+
+
+
+### SketchfabURLList {#SketchfabURLList} 
+
+
+
+A URLList subclass to match Sketchfab urls
+
+
+
+
+
+
+
+### GalleryList {#GalleryList} 
+
+
+
+List subclass to contain, compare and transform images
+
+
+
+
+
+
+
+### CreateModFileParams {#CreateModFileParams} 
+
+
+
+Class specifying the parameters to submit when creating a mod file
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | RootDirectory | Path to a directory to treat as the root of the mod. The SDK will compress all contents of this folder into a .zip archive, with a relative path based on this directory. This directory will not be created itself, the contents will exist at the top level of the archive. |
+| [`Modio::Optional<std::string>`](#_2459553995904) | Version | Optional version string for this modfile release |
+| [`Modio::Optional<std::string>`](#_2459553995904) | Changelog | Optional changelog string for this modfile release |
+| [`Modio::Optional<_Bool>`](#_2459560013936) | bSetAsActive | Should this mod be set as active/latest release? Defaults to true if not set. |
+| [`Modio::Optional<std::string>`](#_2459553995904) | MetadataBlob | Optional metadata blob for this mod |
+| [`Modio::Optional<std::vector<Modio::Metadata> >`](#_2459540366880) | MetadataKvp | Optional key-value-pair metadata for this mod |
+| [`Modio::Optional<std::vector<Modio::ModfilePlatform> >`](#_2459540609408) | Platforms | Optional vector of platforms for this modfile |
+</RefTable>
+
+
+
+### CreateModParams {#CreateModParams} 
+
+
+
+Class specifying the parameters to submit when creating a mod
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | PathToLogoFile | Path to the logo for the mod. Must point to a valid file on disk or the mod will not be created on the server. |
+| [`std::string`](#_2459541209920) | Name | The name of the mod |
+| [`std::string`](#_2459541209920) | Summary | A brief summary of what the mod is |
+| [`Modio::Optional<std::string>`](#_2459553995904) | NamePath | Optional override for the name 'slug' in the mod's URL |
+| [`Modio::Optional<Modio::ObjectVisibility>`](#_2459560617088) | Visibility | Optional override for the mod's visibility status. Defaults to Public (1) |
+| [`Modio::Optional<std::string>`](#_2459553995904) | Description | Optional long description of the mod |
+| [`Modio::Optional<std::string>`](#_2459553995904) | HomepageURL | Optional URL to the mod's homepage. Must be a valid URL |
+| [`Modio::Optional<std::size_t>`](#_2459560978608) | Stock | Optional quantity limit on the mod |
+| [`Modio::Optional<Modio::ProfileMaturity>`](#_2459561208704) | MaturityRating | Bitwise mask of flags indicating mature content |
+| [`Modio::Optional<Modio::ModCommunityOptionsFlags>`](#_2459561445424) | CommunityOptions | Community options for the mod |
+| [`Modio::Optional<std::string>`](#_2459553995904) | MetadataBlob | Optional metadata blob for this mod |
+| [`Modio::Optional<std::vector<Modio::Metadata> >`](#_2459540366880) | MetadataKvp | Optional key-value-pair metadata for this mod |
+| [`Modio::Optional<std::vector<std::string> >`](#_2459561684224) | Tags | Optional list of mod tags. All tags must be supported by the parent game to be applied |
+</RefTable>
+
+
+
+### CreateSourceFileParams {#CreateSourceFileParams} 
+
+
+
+Class specifying the parameters to submit when creating a mod source file
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | RootDirectory | Path to a directory to treat as the root of the mod source. The SDK will compress all contents of this folder into a .zip archive, with a relative path based on this directory. This directory will not be created itself, the contents will exist at the top level of the archive. |
+| [`Modio::Optional<std::string>`](#_2459553995904) | Version | Optional version string for this modfile release |
+| [`Modio::Optional<std::string>`](#_2459553995904) | Changelog | Optional changelog string for this modfile release |
+| [`Modio::Optional<std::string>`](#_2459553995904) | MetadataBlob | Optional metadata blob for this mod |
+| [`Modio::Optional<std::vector<Modio::ModfilePlatform> >`](#_2459540609408) | Platforms | Optional vector of platforms for this modfile |
+</RefTable>
+
+
+
+### EditModParams {#EditModParams} 
+
+
+
+Class specifying fields to update for a mod
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::Optional<std::string>`](#_2459553995904) | Name | The name of the mod |
+| [`Modio::Optional<std::string>`](#_2459553995904) | Summary | A brief summary of what the mod is |
+| [`Modio::Optional<std::string>`](#_2459553995904) | NamePath | Optional override for the name 'slug' in the mod's URL |
+| [`Modio::Optional<Modio::ObjectVisibility>`](#_2459560617088) | Visibility | Optional override for the mod's visibility status. Defaults to Public (1) |
+| [`Modio::Optional<std::string>`](#_2459553995904) | Description | Optional long description of the mod |
+| [`Modio::Optional<std::string>`](#_2459553995904) | HomepageURL | Optional URL to the mod's homepage. Must be a valid URL |
+| [`Modio::Optional<Modio::MaturityOption>`](#_2459561970512) | MaturityRating | Bitwise mask of flags indicating mature content |
+| [`Modio::Optional<Modio::ModCommunityOptionsFlags>`](#_2459561445424) | CommunityOptions | Community options for the mod |
+| [`Modio::Optional<std::string>`](#_2459553995904) | MetadataBlob | Optional metadata blob for this mod |
+| [`Modio::Optional<std::vector<Modio::Metadata> >`](#_2459540366880) | MetadataKvp | Optional key-value-pair metadata for this mod |
+| [`Modio::Optional<std::string>`](#_2459553995904) | LogoPath | Optional path to a new logo image |
+| [`Modio::Optional<std::vector<std::string> >`](#_2459561684224) | Tags | Optional tags vector for this mod |
+</RefTable>
+
+
+
+### FilterParams {#FilterParams} 
+
+
+
+Class storing a set of filter parameters for use in [`ListAllModsAsync`](#listallmodsasync)
+
+
+#### Enums
+
+
+##### SortFieldType {#_2459564813296} 
+
+Enum indicating which field should be used to sort the results.
+
+
+###### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `ID` | 0 |
+| `DownloadsToday` | 1 |
+| `SubscriberCount` | 2 |
+| `Rating` | 3 |
+| `DateMarkedLive` | 4 |
+| `DateUpdated` | 5 |
+| `DownloadsTotal` | 6 |
+| `Alphabetical` | 7 |
+</RefTable>
+
+
+
+##### SortDirection {#_2459564813840} 
+
+Enum indicating which direction sorting should be applied
+
+
+###### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Ascending` | 0 |
+| `Descending` | 1 |
+</RefTable>
+
+
+
+##### RevenueFilterType {#_2459564814768} 
+
+Enum indicating filtering options based off revenue type
+
+
+###### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Free` | 0 |
+| `Paid` | 1 |
+| `FreeAndPaid` | 2 |
+</RefTable>
+
+
+
+#### Functions
+
+
+##### SortBy
+
+
+
+
+
+```cpp
+Modio::FilterParams &SortBy(Modio::FilterParams::SortFieldType ByField, Modio::FilterParams::SortDirection ByDirection)
+```
+
+Indicates results should be sorted using the specified field and direction
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ByField|Field to sort with| 
+|ByDirection|Direction to sort| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### NameContains
+
+
+
+
+
+```cpp
+Modio::FilterParams &NameContains(std::string SearchString)
+```
+
+Only include mods where the name contains the provided string
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|SearchString|Search string| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### NameContains
+
+
+
+
+
+```cpp
+Modio::FilterParams &NameContains(const std::vector<std::string> &SearchString)
+```
+
+Only include mods where the name contains at least one of the provided strings (string1 OR string2 OR stringN...)
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|SearchString|First search string| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### MatchingAuthor
+
+
+
+
+
+```cpp
+Modio::FilterParams &MatchingAuthor(const Modio::UserID &UserId)
+```
+
+Only include mods with the specified author User ID
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|UserId|The User ID to filter on| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### ExcludingAuthor
+
+
+
+
+
+```cpp
+Modio::FilterParams &ExcludingAuthor(const Modio::UserID &UserId)
+```
+
+Exclude mods with the specified author User ID
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|UserId|The User ID to filter on| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### MatchingAuthors
+
+
+
+
+
+```cpp
+Modio::FilterParams &MatchingAuthors(const std::vector<Modio::UserID> &UserIds)
+```
+
+Only include mods with the specified author User IDs
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|UserIds|The list of User IDs to filter on| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### ExcludingAuthors
+
+
+
+
+
+```cpp
+Modio::FilterParams &ExcludingAuthors(const std::vector<Modio::UserID> &UserIds)
+```
+
+Exclude mods with the specified author User IDs
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|UserIds|The list of User IDs to filter on| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### MatchingIDs
+
+
+
+
+
+```cpp
+Modio::FilterParams &MatchingIDs(const std::vector<Modio::ModID> &IDSet)
+```
+
+Only include mods with the specified IDs
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|IDSet|The list of Mod IDs to filter on| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### ExcludingIDs
+
+
+
+
+
+```cpp
+Modio::FilterParams &ExcludingIDs(const std::vector<Modio::ModID> &IDSet)
+```
+
+Exclude mods with the specified IDs. This takes precedence over MatchingIDs.
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|IDSet|The list of Mod IDs to exclude| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### MarkedLiveAfter
+
+
+
+
+
+```cpp
+Modio::FilterParams &MarkedLiveAfter(std::chrono::system_clock::time_point LiveAfter, bool RoundToHour = true)
+```
+
+Only include mods that were marked live (i.e released) after the specified date
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|LiveAfter|Minimum date| 
+|If|LiveAfter should be rounded to the nearest hour (for cacheability on the backend)| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### MarkedLiveBefore
+
+
+
+
+
+```cpp
+Modio::FilterParams &MarkedLiveBefore(std::chrono::system_clock::time_point LiveBefore, bool RoundToHour = true)
+```
+
+Only include mods that were marked live (i.e released) before the specified date
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|LiveBefore|Maximum date| 
+|If|LiveBefore should be rounded to the nearest hour (for cacheability on the backend)| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### WithTags
+
+
+
+
+
+```cpp
+Modio::FilterParams &WithTags(std::string Tag)
+```
+
+Only include mods that have the specified tag
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Tag|Tag to include| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### WithTags
+
+
+
+
+
+```cpp
+Modio::FilterParams &WithTags(std::vector<std::string> NewTags)
+```
+
+Only include mods that have all the specified tags (tag1 AND tag2 AND tagN...)
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|NewTags|The set of tags to filter on| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### WithoutTags
+
+
+
+
+
+```cpp
+Modio::FilterParams &WithoutTags(std::string Tag)
+```
+
+Only include mods that do not have the specified tag
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Tag|Tag to exclude| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### WithoutTags
+
+
+
+
+
+```cpp
+Modio::FilterParams &WithoutTags(std::vector<std::string> NewTags)
+```
+
+Only include mods that do not have any of the specified tags ( NOT (tag1 OR tag2 OR tagN...))
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|NewTags|Tags to exclude| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### MetadataLike
+
+
+
+
+
+```cpp
+Modio::FilterParams &MetadataLike(std::string SearchString)
+```
+
+Only include mods that contain a metadata blob that contains the specified string
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|SearchString|String to search for| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### IndexedResults
+
+
+
+
+
+```cpp
+Modio::FilterParams &IndexedResults(std::size_t StartIndex, std::size_t ResultCount)
+```
+
+Returns a sub-range of query results from StartIndex to StartIndex + ResultCount
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|StartIndex|Zero-based index of first result to return| 
+|ResultCount|Number of results to return| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### PagedResults
+
+
+
+
+
+```cpp
+Modio::FilterParams &PagedResults(std::size_t PageNumber, std::size_t PageSize)
+```
+
+Returns a sub-range of query results based on a specified page size and index
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|PageNumber|Zero-based index of page to return| 
+|PageSize|Number of results in a page| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### RevenueType
+
+
+
+
+
+```cpp
+Modio::FilterParams &RevenueType(Modio::FilterParams::RevenueFilterType ByRevenue)
+```
+
+Indicates results should be filtered by revenue options
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ByRevenue|Revenue filter to use| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### DisallowMatureContent
+
+
+
+
+
+```cpp
+Modio::FilterParams &DisallowMatureContent()
+```
+
+Indicates results should exclude all mods which contain mature content
+
+
+
+###### Returns
+
+*this
+
+
+
+
+##### WithMatureContentFlags
+
+
+
+
+
+```cpp
+Modio::FilterParams &WithMatureContentFlags(Modio::MaturityOption ByMaturity)
+```
+
+Indicates results should be filtered by maturity options
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ByMaturity|Maturity flags to filter by| 
+</RefTable>
+
+###### Returns
+
+*this
+
+
+
+
+##### FilterParams
+
+
+
+
+
+```cpp
+FilterParams()
+```
+
+Default FilterParams constructor. Sorts by mod ID in ascending order and returns 100 results (the maximum allowed by the REST API).
+
+
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`SortFieldType`](#_2459564813296) | SortField |  |
+| [`SortDirection`](#_2459564813840) | Direction |  |
+| [`std::vector<Modio::UserID>`](#_2459564820528) | IncludedAuthorUserIds |  |
+| [`std::vector<Modio::UserID>`](#_2459564820528) | ExcludedAuthorUserIds |  |
+| [`std::vector<std::string>`](#_2459558441888) | SearchKeywords |  |
+| [`Modio::Optional<std::chrono::system_clock::time_point>`](#_2459539343920) | DateRangeBegin |  |
+| [`Modio::Optional<std::chrono::system_clock::time_point>`](#_2459539343920) | DateRangeEnd |  |
+| [`std::vector<std::string>`](#_2459558441888) | Tags |  |
+| [`std::vector<std::string>`](#_2459558441888) | ExcludedTags |  |
+| [`std::vector<Modio::ModID>`](#_2459555019680) | IncludedIDs |  |
+| [`std::vector<Modio::ModID>`](#_2459555019680) | ExcludedIDs |  |
+| [`Modio::Optional<Modio::FilterParams::RevenueFilterType>`](#_2459565337792) | Revenue |  |
+| [`Modio::Optional<Modio::MaturityOption>`](#_2459561970512) | Maturity |  |
+| [`Modio::Optional<std::string>`](#_2459553995904) | MetadataBlobSearchString |  |
+| [`_Bool`](#_2459507020240) | IsPaged |  |
+| [`std::size_t`](#_2459507020592) | Index |  |
+| [`std::size_t`](#_2459507020592) | Count |  |
+</RefTable>
+
+
+
+
+### ModCollectionEntry {#ModCollectionEntry} 
+
+
+
+Class representing a mod which is installed locally
+
+
+
+#### Functions
+
+
+##### GetID
+
+
+
+
+
+```cpp
+Modio::ModID GetID() const
+```
+
+
+
+
+
+###### Returns
+
+Mod ID
+
+
+
+
+##### GetModProfile
+
+
+
+
+
+```cpp
+const Modio::ModInfo &GetModProfile() const
+```
+
+
+
+
+
+###### Returns
+
+Modio::ModInfo containing mod profile data
+
+
+
+
+##### GetPath
+
+
+
+
+
+```cpp
+std::string GetPath() const
+```
+
+
+
+
+
+###### Returns
+
+Path to the mod's installation folder on disk NOTE: If the mod is not yet installed this path may not yet exist. Check\{ModCollectionEntry::GetModState} before trying to load files in this location
+
+
+
+
+##### GetRawSizeOnDisk
+
+
+
+
+
+```cpp
+Modio::FileSize GetRawSizeOnDisk() const
+```
+
+
+
+
+
+###### Returns
+
+Size on disk of the mod
+
+
+
+
+##### GetSizeOnDisk
+
+
+
+
+
+```cpp
+Modio::Optional<Modio::FileSize> GetSizeOnDisk() const
+```
+
+
+
+
+
+###### Returns
+
+Size on disk if the mod has been installed, or empty optional if installation is in progress
+
+
+
+
+##### GetLocalUserSubscriptions
+
+
+
+
+
+```cpp
+std::set<Modio::UserID> GetLocalUserSubscriptions() const
+```
+
+
+
+
+
+###### Returns
+
+The local user subscriptions
+
+
+
+
+##### GetNeverRetryReason
+
+
+
+
+
+```cpp
+Modio::ErrorCode GetNeverRetryReason() const
+```
+
+
+
+
+
+###### Returns
+
+The reason for never retrying
+
+
+
+
+##### GetLastError
+
+
+
+
+
+```cpp
+Modio::ErrorCode GetLastError() const
+```
+
+
+
+
+
+###### Returns
+
+Modio::ErrorCode The last error that occurred for this mod
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::ModID`](#_2459553647456) | ID | The ID of the mod |
+| [`std::atomic<Modio::ModState>`](#_2459565648096) | CurrentState | The status of the mod, is it pending installation, is it installed but needing an update, etc |
+| [`Modio::Optional<Modio::ModState>`](#_2459565805792) | RollbackState |  |
+| [`Modio::ModInfo`](#_2459559951536) | ModProfile | Mod descriptor from the REST API |
+| [`std::atomic<uint8_t>`](#_2459553035760) | LocalUserSubscriptionCount | Reference counting to allow automatic uninstallation of unused local mods |
+| [`std::set<Modio::UserID>`](#_2459566440720) | LocalUserSubscriptions |  |
+| [`std::string`](#_2459541209920) | PathOnDisk |  |
+| [`Modio::FileSize`](#_2459553682000) | SizeOnDisk |  |
+| [`std::atomic<_Bool>`](#_2459553034096) | ShouldNotRetry | flag if this mod should not be processed because it encountered an unrecoverable error during installation/update. This should not be saved to disk as we will more than likely want to retry next session |
+| [`Modio::ErrorCode`](#_2459553553408) | NeverRetryReason |  |
+| [`Modio::ErrorCode`](#_2459553553408) | LastErrorCode |  |
+| [`std::uint8_t`](#_2459507020464) | RetriesRemainingThisSession |  |
+</RefTable>
+
+
+
+### ModProgressInfo {#ModProgressInfo} 
+
+
+
+Class representing the progress of a mod installation or update
+
+
+#### Enums
+
+
+##### EModProgressState {#_2459566892576} 
+
+Enum representing which state the currently processing mod is in
+
+
+###### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Initializing` | 0 |
+| `Downloading` | 1 |
+| `Extracting` | 2 |
+| `Compressing` | 3 |
+| `Uploading` | 4 |
+</RefTable>
+
+
+
+#### Functions
+
+
+##### GetCurrentState
+
+
+
+
+
+```cpp
+Modio::ModProgressInfo::EModProgressState GetCurrentState() const
+```
+
+Retrieves the state of the currently processing mod
+
+
+
+###### Returns
+
+Enum value indicating the current state
+
+
+
+
+##### GetCurrentProgress
+
+
+
+
+
+```cpp
+Modio::FileSize GetCurrentProgress(Modio::ModProgressInfo::EModProgressState State) const
+```
+
+Retrieves the progress value for the specified state. CurrentProgress == TotalProgress for states which have completed, for example if a mod is currently Extracting, then passing in Downloading would give you a value equal to the total download size
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|State|which state to query progress information for| 
+</RefTable>
+
+###### Returns
+
+Modio::FileSize for current progress in bytes
+
+
+
+
+##### GetTotalProgress
+
+
+
+
+
+```cpp
+Modio::FileSize GetTotalProgress(Modio::ModProgressInfo::EModProgressState State) const
+```
+
+Retrieves the total amount of progress required for the specified state.
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|State|which state to query total progress for| 
+</RefTable>
+
+###### Returns
+
+Modio::FileSize for total progress in bytes
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::ModID`](#_2459553647456) | ID | The mod ID of the mod being processed |
+</RefTable>
+
+
+
+
+### UserSubscriptionList {#UserSubscriptionList} 
+
+
+
+Class containing the mod IDs the current user is subscribed to
+
+
+
+#### Functions
+
+
+
+
+
+### ModCollection {#ModCollection} 
+
+
+
+Container of multiple mods organized by Modio::ModID
+
+
+
+#### Functions
+
+
+##### FilterByUserSubscriptions
+
+
+
+
+
+```cpp
+const Modio::ModCollection FilterByUserSubscriptions(const Modio::UserSubscriptionList &UserSubscriptions) const
+```
+
+Retrieve a ModCollection given a UserSubscriptionList
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|UserSubscriptions|patterns that would entitle a filter| 
+</RefTable>
+
+###### Returns
+
+ModCollection filled with patterns from UserSubscriptions or empty if nothing is found
+
+
+
+
+##### AddOrUpdateMod
+
+
+
+
+
+```cpp
+bool AddOrUpdateMod(Modio::ModInfo ModToAdd, std::string CalculatedModPath)
+```
+
+Either inserts a mod into the collection or updates its associated profile
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModToAdd|The mod to insert or update| 
+|CalculatedModPath|The new path to the mod on disk| 
+</RefTable>
+
+###### Returns
+
+True of mod was inserted, false if mod was updated
+
+
+
+
+##### UpdateMod
+
+
+
+
+
+```cpp
+bool UpdateMod(Modio::ModInfo ModToUpdate, std::string CalculatedModPath)
+```
+
+Updates a mod in the collection if it exists, otherwise does nothing
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModToUpdate|The mod to update| 
+|CalculatedModPath|The new path to the mod on disk| 
+</RefTable>
+
+###### Returns
+
+True of mod was updated, false if mod was not present
+
+
+
+
+##### UpdateModPath
+
+
+
+
+
+```cpp
+bool UpdateModPath(Modio::ModID ModToUpdate, std::string CalculatedModPath)
+```
+
+Updates the mod path in the mod collection if it exists, otherwise does nothing
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|ModToUpdate|The mod to update| 
+|CalculatedModPath|The new path to the mod on disk| 
+</RefTable>
+
+###### Returns
+
+True of mod was updated, false if mod was not present
+
+
+
+
+##### Entries
+
+
+
+
+
+```cpp
+const std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> &Entries() const
+```
+
+Retrieve a dictionary of ModID - ModCollectionEntry stored in this ModCollection
+
+
+
+###### Returns
+
+Dictionary where keys are ModID and values are ModCollectionEntry
+
+
+
+
+##### Entries
+
+
+
+
+
+```cpp
+std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>> &Entries()
+```
+
+Retrieve a dictionary of ModID - ModCollectionEntry stored in this ModCollection
+
+
+
+###### Returns
+
+Dictionary where keys are ModID and values are ModCollectionEntry
+
+
+
+
+##### GetByModID
+
+
+
+
+
+```cpp
+Modio::Optional<Modio::ModCollectionEntry &> GetByModID(Modio::ModID ModId) const
+```
+
+Retrieve a single ModCollectionEntry if one is found using a ModID
+
+
+
+###### Returns
+
+A ModCollectionEntry when the ModCollection finds it using a ModID, otherwise empty
+
+
+
+
+##### RemoveMod
+
+
+
+
+
+```cpp
+bool RemoveMod(Modio::ModID ModId, bool bForce = false)
+```
+
+Remove a ModCollectionEntry inside the ModCollection indexed by ModID
+
+
+
+###### Returns
+
+True when the mod was found and removed, otherwise false
+
+
+
+
+##### SortEntriesByRetryPriority
+
+
+
+
+
+```cpp
+std::vector<std::shared_ptr<Modio::ModCollectionEntry>> SortEntriesByRetryPriority() const
+```
+
+Retrieved a sorted ModCollectionEntry vector by priority
+
+
+
+###### Returns
+
+Vector with ModCollectionEntry
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::map<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry> >`](#_2459567157184) | ModEntries |  |
+</RefTable>
+
+
+
+### ModEventLog {#ModEventLog} 
+
+
+
+Container of events directly related to a ModID, in particular any error occurred during execution
+
+
+
+#### Functions
+
+
+##### AddEntry
+
+
+
+
+
+```cpp
+void AddEntry(Modio::ModManagementEvent Entry)
+```
+
+Adds a new entry to the event log. If a given mod ID has an existing entry, this replaces it, effectively updating it.
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Entry|The entry to add| 
+</RefTable>
+
+
+
+
+##### ClearLog
+
+
+
+
+
+```cpp
+inline std::vector<Modio::ModManagementEvent> ClearLog()
+```
+
+Clears the log of events
+
+
+
+###### Returns
+
+All entries in the log at the time ClearLog was called
+
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::vector<Modio::ModManagementEvent>`](#_2459567647168) | InternalData |  |
+</RefTable>
+
+
+
+### PagedResult {#PagedResult} 
+
+
+
+Base class for all types that represent a page from a set of results
+
+
+
+#### Functions
+
+
+##### GetPageCount
+
+
+
+
+
+```cpp
+inline std::int32_t GetPageCount() const
+```
+
+Get the PageCount
+
+
+
+
+
+
+##### GetPageIndex
+
+
+
+
+
+```cpp
+inline std::int32_t GetPageIndex() const
+```
+
+Get the PageIndex
+
+
+
+
+
+
+##### GetPageSize
+
+
+
+
+
+```cpp
+inline std::int32_t GetPageSize() const
+```
+
+Get the PageSize
+
+
+
+
+
+
+##### GetTotalResultCount
+
+
+
+
+
+```cpp
+inline std::int32_t GetTotalResultCount() const
+```
+
+Get the TotalResultCount
+
+
+
+
+
+
+##### GetResultCount
+
+
+
+
+
+```cpp
+inline std::int32_t GetResultCount() const
+```
+
+Get the ResultCount
+
+
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::int32_t`](#_2459507020368) | PageIndex |  |
+| [`std::int32_t`](#_2459507020368) | PageSize |  |
+| [`std::int32_t`](#_2459507020368) | PageCount |  |
+| [`std::int32_t`](#_2459507020368) | TotalResultCount |  |
+| [`std::int32_t`](#_2459507020368) | ResultCount |  |
+</RefTable>
+
+
+
+### ModDependencyList {#ModDependencyList} 
+
+
+
+Container for a collection of ModDependency objects
+
+
+
+#### Functions
+
+
+
+##### AppendUnique
+
+
+
+
+
+```cpp
+void AppendUnique(const Modio::ModDependencyList &Other)
+```
+
+Insert the unique contents of a ModDependencyList to the end of this list
+
+
+
+
+
+
+##### AppendUnique
+
+
+
+
+
+```cpp
+void AppendUnique(const Modio::ModDependency &ModDependencyData)
+```
+
+Insert a unique ModDependency to the end of this list
+
+
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::uint64_t`](#_2459507020592) | TotalFilesize | Total size of all the dependency files in bytes. |
+| [`std::uint64_t`](#_2459507020592) | TotalFilesizeUncompressed | Total Size of the uncompressed dependency files in bytes. |
+</RefTable>
+
+
+
+### ReportParams {#ReportParams} 
+
+
+
+Class containing data to be submitted in a content report
+
+
+#### Enums
+
+
+
+#### Functions
+
+
+##### ReportParams
+
+
+
+
+
+```cpp
+ReportParams(Modio::GameID Game, Modio::ReportType Type, std::string ReportDescription, Modio::Optional<std::string> ReporterName, Modio::Optional<std::string> ReporterContact)
+```
+
+Creates a content report for a game.
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Game|The ID of the game being reported| 
+|Type|The nature of the content report| 
+|ReportDescription|A description of why the content is being reported| 
+|ReporterName|Name of the submitting user. Recommended for DMCA reports, but may be empty| 
+|ReporterContact|Contact details of the submitting user. Recommended for DMCA reports, but may be empty| 
+</RefTable>
+
+
+
+
+##### ReportParams
+
+
+
+
+
+```cpp
+ReportParams(Modio::UserID User, Modio::ReportType Type, std::string ReportDescription, Modio::Optional<std::string> ReporterName, Modio::Optional<std::string> ReporterContact)
+```
+
+Creates a content report for a game.
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|User|The ID of the User being reported| 
+|Type|The nature of the content report| 
+|ReportDescription|A description of why the content is being reported| 
+|ReporterName|Name of the submitting user. Recommended for DMCA reports, but may be empty| 
+|ReporterContact|Contact details of the submitting user. Recommended for DMCA reports, but may be empty| 
+</RefTable>
+
+
+
+
+##### ReportParams
+
+
+
+
+
+```cpp
+ReportParams(Modio::ModID Mod, Modio::ReportType Type, std::string ReportDescription, Modio::Optional<std::string> ReporterName, Modio::Optional<std::string> ReporterContact)
+```
+
+Creates a content report for a game.
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Mod|The ID of the content being reported| 
+|Type|The nature of the content report| 
+|ReportDescription|A description of why the content is being reported| 
+|ReporterName|Name of the submitting user. Recommended for DMCA reports, but may be empty| 
+|ReporterContact|Contact details of the submitting user. Recommended for DMCA reports, but may be empty| 
+</RefTable>
+
+
+
+
+##### ReportParams
+
+
+
+
+
+```cpp
+ReportParams(Modio::ModCollectionID Mod, Modio::ReportType Type, std::string ReportDescription, Modio::Optional<std::string> ReporterName, Modio::Optional<std::string> ReporterContact)
+```
+
+Creates a content report for a game.
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Mod|The ID of the content being reported| 
+|Type|The nature of the content report| 
+|ReportDescription|A description of why the content is being reported| 
+|ReporterName|Name of the submitting user. Recommended for DMCA reports, but may be empty| 
+|ReporterContact|Contact details of the submitting user. Recommended for DMCA reports, but may be empty| 
+</RefTable>
+
+
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::Optional<std::string>`](#_2459553995904) | ReporterName |  |
+| [`Modio::Optional<std::string>`](#_2459553995904) | ReporterContact |  |
+| [`std::string`](#_2459541209920) | ReportDescription |  |
+| [`Modio::ReportParams::ResourceType`](#_2459571173328) | ReportedResourceType |  |
+| [`std::int64_t`](#_2459507020432) | ResourceID | Type-erased storage for the underlying resource ID. NB if REST API changes ID types this will need to be altered to match |
+| [`Modio::ReportType`](#_2459571161072) | Type |  |
+</RefTable>
+
+
+
+
+### EntitlementConsumptionStatusList {#EntitlementConsumptionStatusList} 
+
+
+
+Class representing a list of mods that may be a page from a larger set of results
+
+
+
+#### Functions
+
+
+##### Append
+
+
+
+
+
+```cpp
+void Append(const Modio::EntitlementConsumptionStatusList &Other)
+```
+
+Insert ModioEntitlementConsumptionStatusList to the end of this list
+
+
+
+
+
+
+##### Append
+
+
+
+
+
+```cpp
+void Append(const Modio::EntitlementConsumptionStatus &EntitlementConsumptionStatusData)
+```
+
+Insert a ModioEntitlementConsumptionStatus to the end of this list
+
+
+
+
+
+
+##### EntitlementsThatRequireRetry
+
+
+
+
+
+```cpp
+Modio::Optional<Modio::EntitlementConsumptionStatusList> EntitlementsThatRequireRetry() const
+```
+
+Filter elements that require a second request to confirm the entitlement
+
+
+
+###### Returns
+
+Optional list with the elements that need a retry, otherwise an empty object.
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::Optional<Modio::EntitlementWalletBalance>`](#_2459571558192) | WalletBalance | Updated wallet balance from syncing entitlements |
+</RefTable>
+
+
+
+### ModTagOptions {#ModTagOptions} 
+
+
+
+Container for a collection of ModTagInfo objects
+
+
+
+
+
+
+
+### GameInfoList {#GameInfoList} 
+
+
+
+Class representing a list of games that may be a page from a larger set of results
+
+
+
+#### Functions
+
+
+##### Append
+
+
+
+
+
+```cpp
+void Append(const Modio::GameInfoList &Other)
+```
+
+Insert GameInfoList to the end of this list
+
+
+
+
+
+
+##### Append
+
+
+
+
+
+```cpp
+void Append(const Modio::GameInfo &GameInfoData)
+```
+
+Insert a GameInfo to the end of this list
+
+
+
+
+
+
+
+
+
+### ModCollectionInfoList {#ModCollectionInfoList} 
+
+
+
+Class representing a list of mods that may be a page from a larger set of results
+
+
+
+#### Functions
+
+
+##### Append
+
+
+
+
+
+```cpp
+void Append(const Modio::ModCollectionInfoList &Other)
+```
+
+Insert ModCollectionInfoList to the end of this list
+
+
+
+
+
+
+##### Append
+
+
+
+
+
+```cpp
+void Append(const Modio::ModCollectionInfo &ModInfoData)
+```
+
+Insert a ModCollectionInfo to the end of this list
+
+
+
+
+
+
+
+
+
+### ModDetails {#ModDetails} 
+
+
+
+Collection of FileMetadata objects representing mod file updates
+
+
+
+
+
+
+
+### ModInfoList {#ModInfoList} 
+
+
+
+Class representing a list of mods that may be a page from a larger set of results
+
+
+
+#### Functions
+
+
+##### Append
+
+
+
+
+
+```cpp
+void Append(const Modio::ModInfoList &Other)
+```
+
+Insert ModInfoList to the end of this list
+
+
+
+
+
+
+##### Append
+
+
+
+
+
+```cpp
+void Append(const Modio::ModInfo &ModInfoData)
+```
+
+Insert a ModInfo to the end of this list
+
+
+
+
+
+
+
+
+
+### UserList {#UserList} 
+
+
+
+Class representing a list of users
+
+
+
+#### Functions
+
+
+##### Append
+
+
+
+
+
+```cpp
+void Append(const Modio::UserList &Other)
+```
+
+Insert UserList to the end of this list
+
+
+
+
+
+
+##### Append
+
+
+
+
+
+```cpp
+void Append(const Modio::User &UserData)
+```
+
+Insert a User to the end of this list
+
+
+
+
+
+
+
+
+
+
+
+
+## Structs
+
+
+### StrongInteger {#StrongInteger} 
+
+
+
+Strong integer type to prevent accidental function parameter reordering and prevent unwanted implicit conversions
+
+
+
+#### Functions
+
+
+##### StrongInteger&lt;UnderlyingIntegerType&gt;
+
+
+
+
+
+```cpp
+constexpr explicit StrongInteger<UnderlyingIntegerType>(UnderlyingIntegerType Value)
+```
+
+explicit constructor from a value of the underlying integer type
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Value|initial value| 
+</RefTable>
+
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`UnderlyingIntegerType`](#_2459510962640) | Value |  |
+</RefTable>
+
+
+
+### EmailAuthCode {#EmailAuthCode} 
+
+
+
+Strong type representing an email authentication code sent to a user email address
+
+
+
+#### Functions
+
+
+##### EmailAuthCode
+
+
+
+
+
+```cpp
+explicit EmailAuthCode(const std::string &Code)
+```
+
+Explicit constructor
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Code|The code sent to the user's email| 
+</RefTable>
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | InternalCode |  |
+</RefTable>
+
+
+
+### EmailAddress {#EmailAddress} 
+
+
+
+Strong type representing an email address
+
+
+
+#### Functions
+
+
+##### EmailAddress
+
+
+
+
+
+```cpp
+explicit EmailAddress(const std::string &Code)
+```
+
+Explicit constructor
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Code|The code sent to the user's email| 
+</RefTable>
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | InternalAddress |  |
+</RefTable>
+
+
+
+### ApiKey {#ApiKey} 
+
+
+
+Strong type representing an api key
+
+
+
+#### Functions
+
+
+##### ApiKey
+
+
+
+
+
+```cpp
+explicit ApiKey(const std::string &InApiKey)
+```
+
+Explicit constructor
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|InApiKey|The code sent to the user's email| 
+</RefTable>
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | InternalApiKey |  |
+</RefTable>
+
+
+
+### UserID {#UserID} 
+
+
+
+Strong type for User IDs
+
+
+
+#### Functions
+
+
+
+
+
+### ModID {#ModID} 
+
+
+
+Strong type for Mod IDs
+
+
+
+#### Functions
+
+
+
+
+
+### ModCollectionID {#ModCollectionID} 
+
+
+
+Strong type for Mod Collection IDs
+
+
+
+#### Functions
+
+
+
+
+
+### FileMetadataID {#FileMetadataID} 
+
+
+
+Strong type for File Metadata IDs
+
+
+
+
+
+
+
+### MediaFileID {#MediaFileID} 
+
+
+
+Strong type for Media File ID
+
+
+
+
+
+
+
+### FileOffset {#FileOffset} 
+
+
+
+Strong type for file offsets
+
+
+
+
+
+
+
+### FileSize {#FileSize} 
+
+
+
+Strong type for file sizes
+
+
+
+
+
+
+
+### GameID {#GameID} 
+
+
+
+Strong type for a game ID
+
+
+
+#### Functions
+
+
+
+
+
+###  {#} 
+
+
+
+Strong type representing a Guid as 16byte binary value
+
+
+
+#### Functions
+
+
+
+
+
+
+
+
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::uint8_t[16]`](#_2459516699712) | Raw8 |  |
+| [`std::uint64_t[2]`](#_2459516687072) | Raw64 |  |
+</RefTable>
+
+
+
+### Guid {#Guid} 
+
+
+
+Strong type representing a Guid
+
+
+
+#### Functions
+
+
+##### GenerateGuid
+
+
+
+
+
+```cpp
+static Modio::Guid GenerateGuid()
+```
+
+Generates a new Guid. NOTE: This is a minimalistic implementation of generating a Guid for metrics, an improved more robust per-platform implementation is planned
+
+
+
+
+
+
+##### Guid
+
+
+
+
+
+```cpp
+explicit Guid(const std::string &InGuid)
+```
+
+Explicit constructor
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|InGuid|string based Guid| 
+</RefTable>
+
+
+
+
+##### Guid
+
+
+
+
+
+```cpp
+explicit Guid(const Modio::GuidV4 &InGuid)
+```
+
+Explicit constructor
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|InGuid|raw 128bit Guid| 
+</RefTable>
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | InternalGuid |  |
+</RefTable>
+
+
+
+### ModCreationHandle {#ModCreationHandle} 
+
+
+
+Strong type wrapping a handle to an as-yet-uncreated mod
+
+
+
+
+
+
+
+### AuthenticationParams {#AuthenticationParams} 
+
+
+
+Simple struct to encapsulate data passed to external authentication systems
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | AuthToken | AuthToken String received by an authentication provider, that later is used to verify a user on the mod.io API |
+| [`Modio::Optional<std::string>`](#_2459553995904) | UserEmail | UserEmail Optional string that associates an email with a user |
+| [`_Bool`](#_2459507020240) | bUserHasAcceptedTerms | bUserHasAcceptedTerms Boolean value that signals when a user has accepted the mod.io Terms of Service. True when they are accepted, false otherwise. |
+| [`_Bool`](#_2459507020240) | bURLEncodeAuthToken | bURLEncodeAuthToken Boolean value to let the SDK know if the AuthToken requires URL encoding before sending the string to the mod.io API. By default, it would not perform URL encoding. |
+| [`std::map<std::string, std::string>`](#_2459554234640) | ExtendedParameters | ExtendedParameters A map to store extended parameters required by some providers. |
+</RefTable>
+
+
+
+### FieldError {#FieldError} 
+
+
+
+Simple struct representing a validation error from the REST API
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | Field | String description of the field failing validation |
+| [`std::string`](#_2459541209920) | Error | String containing the reason for the validation failure |
+</RefTable>
+
+
+
+### EntitlementParams {#EntitlementParams} 
+
+
+
+Simple struct to encapsulate portal-specific data required when consuming entitlements
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::map<std::string, std::string>`](#_2459554234640) | ExtendedParameters | ExtendedParameters A map to store extended parameters required by some portals. |
+</RefTable>
+
+
+
+### MetricsSessionParams {#MetricsSessionParams} 
+
+
+
+Simple struct to store metric session specific parameters for use in [`Modio::MetricsSessionStartAsync`](#metricssessionstartasync)
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::Optional<Modio::Guid>`](#_2459554785248) | SessionId | Set a custom Session Id to be used in the metrics service for your session |
+| [`std::vector<Modio::ModID>`](#_2459555019680) | ModIds | Includes mods which will be tracked as part of the metrics service |
+</RefTable>
+
+
+
+### StorageInfo {#StorageInfo} 
+
+
+
+Structure containing storage usage information including availability and consumption
+
+
+
+#### Functions
+
+
+##### GetSpace
+
+
+
+
+
+```cpp
+Modio::FileSize GetSpace(Modio::StorageLocation Location, Modio::StorageUsage Usage) const
+```
+
+Returns the recorded storage space for a given storage location and usage type
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Location|Where the storage has been written to| 
+|Usage|The type of storage usage recorded| 
+</RefTable>
+
+###### Returns
+
+Modio::FileSize for total storage space in bytes
+
+
+
+
+##### GetQuota
+
+
+
+
+
+```cpp
+static Modio::Optional<Modio::FileSize> GetQuota(Modio::StorageLocation Location)
+```
+
+Get the storage quota for a given `Modio::StorageLocation` if one has been set.
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|Location|The type of storage to get the quota for.| 
+</RefTable>
+
+###### Returns
+
+`Modio::Optional<Modio::FileSize>` of the storage quota in bytes for the specified `Modio::StorageLocation`. Empty if no quota is set.
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+</RefTable>
+
+
+
+### FileMetadata {#FileMetadata} 
+
+
+
+Metadata for a release archive for a mod
+
+
+#### Enums
+
+
+##### VirusScanStatus {#_2459556360800} 
+
+Enum related to the Virus scan status of a file
+
+
+###### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `NotScanned` | 0 |
+| `ScanComplete` | 1 |
+| `InProgress` | 2 |
+| `TooLargeToScan` | 3 |
+| `FileNotFound` | 4 |
+| `ErrorScanning` | 5 |
+</RefTable>
+
+
+
+##### VirusStatus {#_2459556361680} 
+
+Enum related to the Virus status of a file
+
+
+###### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `NoThreat` | 0 |
+| `Malicious` | 1 |
+| `PotentiallyHarmful` | 2 |
+</RefTable>
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::FileMetadataID`](#_2459553663584) | MetadataId | Unique modfile id. |
+| [`Modio::ModID`](#_2459553647456) | ModId | Unique mod id. |
+| [`std::int64_t`](#_2459507020432) | DateAdded | Unix timestamp of date file was added. |
+| [`Modio::FileMetadata::VirusScanStatus`](#_2459556360800) | CurrentVirusScanStatus | Current virus scan status of the file. For newly added files that have yet to be scanned this field will change frequently until a scan is complete |
+| [`Modio::FileMetadata::VirusStatus`](#_2459556361680) | CurrentVirusStatus | Was a virus detected? |
+| [`std::uint64_t`](#_2459507020592) | Filesize | Size of the file in bytes. |
+| [`std::uint64_t`](#_2459507020592) | FilesizeUncompressed | Size of the uncompressed file in bytes. |
+| [`std::string`](#_2459541209920) | Filename | Filename including extension. |
+| [`std::string`](#_2459541209920) | Version | Release version this file represents. |
+| [`std::string`](#_2459541209920) | Changelog | Changelog for the file. |
+| [`std::string`](#_2459541209920) | MetadataBlob | Metadata stored by the game developer for this file. |
+| [`std::string`](#_2459541209920) | DownloadBinaryURL | Modfile download URL |
+| [`std::int64_t`](#_2459507020432) | DownloadExpiryDate | Modfile download expiry date |
+</RefTable>
+
+
+
+### ModCommunityOptionsFlags {#ModCommunityOptionsFlags} 
+
+
+
+A strong type flag object to represent ModCommunityOptions
+
+
+
+#### Functions
+
+
+
+
+
+### ModMonetizationSKU {#ModMonetizationSKU} 
+
+
+
+Represents a SKU for monetization
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::uint8_t`](#_2459507020464) | Id | Unique identifier for the SKU |
+| [`std::string`](#_2459541209920) | Sku | Name of the actual SKU pack |
+| [`std::string`](#_2459541209920) | Portal | Portal that this SKU is associated with |
+</RefTable>
+
+
+
+### ModStats {#ModStats} 
+
+
+
+Contains download stats and ratings for a mod
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::int64_t`](#_2459507020432) | PopularityRankPosition | Current rank of the mod. |
+| [`std::int64_t`](#_2459507020432) | PopularityRankTotalMods | Number of ranking spots the current rank is measured against. |
+| [`std::int64_t`](#_2459507020432) | DownloadsTotal | Number of total mod downloads. |
+| [`std::int64_t`](#_2459507020432) | SubscribersTotal | Number of total users who have subscribed to the mod. |
+| [`std::int64_t`](#_2459507020432) | RatingTotal | Number of times this mod has been rated. |
+| [`std::int64_t`](#_2459507020432) | RatingPositive | Number of positive ratings. |
+| [`std::int64_t`](#_2459507020432) | RatingNegative | Number of negative ratings. |
+| [`std::int64_t`](#_2459507020432) | RatingPercentagePositive | Number of positive ratings, divided by the total ratings to determine it’s percentage score. |
+| [`double`](#_2459507020656) | RatingWeightedAggregate | Overall rating of this item calculated using the [Wilson score confidence interval](https://www.evanmiller.org/how-not-to-sort-by-average-Ratinghtml). This column is good to sort on, as it will order items based on number of ratings and will place items with many positive ratings above those with a higher score but fewer ratings. |
+| [`std::string`](#_2459541209920) | RatingDisplayText | Textual representation of the rating in format: Overwhelmingly Positive -> Very Positive -> Positive -> Mostly Positive -> Mixed -> Negative -> Mostly Negative -> Very Negative -> Overwhelmingly Negative -> Unrated |
+</RefTable>
+
+
+
+### ProfileMaturity {#ProfileMaturity} 
+
+
+
+A strong type flag object to represent MaturityOption from a mod.io info. * Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to * be labeled as mature. The value of this field will default to "Maturity Option None" unless the parent * game allows to flag mature content.
+
+
+
+#### Functions
+
+
+
+
+
+### User {#User} 
+
+
+
+Object representing a mod.io user profile
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::UserID`](#_2459553636432) | UserId | Unique id for the user |
+| [`std::string`](#_2459541209920) | Username | Username of the user |
+| [`Modio::Optional<Modio::OAuthToken>`](#_2459557868448) | AuthToken | Authentification token of the user |
+| [`_Bool`](#_2459507020240) | Verified | If the user has connected an email address to their account |
+| [`std::int64_t`](#_2459507020432) | DateOnline | Unix timestamp the user was last online |
+| [`std::string`](#_2459541209920) | ProfileUrl | URL of the user's mod.io profile |
+| [`Modio::Avatar`](#_2459557849008) | Avatar | Cached information about the user's avatar |
+| [`std::string`](#_2459541209920) | DisplayNamePortal | The display name of the User for the given Portal that the mod search is coming from * ie if the Portal is PSN, then this is the owning user's PSN profile name if accounts are linked. |
+</RefTable>
+
+
+
+### ModTag {#ModTag} 
+
+
+
+Strong type for a ModTag
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | Tag |  |
+| [`std::string`](#_2459541209920) | TagLocalized |  |
+</RefTable>
+
+
+
+### Metadata {#Metadata} 
+
+
+
+Key-Value pair that represents a mod metadata
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | Key |  |
+| [`std::string`](#_2459541209920) | Value |  |
+</RefTable>
+
+
+
+### ModInfo {#ModInfo} 
+
+
+
+Full mod profile including current release information, media links, and stats
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::ModID`](#_2459553647456) | ModId | Unique Mod ID |
+| [`std::string`](#_2459541209920) | ProfileName | Name of the mod |
+| [`std::string`](#_2459541209920) | ProfileSummary | Summary of the mod |
+| [`std::string`](#_2459541209920) | ProfileDescription | Detailed description in HTML format |
+| [`std::string`](#_2459541209920) | ProfileDescriptionPlaintext | Detailed description in plaintext |
+| [`std::string`](#_2459541209920) | ProfileURL | URL to the mod profile |
+| [`Modio::User`](#_2459558411328) | ProfileSubmittedBy | Information on the user who submitted the mod |
+| [`std::int64_t`](#_2459507020432) | ProfileDateAdded | Unix timestamp of the date the mod was registered |
+| [`std::int64_t`](#_2459507020432) | ProfileDateUpdated | Unix timestamp of the date the mod was updated |
+| [`std::int64_t`](#_2459507020432) | ProfileDateLive | Unix timestamp of the date the mod was marked live |
+| [`Modio::ProfileMaturity`](#_2459556556560) | ProfileMaturityOption | Object representing a mod.io user profile	* Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to	* be labeled as mature. The value of this field will default to None unless the parent game allows * to flag mature content. |
+| [`Modio::ModCommunityOptionsFlags`](#_2459556462240) | CommunityOptions | Community options for the mod |
+| [`std::string`](#_2459541209920) | MetadataBlob | Metadata stored by the game developer. |
+| [`Modio::Optional<Modio::FileMetadata>`](#_2459559051216) | FileInfo | Information about the mod's most recent public release |
+| [`std::vector<Modio::Metadata>`](#_2459559286688) | MetadataKvp | Arbitrary key-value metadata set for this mod |
+| [`std::vector<Modio::ModTag>`](#_2459559687600) | Tags | Tags this mod has set |
+| [`std::size_t`](#_2459507020592) | NumGalleryImages | Number of images in the mod's media gallery |
+| [`Modio::GalleryList`](#_2459559004976) | GalleryImages | List of images in the mod's media gallery |
+| [`Modio::YoutubeURLList`](#_2459558844784) | YoutubeURLs | List of youtube links provided by the creator of the mod |
+| [`Modio::SketchfabURLList`](#_2459558846192) | SketchfabURLs | List of sketchfab links provided by the creator of the mod |
+| [`Modio::ModStats`](#_2459556494096) | Stats | Stats and rating information for the mod |
+| [`Modio::Logo`](#_2459559013024) | ModLogo | Media data related to the mod logo |
+| [`std::string`](#_2459541209920) | Version | The current ModInfo version. This property is updated when changes to the class happen. This is NOT the version of the mod itself. Mod versioning is tied to FileInfo, not ModInfo. |
+| [`Modio::ModServerSideStatus`](#_2459559047344) | ModStatus | The current ModStatus on the server: Accepted, NotAccepted, or Deleted. |
+| [`Modio::ObjectVisibility`](#_2459554779504) | Visibility | The visibility status of the mod, default to Public |
+| [`std::uint64_t`](#_2459507020592) | Price | Price of this mod |
+| [`std::vector<Modio::ModMonetizationSKU>`](#_2459559821184) | SKUMappings | SKU Mappings for this mod for monetization purposes |
+| [`_Bool`](#_2459507020240) | Dependencies | If this mod has any direct dependencies |
+</RefTable>
+
+
+
+### InitializeOptions {#InitializeOptions} 
+
+
+
+Structure with all initialization parameters needed to start the API, all need to be filled in for the SDK to properly initialize
+
+
+
+#### Functions
+
+
+##### InitializeOptions
+
+
+
+
+
+```cpp
+InitializeOptions()
+```
+
+Default constructor that sets all variables to an invalid base value
+
+
+
+
+
+
+##### InitializeOptions
+
+
+
+
+
+```cpp
+explicit InitializeOptions(Modio::GameID GameID, Modio::ApiKey APIKey, Modio::Environment GameEnvironment, Modio::Portal PortalInUse, Modio::UserHandleType LocalSessionIdentifier)
+```
+
+Explicit and preferred constructor with the necessary variables to store
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|GameID|The mod.io provided ID to identify the game| 
+|APIKey|The mod.io provided key associated with the game| 
+|GameEnvironment|The mod.io environment to use, listed in the enumeration Modio::Environment| 
+|PortalInUse|The service portal to use, listed in the enumeration Modio::Portal| 
+|LocalSessionIdentifier|A unique identifier for the local session. This local session can have a single mod.io user account associated with it.| 
+</RefTable>
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::GameID`](#_2459553686256) | GameID | The mod.io-provided ID for the game. |
+| [`Modio::ApiKey`](#_2459553618256) | APIKey | The mod.io-provided API key for your application or game. |
+| [`Modio::UserHandleType`](#_2459541209920) | User | Unique identifier for the local session, which will optionally contain user data for an authenticated mod.io user (once authentication is completed). |
+| [`Modio::Portal`](#_2459553574656) | PortalInUse | The storefront or distribution method to use. The API uses this parameter to serve platform-compliant user names. Use `Modio::Portal::None` if your title does not require this. |
+| [`Modio::Environment`](#_2459553561536) | GameEnvironment | The mod.io environment you want to run the SDK on. |
+| [`std::map<std::string, std::string>`](#_2459554234640) | ExtendedParameters | Platform-specific extended initialization parameters. See Platform-specific Notes for more information regarding any special values your platform requires or supports. |
+</RefTable>
+
+
+
+### ModManagementEvent {#ModManagementEvent} 
+
+
+
+Simple struct representing the outcome of a mod management operation
+
+
+#### Enums
+
+
+##### EventType {#_2459567149344} 
+
+What type of event occurred
+
+
+###### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `BeginInstall` | 0 |
+| `Installed` | 1 |
+| `BeginUninstall` | 2 |
+| `Uninstalled` | 3 |
+| `BeginUpdate` | 4 |
+| `Updated` | 5 |
+| `BeginUpload` | 6 |
+| `Uploaded` | 7 |
+</RefTable>
+
+
+
+#### Functions
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::ModID`](#_2459553647456) | ID | ID for the mod that the event occurred on |
+| [`Modio::ModManagementEvent::EventType`](#_2459567149344) | Event | What type of event occurred |
+| [`Modio::ErrorCode`](#_2459553553408) | Status | Empty if operation completed successfully, truthy/contains error code if operation failed |
+</RefTable>
+
+
+
+### ModDependency {#ModDependency} 
+
+
+
+Simple struct containing simplified information about a mod which is a dependency of another mod
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::ModID`](#_2459553647456) | ModID | Unique mod id. |
+| [`std::string`](#_2459541209920) | ModName | Name of the mod |
+| [`std::int64_t`](#_2459507020432) | DateAdded | Unix timestamp of the date the mod was registered |
+| [`std::int64_t`](#_2459507020432) | DateUpdated | Unix timestamp of the date the mod was updated |
+| [`std::uint8_t`](#_2459507020464) | DependencyDepth | The level at which this dependency sits. When greater than zero (0), it means that this dependency relies on additional dependencies. |
+| [`Modio::Logo`](#_2459559013024) | Logo | Media data related to the mod logo |
+| [`Modio::Optional<Modio::FileMetadata>`](#_2459559051216) | FileInfo | Information about the mod's most recent public release |
+| [`Modio::ModServerSideStatus`](#_2459559047344) | Status | The current ModStatus on the server: Accepted, NotAccepted, or Deleted. |
+| [`Modio::ObjectVisibility`](#_2459554779504) | Visibility | The visibility status of the mod, default to Public |
+</RefTable>
+
+
+
+### ServerInitializeOptions {#ServerInitializeOptions} 
+
+:::warning[Experimental Feature]
+This class is part of an experimental feature and is subject to change. 
+:::
+
+
+
+Structure with all initialization parameters needed to start the API in the context of a dedicated server all fields need to be filled in for the SDK to properly initialize. Inherits from the base InitializeOptions.
+
+
+
+#### Functions
+
+
+##### ServerInitializeOptions
+
+
+:::warning[Experimental Feature]
+This function is part of an experimental feature and is subject to change. 
+:::
+
+
+
+
+```cpp
+ServerInitializeOptions()
+```
+
+Default constructor that sets all variables to an invalid base value
+
+
+
+
+
+
+##### ServerInitializeOptions
+
+
+:::warning[Experimental Feature]
+This function is part of an experimental feature and is subject to change. 
+:::
+
+
+
+
+```cpp
+explicit ServerInitializeOptions(Modio::GameID GameID, Modio::ApiKey APIKey, Modio::Environment GameEnvironment, Modio::Portal PortalInUse, Modio::UserHandleType LocalSessionIdentifier, std::string &ModsDirectory, std::string &Token, std::vector<Modio::ModID> Mods)
+```
+
+Explicit and preferred constructor with the necessary variables to store
+
+
+###### Parameters
+
+<RefTable colWidths={['30%', '30%', '40%']} stripes="odd">
+| | |
+|-|-|
+|GameID|The mod.io provided ID to identify the game| 
+|APIKey|The mod.io provided key associated with the game| 
+|GameEnvironment|The mod.io environment to use, listed in the enumeration Modio::Environment| 
+|PortalInUse|The service portal to use, listed in the enumeration Modio::Portal| 
+|LocalSessionIdentifier|A unique identifier for the local session. This local session can have a single mod.io Server token associated with it.| 
+|ModsDirectory|The directory where the SDK will install and look for any and all Mod files| 
+|Token|The OAuth token for this Server| 
+|Mods|A vector of ModIDs to be installed on this server as part of the the initialization process| 
+</RefTable>
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | ModsDirectory | The directory this Server should store its modfiles in. |
+| [`std::string`](#_2459541209920) | Token | The S2S token for this Server. |
+| [`std::vector<Modio::ModID>`](#_2459555019680) | Mods | The base mods for this Server. |
+</RefTable>
+
+
+
+
+### EntitlementConsumptionVirtualCurrencyDetails {#EntitlementConsumptionVirtualCurrencyDetails} 
+
+
+
+Further details about a Virtual Currency entitlement that was consumed
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::int32_t`](#_2459507020368) | TokensAllocated | Amount of tokens that were issued for this specific entitlement consumption |
+</RefTable>
+
+
+
+### EntitlementConsumptionStatus {#EntitlementConsumptionStatus} 
+
+
+
+The result of an entitlement's consumption
+
+
+
+#### Functions
+
+
+##### EntitlementRequiresRetry
+
+
+
+
+
+```cpp
+bool EntitlementRequiresRetry() const
+```
+
+Ask the entitlement if it needs to sync with the endpoint given that it has not been consumed and the transaction state is failed or pending.
+
+
+
+###### Returns
+
+True when the entitlement needs to sync with the API. Otherwise false
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | TransactionId | ID of the transaction to redeem this entitlement |
+| [`Modio::EntitlementConsumptionState`](#_2459571404832) | TransactionState | State of the transaction |
+| [`std::string`](#_2459541209920) | SkuId | ID of the SKU that we attempted to consume |
+| [`_Bool`](#_2459507020240) | EntitlementConsumed | Whether this entitlement was consumed or not |
+| [`Modio::EntitlementType`](#_2459554784288) | EntitlementType | Type of Entitlement that was consumed |
+| [`Modio::EntitlementConsumptionVirtualCurrencyDetails`](#_2459571405504) | VirtualCurrencyDetails | Details about |
+</RefTable>
+
+
+
+### EntitlementWalletBalance {#EntitlementWalletBalance} 
+
+
+
+Updated wallet balance from the sync entitlements call
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::uint64_t`](#_2459507020592) | Balance |  |
+</RefTable>
+
+
+
+### GameCommunityOptionsFlags {#GameCommunityOptionsFlags} 
+
+
+
+A strong type flag object to represent GameCommunityOptions from a mod.io info.
+
+
+
+#### Functions
+
+
+
+
+
+### GameMaturityOptionsFlags {#GameMaturityOptionsFlags} 
+
+
+
+A strong type flag object to represent GameMaturityOptions from a mod.io info.
+
+
+
+#### Functions
+
+
+
+
+
+### GameMonetization {#GameMonetization} 
+
+
+
+A strong type flag object to represent GameMonetizationOptions from a mod.io info.
+
+
+
+#### Functions
+
+
+
+
+
+### GameStats {#GameStats} 
+
+
+
+Contains download stats for a game
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::GameID`](#_2459553686256) | GameID | Unique game id |
+| [`std::int64_t`](#_2459507020432) | ModCountTotal | Available mod count for the game |
+| [`std::int64_t`](#_2459507020432) | ModDownloadsToday | Mods downloaded today for the game |
+| [`std::int64_t`](#_2459507020432) | ModDownloadsTotal | Total Mods downloaded for the game |
+| [`std::int64_t`](#_2459507020432) | ModDownloadsDailyAverage | Average mods downloaded on a daily basis |
+| [`std::int64_t`](#_2459507020432) | ModSubscribersTotal | Number of total users who have subscribed to the mods for the game |
+| [`std::int64_t`](#_2459507020432) | DateExpires | Unix timestamp until this game's statistics are considered stale |
+</RefTable>
+
+
+
+### ModTagLocalizationData {#ModTagLocalizationData} 
+
+
+
+Localization data for a tag value
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | Tag | The original raw unlocalized tag value used by the REST API |
+| [`std::map<std::string, std::string>`](#_2459554234640) | Translations | Culture code -> Localized tag value string mapping for all configured languages. |
+</RefTable>
+
+
+
+### LocalizedTagCategory {#LocalizedTagCategory} 
+
+
+
+Struct containing pre-localized display strings for a tag group
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | GroupName | Localized display string for this tag category's name |
+| [`std::vector<std::string>`](#_2459558441888) | Tags | Localized display strings for all valid values in this tag category |
+</RefTable>
+
+
+
+### ModTagInfo {#ModTagInfo} 
+
+
+
+Metadata about a group of tags that can be used for filtering mods
+
+
+
+#### Functions
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | TagGroupName | Raw unlocalized tag group name |
+| [`std::vector<std::string>`](#_2459558441888) | TagGroupValues | Valid raw unlocalized tag values this group contains |
+| [`std::map<std::string, std::string>`](#_2459554234640) | TagGroupNameLocData | Culture code -> localized tag category name mapping for all configured languages |
+| [`std::vector<Modio::ModTagLocalizationData>`](#_2459572157600) | TagGroupValueLocData | Localization data for this tag category's values in all configured languages |
+| [`_Bool`](#_2459507020240) | bAllowMultipleSelection | True if multiple tags from the group can be used simultaneously |
+| [`_Bool`](#_2459507020240) | bHidden | True if only visible by admins |
+| [`_Bool`](#_2459507020240) | bLocked | True if only editable by admins |
+| [`std::string`](#_2459541209920) | Locale | the culture code for the mod.io locale at the time the mod.io API returned this data |
+</RefTable>
+
+
+
+### GamePlatform {#GamePlatform} 
+
+
+
+Details about a platform that this game supports
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::ModfilePlatform`](#_2459553579744) | Platform | Platform that the game supports |
+| [`_Bool`](#_2459507020240) | Locked | Whether or not this platform is Locked from having files submitted to it |
+| [`_Bool`](#_2459507020240) | Moderated | Whether or not files submitted for this platform are required to go through moderation |
+</RefTable>
+
+
+
+### HeaderImage {#HeaderImage} 
+
+
+
+Contains media URLs to the preview header image for the game
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | Filename |  |
+| [`std::string`](#_2459541209920) | Original |  |
+</RefTable>
+
+
+
+### OtherUrl {#OtherUrl} 
+
+
+
+Creator defined URLs to share
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | Label |  |
+| [`std::string`](#_2459541209920) | Url |  |
+</RefTable>
+
+
+
+### Theme {#Theme} 
+
+
+
+Theme color values for the game
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::string`](#_2459541209920) | Primary |  |
+| [`std::string`](#_2459541209920) | Dark |  |
+| [`std::string`](#_2459541209920) | Light |  |
+| [`std::string`](#_2459541209920) | Success |  |
+| [`std::string`](#_2459541209920) | Warning |  |
+| [`std::string`](#_2459541209920) | Danger |  |
+</RefTable>
+
+
+
+### GameInfo {#GameInfo} 
+
+
+
+Details about a game
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::GameID`](#_2459553686256) | GameID | Unique Game ID |
+| [`std::int64_t`](#_2459507020432) | DateAdded | Unix timestamp of date game was registered |
+| [`std::int64_t`](#_2459507020432) | DateUpdated | Unix timestamp of date game was updated |
+| [`std::int64_t`](#_2459507020432) | DateLive | Unix timestamp of date game was set live |
+| [`std::string`](#_2459541209920) | UgcName | Word used to describe user-generated content (mods, items, addons etc) |
+| [`Modio::Icon`](#_2459572691472) | Icon | Contains media URLs to the icon for the game |
+| [`Modio::Logo`](#_2459559013024) | Logo | Contains media URLs to the logo for the game |
+| [`Modio::HeaderImage`](#_2459572799680) | HeaderImage | Contains media URLs to the preview header image for the game |
+| [`std::string`](#_2459541209920) | Name | Name of the game |
+| [`std::string`](#_2459541209920) | Summary | Summary of the game's mod support |
+| [`std::string`](#_2459541209920) | Instructions | A guide about creating and uploading mods for this game to mod.io |
+| [`std::string`](#_2459541209920) | InstructionsUrl | Link to a mod.io guide, modding wiki, or a page where modders can learn how to make and submit mods to this game's profile |
+| [`std::string`](#_2459541209920) | ProfileUrl | URL to the game |
+| [`Modio::Theme`](#_2459572806880) | Theme | Theme color values for the game |
+| [`Modio::GameStats`](#_2459572145232) | Stats | Numerous aggregate stats for the game |
+| [`std::vector<Modio::OtherUrl>`](#_2459572815600) | OtherUrls | Creator defined URLs to share |
+| [`std::vector<Modio::GamePlatform>`](#_2459572946688) | PlatformSupport | Platforms supported by this title |
+| [`Modio::GameCommunityOptionsFlags`](#_2459572009536) | CommunityOptions | Community options for the game |
+| [`Modio::GameMonetization`](#_2459572119184) | GameMonetizationOptions | Monetization options for the game |
+| [`Modio::GameMaturityOptionsFlags`](#_2459572062160) | MaturityOptions | Maturity options for the game |
+| [`std::string`](#_2459541209920) | VirtualTokenName | Name of the Virtual Tokens for this game |
+| [`std::vector<Modio::ModTagInfo>`](#_2459572551296) | TagOptions | Tags for this game |
+| [`Modio::GameCloudCookingStatus`](#_2459572810864) | CloudCookingStatus | Cloud Cooking status for this game |
+</RefTable>
+
+
+
+### ModCollectionStats {#ModCollectionStats} 
+
+
+
+Contains download stats and ratings for a mod collection
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`std::int64_t`](#_2459507020432) | DownloadsToday | Number of mod collection downloads today. |
+| [`std::int64_t`](#_2459507020432) | DownloadsTotal | Number of total mod collection downloads. |
+| [`std::int64_t`](#_2459507020432) | DownloadsUnique | Number of unique mod collection downloads. |
+| [`std::int64_t`](#_2459507020432) | RatingTotal30Days | Number of times this mod collection has been rated. |
+| [`std::int64_t`](#_2459507020432) | RatingPositive30Days | Number of positive ratings over 30 days. |
+| [`std::int64_t`](#_2459507020432) | RatingNegative30Days | Number of negative ratings over 30 days. |
+| [`std::int64_t`](#_2459507020432) | RatingTotal | Number of times this mod collection has been rated. |
+| [`std::int64_t`](#_2459507020432) | RatingPositive | Number of positive ratings. |
+| [`std::int64_t`](#_2459507020432) | RatingNegative | Number of negative ratings. |
+| [`std::int64_t`](#_2459507020432) | NumberOfComments | Number of comments. |
+| [`std::int64_t`](#_2459507020432) | NumberOfFollowers | Number of followers. |
+| [`std::int64_t`](#_2459507020432) | NumberOfMods | Number of mods in the collection. |
+</RefTable>
+
+
+
+
+### Terms {#Terms} 
+
+
+
+This struct contains strings that should be displayed to a user when displaying the terms of use and offering to create a mod.io account
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::Terms::TermsButtons`](#_2459574132032) | Buttons | It contains the text details for the terms |
+| [`Modio::Terms::TermsLinks`](#_2459574136432) | Links | Link structs to contain all related terms |
+| [`std::string`](#_2459541209920) | TermsText | The plaintext version of the mod.io terms of use |
+</RefTable>
+
+
+
+### TransactionRecord {#TransactionRecord} 
+
+
+
+Contains information about a successful transaction for a mod
+
+
+
+
+#### Variables
+
+<RefTable colWidths={['30%', '20%', '50%']} stripes="odd">
+| | | |
+|-|-|-|
+| [`Modio::ModID`](#_2459553647456) | AssociatedModID | The mod the purchase was for |
+| [`std::uint64_t`](#_2459507020592) | Price | The price the mod was purchased for |
+| [`std::uint64_t`](#_2459507020592) | UpdatedUserWalletBalance | The updated balance in the user's wallet after the transaction |
+| [`Modio::ModInfo`](#_2459559951536) | Mod | ModInfo of the mod that was purchase and subscribed to |
+</RefTable>
+
+
+
+
+### UserRatingList {#UserRatingList} 
+
+
+
+Object representing a mod.io user's ratings
+
+
+
+#### Functions
+
+
+##### Append
+
+
+
+
+
+```cpp
+void Append(const Modio::UserRatingList &Other)
+```
+
+Insert ModInfoList to the end of this list
+
+
+
+
+
+
+##### Append
+
+
+
+
+
+```cpp
+void Append(const Modio::UserRating &UserRatingData)
+```
+
+Insert a ModInfo to the end of this list
+
+
+
+
+
+
+
+
+
+
+
+
+## Enums
+
+
+### Environment {#_2459553561536} 
+
+Enum representing what environment your game is deployed in
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Test` | 0 |
+| `Live` | 1 |
+</RefTable>
+
+
+
+### Portal {#_2459553574656} 
+
+Enum representing the store or service your game is being distributed through
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `None` | 0 |
+| `Apple` | 1 |
+| `EpicGamesStore` | 2 |
+| `GOG` | 3 |
+| `Google` | 4 |
+| `Itchio` | 5 |
+| `Nintendo` | 6 |
+| `PSN` | 7 |
+| `Steam` | 8 |
+| `XboxLive` | 9 |
+| `Meta` | 10 |
+</RefTable>
+
+
+
+### ModfilePlatform {#_2459553579744} 
+
+Enum representing the platform(s) that a modfile is enabled for
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Windows` | 0 |
+| `Mac` | 1 |
+| `Linux` | 2 |
+| `Android` | 3 |
+| `iOS` | 4 |
+| `XboxOne` | 5 |
+| `XboxSeriesX` | 6 |
+| `PS4` | 7 |
+| `PS5` | 8 |
+| `Switch` | 9 |
+| `Oculus` | 10 |
+| `Source` | 11 |
+| `WindowsServer` | 12 |
+| `LinuxServer` | 13 |
+| `Switch2` | 14 |
+</RefTable>
+
+
+
+### LogoSize {#_2459553584064} 
+
+Enum representing mod logo sizes
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Original` | 0 |
+| `Thumb320` | 1 |
+| `Thumb640` | 2 |
+| `Thumb1280` | 3 |
+</RefTable>
+
+
+
+### IconSize {#_2459553588304} 
+
+Enum representing game icon sizes
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Original` | 0 |
+| `Thumb64` | 1 |
+| `Thumb128` | 2 |
+| `Thumb256` | 3 |
+</RefTable>
+
+
+
+### AvatarSize {#_2459553592416} 
+
+Enum representing avatar image sizes
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Original` | 0 |
+| `Thumb50` | 1 |
+| `Thumb100` | 2 |
+</RefTable>
+
+
+
+### GallerySize {#_2459553596528} 
+
+Enum representing an image gallery size
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Original` | 0 |
+| `Thumb320` | 1 |
+| `Thumb1280` | 2 |
+</RefTable>
+
+
+
+### Language {#_2459554770720} 
+
+Enum representing the languages mod.io support responses in
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `English` | 0 |
+| `Bulgarian` | 1 |
+| `French` | 2 |
+| `German` | 3 |
+| `Italian` | 4 |
+| `Polish` | 5 |
+| `Portuguese` | 6 |
+| `Hungarian` | 7 |
+| `Japanese` | 8 |
+| `Korean` | 9 |
+| `Russian` | 10 |
+| `Spanish` | 11 |
+| `SpanishLatinAmerican` | 12 |
+| `Thai` | 13 |
+| `ChineseSimplified` | 14 |
+| `ChineseTraditional` | 15 |
+| `Turkish` | 16 |
+| `Ukrainian` | 17 |
+| `Arabic` | 18 |
+| `Czech` | 19 |
+| `PortugueseBrazilian` | 20 |
+</RefTable>
+
+
+
+### AuthenticationProvider {#_2459554772192} 
+
+Simple struct to encapsulate data passed to external authentication systems
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `XboxLive` | 0 |
+| `Steam` | 1 |
+| `GoG` | 2 |
+| `Itch` | 3 |
+| `Switch` | 4 |
+| `Discord` | 5 |
+| `PSN` | 6 |
+| `Oculus` | 7 |
+| `Epic` | 8 |
+| `OpenID` | 9 |
+| `Apple` | 10 |
+| `GoogleIDToken` | 11 |
+| `GoogleServerSideToken` | 12 |
+</RefTable>
+
+
+
+### LogLevel {#_2459554776720} 
+
+Degree of severity for the log output
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Trace` | 0 |
+| `Detailed` | 1 |
+| `Info` | 2 |
+| `Warning` | 3 |
+| `Error` | 4 |
+</RefTable>
+
+
+
+### LogCategory {#_2459554777840} 
+
+The category of the log message (usually the internal service the message is originating from)
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Core` | 0 |
+| `File` | 1 |
+| `Http` | 2 |
+| `Compression` | 3 |
+| `User` | 4 |
+| `ModManagement` | 5 |
+| `Test` | 6 |
+| `System` | 7 |
+| `ModMetrics` | 8 |
+</RefTable>
+
+
+
+### Rating {#_2459554778816} 
+
+A rating for a mod.
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Neutral` | 0 |
+| `Positive` | 1 |
+| `Negative` | -1 |
+</RefTable>
+
+
+
+### ObjectVisibility {#_2459554779504} 
+
+The visibility of a mod.
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Hidden` | 0 |
+| `Public` | 1 |
+</RefTable>
+
+
+
+### PlatformStatus {#_2459554780096} 
+
+File approval status to filter by. Passed in ExtendedInitializationParameters for the duration of a session.
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `LiveAndPending` | 0 |
+| `PendingOnly` | 1 |
+| `ApprovedOnly` | 2 |
+</RefTable>
+
+
+
+### EntitlementType {#_2459554784288} 
+
+Type of entitlement
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `VirtualCurrency` | 0 |
+| `SKU` | 1 |
+</RefTable>
+
+
+
+### StorageLocation {#_2459555154144} 
+
+Where the storage has been written to
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Local` | 0 |
+| `Cache` | 1 |
+</RefTable>
+
+
+
+### StorageUsage {#_2459555154832} 
+
+The type of storage usage
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Consumed` | 0 |
+| `Available` | 1 |
+</RefTable>
+
+
+
+### ModCommunityOptions {#_2459556432640} 
+
+Community options for a game	* 0 = None set (default)	* 1 = Comments are enabled	* 64 = Enable Previews	* 128 = Enable Preview URLs	* 1024 = Allow mod dependencies	* 8192 = Enable Collections	* 16384 = Enable Collection Comments
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `None` | 0 |
+| `EnableComments` | 1 |
+| `EnablePreviews` | 64 |
+| `EnablePreviewURLs` | 128 |
+| `AllowDependencies` | 1024 |
+| `EnableCollections` | 8192 |
+| `EnableCollectionComments` | 16384 |
+</RefTable>
+
+
+
+### MaturityOption {#_2459556504944} 
+
+Maturity types classification according to the mod.io API	* 0 = None set (default)	* 1 = Alcohol	* 2 = Drugs	* 4 = Violence	* 8 = Explicit
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `None` | 0 |
+| `Alcohol` | 1 |
+| `Drugs` | 2 |
+| `Violence` | 4 |
+| `Explicit` | 8 |
+</RefTable>
+
+
+
+### OAuthTokenState {#_2459557748928} 
+
+OAuth token object
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Valid` | 0 |
+| `Expired` | 1 |
+| `Invalid` | 2 |
+</RefTable>
+
+
+
+### ModServerSideStatus {#_2459559047344} 
+
+Possible status as received from the server
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `NotAccepted` | 0 |
+| `Accepted` | 1 |
+| `Deleted` | 3 |
+</RefTable>
+
+
+
+### HttpError {#_2459562756960} 
+
+
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `CannotOpenConnection` | 20481 |
+| `DownloadNotPermitted` | 20482 |
+| `ExcessiveRedirects` | 20483 |
+| `HttpAlreadyInitialized` | 20484 |
+| `HttpNotInitialized` | 20485 |
+| `InsufficientPermissions` | 20486 |
+| `InvalidResponse` | 20487 |
+| `RateLimited` | 20488 |
+| `RequestError` | 20489 |
+| `ResourceNotAvailable` | 20490 |
+| `SecurityConfigurationInvalid` | 20491 |
+| `ServerClosedConnection` | 20492 |
+| `ServerUnavailable` | 20493 |
+| `ServersOverloaded` | 20494 |
+</RefTable>
+
+
+
+### FilesystemError {#_2459562795488} 
+
+
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `DirectoryNotEmpty` | 20737 |
+| `DirectoryNotFound` | 20738 |
+| `FileLocked` | 20739 |
+| `FileNotFound` | 20740 |
+| `InsufficientSpace` | 20741 |
+| `NoPermission` | 20742 |
+| `PathTooLong` | 20743 |
+| `ReadError` | 20744 |
+| `UnableToCreateFile` | 20745 |
+| `UnableToCreateFolder` | 20746 |
+| `WriteError` | 20747 |
+</RefTable>
+
+
+
+### UserAuthError {#_2459562825328} 
+
+
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `AlreadyAuthenticated` | 20993 |
+| `EmailLoginCodeExpired` | 20994 |
+| `EmailLoginCodeInvalid` | 20995 |
+| `NoAuthToken` | 20996 |
+| `StatusAuthTokenInvalid` | 20997 |
+| `StatusAuthTokenMissing` | 20998 |
+| `UnableToInitStorage` | 20999 |
+</RefTable>
+
+
+
+### UserDataError {#_2459562853344} 
+
+
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `BlobMissing` | 21249 |
+| `InvalidUser` | 21250 |
+</RefTable>
+
+
+
+### ArchiveError {#_2459562879344} 
+
+
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `InvalidHeader` | 21505 |
+| `UnsupportedCompression` | 21506 |
+</RefTable>
+
+
+
+### GenericError {#_2459562907456} 
+
+
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `BadParameter` | 21761 |
+| `CouldNotCreateHandle` | 21762 |
+| `EndOfFile` | 21763 |
+| `IndexOutOfRange` | 21764 |
+| `NoDataAvailable` | 21765 |
+| `OperationCanceled` | 21766 |
+| `OperationError` | 21767 |
+| `QueueClosed` | 21768 |
+| `RequestInProgress` | 21769 |
+| `SDKAlreadyInitialized` | 21770 |
+| `SDKNotInitialized` | 21771 |
+</RefTable>
+
+
+
+### SystemError {#_2459562940544} 
+
+
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `UnknownSystemError` | 22017 |
+</RefTable>
+
+
+
+### ZlibError {#_2459562970480} 
+
+
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `EndOfStream` | 22273 |
+| `IncompleteLengthSet` | 22274 |
+| `InvalidBitLengthRepeat` | 22275 |
+| `InvalidBlockType` | 22276 |
+| `InvalidCodeLengths` | 22277 |
+| `InvalidDistance` | 22278 |
+| `InvalidDistanceCode` | 22279 |
+| `InvalidLiteralLength` | 22280 |
+| `InvalidStoredLength` | 22281 |
+| `MissingEOB` | 22282 |
+| `NeedBuffers` | 22283 |
+| `OverSubscribedLength` | 22284 |
+| `StreamError` | 22285 |
+| `TooManySymbols` | 22286 |
+</RefTable>
+
+
+
+### ModManagementError {#_2459563006752} 
+
+
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `AlreadySubscribed` | 22529 |
+| `InstallOrUpdateCancelled` | 22530 |
+| `ModBeingProcessed` | 22531 |
+| `ModManagementAlreadyEnabled` | 22532 |
+| `ModManagementDisabled` | 22533 |
+| `NoPendingWork` | 22534 |
+| `TempModSetNotInitialized` | 22535 |
+| `UploadCancelled` | 22536 |
+</RefTable>
+
+
+
+### ModValidationError {#_2459563040688} 
+
+
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `ModDirectoryNotFound` | 22785 |
+| `NoFilesFoundForMod` | 22786 |
+</RefTable>
+
+
+
+### MonetizationError {#_2459563073072} 
+
+
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `AccountLacksEntitlement` | 23041 |
+| `DisplayPriceIncorrect` | 23042 |
+| `GameMonetizationNotEnabled` | 23043 |
+| `IncorrectDisplayPrice` | 23044 |
+| `InsufficientFunds` | 23045 |
+| `ItemAlreadyOwned` | 23046 |
+| `MonetizationAuthenticationFailed` | 23047 |
+| `PaymentFailed` | 23048 |
+| `RetryEntitlements` | 23049 |
+| `UnexpectedError` | 23050 |
+| `UserMonetizationDisabled` | 23051 |
+| `UserMonetizationNotConfigured` | 23052 |
+| `WalletFetchFailed` | 23053 |
+</RefTable>
+
+
+
+### ParentalControlRestriction {#_2459563111488} 
+
+
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `ParentalControlRestriction` | 23297 |
+</RefTable>
+
+
+
+### MetricsError {#_2459563209616} 
+
+
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `NoModsInSession` | 23553 |
+| `SessionAlreadyInitialized` | 23554 |
+| `SessionIsActive` | 23555 |
+| `SessionIsNotActive` | 23556 |
+| `SessionNotInitialized` | 23557 |
+</RefTable>
+
+
+
+### PremiumFeaturesError {#_2459563244688} 
+
+
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `FeatureNotEnabled` | 23809 |
+</RefTable>
+
+
+
+### ApiError {#_2459563291104} 
+
+
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `APIKeyForTestOnly` | 11017 |
+| `APIKeyHasNoGame` | 11016 |
+| `AlreadySubscribed` | 15004 |
+| `AlreadySubscribedToUser` | 11134 |
+| `AlreadyUnsubscribed` | 15005 |
+| `AuthenticatedAccountHasBeenDeleted` | 11006 |
+| `BannedUserAccount` | 11007 |
+| `BinaryFileCorrupted` | 13001 |
+| `BinaryFileUnreadable` | 13002 |
+| `CannotMuteYourself` | 17039 |
+| `CannotSubscribeToSelf` | 15091 |
+| `CannotVerifyExternalCredentials` | 11032 |
+| `CloudCookingDisabled` | 29700 |
+| `CrossOriginForbidden` | 10001 |
+| `EmailExchangeCodeAlreadyRedeemed` | 11011 |
+| `EmailLoginCodeExpired` | 11012 |
+| `EmailLoginCodeInvalid` | 11014 |
+| `ExpiredOrRevokedAccessToken` | 11005 |
+| `FailedToCompleteTheRequest` | 10002 |
+| `ForbiddenDMCA` | 15000 |
+| `ForbiddenHidden` | 15001 |
+| `ForbiddenMissingFile` | 15020 |
+| `ForbiddenTACNotAccepted` | 15011 |
+| `InsufficientPermission` | 15019 |
+| `InvalidAPIKey` | 11002 |
+| `InvalidApiVersion` | 10003 |
+| `InvalidJSON` | 13004 |
+| `InvalidZipFile` | 28004 |
+| `MalformedAPIKey` | 11001 |
+| `MatureModsNotAllowed` | 15054 |
+| `MissingAPIKey` | 11000 |
+| `MissingContentTypeHeader` | 13005 |
+| `MissingReadPermission` | 11004 |
+| `MissingWritePermission` | 11003 |
+| `ModCannotAddDependencyMonetized` | 15076 |
+| `ModCannotAllowDependencyMonetized` | 15073 |
+| `ModCannotDeleteDependency` | 15074 |
+| `ModDependenciesNotAllowed` | 15072 |
+| `ModIsDependency` | 15071 |
+| `ModfileNoUploadPermission` | 15006 |
+| `ModioOutage` | 10000 |
+| `MonetizationAccountLacksEntitlement` | 900099 |
+| `MonetizationAuthentication` | 900002 |
+| `MonetizationGameMonetizationNotEnabled` | 900022 |
+| `MonetizationInMaintenance` | 900012 |
+| `MonetizationIncorrectDisplayPrice` | 900035 |
+| `MonetizationInsufficientFunds` | 900049 |
+| `MonetizationItemAlreadyOwned` | 900034 |
+| `MonetizationPaymentFailed` | 900030 |
+| `MonetizationUnableToCommunicate` | 900001 |
+| `MonetizationUnexpectedError` | 900000 |
+| `MonetizationWalletFetchFailed` | 900008 |
+| `MuteUserNotFound` | 17000 |
+| `NotFollowingUser` | 11135 |
+| `OpenIDNotConfigured` | 11086 |
+| `PSNChildAccountNotPermitted` | 11085 |
+| `PSNNotAllowedToInteractWithUGC` | 11096 |
+| `PlatformSpecificModfilesNotSupported` | 14037 |
+| `PremiumFeatureNotEnabled` | 14040 |
+| `Ratelimited` | 11008 |
+| `RatelimitedSameEndpoint` | 11009 |
+| `ReportedEntityUnavailable` | 15030 |
+| `RequestedCommentNotFound` | 15026 |
+| `RequestedGameDeleted` | 14006 |
+| `RequestedGameNotFound` | 14001 |
+| `RequestedInvalidResponseFormat` | 13007 |
+| `RequestedModDeleted` | 15023 |
+| `RequestedModNotFound` | 15022 |
+| `RequestedModfileNotFound` | 15010 |
+| `RequestedResourceNotFound` | 14000 |
+| `RequestedUserBanned` | 11130 |
+| `RequestedUserDeleted` | 11131 |
+| `RequestedUserNotFound` | 21000 |
+| `SubmitReportRightsRevoked` | 15029 |
+| `UnsupportedContentTypeHeader` | 13006 |
+| `UserExistingModRating` | 15028 |
+| `UserMonetizationDisabled` | 900015 |
+| `UserMonetizationNotConfigured` | 900007 |
+| `UserNoAcceptTermsOfUse` | 11074 |
+| `UserNoModRating` | 15043 |
+| `UserUnableToPerformRating` | 17011 |
+| `ValidationErrors` | 13009 |
+| `XBoxLiveChildAccountNotPermitted` | 11030 |
+| `XBoxLiveNotAllowedToInteractWithUGC` | 11028 |
+</RefTable>
+
+
+
+### ErrorConditionTypes {#_2459563713904} 
+
+Enum describing the different conditions a Modio::ErrorCode can satisfy Check if a Modio::ErrorCode meets a particular condition using ErrorCodeMatches
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `ModioServiceError` | 1 |
+| `NetworkError` | 2 |
+| `ConfigurationError` | 3 |
+| `InvalidArgsError` | 4 |
+| `FilesystemError` | 5 |
+| `InternalError` | 6 |
+| `ApiErrorRefSuccess` | 7 |
+| `ModInstallRetryableError` | 8 |
+| `ModInstallDeferredError` | 9 |
+| `ModDeleteDeferredError` | 10 |
+| `ModInstallUnrecoverableError` | 11 |
+| `EntityNotFoundError` | 12 |
+| `UserTermsOfUseError` | 13 |
+| `SubmitReportError` | 14 |
+| `UserNotAuthenticatedError` | 15 |
+| `SDKNotInitialized` | 16 |
+| `UserAlreadyAuthenticatedError` | 17 |
+| `SystemError` | 18 |
+| `OperationCanceled` | 19 |
+| `ModManagementDisabled` | 20 |
+| `RateLimited` | 21 |
+| `ModBeingProcessed` | 22 |
+| `InsufficientSpace` | 23 |
+| `SDKAlreadyInitialized` | 24 |
+| `ModManagementAlreadyEnabled` | 25 |
+| `InsufficientPermissions` | 26 |
+| `EmailLoginCodeInvalid` | 27 |
+| `AlreadySubscribed` | 28 |
+| `InstallOrUpdateCancelled` | 29 |
+| `UploadCancelled` | 30 |
+| `TempModSetNotInitialized` | 31 |
+| `MonetizationOperationError` | 32 |
+| `PaymentTransactionFailed` | 33 |
+| `IncorrectPrice` | 34 |
+| `ItemAlreadyOwned` | 35 |
+| `ParentalControlRestrictions` | 36 |
+| `MetricsSessionNotInitialized` | 37 |
+| `MetricsSessionAlreadyInitialized` | 38 |
+| `MetricsSessionIsActive` | 39 |
+| `MetricsSessionIsNotActive` | 40 |
+| `MetricsSessionHasNoMods` | 41 |
+| `PremiumFeatureNotAvailable` | 42 |
+| `EmailExchangeCodeAlreadyRedeemed` | 43 |
+| `ModDependenciesNotAllowed` | 44 |
+| `ModCannotAddDependencyMonetized` | 45 |
+| `ModIsDependency` | 46 |
+| `ModCannotAllowDependencyMonetized` | 47 |
+| `ModCannotDeleteDependency` | 48 |
+| `RequestInProgress` | 49 |
+| `InvalidZipFile` | 50 |
+| `CloudCookingDisabled` | 51 |
+| `AlreadySubscribedToUser` | 52 |
+| `CannotSubscribeToSelf` | 53 |
+</RefTable>
+
+
+
+### ModState {#_2459565640624} 
+
+Enum representing the current state of a mod
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `InstallationPending` | 0 |
+| `Installed` | 1 |
+| `UpdatePending` | 2 |
+| `Downloading` | 3 |
+| `Extracting` | 4 |
+| `UninstallPending` | 5 |
+</RefTable>
+
+
+
+### UserSubscriptionListChangeType {#_2459567141632} 
+
+Enum indicating if a mod was added or removed when calculating the difference of two user subscription lists
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Added` | 0 |
+| `Removed` | 1 |
+| `Updated` | 2 |
+</RefTable>
+
+
+
+### ReportType {#_2459571161072} 
+
+The type of report being made
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Generic` | 0 |
+| `DMCA` | 1 |
+| `NotWorking` | 2 |
+| `RudeContent` | 3 |
+| `IllegalContent` | 4 |
+| `StolenContent` | 5 |
+| `FalseInformation` | 6 |
+| `Other` | 7 |
+</RefTable>
+
+
+
+### EntitlementConsumptionState {#_2459571404832} 
+
+State of an entitlement consumption transaction
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Failed` | 0 |
+| `Pending` | 1 |
+| `Fulfilled` | 2 |
+| `ConsumeLimitExceeded` | 3 |
+</RefTable>
+
+
+
+### GameCommunityOptions {#_2459571914224} 
+
+Community options for a game	* 0 = None set (default)	* 1 = Comments are enabled	* 2 = Guides are enabled	* 4 = Pin on homepage	* 8 = Show on homepage	* 16 = Show more on homepage	* 32 = Allow change status	* 64 = Enable Previews (Game must be hidden)	* 128 = Allow Preview Share-URL (Previews must be enabled)	* 256 = Allow negative ratings	* 512 = Allow mods to be edited on web	* 1024 = Allow mod dependencies	* 2048 = Allow comments on guides
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `None` | 0 |
+| `EnableComments` | 1 |
+| `EnableGuides` | 2 |
+| `PinOnHomepage` | 4 |
+| `ShowOnHomepage` | 8 |
+| `ShowMoreOnHomepage` | 16 |
+| `AllowChangeStatus` | 32 |
+| `EnablePreviews` | 64 |
+| `AllowPreviewShareURL` | 128 |
+| `AllowNegativeRatings` | 256 |
+| `AllowModsToBeEditedOnWeb` | 512 |
+| `AllowModDependencies` | 1024 |
+| `AllowCommentsOnGuides` | 2048 |
+</RefTable>
+
+
+
+### GameMaturityOptions {#_2459572032560} 
+
+Maturity options for a game	* 0 = Don't allow mature content in mods (default)	* 1 = This game allows mods containing mature content	* 2 = This game is for mature audiences only
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `None` | 0 |
+| `MatureModsAllowed` | 1 |
+| `MatureAudiencesOnly` | 2 |
+</RefTable>
+
+
+
+### GameMonetizationOptions {#_2459572089472} 
+
+Monetization properties of a game	* 0 = None set (default)	* 1 = Monetization is enabled	* 2 = Marketplace is enabled	* 4 = Partner Program is enabled	* 8 = Scarcity feature is enabled (limited items)	* 16 = Forced Scarcity feature enabled, limiting mod creators to a scarcity range	* 32 = Unified monetization enabled	* 64 = Removes the requirements of files for monetized mods	* 128 = Premium Features	* 256 = Currency Packs can be purchased via the web, rather than just in-game	* 512 = Mods can be purchased via the web, rather than just in-game	* 1024 = UGC Self Refunds are disabled	* 2048 = Marketplace USD is enabled
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `None` | 0 |
+| `Monetization` | 1 |
+| `Marketplace` | 2 |
+| `PartnerProgram` | 4 |
+| `Limited` | 8 |
+| `ForcedLimited` | 16 |
+| `Unified` | 32 |
+| `MonetizationFileless` | 64 |
+| `PremiumFeatures` | 128 |
+| `WebPurchasesCurrencyPacks` | 256 |
+| `WebPurchasesMods` | 512 |
+| `UGCSelfRefundsDisabled` | 1024 |
+| `MarketplaceUSD` | 2048 |
+</RefTable>
+
+
+
+### GameCloudCookingStatus {#_2459572810864} 
+
+Cloud Cooking status for this game
+
+
+#### Values
+
+<RefTable colWidths={['50%', '50%']} stripes="odd">
+| | |
+|-|-|
+| `Disabled` | 0 |
+| `Initializing` | 1 |
+| `Initialized` | 2 |
+| `Finalizing` | 3 |
+| `Enabled` | 4 |
+| `ActionRequired` | 5 |
+| `TearingDown` | 6 |
+</RefTable>
+
+
+
+
+

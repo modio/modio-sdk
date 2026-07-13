@@ -97,12 +97,17 @@ namespace Modio
 			}
 
 			template<typename CompletionToken>
-			auto BeginWriteAsync(IOObjectImplementationType PlatformIOObjectInstance, Modio::FileSize TotalLength,
-								 CompletionToken&& Token)
+			auto BeginWriteAsync(IOObjectImplementationType /*PlatformIOObjectInstance*/,
+								 Modio::FileSize /*TotalLength*/, CompletionToken&& Token)
 			{
-				Modio::Detail::Buffer EmptyBuffer(TotalLength);
+				// No-op on macOS: the upload body source stream was set up during
+				// InitializeRequest (BeginStreamedBody on the wrapper) and the task
+				// is started by SendRequestAsync. Body bytes flow through
+				// WriteSomeAsync. Matches the nx/orbis/prospero behaviour and is
+				// safer than the previous implementation, which would have pushed
+				// TotalLength bytes of uninitialized memory if it were ever called.
 				return ModioAsio::async_compose<CompletionToken, void(Modio::ErrorCode)>(
-					WriteSomeToRequestOp(PlatformIOObjectInstance, std::move(EmptyBuffer), HttpState), Token,
+					[](auto& Self) { Self.complete({}); }, Token,
 					Modio::Detail::Services::GetGlobalContext().get_executor());
 			}
 

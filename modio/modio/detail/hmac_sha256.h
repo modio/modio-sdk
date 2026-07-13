@@ -392,3 +392,18 @@ static void* sha256(const void* data, const size_t datalen, void* out, const siz
 	sz = (outlen > SHA256_HASH_SIZE) ? SHA256_HASH_SIZE : outlen;
 	return memcpy(out, hash.bytes, sz);
 }
+
+#undef ror
+#undef STORE32H
+#undef LOAD32H
+#undef STORE64H
+#undef Ch
+#undef Maj
+#undef S
+#undef R
+#undef Sigma0
+#undef Sigma1
+#undef Gamma0
+#undef Gamma1
+#undef Sha256Round
+#undef SHA256_BLOCK_SIZE

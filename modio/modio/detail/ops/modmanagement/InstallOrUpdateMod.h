@@ -47,7 +47,7 @@ namespace Modio
 				}
 				if (ModProgress.lock() == nullptr)
 				{
-					// Avoid rollback of state when ModProgress is null, should only happen when unsubing to an
+					// Avoid rollback of state when ModProgress is null, should only happen when unsubscribing to an
 					// installing mod
 					Transaction.Commit();
 					Self.complete(Modio::make_error_code(Modio::ModManagementError::InstallOrUpdateCancelled));

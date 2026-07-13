@@ -145,7 +145,12 @@ namespace Modio
 			Modio::ModState CurrentState = ModEntry.second->GetModState();
 			if (CurrentState != Modio::ModState::Installed)
 			{
-				return true;
+				auto NeverRetry = ModEntry.second->GetNeverRetryReason();
+				auto LastError = ModEntry.second->GetLastError();
+				if (!NeverRetry && !LastError)
+				{
+					return true;
+				}
 			}
 		}
 
@@ -155,7 +160,12 @@ namespace Modio
 			Modio::ModState CurrentState = ModEntry.second->GetModState();
 			if (CurrentState != Modio::ModState::Installed)
 			{
-				return true;
+				auto NeverRetry = ModEntry.second->GetNeverRetryReason();
+				auto LastError = ModEntry.second->GetLastError();
+				if (!NeverRetry && !LastError)
+				{
+					return true;
+				}
 			}
 		}
 

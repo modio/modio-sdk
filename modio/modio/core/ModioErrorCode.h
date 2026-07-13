@@ -1181,6 +1181,7 @@ namespace Modio
 		UserMonetizationNotConfigured = 900007,
 		UserNoAcceptTermsOfUse = 11074,
 		UserNoModRating = 15043,
+		UserUnableToPerformRating = 17011,
 		ValidationErrors = 13009,
 		XBoxLiveChildAccountNotPermitted = 11030,
 		XBoxLiveNotAllowedToInteractWithUGC = 11028
@@ -1435,6 +1436,9 @@ namespace Modio
 					break;
 				case ApiError::UserNoModRating:
 						return "The authenticated user cannot clear the mod rating as none exists.";
+					break;
+				case ApiError::UserUnableToPerformRating:
+						return "The current user is unable to submit votes at this time.";
 					break;
 				case ApiError::ValidationErrors:
 						return "The request contains validation errors for the data supplied. See the attached errors field within the Error Object to determine which input failed.";
@@ -3640,12 +3644,12 @@ namespace Modio
 		return { static_cast<std::int32_t>(e), Modio::ErrorConditionCategory()};
 	}
 
-	/// @docnone
-	inline bool ErrorCodeMatches(const Modio::ErrorCode& ec, Modio::ErrorConditionTypes Type)
-	{
-		return ec == make_error_condition(Type);
-	}
-	
+	/// @docpublic
+	/// @brief Checks to see if the error code matches one of the error condition types (e.g. Network error, Auth Error, etc)
+	/// @param ec the error code
+	/// @param Type the error category
+	/// @return	true if this error code matches the category
+	MODIOSDK_API bool ErrorCodeMatches(const Modio::ErrorCode& ec, Modio::ErrorConditionTypes Type);
 }
 
 // Type trait so stdlib knows ErrorConditionTypes is a list of error conditions

@@ -117,6 +117,7 @@ namespace Modio
 														   std::move(Self));
 					if (ec)
 					{
+						Impl.reset();
 						Self.complete(ec, Modio::FileSize(0));
 						return;
 					}

@@ -39,7 +39,7 @@ namespace Modio
 			auto ServiceLabelIterator = Params.ExtendedParameters.find("service_label");
 			if (ServiceLabelIterator != Params.ExtendedParameters.end())
 			{
-				RequestParams = RequestParams.AppendPayloadValue("service_label", ServiceLabelIterator->second);
+				RequestParams = RequestParams.AppendPayloadValue("psn_service_label", ServiceLabelIterator->second);
 			}
 
 			return ModioAsio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)>,

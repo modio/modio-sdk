@@ -136,8 +136,6 @@ namespace Modio
 				this->AddToCache(ModInfoData);
 				ModCollectionIDVec.push_back(ModInfoData.Id);
 			});
-
-			CacheInstance->ModCollectionInfoListCache.emplace(GameIDDetail, ModCollectionIDVec);
 		}
 
 		void CacheService::AddToCache(Modio::ModID ModId, std::uint64_t Filesize, bool recursive)
