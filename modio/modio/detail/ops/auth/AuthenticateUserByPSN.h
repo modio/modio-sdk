@@ -20,7 +20,7 @@ namespace Modio
 											   std::function<void(Modio::ErrorCode)> Callback)
 		{
 			Modio::Detail::HttpRequestParams Params =
-				Modio::Detail::AuthenticateViaPsnRequest
+				Modio::Detail::AuthenticateViaPsRequest
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::AuthCode, User.AuthToken)
 					.EncodeAndAppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed,
@@ -41,6 +41,12 @@ namespace Modio
 			else
 			{
 				Params = Params.AppendPayloadValue("env", "256");
+			}
+			// If caller has indicated the host application uses the crossgen SDK, pass that on. Otherwise don't send anything
+			ParamIterator = User.ExtendedParameters.find("ps4_crossgen");
+			if (ParamIterator != User.ExtendedParameters.end())
+			{
+				Params = Params.AppendPayloadValue("ps4_crossgen", ParamIterator->second);
 			}
 			Modio::Detail::AuthenticateUserExternalAsync(Params, Callback);
 		}

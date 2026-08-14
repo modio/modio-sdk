@@ -19,7 +19,7 @@ namespace Modio
 		inline void RefreshUserEntitlementsPSNAsync(Modio::EntitlementParams Params,
 			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)> Callback)
 		{
-			Modio::Detail::HttpRequestParams RequestParams = Modio::Detail::SyncPlaystationNetworkEntitlementsRequest.AppendPayloadValue(
+			Modio::Detail::HttpRequestParams RequestParams = Modio::Detail::SyncPlaystationEntitlementsRequest.AppendPayloadValue(
 					Modio::Detail::Constants::APIStrings::AuthCode,
 					Params.ExtendedParameters[Modio::Detail::Constants::APIStrings::AuthCode]);
 

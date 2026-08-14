@@ -31,7 +31,7 @@
     #define MODIO_IMPORT    extern
 #endif
 
-#ifdef MODIO_BUILD_DLL
+#ifdef MODIO_DLL_EXPORT
     #define MODIODLL_EXPORT MODIO_EXPORT
 #else
     #define MODIODLL_EXPORT MODIO_IMPORT
@@ -476,7 +476,6 @@ typedef struct CModioModManagementEvent CModioModManagementEvent;
 typedef struct CModioModCreationHandle CModioModCreationHandle;
 typedef struct CModioLink CModioLink;
 typedef struct CModioEditModParams CModioEditModParams;
-typedef struct CModioEditModCollectionParams CModioEditModCollectionParams;
 typedef struct CModioIcon CModioIcon;
 typedef struct CModioLogo CModioLogo;
 typedef struct CModioHeaderImage CModioHeaderImage;
@@ -522,7 +521,6 @@ typedef struct CModioAPIKey CModioAPIKey;
 typedef struct CModioModInfo CModioModInfo;
 typedef struct CModioModCollectionInfo CModioModCollectionInfo;
 typedef struct CModioImage CModioImage;
-typedef struct CModioCreateModCollectionParams CModioCreateModCollectionParams;
 typedef struct CModioCreateModParams CModioCreateModParams;
 typedef struct CModioPlatformList CModioPlatformList;
 typedef struct CModioGamePlatformList CModioGamePlatformList;
@@ -612,29 +610,6 @@ MODIODLL_EXPORT void SetModioEditModParamsMaturityRating(CModioEditModParams* It
 MODIODLL_EXPORT void SetModioEditModParamsMetadataBlob(CModioEditModParams* Item, CModioString const* MetadataBlob);
 MODIODLL_EXPORT void SetModioEditModParamsLogoPath(CModioEditModParams* Item, CModioString const* LogoPath);
 MODIODLL_EXPORT void SetModioEditModParamsVisibility(CModioEditModParams* Item, EModioObjectVisibility const* Visibility);
-
-MODIODLL_EXPORT CModioEditModCollectionParams* CreateModioEditModCollectionParams();
-MODIODLL_EXPORT void ReleaseModioEditModCollectionParams(CModioEditModCollectionParams* Item);
-MODIODLL_EXPORT CModioEditModCollectionParams* CopyModioEditModCollectionParams(const CModioEditModCollectionParams* Item);
-
-MODIODLL_EXPORT CModioString* GetModioEditModCollectionParamsLogoPath(const CModioEditModCollectionParams* ModioEditModCollectionParams);
-MODIODLL_EXPORT CModioString* GetModioEditModCollectionParamsName(const CModioEditModCollectionParams* ModioEditModCollectionParams);
-MODIODLL_EXPORT CModioString* GetModioEditModCollectionParamsSummary(const CModioEditModCollectionParams* ModioEditModCollectionParams);
-MODIODLL_EXPORT CModioString* GetModioEditModCollectionParamsCategory(const CModioEditModCollectionParams* ModioEditModCollectionParams);
-MODIODLL_EXPORT COptionalObjectVisibility GetModioEditModCollectionParamsVisibility(const CModioEditModCollectionParams* ModioEditModCollectionParams);
-MODIODLL_EXPORT CModioModIDList* GetModioEditModCollectionParamsMods(const CModioEditModCollectionParams* ModioEditModCollectionParams);
-MODIODLL_EXPORT CModioString* GetModioEditModCollectionParamsNamePath(const CModioEditModCollectionParams* ModioEditModCollectionParams);
-MODIODLL_EXPORT CModioString* GetModioEditModCollectionParamsDescription(const CModioEditModCollectionParams* ModioEditModCollectionParams);
-MODIODLL_EXPORT CModioStringList* GetModioEditModCollectionParamsTags(const CModioEditModCollectionParams* ModioEditModCollectionParams);
-MODIODLL_EXPORT void SetModioEditModCollectionParamsLogoPath(CModioEditModCollectionParams* Item, CModioString const* LogoPath);
-MODIODLL_EXPORT void SetModioEditModCollectionParamsName(CModioEditModCollectionParams* Item, CModioString const* Name);
-MODIODLL_EXPORT void SetModioEditModCollectionParamsSummary(CModioEditModCollectionParams* Item, CModioString const* Summary);
-MODIODLL_EXPORT void SetModioEditModCollectionParamsCategory(CModioEditModCollectionParams* Item, CModioString const* Category);
-MODIODLL_EXPORT void SetModioEditModCollectionParamsVisibility(CModioEditModCollectionParams* Item, EModioObjectVisibility const* Visibility);
-MODIODLL_EXPORT void SetModioEditModCollectionParamsMods(CModioEditModCollectionParams* Item, CModioModIDList const* Mods);
-MODIODLL_EXPORT void SetModioEditModCollectionParamsNamePath(CModioEditModCollectionParams* Item, CModioString const* NamePath);
-MODIODLL_EXPORT void SetModioEditModCollectionParamsDescription(CModioEditModCollectionParams* Item, CModioString const* Description);
-MODIODLL_EXPORT void SetModioEditModCollectionParamsTags(CModioEditModCollectionParams* Item, CModioStringList const* Tags);
 
 MODIODLL_EXPORT CModioIcon* CreateModioIcon();
 MODIODLL_EXPORT void ReleaseModioIcon(CModioIcon* Item);
@@ -1288,29 +1263,6 @@ MODIODLL_EXPORT void SetModioImageFilename(CModioImage* Item, CModioString const
 MODIODLL_EXPORT void SetModioImageOriginalURL(CModioImage* Item, CModioString const* OriginalURL);
 MODIODLL_EXPORT void SetModioImageThumb320x180(CModioImage* Item, CModioString const* Thumb320x180);
 MODIODLL_EXPORT void SetModioImageThumb1280x720(CModioImage* Item, CModioString const* Thumb1280x720);
-
-MODIODLL_EXPORT CModioCreateModCollectionParams* CreateModioCreateModCollectionParams();
-MODIODLL_EXPORT void ReleaseModioCreateModCollectionParams(CModioCreateModCollectionParams* Item);
-MODIODLL_EXPORT CModioCreateModCollectionParams* CopyModioCreateModCollectionParams(const CModioCreateModCollectionParams* Item);
-
-MODIODLL_EXPORT CModioString* GetModioCreateModCollectionParamsPathToLogoFile(const CModioCreateModCollectionParams* ModioCreateModCollectionParams);
-MODIODLL_EXPORT CModioString* GetModioCreateModCollectionParamsName(const CModioCreateModCollectionParams* ModioCreateModCollectionParams);
-MODIODLL_EXPORT CModioString* GetModioCreateModCollectionParamsSummary(const CModioCreateModCollectionParams* ModioCreateModCollectionParams);
-MODIODLL_EXPORT CModioString* GetModioCreateModCollectionParamsCategory(const CModioCreateModCollectionParams* ModioCreateModCollectionParams);
-MODIODLL_EXPORT EModioObjectVisibility GetModioCreateModCollectionParamsVisibility(const CModioCreateModCollectionParams* ModioCreateModCollectionParams);
-MODIODLL_EXPORT CModioModIDList* GetModioCreateModCollectionParamsMods(const CModioCreateModCollectionParams* ModioCreateModCollectionParams);
-MODIODLL_EXPORT CModioString* GetModioCreateModCollectionParamsNamePath(const CModioCreateModCollectionParams* ModioCreateModCollectionParams);
-MODIODLL_EXPORT CModioString* GetModioCreateModCollectionParamsDescription(const CModioCreateModCollectionParams* ModioCreateModCollectionParams);
-MODIODLL_EXPORT CModioStringList* GetModioCreateModCollectionParamsTags(const CModioCreateModCollectionParams* ModioCreateModCollectionParams);
-MODIODLL_EXPORT void SetModioCreateModCollectionParamsPathToLogoFile(CModioCreateModCollectionParams* Item, CModioString const* PathToLogoFile);
-MODIODLL_EXPORT void SetModioCreateModCollectionParamsName(CModioCreateModCollectionParams* Item, CModioString const* Name);
-MODIODLL_EXPORT void SetModioCreateModCollectionParamsSummary(CModioCreateModCollectionParams* Item, CModioString const* Summary);
-MODIODLL_EXPORT void SetModioCreateModCollectionParamsCategory(CModioCreateModCollectionParams* Item, CModioString const* Category);
-MODIODLL_EXPORT void SetModioCreateModCollectionParamsVisibility(CModioCreateModCollectionParams* Item, EModioObjectVisibility Visibility);
-MODIODLL_EXPORT void SetModioCreateModCollectionParamsMods(CModioCreateModCollectionParams* Item, CModioModIDList const* Mods);
-MODIODLL_EXPORT void SetModioCreateModCollectionParamsNamePath(CModioCreateModCollectionParams* Item, CModioString const* NamePath);
-MODIODLL_EXPORT void SetModioCreateModCollectionParamsDescription(CModioCreateModCollectionParams* Item, CModioString const* Description);
-MODIODLL_EXPORT void SetModioCreateModCollectionParamsTags(CModioCreateModCollectionParams* Item, CModioStringList const* Tags);
 
 MODIODLL_EXPORT CModioCreateModParams* CreateModioCreateModParams();
 MODIODLL_EXPORT void ReleaseModioCreateModParams(CModioCreateModParams* Item);

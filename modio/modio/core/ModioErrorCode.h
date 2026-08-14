@@ -1144,15 +1144,23 @@ namespace Modio
 		ModioOutage = 10000,
 		MonetizationAccountLacksEntitlement = 900099,
 		MonetizationAuthentication = 900002,
-		MonetizationGameMonetizationNotEnabled = 900022,
+		MonetizationEpicEntitlementAuthFailed = 900102,
+		MonetizationGameMonetizationNotEnabled = 900020,
+		MonetizationGameNotConfiguredForSpecifiedPortal = 900054,
+		MonetizationGameOrModOnboardingIncomplete = 900022,
+		MonetizationGoogleEntitlementAuthFailed = 900103,
 		MonetizationInMaintenance = 900012,
 		MonetizationIncorrectDisplayPrice = 900035,
 		MonetizationInsufficientFunds = 900049,
 		MonetizationItemAlreadyOwned = 900034,
+		MonetizationPS4EntitlementAuthFailed = 900104,
+		MonetizationPS5EntitlementAuthFailed = 900105,
 		MonetizationPaymentFailed = 900030,
+		MonetizationSteamEntitlementAuthFailed = 900106,
 		MonetizationUnableToCommunicate = 900001,
 		MonetizationUnexpectedError = 900000,
 		MonetizationWalletFetchFailed = 900008,
+		MonetizationXBoxEntitlementAuthFailed = 900107,
 		MuteUserNotFound = 17000,
 		NotFollowingUser = 11135,
 		OpenIDNotConfigured = 11086,
@@ -1326,8 +1334,20 @@ namespace Modio
 				case ApiError::MonetizationAuthentication:
 						return "A failure has occured when trying to authenticate with the monetization system.";
 					break;
+				case ApiError::MonetizationEpicEntitlementAuthFailed:
+						return "Platform authentication failure when performing a monetization action.";
+					break;
 				case ApiError::MonetizationGameMonetizationNotEnabled:
 						return "The game does not have active monetization.";
+					break;
+				case ApiError::MonetizationGameNotConfiguredForSpecifiedPortal:
+						return "The game lacks a monetization configuration for the specified portal.";
+					break;
+				case ApiError::MonetizationGameOrModOnboardingIncomplete:
+						return "The game or mod has not completed monetization onboarding.";
+					break;
+				case ApiError::MonetizationGoogleEntitlementAuthFailed:
+						return "Platform authentication failure when performing a monetization action.";
 					break;
 				case ApiError::MonetizationInMaintenance:
 						return "The monetization is currently in maintance mode. Please try again later.";
@@ -1341,8 +1361,17 @@ namespace Modio
 				case ApiError::MonetizationItemAlreadyOwned:
 						return "The account already owns this item.";
 					break;
+				case ApiError::MonetizationPS4EntitlementAuthFailed:
+						return "Platform authentication failure when performing a monetization action.";
+					break;
+				case ApiError::MonetizationPS5EntitlementAuthFailed:
+						return "Platform authentication failure when performing a monetization action.";
+					break;
 				case ApiError::MonetizationPaymentFailed:
 						return "The payment transaction failed. Please try again later.";
+					break;
+				case ApiError::MonetizationSteamEntitlementAuthFailed:
+						return "Platform authentication failure when performing a monetization action.";
 					break;
 				case ApiError::MonetizationUnableToCommunicate:
 						return "Unable to communicate with the monetization system. Please try again later.";
@@ -1352,6 +1381,9 @@ namespace Modio
 					break;
 				case ApiError::MonetizationWalletFetchFailed:
 						return "Unable to fetch the accounts' wallet. Please confirm the account has one";
+					break;
+				case ApiError::MonetizationXBoxEntitlementAuthFailed:
+						return "Platform authentication failure when performing a monetization action.";
 					break;
 				case ApiError::MuteUserNotFound:
 						return "The user with the supplied UserID could not be found.";
@@ -1684,6 +1716,8 @@ namespace Modio
 		TempModSetNotInitialized = 31,
 		/// @brief An error occurred while performing a monetization operation.
 		MonetizationOperationError = 32,
+		/// @brief Platform auth failure when performing a monetization operation. The platform auth parameters may be invalid or expired.
+		MonetizationPlatformAuthInvalid = 54,
 		/// @brief The transaction requires a payment but it could not be fulfilled. Please retry with funds on the wallet
 		PaymentTransactionFailed = 33,
 		/// @brief The display price for the mod is out-of-date or incorrect. Please retry with the correct display price.
@@ -1833,6 +1867,9 @@ namespace Modio
 				break;
 				case ErrorConditionTypes::MonetizationOperationError:
 					return "An error occurred while performing a monetization operation.";
+				break;
+				case ErrorConditionTypes::MonetizationPlatformAuthInvalid:
+					return "Platform auth failure when performing a monetization operation. The platform auth parameters may be invalid or expired.";
 				break;
 				case ErrorConditionTypes::PaymentTransactionFailed:
 					return "The transaction requires a payment but it could not be fulfilled. Please retry with funds on the wallet";
@@ -3011,7 +3048,47 @@ namespace Modio
 						return true;
 					}
 
+					if (ec == Modio::ApiError::MonetizationGameOrModOnboardingIncomplete)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationGameNotConfiguredForSpecifiedPortal)
+					{
+						return true;
+					}
+
 					if (ec == Modio::ApiError::MonetizationAccountLacksEntitlement)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationEpicEntitlementAuthFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationGoogleEntitlementAuthFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationPS4EntitlementAuthFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationPS5EntitlementAuthFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationSteamEntitlementAuthFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationXBoxEntitlementAuthFailed)
 					{
 						return true;
 					}
@@ -3084,6 +3161,39 @@ namespace Modio
 					}
 
 	
+				break;
+				case ErrorConditionTypes::MonetizationPlatformAuthInvalid:
+					if (ec == Modio::ApiError::MonetizationEpicEntitlementAuthFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationGoogleEntitlementAuthFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationPS4EntitlementAuthFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationPS5EntitlementAuthFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationSteamEntitlementAuthFailed)
+					{
+						return true;
+					}
+
+					if (ec == Modio::ApiError::MonetizationXBoxEntitlementAuthFailed)
+					{
+						return true;
+					}
+
+
 				break;
 				case ErrorConditionTypes::PaymentTransactionFailed:
 					if (ec == Modio::MonetizationError::PaymentFailed)

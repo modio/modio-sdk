@@ -121,8 +121,8 @@ namespace Modio
 
 			HttpRequest::HttpRequest(HttpSession& Owner) : PImpl(std::make_shared<Impl>(Owner.PImpl))
 			{
-				PImpl->Request = [[NSMutableURLRequest alloc] init];
-				PImpl->Request.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+				PImpl->Request = AdoptRef([[NSMutableURLRequest alloc] init]);
+				PImpl->Request.Get().cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
 			}
 
 			HttpRequest::~HttpRequest()
@@ -130,43 +130,43 @@ namespace Modio
 				Cancel();
 				// Remove the map entry. Late delegate callbacks that already
 				// locked the shared_ptr keep Impl alive safely.
-				if (PImpl->Task != nil)
+				if (PImpl->Task)
 				{
 					if (auto SessionImpl = PImpl->OwnerSession.lock())
 					{
 						SessionImpl->UnregisterTask(
-							static_cast<std::uint64_t>(PImpl->Task.taskIdentifier));
+							static_cast<std::uint64_t>(PImpl->Task.Get().taskIdentifier));
 					}
 				}
 				if (PImpl->UploadWriteStream)
 				{
-					[PImpl->UploadWriteStream close];
-					PImpl->UploadWriteStream = nil;
+					[PImpl->UploadWriteStream.Get() close];
+					PImpl->UploadWriteStream.Reset();
 				}
 			}
 
 			void HttpRequest::SetURL(const std::string& URL)
 			{
 				NSString* URLString = [NSString stringWithUTF8String:URL.c_str()];
-				PImpl->Request.URL = [NSURL URLWithString:URLString];
+				PImpl->Request.Get().URL = [NSURL URLWithString:URLString];
 			}
 
 			void HttpRequest::SetVerb(const std::string& Verb)
 			{
-				PImpl->Request.HTTPMethod = [NSString stringWithUTF8String:Verb.c_str()];
+				PImpl->Request.Get().HTTPMethod = [NSString stringWithUTF8String:Verb.c_str()];
 			}
 
 			void HttpRequest::AddHeader(const std::string& Name, const std::string& Value)
 			{
 				NSString* NameString = [NSString stringWithUTF8String:Name.c_str()];
 				NSString* ValueString = [NSString stringWithUTF8String:Value.c_str()];
-				[PImpl->Request setValue:ValueString forHTTPHeaderField:NameString];
+				[PImpl->Request.Get() setValue:ValueString forHTTPHeaderField:NameString];
 			}
 
 			void HttpRequest::SetBody(Modio::Detail::Buffer Body)
 			{
 				NSData* BodyData = [NSData dataWithBytes:Body.Data() length:Body.GetSize()];
-				PImpl->Request.HTTPBody = BodyData;
+				PImpl->Request.Get().HTTPBody = BodyData;
 			}
 
 			void HttpRequest::BeginStreamedBody(std::uint64_t TotalLength)
@@ -176,17 +176,24 @@ namespace Modio
 				static constexpr CFIndex BoundPairBufferSize = 64 * 1024;
 				CFStreamCreateBoundPair(kCFAllocatorDefault, &ReadStream, &WriteStream, BoundPairBufferSize);
 
-				NSInputStream* BodyInput = (__bridge_transfer NSInputStream*) ReadStream;
-				NSOutputStream* BodyOutput = (__bridge_transfer NSOutputStream*) WriteStream;
+				// __bridge, unlike __bridge_transfer, is valid with and without ARC.
+				// It transfers no ownership, so the +1 from CFStreamCreateBoundPair is
+				// handed back below once the request and the handle have each taken a
+				// reference of their own.
+				NSInputStream* BodyInput = (__bridge NSInputStream*) ReadStream;
+				NSOutputStream* BodyOutput = (__bridge NSOutputStream*) WriteStream;
 
-				PImpl->Request.HTTPBodyStream = BodyInput;
+				PImpl->Request.Get().HTTPBodyStream = BodyInput;
 				PImpl->UploadWriteStream = BodyOutput;
-				[PImpl->UploadWriteStream open];
+				[PImpl->UploadWriteStream.Get() open];
+
+				CFRelease(ReadStream);
+				CFRelease(WriteStream);
 
 				// Streamed bodies need an explicit Content-Length.
 				NSString* LengthString = [NSString stringWithFormat:@"%llu",
 											(unsigned long long) TotalLength];
-				[PImpl->Request setValue:LengthString forHTTPHeaderField:@"Content-Length"];
+				[PImpl->Request.Get() setValue:LengthString forHTTPHeaderField:@"Content-Length"];
 			}
 
 			void HttpRequest::Start()
@@ -199,20 +206,20 @@ namespace Modio
 					return;
 				}
 
-				NSURLSession* Session = SessionImpl->Session;
+				NSURLSession* Session = SessionImpl->Session.Get();
 
-				if (PImpl->UploadWriteStream != nil)
+				if (PImpl->UploadWriteStream)
 				{
-					PImpl->Task = [Session uploadTaskWithStreamedRequest:PImpl->Request];
+					PImpl->Task = [Session uploadTaskWithStreamedRequest:PImpl->Request.Get()];
 				}
 				else
 				{
-					PImpl->Task = [Session dataTaskWithRequest:PImpl->Request];
+					PImpl->Task = [Session dataTaskWithRequest:PImpl->Request.Get()];
 				}
 
 				// Register before resume so the delegate sees the task immediately.
 				SessionImpl->RegisterRequest(
-					static_cast<std::uint64_t>(PImpl->Task.taskIdentifier),
+					static_cast<std::uint64_t>(PImpl->Task.Get().taskIdentifier),
 					std::weak_ptr<Impl>(PImpl));
 
 				bool Advanced = false;
@@ -223,10 +230,10 @@ namespace Modio
 				if (!Advanced)
 				{
 					// A concurrent Cancel() already moved to a terminal state.
-					[PImpl->Task cancel];
+					[PImpl->Task.Get() cancel];
 					return;
 				}
-				[PImpl->Task resume];
+				[PImpl->Task.Get() resume];
 			}
 
 			void HttpRequest::Cancel()
@@ -240,13 +247,13 @@ namespace Modio
 				{
 					return;
 				}
-				if (PImpl->Task != nil)
+				if (PImpl->Task)
 				{
-					[PImpl->Task cancel];
+					[PImpl->Task.Get() cancel];
 				}
-				if (PImpl->UploadWriteStream != nil)
+				if (PImpl->UploadWriteStream)
 				{
-					[PImpl->UploadWriteStream close];
+					[PImpl->UploadWriteStream.Get() close];
 				}
 			}
 
@@ -350,11 +357,11 @@ namespace Modio
 
 			std::size_t HttpRequest::WriteRequestBody(const std::uint8_t* Bytes, std::size_t Length)
 			{
-				if (PImpl->UploadWriteStream == nil || Bytes == nullptr || Length == 0)
+				if (!PImpl->UploadWriteStream || Bytes == nullptr || Length == 0)
 				{
 					return 0;
 				}
-				NSInteger Written = [PImpl->UploadWriteStream write:Bytes maxLength:Length];
+				NSInteger Written = [PImpl->UploadWriteStream.Get() write:Bytes maxLength:Length];
 				if (Written < 0)
 				{
 					return 0;
@@ -369,11 +376,11 @@ namespace Modio
 
 			bool HttpRequest::CanAcceptBodyBytes() const
 			{
-				if (PImpl->UploadWriteStream == nil)
+				if (!PImpl->UploadWriteStream)
 				{
 					return false;
 				}
-				return [PImpl->UploadWriteStream hasSpaceAvailable] == YES;
+				return [PImpl->UploadWriteStream.Get() hasSpaceAvailable] == YES;
 			}
 		} // namespace Apple
 	} // namespace Detail

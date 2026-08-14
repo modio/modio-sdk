@@ -12,6 +12,7 @@
 
 #include "modio/core/entities/ModioEntitlementConsumptionStatusList.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
+#include "modio/detail/serialization/ModioEntitlementConsumptionStatusListSerialization.h"
 
 #include <asio/yield.hpp>
 namespace Modio

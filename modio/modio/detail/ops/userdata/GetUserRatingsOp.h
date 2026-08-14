@@ -11,6 +11,7 @@
 #pragma once
 
 #include "modio/core/ModioCoreTypes.h"
+#include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/http/PerformRequestAndGetResponseOp.h"
 #include "modio/detail/serialization/ModioUserRatingListSerialization.h"
 
@@ -23,7 +24,6 @@ namespace Modio
 		/// @brief Async operation to retrieve a user media metadata
 		class GetUserRatingsOp
 		{
-
 			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 
@@ -33,11 +33,11 @@ namespace Modio
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
 			{
-				reenter(CoroutineState) 
+				reenter(CoroutineState)
 				{
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer,
-						Modio::Detail::GetUserRatingsRequest,
+						Modio::Detail::GetUserRatingsRequest.SetGameID(Modio::Detail::SDKSessionData::CurrentGameID()),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 
 					if (ec)
@@ -54,7 +54,8 @@ namespace Modio
 
 					{
 						// Got the response OK, try to marshal to the expected type
-						Modio::Optional<Modio::UserRatingList> List = TryMarshalResponse<Modio::UserRatingList>(ResponseBodyBuffer);
+						Modio::Optional<Modio::UserRatingList> List =
+							TryMarshalResponse<Modio::UserRatingList>(ResponseBodyBuffer);
 						// Marshalled OK
 						if (List.has_value())
 						{
@@ -71,15 +72,13 @@ namespace Modio
 			}
 
 		private:
-			
-
 		};
 
 		template<typename GetUserRatingsCompleteCallback>
 		void GetUserRatingsAsync(GetUserRatingsCompleteCallback&& OnGetUserRatingsComplete)
 		{
 			return ModioAsio::async_compose<GetUserRatingsCompleteCallback,
-									   void(Modio::ErrorCode, Modio::Optional<Modio::UserRatingList>)>(
+											void(Modio::ErrorCode, Modio::Optional<Modio::UserRatingList>)>(
 				Modio::Detail::GetUserRatingsOp(), OnGetUserRatingsComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

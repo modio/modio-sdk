@@ -22,7 +22,7 @@ The mod.io SDK is built and tested against iOS using XCode v14 & v15.1. Using di
 
 In iOS, the default way to compile the mod.io SDK requires CMake, which you can install following the [CMake](https://cmake.org/download) instructions or using a package manager like `brew`:
 
-```cmake
+```bash
 brew install cmake ninja
 ```
 
@@ -30,7 +30,7 @@ brew install cmake ninja
 You can use Ninja or XCode as project generators. The former works like any other C++ project. The later will create a `.xcodeproj` file in the designated output folder.
 :::
 
-iOS compiles by default to the simulator. If you need to deploy to a device, add variable `MODIO_IOS_DEVICE` to cmake. Check documentation in the platform link:platform/ios/README.adoc[README.adoc] for more details.
+iOS compiles by default to the simulator. If you need to deploy to a device, add variable `MODIO_IOS_DEVICE` to cmake. Check documentation in the platform [README.adoc](platform/ios/README.adoc) for more details.
 
 The minimum deployment target is iOS 15.0
 

@@ -866,6 +866,7 @@ namespace Modio
 	/// @requires authenticated-user
 	/// @requires no-rate-limiting
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @errorcategory MonetizationPlatformAuthInvalid|The platform auth token provided is invalid or has expired
 	/// @errorcategory MonetizationError|Problems during purchase transaction
 	/// @errorcategory UserNotAuthenticatedError|No authenticated user
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
@@ -886,6 +887,7 @@ namespace Modio
 	/// @requires no-rate-limiting
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @errorcategory MonetizationError|Problems during purchase transaction
+	/// @errorcategory MonetizationPlatformAuthInvalid|The platform auth token provided is invalid or has expired
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @error UserDataError::InvalidUser|No authenticated user
@@ -905,6 +907,7 @@ namespace Modio
 	/// @requires no-rate-limiting
 	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
 	/// @errorcategory MonetizationError|Problems during purchase transaction
+	/// @errorcategory MonetizationPlatformAuthInvalid|The platform auth token provided is invalid or has expired
 	/// @error GenericError::SDKNotInitialized|SDK not initialized
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	/// @error UserDataError::InvalidUser|No authenticated user

@@ -19,6 +19,8 @@
 
 #include "macos/AppleHttpRequest.h"
 #include "macos/AppleHttpSession.h"
+#include "macos/AppleScopedSemaphore.h"
+#include "macos/AppleStrongRef.h"
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioErrorCode.h"
 #include <atomic>
@@ -47,15 +49,15 @@ namespace Modio
 
 			struct HttpSession::Impl
 			{
-				NSURLSession* Session = nil;
-				ModioHttpDelegate* Delegate = nil;
-				NSOperationQueue* DelegateQueue = nil;
+				StrongRef<NSURLSession> Session;
+				StrongRef<ModioHttpDelegate> Delegate;
+				StrongRef<NSOperationQueue> DelegateQueue;
 				std::string UserAgent;
 				std::atomic<bool> Closing {false};
 
 				// Signaled from didBecomeInvalidWithError. Close() waits on this
 				// to ensure no delegate callback outlives the session.
-				dispatch_semaphore_t InvalidationSemaphore = dispatch_semaphore_create(0);
+				ScopedSemaphore InvalidationSemaphore {0};
 
 				// Task-to-request map. Holds weak_ptrs so delegate callbacks can
 				// safely lock a shared_ptr even if the owning HttpRequest is
@@ -75,10 +77,10 @@ namespace Modio
 				// Weak so the request can safely outlive its session.
 				std::weak_ptr<HttpSession::Impl> OwnerSession;
 
-				NSMutableURLRequest* Request = nil;
-				NSURLSessionTask* Task = nil;
-				// Output stream for streamed uploads; paired with the request's HTTPBodyStream.
-				NSOutputStream* UploadWriteStream = nil;
+				StrongRef<NSMutableURLRequest> Request;
+				StrongRef<NSURLSessionTask> Task;
+				// Output stream for streamed uploads, paired with the request's HTTPBodyStream.
+				StrongRef<NSOutputStream> UploadWriteStream;
 
 				// Polled lock-free by the SDK thread. Writers must hold StateMutex
 				// to prevent races and ensure companion fields are visible before

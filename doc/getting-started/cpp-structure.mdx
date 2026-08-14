@@ -77,7 +77,7 @@ Whilst it is safe to call all other SDK functions from a different thread to the
 
 By using a background thread for [RunPendingHandlers](https://docs.mod.io/cppsdk/refdocs#runpendinghandlers), you can decouple the frequency with which you perform SDK 'work' from the frequency of your application's main loop for greater performance. 
 
-See * [Thread Safety](#thread-safety) for more information.
+See [Thread Safety](#thread-safety) for more information.
 :::
 
 ## Users and local profiles
@@ -139,7 +139,7 @@ else
 }
 ```
 
-#### Handling Failures
+#### Handling failures
 
 Sometimes an entitlement may fail to be consumed. To verify this, you should check if `Modio::Optional<Modio::EntitlementConsumptionStatusList>::EntitlementsThatRequireRetry()` has a value. If so, you can retry the call to RefreshUserEntitlementsAsync. If the failure persists, you should show an error, indicating that the customer contact mod.io support.
 
@@ -149,7 +149,7 @@ Sometimes, this information will be all that is required, just a simple 'success
 
 In many cases, however, you will want to perform some degree of inspection on an ErrorCode to determine specific information about that error. If nothing else you can display a reason for the failure to the end user.
 
-#### Direct Queries
+#### Direct queries
 
 It's possible to query the raw value of an ErrorCode by comparing it against a particular enum value. For example, to check if a particular ErrorCode represents a filesystem error of 'Not enough space', you could do the following:
 
@@ -190,7 +190,7 @@ This isn't ideal though, for several reasons:
 
 We can address these by using 'semantic queries' against the error code rather than directly comparing numerical values.
 
-#### Semantic Queries
+#### Semantic queries
 The SDK provides a function with several overloads that you can use to query for the semantic meaning of an ErrorCode.
 
 Firstly, you can query if an ErrorCode is equivalent to a specific raw enum value:

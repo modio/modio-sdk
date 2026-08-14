@@ -115,7 +115,7 @@ didCompleteWithError:(NSError*)Error
 - (void)URLSession:(NSURLSession*)Session didBecomeInvalidWithError:(NSError*)Error
 {
 	// Final delegate message. Unblock Close().
-	dispatch_semaphore_signal(_SessionImpl->InvalidationSemaphore);
+	_SessionImpl->InvalidationSemaphore.Signal();
 }
 
 @end
@@ -156,9 +156,6 @@ namespace Modio
 			HttpSession::~HttpSession()
 			{
 				Close();
-				PImpl->Session = nil;
-				PImpl->Delegate = nil;
-				PImpl->DelegateQueue = nil;
 			}
 
 			Modio::ErrorCode HttpSession::Initialize(const std::string& UserAgent)
@@ -176,16 +173,15 @@ namespace Modio
 					};
 				}
 
-				NSOperationQueue* Queue = [[NSOperationQueue alloc] init];
-				Queue.maxConcurrentOperationCount = 1;
-				Queue.name = @"io.mod.AppleHttpSession.delegate";
-				PImpl->DelegateQueue = Queue;
+				PImpl->DelegateQueue = AdoptRef([[NSOperationQueue alloc] init]);
+				PImpl->DelegateQueue.Get().maxConcurrentOperationCount = 1;
+				PImpl->DelegateQueue.Get().name = @"io.mod.AppleHttpSession.delegate";
 
-				PImpl->Delegate = [[ModioHttpDelegate alloc] initWithSession:PImpl.get()];
+				PImpl->Delegate = AdoptRef([[ModioHttpDelegate alloc] initWithSession:PImpl.get()]);
 				PImpl->Session = [NSURLSession sessionWithConfiguration:Config
-															   delegate:PImpl->Delegate
-														  delegateQueue:Queue];
-				if (PImpl->Session == nil)
+															   delegate:PImpl->Delegate.Get()
+														  delegateQueue:PImpl->DelegateQueue.Get()];
+				if (!PImpl->Session)
 				{
 					return Modio::make_error_code(Modio::HttpError::HttpNotInitialized);
 				}
@@ -204,13 +200,13 @@ namespace Modio
 				{
 					return;
 				}
-				if (PImpl->Session != nil)
+				if (PImpl->Session)
 				{
 					// Cancels all in-flight tasks, then blocks until the
 					// final delegate message (didBecomeInvalidWithError:)
 					// has fired, ensuring no further callbacks reference Impl.
-					[PImpl->Session invalidateAndCancel];
-					dispatch_semaphore_wait(PImpl->InvalidationSemaphore, DISPATCH_TIME_FOREVER);
+					[PImpl->Session.Get() invalidateAndCancel];
+					PImpl->InvalidationSemaphore.WaitForever();
 				}
 			}
 

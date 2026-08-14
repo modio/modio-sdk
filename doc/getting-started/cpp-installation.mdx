@@ -23,7 +23,7 @@ This guide covers:
 
 To build on Windows, the mod.io SDK requires Visual Studio 2019 or 2022 with the "Desktop Development with C++" workload. This workload includes CMake (version 3.20 or higher), Ninja, and MSVC C++ compiler.
 
-### Platform Installation Guides
+### Platform installation guides
 
 If you are building for other platforms, you can follow each platform's requirements below:
 
@@ -70,7 +70,7 @@ The included `CMakePresets.json` includes the most common configurations as pres
 If you have Visual Studio installed as your development environment, you can run the following commands from the Developer Command Prompt to easily have your environment configured. Otherwise, ensure that CMake and Ninja are part of your PATH.
 :::
 
-#### Generate Source
+#### Generate source
 
 To generate build files using Ninja, run `cmake -S <modio-sdk folder> --preset=win`. This will produce a Windows build configuration using Ninja at `<modio-sdk folder>/out/build/win`. This directory can then be used to build the SDK in the way you wish to include it.
 
@@ -114,7 +114,7 @@ cmake -S <modio-sdk folder> --preset=win -DMODIO_BUILD_DYNAMIC_LIBRARY=ON
 cmake --build <modio-sdk folder>/out/build/win --target modioShared
 ```
 
-### Other Build Systems
+### Other build systems
 
 If you use a different build system or wish to generate project files for inclusion in an existing Visual Studio solution, you can override the default CMake generator. For example, it is possible to use an MSBuild-based Visual Studio Solution via `make -S <modio-sdk folder> --preset=win -G "Visual Studio 17 2022"`. This will produce a VS Solution file in `out\build\win`.
 
@@ -152,7 +152,7 @@ Deprecated functionality will remain for a minimum of 3 releases to allow for tr
 
 If you want to disable deprecated code to avoid warnings or just its usage, you can add `define MODIO_NO_DEPRECATED`, this define will avoid compilation of deprecated code.
 
-### Experimental Functionality
+### Experimental functionality
 
 Some functionality in the SDK is marked as experimental. While these will generally be fully functional, the interface is subject to breaking changes that do not follow the above deprecation path.
 
@@ -160,7 +160,7 @@ Some functionality in the SDK is marked as experimental. While these will genera
 
 It is possible to employ the Clang compiler provided by Visual Studio Installer under the name `C++ Clang Compiler for Windows`. You can update the `CMakePreset.json` using the following variables:
 
-```
+```json
 "cacheVariables": 
 {
   "CMAKE_C_COMPILER":

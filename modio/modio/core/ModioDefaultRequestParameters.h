@@ -26,6 +26,7 @@ namespace Modio
         static const HttpRequestParams GetCurrentAgreementRequest { Modio::Detail::Verb::GET, "/agreements/types/{agreement-type-id}/current" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetAgreementVersionRequest { Modio::Detail::Verb::GET, "/agreements/versions/{agreement-version-id}" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams TermsRequest { Modio::Detail::Verb::GET, "/authenticate/terms" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
+        static const HttpRequestParams AuthenticateViaPsRequest { Modio::Detail::Verb::POST, "/authentication/ps" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AuthenticateViaAppleRequest { Modio::Detail::Verb::POST, "/external/appleauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AuthenticateViaDiscordRequest { Modio::Detail::Verb::POST, "/external/discordauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AuthenticateViaEpicgamesRequest { Modio::Detail::Verb::POST, "/external/epicgamesauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
@@ -35,7 +36,6 @@ namespace Modio
         static const HttpRequestParams AuthenticateViaItchioRequest { Modio::Detail::Verb::POST, "/external/itchioauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AuthenticateViaOculusRequest { Modio::Detail::Verb::POST, "/external/oculusauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AuthenticateViaOpenidRequest { Modio::Detail::Verb::POST, "/external/openidauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
-        static const HttpRequestParams AuthenticateViaPsnRequest { Modio::Detail::Verb::POST, "/external/psnauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AuthenticateViaSteamRequest { Modio::Detail::Verb::POST, "/external/steamauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AuthenticateViaSwitchRequest { Modio::Detail::Verb::POST, "/external/switchauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AuthenticateViaUdtRequest { Modio::Detail::Verb::POST, "/external/udtauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
@@ -152,7 +152,7 @@ namespace Modio
         static const HttpRequestParams SyncEpicgamesEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/epicgames/sync" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams SyncGoogleEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/google/sync" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams SyncMetaEntitlementRequest { Modio::Detail::Verb::POST, "/me/iap/meta/sync" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
-        static const HttpRequestParams SyncPlaystationNetworkEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/psn/sync" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
+        static const HttpRequestParams SyncPlaystationEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/ps/sync" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams SyncSteamEntitlementRequest { Modio::Detail::Verb::POST, "/me/iap/steam/sync" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams SyncXboxLiveEntitlementsRequest { Modio::Detail::Verb::POST, "/me/iap/xboxlive/sync" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetUserModsRequest { Modio::Detail::Verb::GET, "/me/mods" }; 
@@ -178,18 +178,14 @@ namespace Modio
         static const HttpRequestParams S2sTransactionCommitRequest { Modio::Detail::Verb::POST, "/s2s/transactions/commit" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams S2sTransactionIntentRequest { Modio::Detail::Verb::POST, "/s2s/transactions/intent" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetUserPublicProfileRequest { Modio::Detail::Verb::GET, "/users/{user-id}" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
-        static const HttpRequestParams UnblockAUserRequest { Modio::Detail::Verb::DELETE, "/users/{user-id}/block" }; 
-        static const HttpRequestParams BlockAUserRequest { Modio::Detail::Verb::POST, "/users/{user-id}/block" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetUserProfileCollectionsRequest { Modio::Detail::Verb::GET, "/users/{user-id}/collections" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetUserFollowersRequest { Modio::Detail::Verb::GET, "/users/{user-id}/followers" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
-        static const HttpRequestParams BulkUnfollowUsersRequest { Modio::Detail::Verb::DELETE, "/users/{user-id}/following" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetUserFollowingRequest { Modio::Detail::Verb::GET, "/users/{user-id}/following" }; 
         static const HttpRequestParams FollowUserRequest { Modio::Detail::Verb::POST, "/users/{user-id}/following" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams UnfollowUserRequest { Modio::Detail::Verb::DELETE, "/users/{user-id}/following/{target-user-id}" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams UnmuteAUserRequest { Modio::Detail::Verb::DELETE, "/users/{user-id}/mute" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams MuteAUserRequest { Modio::Detail::Verb::POST, "/users/{user-id}/mute" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetPurchasesByGivenUserRequest { Modio::Detail::Verb::GET, "/users/{user-id}/purchases" }; 
-        static const HttpRequestParams UnsubscribeFromModsBulkRequest { Modio::Detail::Verb::DELETE, "/users/{user-id}/subscriptions" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams GetAgeGateWidgetRequest { Modio::Detail::Verb::GET, "/widgets/age-gate" }; 
         static const HttpRequestParams GetAirwallexWidgetSessionRequest { Modio::Detail::Verb::POST, "/widgets/airwallex" , GetContentTypeEnum("application/json") }; 
         static const HttpRequestParams GetTiliaWidgetSessionRequest { Modio::Detail::Verb::POST, "/widgets/tilia" , GetContentTypeEnum("application/json") }; 

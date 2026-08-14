@@ -512,7 +512,6 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
                 mode_ = LEN;
             break;
         }
-        MODIO_FALL_THROUGH;
 
         case LIT:
         {
@@ -523,7 +522,6 @@ doWrite(z_params& zs, Flush flush, Modio::ErrorCode& ec)
             mode_ = LEN;
             break;
         }
-        MODIO_FALL_THROUGH;
 
         case CHECK:
             mode_ = DONE;

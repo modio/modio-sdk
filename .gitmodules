@@ -17,7 +17,7 @@
 	url = https://github.com/nemtrif/utfcpp
 [submodule "ext/httpparser"]
 	path = ext/httpparser
-	url = https://github.com/nekipelov/httpparser.git
+	url = https://github.com/modio/modio-integration-httpparser.git
 [submodule "ext/json"]
 	path = ext/json
 	url = https://github.com/nlohmann/json.git
@@ -32,4 +32,4 @@
 	url = https://github.com/Naios/function2.git
 [submodule "ext/concurrentqueue"]
 	path = ext/concurrentqueue
-	url = https://github.com/cameron314/concurrentqueue.git
+	url = https://github.com/modio/modio-integration-concurrentqueue.git
