@@ -16,7 +16,7 @@ namespace Modio
 {
 	namespace Detail
 	{
-		inline void RefreshUserEntitlementsPSNAsync(Modio::EntitlementParams Params,
+		inline void RefreshUserEntitlementsPSAsync(Modio::EntitlementParams Params,
 			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)> Callback)
 		{
 			Modio::Detail::HttpRequestParams RequestParams = Modio::Detail::SyncPlaystationEntitlementsRequest.AppendPayloadValue(
@@ -32,7 +32,8 @@ namespace Modio
 			auto ParamIterator = Params.ExtendedParameters.find("service_label");
 			if (ParamIterator != Params.ExtendedParameters.end())
 			{
-				RequestParams = RequestParams.AppendPayloadValue("psn_service_label", ParamIterator->second);
+				RequestParams = RequestParams.AppendPayloadValue(Modio::Detail::Constants::APIStrings::PsServiceLabel,
+																 ParamIterator->second);
 			}
 
 			return ModioAsio::async_compose<

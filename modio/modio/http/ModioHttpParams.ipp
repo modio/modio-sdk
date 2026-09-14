@@ -654,8 +654,8 @@ namespace Modio
 				case Portal::Nintendo:
 					Headers.emplace_back("x-modio-portal", "Nintendo");
 					break;
-				case Portal::PSN:
-					Headers.emplace_back("x-modio-portal", "PSN");
+				case Portal::PS:
+					Headers.emplace_back("x-modio-portal", "PS");
 					break;
 				case Portal::Steam:
 					Headers.emplace_back("x-modio-portal", "Steam");

@@ -50,6 +50,14 @@
 	#endif
 #endif
 
+#ifndef MODIO_DEPRECATED_ENUM
+	#if MODIO_DISABLE_ALL_DEPRECATIONS
+		#define MODIO_DEPRECATED_ENUM(...)
+	#else
+		#define MODIO_DEPRECATED_ENUM(Since, Replacement) [[deprecated("Since " #Since "; use " #Replacement)]]
+	#endif
+#endif
+
 #ifndef MODIO_FALL_THROUGH
 	#define MODIO_FALL_THROUGH HEDLEY_FALL_THROUGH
 #endif

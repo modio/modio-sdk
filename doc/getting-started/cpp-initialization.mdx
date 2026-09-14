@@ -64,6 +64,10 @@ Simply set the value before passing your initialization parameters in to [Initia
 Options.ExtendedParameters["SomeParameterName"] = "SomeParameterValue";
 ```
 
+:::warning
+For Windows Server and Linux Server you need to provide the extended parameter `PlatformOverride` with the `windowsserver` or `linuxserver`. This is required because the SDK cannot detect the platform automatically in these environments.
+:::
+
 ### General
 
 The SDK supports the following general use parameters that can be set through `ExtendedParameters`:
@@ -71,7 +75,7 @@ The SDK supports the following general use parameters that can be set through `E
 | Parameter | Description |
 | --- | --- |
 | `PendingOnlyResults` | Only include UGC in search results that are pending moderation. For moderation and testing purposes. Set to "true" to enable. Warning: Should only be enabled when the user is a moderator or admin of the game, setting in shipping builds is not recommended. |
-| `PlatformOverride` | Set the platform to be used when making requests to show UGC for that platform instead. For moderation and testing purposes. This parameter will soon be deprecated. |
+| `PlatformOverride` | Set the platform to be used when making requests to show UGC for that platform instead. |
 
 ### Storage Quota
 

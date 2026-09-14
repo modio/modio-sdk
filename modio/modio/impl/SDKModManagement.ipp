@@ -76,12 +76,9 @@ namespace Modio
 	void SubscribeToModAsync(Modio::ModID ModToSubscribeTo, bool IncludeDependencies,
 							 std::function<void(Modio::ErrorCode)> OnSubscribeComplete)
 	{
-		{
-			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
-			Modio::Detail::SDKSessionData::IncrementModManagementEventQueued();
-		}
-		Modio::Detail::SDKSessionData::EnqueueTask(
-			[ModToSubscribeTo, IncludeDependencies, OnSubscribeComplete = std::move(OnSubscribeComplete)]() mutable {
+		Modio::Detail::SDKSessionData::EnqueueTask([ModToSubscribeTo, IncludeDependencies,
+													OnSubscribeComplete = std::move(OnSubscribeComplete),
+													Tracker = Modio::Detail::SDKModManagementOp()]() mutable {
 				if (Modio::Detail::RequireSDKIsInitialized(OnSubscribeComplete) &&
 					Modio::Detail::RequireNotRateLimited(OnSubscribeComplete) &&
 					Modio::Detail::RequireUserIsAuthenticated(OnSubscribeComplete) &&
@@ -91,23 +88,15 @@ namespace Modio
 				{
 					Modio::Detail::SubscribeToModAsync(ModToSubscribeTo, IncludeDependencies, OnSubscribeComplete);
 				}
-				else
-				{
-					auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
-					Modio::Detail::SDKSessionData::DecrementModManagementEventQueued();
-				}
 			});
 	}
 
 	void UnsubscribeFromModAsync(Modio::ModID ModToUnsubscribeFrom,
 								 std::function<void(Modio::ErrorCode)> OnUnsubscribeComplete)
 	{
-		{
-			auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
-			Modio::Detail::SDKSessionData::IncrementModManagementEventQueued();
-		}
-		Modio::Detail::SDKSessionData::EnqueueTask(
-			[ModToUnsubscribeFrom, OnUnsubscribeComplete = std::move(OnUnsubscribeComplete)]() mutable {
+		Modio::Detail::SDKSessionData::EnqueueTask([ModToUnsubscribeFrom,
+													OnUnsubscribeComplete = std::move(OnUnsubscribeComplete),
+													Tracker = Modio::Detail::SDKModManagementOp()]() mutable {
 				if (Modio::Detail::RequireSDKIsInitialized(OnUnsubscribeComplete) &&
 					Modio::Detail::RequireNotRateLimited(OnUnsubscribeComplete) &&
 					Modio::Detail::RequireUserIsAuthenticated(OnUnsubscribeComplete) &&
@@ -115,11 +104,6 @@ namespace Modio
 					Modio::Detail::RequireValidModID(ModToUnsubscribeFrom, OnUnsubscribeComplete))
 				{
 					Modio::Detail::UnsubscribeFromModAsync(ModToUnsubscribeFrom, OnUnsubscribeComplete);
-				}
-				else
-				{
-					auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
-					Modio::Detail::SDKSessionData::DecrementModManagementEventQueued();
 				}
 			});
 	}
@@ -362,21 +346,37 @@ namespace Modio
 		Modio::Detail::FileService& FileService =
 			Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>();
 		Modio::FileSize AvailableLocalSpace = FileService.GetSpaceAvailable(FileService.GetRootLocalStoragePath());
+
+		// If we have defined a quota for the local storage, check if the quota has been met or exceeded. If it has,
+		// report 0 available space. Otherwise, report the remaining quota as available space.
 		if (Modio::Optional<Modio::FileSize> ModStorageQuota = Modio::Detail::SDKSessionData::GetModStorageQuota())
 		{
 			if (ModStorageQuota.value() > ConsumedLocalSpace)
 			{
 				Modio::FileSize RemainingLocalQuota = ModStorageQuota.value();
 				RemainingLocalQuota -= ConsumedLocalSpace;
-				if (RemainingLocalQuota < AvailableLocalSpace)
+
+				// If this platform requires a quota to be set, we will report the remaining quota as available space
+				// using the quota limit. Otherwise, fall back to the actual available space on disk.
+				if (Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().IsModStorageQuotaRequired())
 				{
-					// Some quota remains
 					SetSpace(Info, Modio::StorageLocation::Local, Modio::StorageUsage::Available, RemainingLocalQuota);
 				}
 				else
 				{
-					// Remaining quota exceeds actual available space
-					SetSpace(Info, Modio::StorageLocation::Local, Modio::StorageUsage::Available, AvailableLocalSpace);
+					if (RemainingLocalQuota < AvailableLocalSpace)
+					{
+						// Some quota remains
+						SetSpace(Info, Modio::StorageLocation::Local, Modio::StorageUsage::Available, RemainingLocalQuota);
+					}
+					else
+					{
+						// Remaining quota exceeds actual available space
+						SetSpace(Info, Modio::StorageLocation::Local, Modio::StorageUsage::Available,
+								 AvailableLocalSpace);
+						Modio::Detail::Logger().Log(
+							LogLevel::Error, LogCategory::File, "When calculating available local space, the remaining quota exceeds the actual available space.");
+					}
 				}
 			}
 			else
@@ -392,7 +392,6 @@ namespace Modio
 		}
 
 		/* Cache Storage Info */
-
 		if (Modio::Optional<Modio::FileSize> CacheStorageQuota = Modio::Detail::SDKSessionData::GetCacheStorageQuota())
 		{
 			Modio::FileSize ConsumedCacheSpace = Modio::Detail::SDKSessionData::GetTotalImageCacheSize();

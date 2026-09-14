@@ -58,8 +58,23 @@ namespace Modio
 							nlohmann::json StateJson = Modio::Detail::ToJson(DataBuffer);
 							from_json(StateJson, Modio::Detail::SDKSessionData::GetSystemModCollection());
 						}
-						Modio::Detail::Logger().Log(Modio::LogLevel::Trace, Modio::LogCategory::ModManagement,
-													"Mod collection loaded");
+
+						// Iterate contents of the collection for early debugging:
+						const auto& PosCollection = Modio::Detail::SDKSessionData::GetSystemModCollection().Entries();
+						Modio::Detail::Logger().Log(Modio::LogLevel::Detailed, Modio::LogCategory::ModManagement,
+													"Mod collection loaded ({} mods)", PosCollection.size());
+						for (const auto& ModEntry : PosCollection)
+						{
+							const auto SizeOnDisk = ModEntry.second->GetSizeOnDisk();
+							const std::string SizeOnDiskString =
+								SizeOnDisk ? std::to_string(static_cast<std::uintmax_t>(*SizeOnDisk)) : "Unknown";
+
+							Modio::Detail::Logger().Log(Modio::LogLevel::Detailed, Modio::LogCategory::ModManagement,
+														"Mod Id {}, Path {}, Size {}, State {}", ModEntry.first,
+														ModEntry.second->GetPath(),
+														SizeOnDiskString,
+														Modio::ModStateToString(ModEntry.second->GetModState()));
+						}
 
 						Self.complete({});
 					}

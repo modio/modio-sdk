@@ -40,7 +40,7 @@ namespace Modio
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
 						ResponseBodyBuffer,
 						Modio::Detail::GetUserGamesRequest.AppendQueryParameterMap(
-							Filter.ToQueryParamaters()),
+							Filter.ToQueryParameters()),
 						Modio::Detail::CachedResponse::Allow, std::move(Self));
 
 					if (ec)

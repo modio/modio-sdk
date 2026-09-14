@@ -33,12 +33,13 @@ namespace Modio
 				Modio::Detail::FileService& FileService =
 					Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>();
 
+				// Special-casing the path to the global settings directory as it should be in the user data folder
+				// but not namespaced to game or game-specific user string
+				bool FileExists = FileService.FileExists(FileService.UserDataFolder() / "../../globalsettings.json");
 				reenter(CoroutineState)
 				{
 					FileBuffer.Clear();
-					// Special-casing the path to the global settings directory as it should be in the user data folder
-					// but not namespaced to game or game-specific user string
-					if (FileService.FileExists(FileService.UserDataFolder() / "../../globalsettings.json"))
+					if (FileExists)
 					{
 						ConfigFile = std::make_unique<Modio::Detail::File>(FileService.UserDataFolder() /
 																			   "../../globalsettings.json",
@@ -79,14 +80,17 @@ namespace Modio
 						}
 						std::copy(DefaultConfigString.begin(), DefaultConfigString.end(), DefaultConfigBuffer->Data());
 					}
-					
-					ec = ConfigFile->Truncate(Modio::FileOffset(0));
-					if (ec)
+
+					if (FileExists)
 					{
-						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-													"Error code after file truncation {}", ec.value());
-						Self.complete(ec);
-						return;
+						ec = ConfigFile->Truncate(Modio::FileOffset(0));
+						if (ec)
+						{
+							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
+														"Error code after file truncation {}", ec.value());
+							Self.complete(ec);
+							return;
+						}
 					}
 
 					ConfigFile->Seek(Modio::FileOffset(0));

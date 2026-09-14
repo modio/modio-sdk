@@ -45,7 +45,6 @@ namespace Modio
 					while (Modio::Detail::SDKSessionData::HasDeferredUnsubscriptions())
 					{
 						CurrentPendingUnsubscribe = Modio::Detail::SDKSessionData::GetDeferredUnsubscription();
-
 						yield Modio::Detail::UnsubscribeFromModAsync(CurrentPendingUnsubscribe, std::move(Self));
 						if (ec)
 						{

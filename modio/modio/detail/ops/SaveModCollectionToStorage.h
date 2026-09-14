@@ -68,11 +68,28 @@ namespace Modio
 					if (Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().MoveAndOverwriteFile(
 							TempFilePath, DestinationFilePath))
 					{
+						// Iterate contents of the collection for early debugging:
+						const auto& PosCollection = Modio::Detail::SDKSessionData::GetSystemModCollection().Entries();
+						Modio::Detail::Logger().Log(Modio::LogLevel::Detailed, Modio::LogCategory::ModManagement,
+													"Mod collection saved ({} mods)", PosCollection.size());
+						for (const auto& ModEntry : PosCollection)
+						{
+							const auto SizeOnDisk = ModEntry.second->GetSizeOnDisk();
+							const std::string SizeOnDiskString =
+								SizeOnDisk ? std::to_string(static_cast<std::uintmax_t>(*SizeOnDisk)) : "Unknown";
+
+							Modio::Detail::Logger().Log(Modio::LogLevel::Detailed, Modio::LogCategory::ModManagement,
+														"Mod Id {}, Path {}, Size {}, State {}", ModEntry.first,
+														ModEntry.second->GetPath(), SizeOnDiskString,
+														Modio::ModStateToString(ModEntry.second->GetModState()));
+						}
 						Self.complete({});
 						return;
 					}
 					else
 					{
+						Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::ModManagement,
+													"Failed to save mod collection");
 						Self.complete(Modio::make_error_code(Modio::FilesystemError::WriteError));
 						return;
 					}

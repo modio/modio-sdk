@@ -42,7 +42,7 @@ namespace Modio
 		Modio::Avatar Avatar {};
 		
 		/// @brief The display name of the User for the given Portal that the mod search is coming from
-		/// * ie if the Portal is PSN, then this is the owning user's PSN profile name if accounts are linked.
+		/// * ie if the Portal is PlayStation, then this is the owning user's PlayStation profile name if accounts are linked.
 		std::string DisplayNamePortal {};
 
 		/// @docnone

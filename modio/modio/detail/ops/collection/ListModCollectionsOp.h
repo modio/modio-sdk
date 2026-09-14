@@ -30,7 +30,7 @@ namespace Modio
 				: GameID(GameID),
 				  FilterParams(FilterParams)
 			{
-				std::map<std::string, std::string> QueryParams = FilterParams.ToQueryParamaters();
+				std::map<std::string, std::string> QueryParams = FilterParams.ToQueryParameters();
 				QueryParams.insert({"mods_total-min", "1"});
 				ListModCollectionsParams = Modio::Detail::GetModCollectionsRequest.SetGameID(GameID)
 											   .AddPlatformStatusFilter()

@@ -101,8 +101,8 @@ namespace Modio
 					return "switch";
 				case AuthenticationProvider::Discord:
 					return "discord";
-				case AuthenticationProvider::PSN:
-					return "psn";
+				case AuthenticationProvider::PS:
+					return "ps";
 				case AuthenticationProvider::Oculus:
 					return "oculus";
 				case AuthenticationProvider::Epic:

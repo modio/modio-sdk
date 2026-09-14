@@ -86,7 +86,7 @@ namespace Modio
 														"Attempted to unsubscribe from mod {}, received error code {}. "
 														"Deferring unsubscription.",
 														ModId, ec.value());
-							// Treating as success when unsubscription is deferred to facilitate UE4 UI functionality
+							// Treating as success when unsubscription is deferred
 							Self.complete({});
 							return;
 						}
@@ -95,6 +95,8 @@ namespace Modio
 					}
 
 					Modio::Detail::SDKSessionData::InvalidateSubscriptionCache();
+					// Safe to remove the deferred unsubscription here, because if we encountered an error requiring the unsubscription to be deferred, or encountered an error when handling a deferred unsubscription, we would have already bailed
+					Modio::Detail::SDKSessionData::RemoveDeferredUnsubscription(ModId);
 
 					yield Modio::Detail::SaveModCollectionToStorageAsync(std::move(Self));
 					yield Modio::Detail::Services::GetGlobalService<Modio::Detail::UserDataService>()
@@ -112,6 +114,7 @@ namespace Modio
 			Modio::ModID ModId {};
 			ModioAsio::coroutine CoroutineState {};
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
+			Modio::Detail::SDKModManagementOp ModManagementTracker {};
 		};
 
 		template<typename UnsubscribeCompleteCallback>

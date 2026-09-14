@@ -11,8 +11,8 @@
 #pragma once
 
 #include "modio/cache/ModioCacheService.h"
-#include "modio/detail/http/PerformRequestImpl.h"
 #include "modio/detail/ModioObjectTrack.h"
+#include "modio/detail/http/PerformRequestImpl.h"
 #include "modio/http/ModioHttpRequest.h"
 
 namespace Modio
@@ -41,7 +41,7 @@ namespace Modio
 			void AppendRemainingResults();
 			void LogRequestDetails();
 			void LogResponseDetails();
-			Modio::ErrorCode MarshallResponse();
+			Modio::ErrorCode MarshalResponse();
 
 		public:
 			PerformRequestAndGetResponseOp(Modio::Detail::DynamicBuffer Response,
@@ -198,11 +198,12 @@ namespace Modio
 						// call so make sure we steal all of them
 						AppendRemainingResults();
 					}
+					
+					// TODO: We should probably not clobber the original ec here, but check both it and the code from MarshalResponse 
+					ec = MarshalResponse();
 
-					/// \todo	is this right???? [RB]
-					ec = MarshallResponse();
-
-					if (ec != make_error_code(Modio::GenericError::EndOfFile))
+					// hotfix: Make sure we check if ec has an error before doing the comparison against the EOF code. Prior to the refactoring of MarshalResponse, ec was always nonzero, but now it can be.
+					if (ec && ec != make_error_code(Modio::GenericError::EndOfFile))
 					{
 						Self.complete(ec);
 						return;
@@ -247,5 +248,5 @@ namespace Modio
 #include <asio/unyield.hpp>
 
 #ifndef MODIO_SEPARATE_COMPILATION
-#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.ipp"
+	#include "modio/detail/ops/http/PerformRequestAndGetResponseOp.ipp"
 #endif

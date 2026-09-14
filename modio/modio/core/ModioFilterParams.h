@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "modio/detail/ModioLibraryConfigurationHelpers.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioSplitCompilation.h"
 #include "modio/core/entities/ModioProfileMaturity.h"
+#include "modio/detail/ModioLibraryConfigurationHelpers.h"
 #include <chrono>
 
 namespace Modio
@@ -24,7 +24,7 @@ namespace Modio
 	{
 	public:
 		/// @docpublic
-		/// @brief Enum indicating which field should be used to sort the results.  
+		/// @brief Enum indicating which field should be used to sort the results.
 		enum class SortFieldType : std::int32_t
 		{
 			ID, /** use mod ID (default) */
@@ -51,8 +51,23 @@ namespace Modio
 		{
 			Free = 0, /** Return only free mods */
 			Paid = 1, /** Return only paid mods */
-			FreeAndPaid = 2 /** Return both free and paid mods */
+			FreeAndPaid = 2, /** Return both free and paid mods */
+			FreeAndPaidWeighted = 3 /** Return both free and paid mods with a configured weighting */
 		};
+
+		/// @docpublic
+		/// @brief Enum indicating the timespan results should be restricted to
+		enum class Timespan : std::uint16_t
+		{
+			Today, /** (default) */
+			Week,
+			Month,
+			ThreeMonths,
+			Year,
+			AllTime
+		};
+
+		MODIOSDK_API bool operator==(const Modio::FilterParams& Other) const;
 
 		/// @docpublic
 		/// @brief Indicates results should be sorted using the specified field and direction
@@ -60,7 +75,7 @@ namespace Modio
 		/// @param ByDirection Direction to sort
 		/// @return *this
 		MODIOSDK_API Modio::FilterParams& SortBy(Modio::FilterParams::SortFieldType ByField,
-											     Modio::FilterParams::SortDirection ByDirection);
+												 Modio::FilterParams::SortDirection ByDirection);
 
 		/// @docpublic
 		/// @brief Only include mods where the name contains the provided string
@@ -93,7 +108,6 @@ namespace Modio
 		/// @return *this
 		MODIOSDK_API Modio::FilterParams& MatchingAuthors(const std::vector<Modio::UserID>& UserIds);
 
-		
 		/// @docpublic
 		/// @brief Exclude mods with the specified author User IDs
 		/// @param UserIds The list of User IDs to filter on
@@ -118,7 +132,7 @@ namespace Modio
 		/// @param If LiveAfter should be rounded to the nearest hour (for cacheability on the backend)
 		/// @return *this
 		MODIOSDK_API Modio::FilterParams& MarkedLiveAfter(std::chrono::system_clock::time_point LiveAfter,
-												 bool RoundToHour = true);
+														  bool RoundToHour = true);
 
 		/// @docpublic
 		/// @brief Only include mods that were marked live (i.e released) before the specified date
@@ -126,7 +140,13 @@ namespace Modio
 		/// @param If LiveBefore should be rounded to the nearest hour (for cacheability on the backend)
 		/// @return *this
 		MODIOSDK_API Modio::FilterParams& MarkedLiveBefore(std::chrono::system_clock::time_point LiveBefore,
-												  bool RoundToHour = true);
+														   bool RoundToHour = true);
+
+		/// @docpublic
+		/// @brief Restricts the filter to items within the specified timespan
+		/// @param FilterTimespan the duration to filter
+		/// @return *this
+		MODIOSDK_API FilterParams& WithinTimespan(Timespan FilterTimespan);
 
 		/// @docpublic
 		/// @brief Only include mods that have the specified tag
@@ -171,13 +191,13 @@ namespace Modio
 		/// @param PageSize Number of results in a page
 		/// @return *this
 		MODIOSDK_API Modio::FilterParams& PagedResults(std::size_t PageNumber, std::size_t PageSize);
-		
+
 		/// @docpublic
 		///	@brief Indicates results should be filtered by revenue options
 		///	@param ByRevenue Revenue filter to use
 		///	@return *this
 		MODIOSDK_API Modio::FilterParams& RevenueType(Modio::FilterParams::RevenueFilterType ByRevenue);
-		
+
 		/// @docpublic
 		///	@brief Indicates results should exclude all mods which contain mature content
 		///	@return *this
@@ -197,9 +217,9 @@ namespace Modio
 		/// @docinternal
 		/// @brief Converts the filter params to a string suitable for use in the REST API
 		/// @return std::string containing the filter parameters
-		MODIOSDK_API std::map<std::string, std::string> ToQueryParamaters() const;
+		MODIOSDK_API std::map<std::string, std::string> ToQueryParameters() const;
 
-	private:
+	protected:
 		/// @docinternal
 		/// @brief Append a tag to the filter params
 		Modio::FilterParams& AppendValue(std::vector<std::string>& Vector, std::string Tag);
@@ -227,9 +247,12 @@ namespace Modio
 
 		Modio::Optional<std::string> MetadataBlobSearchString {};
 
+		Modio::Optional<Modio::FilterParams::Timespan> SpecifiedTimespan {};
+
 		bool IsPaged = false;
 		std::size_t Index = 0;
 		std::size_t Count = 0;
+		
 	};
 
 } // namespace Modio

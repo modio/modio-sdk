@@ -18,6 +18,7 @@
 #include "modio/core/entities/ModioModTagOptions.h"
 #include "modio/core/entities/ModioIcon.h"
 #include "modio/core/entities/ModioLogo.h"
+#include "modio/core/entities/ModioPlacement.h"
 
 namespace Modio
 {
@@ -127,5 +128,7 @@ namespace Modio
 		std::vector<Modio::ModTagInfo> TagOptions {};
 		/// @brief Cloud Cooking status for this game
 		Modio::GameCloudCookingStatus CloudCookingStatus = GameCloudCookingStatus::Disabled;
+		/// @brief Placements for this game
+		std::vector<Modio::Placement> Placements {};
 	};
 } // namespace Modio

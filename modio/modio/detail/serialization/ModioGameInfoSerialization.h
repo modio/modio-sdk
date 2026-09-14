@@ -20,6 +20,8 @@
 #include "modio/detail/serialization/ModioIconSerialization.h"
 #include "modio/detail/serialization/ModioLogoSerialization.h"
 #include "modio/detail/serialization/ModioModTagOptionsSerialization.h"
+#include "modio/detail/serialization/ModioPlacementListSerialization.h"
+#include "modio/detail/serialization/ModioPlacementSerialization.h"
 
 namespace Modio
 {
@@ -91,6 +93,7 @@ namespace Modio
 		Detail::ParseSafe(Json, GameInfo.VirtualTokenName, "token_name");
 		Detail::ParseSafe(Json, GameInfo.TagOptions, "tag_options");
 		Detail::ParseSafe(Json, GameInfo.CloudCookingStatus, "cloud_cooking_status");
+		Detail::ParseSafe(Json, GameInfo.Placements, "placements");
 
 		nlohmann::json PlatformsJson;
 		if (Detail::GetSubobjectSafe(Json, "platforms", PlatformsJson))

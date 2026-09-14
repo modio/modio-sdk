@@ -11,6 +11,7 @@
 #pragma once
 
 #include "modio/core/ModioStdTypes.h"
+#include "modio/detail/HedleyWrapper.h"
 #include <map>
 #include <vector>
 #include <cstring>
@@ -44,8 +45,9 @@ namespace Modio
 		GOG,
 		Google,
 		Itchio,
-		Nintendo,
-		PSN,
+		Nintendo,		
+		PSN MODIO_DEPRECATED_ENUM("2026.9", "PS"),
+		PS,
 		Steam,
 		XboxLive,
 		Meta
@@ -788,7 +790,8 @@ namespace Modio
 		Itch,
 		Switch,
 		Discord,
-		PSN,
+		PSN MODIO_DEPRECATED_ENUM("2026.9", "PS"),
+		PS,
 		Oculus,
 		Epic,
 		OpenID,

@@ -172,27 +172,6 @@ namespace Modio
 
 					// Is there room in the installation path for the extracted files?
 					{
-						bool HasSpaceAvailable =
-							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().CheckSpaceAvailable(
-								CollectionEntry->GetPath(),
-								Modio::FileSize(ModInfoData.FileInfo->FilesizeUncompressed));
-						Modio::FileSize AvailableSpaceAtPath =
-							Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().GetSpaceAvailable(
-								CollectionEntry->GetPath());
-						if (!HasSpaceAvailable)
-						{
-							Modio::Detail::Logger().Log(
-								Modio::LogLevel::Error, Modio::LogCategory::File,
-								"Installing mod {} would exceed the available space in the installation path ({} "
-								"needed, {} available)",
-								ModInfoData.ModId, ModInfoData.FileInfo->FilesizeUncompressed,
-								Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
-									.GetSpaceAvailable(CollectionEntry->GetPath()));
-							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
-							Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
-							return;
-						}
-
 						// Do we already have the file on disk?
 						if (Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>().FileExists(
 								DownloadPath))
@@ -204,18 +183,29 @@ namespace Modio
 								bFileDownloadComplete = true;
 							}
 						}
-						// If we either don't have the file on disk or its size is wrong, check if we have enough space
-						// to download the file
-						if (!bFileDownloadComplete && !HasSpaceAvailable)
+
+						if (!bFileDownloadComplete)
 						{
-							Modio::Detail::Logger().Log(Modio::LogLevel::Error, Modio::LogCategory::File,
-														"Downloading mod {} would exceed the available space in the "
-														"download path ({} needed, {} available)",
-														ModInfoData.ModId, ModInfoData.FileInfo->FilesizeUncompressed,
-														AvailableSpaceAtPath);
-							Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
-							Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
-							return;
+							bool HasSpaceAvailable =
+								Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+									.CheckSpaceAvailable(CollectionEntry->GetPath(),
+														 Modio::FileSize(ModInfoData.FileInfo->FilesizeUncompressed));
+							Modio::FileSize AvailableSpaceAtPath =
+								Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>()
+									.GetSpaceAvailable(CollectionEntry->GetPath());
+
+							if (!HasSpaceAvailable)
+							{
+								Modio::Detail::Logger().Log(
+									Modio::LogLevel::Error, Modio::LogCategory::File,
+									"Installing mod {} would exceed the available space in the installation path ({} "
+									"needed, {} available)",
+									ModInfoData.ModId, ModInfoData.FileInfo->FilesizeUncompressed,
+									AvailableSpaceAtPath);
+								Modio::Detail::SDKSessionData::FinishModDownloadOrUpdate();
+								Self.complete(Modio::make_error_code(Modio::FilesystemError::InsufficientSpace));
+								return;
+							}
 						}
 					}
 

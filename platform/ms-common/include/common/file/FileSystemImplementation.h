@@ -468,6 +468,11 @@ namespace Modio
 											"Failed to get space available. Received error {}", LastError);
 				return Modio::FileSize(0);
 			}
+
+			bool IsModStorageQuotaRequired() override
+			{
+				return false;
+			}
 		};
 	} // namespace Detail
 } // namespace Modio

@@ -464,6 +464,11 @@ namespace Modio
 				return Modio::FileSize(0);
 			}
 
+			bool IsModStorageQuotaRequired() override
+			{
+				return false;
+			}
+
 			static Modio::filesystem::path GetDefaultCommonDataPath(Modio::filesystem::path& CommonDataPath)
 			{
 				Modio::Detail::GetDefaultCommonDataPath(CommonDataPath);

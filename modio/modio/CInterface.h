@@ -75,7 +75,7 @@ typedef enum EModioAuthenticationProvider
     EModioAuthenticationProvider_Itch,
     EModioAuthenticationProvider_Switch,
     EModioAuthenticationProvider_Discord,
-    EModioAuthenticationProvider_PSN,
+    EModioAuthenticationProvider_PS,
     EModioAuthenticationProvider_Oculus,
     EModioAuthenticationProvider_Epic,
     EModioAuthenticationProvider_OpenID,
@@ -160,7 +160,7 @@ typedef enum EModioPortal
     EModioPortal_Google,
     EModioPortal_Itchio,
     EModioPortal_Nintendo,
-    EModioPortal_PSN,
+    EModioPortal_PS,
     EModioPortal_Steam,
     EModioPortal_XboxLive
 } EModioPortal; 

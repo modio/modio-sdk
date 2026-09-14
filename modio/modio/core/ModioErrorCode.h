@@ -1164,8 +1164,8 @@ namespace Modio
 		MuteUserNotFound = 17000,
 		NotFollowingUser = 11135,
 		OpenIDNotConfigured = 11086,
-		PSNChildAccountNotPermitted = 11085,
-		PSNNotAllowedToInteractWithUGC = 11096,
+		PSChildAccountNotPermitted = 11085,
+		PSNotAllowedToInteractWithUGC = 11096,
 		PlatformSpecificModfilesNotSupported = 14037,
 		PremiumFeatureNotEnabled = 14040,
 		Ratelimited = 11008,
@@ -1394,10 +1394,10 @@ namespace Modio
 				case ApiError::OpenIDNotConfigured:
 						return "You must configure your OpenID config for your game in your game authentication settings before being able to authenticate users.";
 					break;
-				case ApiError::PSNChildAccountNotPermitted:
+				case ApiError::PSChildAccountNotPermitted:
 						return "Child accounts are not permitted";
 					break;
-				case ApiError::PSNNotAllowedToInteractWithUGC:
+				case ApiError::PSNotAllowedToInteractWithUGC:
 						return "Account not allowed to interact with UGC";
 					break;
 				case ApiError::PlatformSpecificModfilesNotSupported:

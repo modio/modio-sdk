@@ -35,6 +35,8 @@ namespace Modio
 				size_t DiskSize;
 				/// @brief the total number of files to be written out
 				size_t NumberOfFiles;
+				/// @brief the total number of directories in the archive
+				size_t NumberOfDirectories;
 			};
 
 			/// @docinternal
@@ -48,17 +50,25 @@ namespace Modio
 			{
 				size_t TotalSize = 0;
 				size_t TotalFileCount = 0;
+				size_t TotalDirectoryCount = 0;
 				while (Begin != End)
 				{
 					// Files on cache storage consume a minimum of 16Kb, and will always be aligned
 					// to 16Kb in sizes when written to the disk.
-					size_t ThisFileSize = Begin->UncompressedSize;
-					TotalSize += ThisFileSize;
-					TotalFileCount++;
+					if (Begin->bIsDirectory)
+					{
+						TotalDirectoryCount++;
+					}
+					else
+					{
+						size_t ThisFileSize = Begin->UncompressedSize;
+						TotalSize += ThisFileSize;
+						TotalFileCount++;
+					}
 
 					++Begin;
 				}
-				return ArchiveDiskRequirements {TotalSize, TotalFileCount};
+				return ArchiveDiskRequirements {TotalSize, TotalFileCount, TotalDirectoryCount};
 			}
 
 			Modio::filesystem::path OutputPath {};

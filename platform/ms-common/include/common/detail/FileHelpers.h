@@ -68,6 +68,8 @@ namespace Modio
 					return Modio::make_error_code(Modio::FilesystemError::UnableToCreateFile);
 				case ERROR_INVALID_PARAMETER:
 					return Modio::make_error_code(Modio::GenericError::BadParameter);
+				case ERROR_SHARING_VIOLATION:
+					return Modio::make_error_code(Modio::FilesystemError::FileLocked);
 			}
 
 			return Modio::make_error_code(Modio::SystemError::UnknownSystemError);

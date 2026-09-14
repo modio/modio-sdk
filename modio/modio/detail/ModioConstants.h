@@ -10,6 +10,7 @@
 
 #pragma once
 #include "modio/detail/ModioCompilerMacros.h"
+#include "modio/detail/HedleyWrapper.h"
 #include <chrono>
 
 
@@ -29,7 +30,10 @@ namespace Modio
 				constexpr const char* XboxToken = "xbox_token";
 				constexpr const char* SwitchToken = "id_token";
 				constexpr const char* OpenIDToken = "id_token";
-				constexpr const char* PsnToken = "psn_token";
+				MODIO_DEPRECATED("2026.9", "PsToken") constexpr const char* PsnToken = "ps_token";
+				constexpr const char* PsToken = "ps_token";
+				constexpr const char* PsEnv = "ps_env";
+				constexpr const char* PsServiceLabel = "ps_service_label";
 				constexpr const char* GoogleIDToken = "id_token";
 				constexpr const char* GoogleServerSideToken = "auth_code";
 				constexpr const char* DiscordToken = "discord_token";
@@ -79,7 +83,17 @@ namespace Modio
 				constexpr const char* GrossAmount = "gross_amount";
 				constexpr const char* TokenEntity = "entity";
 				constexpr const char* TokenValue = "token";
+
 			} // namespace JSONKeys
+			namespace TimespanKeys
+			{
+				constexpr const char* Week = "week";
+				constexpr const char* Month = "month";
+				constexpr const char* ThreeMonths = "3_months";
+				constexpr const char* Year = "year";
+				constexpr const char* Today = "today";
+				constexpr const char* AllTime = "all_time";
+			}
 			namespace Configuration
 			{
 				constexpr uint8_t DefaultNumberOfRetries = 3;

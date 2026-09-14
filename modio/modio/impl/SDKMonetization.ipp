@@ -13,7 +13,7 @@
 #include "modio/detail/ops/monetization/FetchUserPurchasesOp.h"
 #include "modio/detail/ops/monetization/GetAvailableUserEntitlementsGoogle.h"
 #include "modio/detail/ops/monetization/GetAvailableUserEntitlementsMeta.h"
-#include "modio/detail/ops/monetization/GetAvailableUserEntitlementsPSN.h"
+#include "modio/detail/ops/monetization/GetAvailableUserEntitlementsPS.h"
 #include "modio/detail/ops/monetization/GetAvailableUserEntitlementsSteam.h"
 #include "modio/detail/ops/monetization/GetAvailableUserEntitlementsXboxLive.h"
 #include "modio/detail/ops/monetization/GetUserDelegationTokenOp.h"
@@ -21,12 +21,12 @@
 #include "modio/detail/ops/monetization/PurchaseModOp.h"
 #include "modio/detail/ops/monetization/PurchaseModWithEntitlementGoogle.h"
 #include "modio/detail/ops/monetization/PurchaseModWithEntitlementMeta.h"
-#include "modio/detail/ops/monetization/PurchaseModWithEntitlementPSN.h"
+#include "modio/detail/ops/monetization/PurchaseModWithEntitlementPS.h"
 #include "modio/detail/ops/monetization/PurchaseModWithEntitlementSteam.h"
 #include "modio/detail/ops/monetization/PurchaseModWithEntitlementXboxLive.h"
 #include "modio/detail/ops/monetization/RefreshUserEntitlementsGoogle.h"
 #include "modio/detail/ops/monetization/RefreshUserEntitlementsMeta.h"
-#include "modio/detail/ops/monetization/RefreshUserEntitlementsPSN.h"
+#include "modio/detail/ops/monetization/RefreshUserEntitlementsPS.h"
 #include "modio/detail/ops/monetization/RefreshUserEntitlementsSteam.h"
 #include "modio/detail/ops/monetization/RefreshUserEntitlementsXboxLive.h"
 #include "modio/detail/serialization/ModioEntitlementConsumptionStatusSerialization.h"
@@ -78,13 +78,13 @@ namespace Modio
 					Modio::Detail::PurchaseModWithEntitlementXboxLiveAsync(ModID, Params, Callback);
 					break;
 
-				case Modio::Portal::PSN:
-					if (Modio::Detail::RequireValidPSNRefreshEntitlementsExtendedParameters(Params, Callback) == false)
+				case Modio::Portal::PS:
+					if (Modio::Detail::RequireValidPSRefreshEntitlementsExtendedParameters(Params, Callback) == false)
 					{
 						return;
 					}
 
-					Modio::Detail::PurchaseModWithEntitlementPSNAsync(ModID, Params, Callback);
+					Modio::Detail::PurchaseModWithEntitlementPSAsync(ModID, Params, Callback);
 					break;
 
 				case Modio::Portal::Google:
@@ -155,13 +155,13 @@ namespace Modio
 					Modio::Detail::RefreshUserEntitlementsXboxLiveAsync(Params, Callback);
 					break;
 
-				case Modio::Portal::PSN:
-					if (Modio::Detail::RequireValidPSNRefreshEntitlementsExtendedParameters(Params, Callback) == false)
+				case Modio::Portal::PS:
+					if (Modio::Detail::RequireValidPSRefreshEntitlementsExtendedParameters(Params, Callback) == false)
 					{
 						return;
 					}
 
-					Modio::Detail::RefreshUserEntitlementsPSNAsync(Params, Callback);
+					Modio::Detail::RefreshUserEntitlementsPSAsync(Params, Callback);
 					break;
 
 				case Modio::Portal::Google:
@@ -232,13 +232,13 @@ namespace Modio
 					Modio::Detail::GetAvailableUserEntitlementsXBoxLiveAsync(Params, Callback);
 					break;
 
-				case Modio::Portal::PSN:
-					if (Modio::Detail::RequireValidPSNRefreshEntitlementsExtendedParameters(Params, Callback) == false)
+				case Modio::Portal::PS:
+					if (Modio::Detail::RequireValidPSRefreshEntitlementsExtendedParameters(Params, Callback) == false)
 					{
 						return;
 					}
 
-					Modio::Detail::GetAvailableUserEntitlementsPSNAsync(Params, Callback);
+					Modio::Detail::GetAvailableUserEntitlementsPSAsync(Params, Callback);
 					break;
 
 				case Modio::Portal::Google:

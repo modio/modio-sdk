@@ -76,7 +76,7 @@ namespace Modio
 			Modio::EntitlementParams User, std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler);
 
 		template<typename... OtherArgs>
-		bool RequireValidPSNRefreshEntitlementsExtendedParameters(
+		bool RequireValidPSRefreshEntitlementsExtendedParameters(
 			Modio::EntitlementParams User, std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler);
 
 		template<typename... OtherArgs>

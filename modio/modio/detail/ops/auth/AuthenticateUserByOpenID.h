@@ -26,23 +26,25 @@ namespace Modio
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed,
 										User.bUserHasAcceptedTerms ? "true" : "false");
 
-			auto ParamIterator = User.ExtendedParameters.find("psn_token");
+			auto ParamIterator = User.ExtendedParameters.find(Modio::Detail::Constants::APIStrings::PsToken);
 			if (ParamIterator != User.ExtendedParameters.end())
 			{
-				Params = Params.AppendPayloadValue("psn_token", ParamIterator->second);
+				Params =
+					Params.AppendPayloadValue(Modio::Detail::Constants::APIStrings::PsToken, ParamIterator->second);
 			}
 
 			if (Modio::Detail::SDKSessionData::GetPlatformEnvironment().has_value())
 			{
-				Params = Params.AppendPayloadValue("psn_env",
+				Params = Params.AppendPayloadValue(Modio::Detail::Constants::APIStrings::PsEnv,
 												   Modio::Detail::SDKSessionData::GetPlatformEnvironment().value());
 			}
 			else
 			{
-				ParamIterator = User.ExtendedParameters.find("psn_env");
+				ParamIterator = User.ExtendedParameters.find(Modio::Detail::Constants::APIStrings::PsEnv);
 				if (ParamIterator != User.ExtendedParameters.end())
 				{
-					Params = Params.AppendPayloadValue("psn_env", ParamIterator->second);
+					Params =
+						Params.AppendPayloadValue(Modio::Detail::Constants::APIStrings::PsEnv, ParamIterator->second);
 				}
 			}
 

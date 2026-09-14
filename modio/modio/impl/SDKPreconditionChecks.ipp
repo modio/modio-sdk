@@ -519,11 +519,11 @@ namespace Modio
 			Modio::EntitlementParams, std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)>&);
 
 		template<typename... OtherArgs>
-		bool RequireValidPSNRefreshEntitlementsExtendedParameters(
+		bool RequireValidPSRefreshEntitlementsExtendedParameters(
 			Modio::EntitlementParams User, std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
 		{
 			if (User.ExtendedParameters.count(Modio::Detail::Constants::APIStrings::AuthCode) ||
-				User.ExtendedParameters.count(Modio::Detail::Constants::APIStrings::PsnToken))
+				User.ExtendedParameters.count(Modio::Detail::Constants::APIStrings::PsToken))
 			{
 				return true;
 			}
@@ -538,14 +538,14 @@ namespace Modio
 				return false;
 			}
 		}
-		template bool RequireValidPSNRefreshEntitlementsExtendedParameters<Modio::Optional<Modio::TransactionRecord>>(
+		template bool RequireValidPSRefreshEntitlementsExtendedParameters<Modio::Optional<Modio::TransactionRecord>>(
 			Modio::EntitlementParams User,
 			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::TransactionRecord>)>& Handler);
-		template bool RequireValidPSNRefreshEntitlementsExtendedParameters<
+		template bool RequireValidPSRefreshEntitlementsExtendedParameters<
 			Modio::Optional<Modio::EntitlementConsumptionStatusList>>(
 			Modio::EntitlementParams User,
 			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)>& Handler);
-		template bool RequireValidPSNRefreshEntitlementsExtendedParameters<Modio::Optional<Modio::EntitlementList>>(
+		template bool RequireValidPSRefreshEntitlementsExtendedParameters<Modio::Optional<Modio::EntitlementList>>(
 			Modio::EntitlementParams User,
 			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)>& Handler);
 

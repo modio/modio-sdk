@@ -61,6 +61,7 @@ namespace Modio
 	struct ServerInitializeOptions;
 	class ModCollectionInfoList;
 	struct ModCollectionInfo;
+	struct Placement;
 	enum class UserSubscriptionListChangeType : std::int32_t;
 	enum class AvatarSize : std::uint8_t;
 	enum class LogoSize : std::uint8_t;

@@ -385,6 +385,12 @@ namespace Modio
 				return PlatformImplementation->GetSpaceAvailable(Destination);
 			}
 
+			bool IsModStorageQuotaRequired()
+			{
+				MODIO_PROFILE_SCOPE(IsModStorageQuotaRequired);
+				return PlatformImplementation->IsModStorageQuotaRequired();
+			}
+
 			/// @brief Recursively searches the media cache to create a queue of image paths and the total
 			/// size of all cached images combined. Note that image paths are added to the queue as they are found
 			/// without additional sorting.

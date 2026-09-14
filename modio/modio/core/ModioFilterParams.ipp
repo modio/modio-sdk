@@ -14,10 +14,36 @@
 #endif
 
 #include "modio/core/entities/ModioProfileMaturity.h"
+#include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioStringHelpers.h"
 
 namespace Modio
 {
+	MODIOSDK_API bool FilterParams::operator==(const Modio::FilterParams& Other) const
+	{
+		// clang-format off
+		// oh, for C++20 and default comparisons
+		return SortField == Other.SortField &&
+		Direction == Other.Direction &&
+		IncludedAuthorUserIds == Other.IncludedAuthorUserIds &&
+		ExcludedAuthorUserIds == Other.ExcludedAuthorUserIds &&
+		SearchKeywords == Other.SearchKeywords &&
+		DateRangeBegin == Other.DateRangeBegin &&
+		DateRangeEnd == Other.DateRangeEnd &&
+		Tags == Other.Tags &&
+		ExcludedTags == Other.ExcludedTags &&
+		IncludedIDs == Other.IncludedIDs &&
+		ExcludedIDs == Other.ExcludedIDs &&
+		Revenue == Other.Revenue &&
+		Maturity == Other.Maturity &&
+		MetadataBlobSearchString == Other.MetadataBlobSearchString &&
+		SpecifiedTimespan == Other.SpecifiedTimespan &&
+		IsPaged == Other.IsPaged &&
+		Index == Other.Index &&
+		Count == Other.Count;
+		// clang-format on 
+	}
+
 	MODIOSDK_API Modio::FilterParams& FilterParams::SortBy(SortFieldType ByField, SortDirection ByDirection)
 	{
 		SortField = ByField;
@@ -86,16 +112,22 @@ namespace Modio
 	}
 
 	MODIOSDK_API Modio::FilterParams& FilterParams::MarkedLiveAfter(std::chrono::system_clock::time_point LiveAfter,
-													   bool RoundToHour)
+																	bool RoundToHour)
 	{
 		DateRangeBegin = RoundToHour ? std::chrono::round<std::chrono::hours>(LiveAfter) : LiveAfter;
 		return *this;
 	}
 
 	MODIOSDK_API Modio::FilterParams& FilterParams::MarkedLiveBefore(std::chrono::system_clock::time_point LiveBefore,
-														bool RoundToHour)
+																	 bool RoundToHour)
 	{
 		DateRangeEnd = RoundToHour ? std::chrono::round<std::chrono::hours>(LiveBefore) : LiveBefore;
+		return *this;
+	}
+
+	MODIOSDK_API Modio::FilterParams& FilterParams::WithinTimespan(Timespan FilterTimespan)
+	{
+		SpecifiedTimespan = FilterTimespan;
 		return *this;
 	}
 
@@ -173,7 +205,7 @@ namespace Modio
 		  Count(100)
 	{}
 
-	MODIOSDK_API std::map<std::string, std::string> Modio::FilterParams::ToQueryParamaters() const
+	MODIOSDK_API std::map<std::string, std::string> Modio::FilterParams::ToQueryParameters() const
 	{
 		std::map<std::string, std::string> FilterFields;
 		std::string SortStr;
@@ -313,6 +345,8 @@ namespace Modio
 					break;
 				case RevenueFilterType::FreeAndPaid:
 					FilterFields.emplace("revenue_type", "2");
+				case RevenueFilterType::FreeAndPaidWeighted:
+					FilterFields.emplace("revenue_type", "3");
 					break;
 				default:;
 			}
@@ -323,7 +357,29 @@ namespace Modio
 			auto maturityOption = static_cast<uint8_t>(Maturity.value());
 			FilterFields.emplace("maturity_option", std::to_string(maturityOption));
 		}
-
+		if (SpecifiedTimespan.has_value()) {
+			switch (SpecifiedTimespan.value())
+			{
+				case Timespan::AllTime:
+					FilterFields.emplace("timespan", std::string(Modio::Detail::Constants::TimespanKeys::AllTime));
+					break;
+					case Timespan::Month:
+					FilterFields.emplace("timespan", std::string(Modio::Detail::Constants::TimespanKeys::Month));
+					break;
+					case Timespan::ThreeMonths:
+					FilterFields.emplace("timespan", std::string(Modio::Detail::Constants::TimespanKeys::ThreeMonths));
+					break;
+					case Timespan::Today:
+					FilterFields.emplace("timespan", std::string(Modio::Detail::Constants::TimespanKeys::Today));
+					break;
+					case Timespan::Week:
+					FilterFields.emplace("timespan", std::string(Modio::Detail::Constants::TimespanKeys::Week));
+					break;
+					case Timespan::Year:
+					FilterFields.emplace("timespan", std::string(Modio::Detail::Constants::TimespanKeys::Year));
+					break;
+			}
+		}
 		return FilterFields;
 	}
 

@@ -185,7 +185,7 @@ namespace Modio
 			}
 		}
 
-		Modio::ErrorCode PerformRequestAndGetResponseOp::MarshallResponse()
+		Modio::ErrorCode PerformRequestAndGetResponseOp::MarshalResponse()
 		{
 			// After this State.ResponseBodyBuffer is considered dead
 			std::uint32_t ResponseCode = Request->GetResponseCode();

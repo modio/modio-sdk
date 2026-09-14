@@ -16,7 +16,7 @@ namespace Modio
 {
 	namespace Detail
 	{
-		inline void AuthenticateUserByPSNAsync(Modio::AuthenticationParams User,
+		inline void AuthenticateUserByPSAsync(Modio::AuthenticationParams User,
 											   std::function<void(Modio::ErrorCode)> Callback)
 		{
 			Modio::Detail::HttpRequestParams Params =

@@ -271,6 +271,35 @@ namespace Modio
 			bool FetchExternalUpdatesRunning = false;
 			std::unordered_map<std::int64_t, bool> CollectionCacheInvalidMap;
 		};
+
+		class SDKModManagementOp
+		{
+			bool InProgress = false;
+		public:
+			inline SDKModManagementOp()
+			{ 
+				InProgress = true;
+				auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
+				Modio::Detail::SDKSessionData::IncrementModManagementEventQueued();
+			}
+			inline ~SDKModManagementOp()
+			{
+				if (InProgress)
+				{
+					auto Lock = Modio::Detail::SDKSessionData::GetWriteLock();
+					Modio::Detail::SDKSessionData::DecrementModManagementEventQueued();
+				}
+			}
+			inline SDKModManagementOp(SDKModManagementOp&& rhs) noexcept
+			{ 
+				InProgress = rhs.InProgress;
+				rhs.InProgress = 0;
+			}
+			SDKModManagementOp(const SDKModManagementOp&) = delete;
+			SDKModManagementOp& operator = (const SDKModManagementOp&) = delete;
+			SDKModManagementOp& operator = (SDKModManagementOp&&) = delete;
+		};
+
 	} // namespace Detail
 } // namespace Modio
 

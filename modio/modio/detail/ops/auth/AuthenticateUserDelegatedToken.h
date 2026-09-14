@@ -50,9 +50,9 @@ namespace Modio
 							Modio::ErrorCode ErrRef =
 								Modio::make_error_code(static_cast<Modio::ApiError>(Error->ErrorRef));
 
-							if (ErrRef == Modio::ApiError::PSNChildAccountNotPermitted ||
+							if (ErrRef == Modio::ApiError::PSChildAccountNotPermitted ||
 								ErrRef == Modio::ApiError::XBoxLiveChildAccountNotPermitted ||
-								ErrRef == Modio::ApiError::PSNNotAllowedToInteractWithUGC ||
+								ErrRef == Modio::ApiError::PSNotAllowedToInteractWithUGC ||
 								ErrRef == Modio::ApiError::XBoxLiveNotAllowedToInteractWithUGC)
 							{
 								Self.complete(Modio::make_error_code(

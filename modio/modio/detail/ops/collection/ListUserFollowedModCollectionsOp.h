@@ -29,7 +29,7 @@ namespace Modio
 				ListFollowedModCollectionsParams = Modio::Detail::GetMeFollowedCollectionsRequest
 											   .AddPlatformStatusFilter()
 											   .AddStatusFilter()
-											   .AppendQueryParameterMap(FilterParams.ToQueryParamaters());
+											   .AppendQueryParameterMap(FilterParams.ToQueryParameters());
 			}
 
 			template<typename CoroType>

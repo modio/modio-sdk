@@ -131,6 +131,7 @@ namespace Modio
 			bool IncludeDependencies = false;
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 			ModioAsio::coroutine CoroutineState {};
+			Modio::Detail::SDKModManagementOp ModManagementTracker {};
 		};
 
 		template<typename SubscribeCompleteCallback>

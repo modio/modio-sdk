@@ -32,7 +32,7 @@ std::map<Modio::Portal, std::string> ModioPortalToSkuPortalMap = {
 	{Modio::Portal::None, "web"},
 	{Modio::Portal::Steam, "steam"},
 	{Modio::Portal::XboxLive, "xboxlive"},
-	{Modio::Portal::PSN, "psn"},
+	{Modio::Portal::PS, "ps"},
 };
 
 static std::vector<Modio::ModMonetizationSKU> GetSkusForPortal(Modio::ModInfo& ModInfo, Modio::Portal Portal)

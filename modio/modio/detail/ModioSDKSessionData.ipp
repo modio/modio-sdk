@@ -820,7 +820,11 @@ namespace Modio
 		
 		void SDKSessionData::DecrementModManagementEventQueued()
 		{
-			Get().ModManagementEventQueued--;
+			// Guard against underflow
+			if (Get().ModManagementEventQueued)
+			{
+				Get().ModManagementEventQueued--;
+			}
 		}
 
 		void SDKSessionData::InvalidateModCache(Modio::ModID ID)

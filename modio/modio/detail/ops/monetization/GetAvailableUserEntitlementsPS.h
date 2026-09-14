@@ -16,7 +16,7 @@ namespace Modio
 {
 	namespace Detail
 	{
-		inline void GetAvailableUserEntitlementsPSNAsync(
+		inline void GetAvailableUserEntitlementsPSAsync(
 			Modio::EntitlementParams Params,
 			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)> Callback)
 		{
@@ -25,21 +25,23 @@ namespace Modio
 			auto AuthCodeIterator = Params.ExtendedParameters.find(Modio::Detail::Constants::APIStrings::AuthCode);
 			bool hasAuthCode = AuthCodeIterator != Params.ExtendedParameters.end();
 
-			RequestParams = RequestParams.AppendPayloadValue(Modio::Detail::Constants::APIStrings::PsnToken,
+			RequestParams = RequestParams.AppendPayloadValue(Modio::Detail::Constants::APIStrings::PsToken,
 				hasAuthCode 
 				? AuthCodeIterator->second
-				: Params.ExtendedParameters[Modio::Detail::Constants::APIStrings::PsnToken]);
+				: Params.ExtendedParameters[Modio::Detail::Constants::APIStrings::PsToken]);
 
 			if (Modio::Detail::SDKSessionData::GetPlatformEnvironment().has_value())
 			{
-				RequestParams = RequestParams.AppendPayloadValue(
-					"psn_env", Modio::Detail::SDKSessionData::GetPlatformEnvironment().value());
+				RequestParams =
+					RequestParams.AppendPayloadValue(Modio::Detail::Constants::APIStrings::PsEnv,
+													 Modio::Detail::SDKSessionData::GetPlatformEnvironment().value());
 			}
 
 			auto ServiceLabelIterator = Params.ExtendedParameters.find("service_label");
 			if (ServiceLabelIterator != Params.ExtendedParameters.end())
 			{
-				RequestParams = RequestParams.AppendPayloadValue("psn_service_label", ServiceLabelIterator->second);
+				RequestParams = RequestParams.AppendPayloadValue(Modio::Detail::Constants::APIStrings::PsServiceLabel,
+																 ServiceLabelIterator->second);
 			}
 
 			return ModioAsio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)>,

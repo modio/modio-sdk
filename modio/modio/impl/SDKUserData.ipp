@@ -22,7 +22,7 @@
 #include "modio/detail/ops/auth/AuthenticateUserByItch.h"
 #include "modio/detail/ops/auth/AuthenticateUserByOculus.h"
 #include "modio/detail/ops/auth/AuthenticateUserByOpenID.h"
-#include "modio/detail/ops/auth/AuthenticateUserByPSN.h"
+#include "modio/detail/ops/auth/AuthenticateUserByPS.h"
 #include "modio/detail/ops/auth/AuthenticateUserBySteam.h"
 #include "modio/detail/ops/auth/AuthenticateUserBySwitchID.h"
 #include "modio/detail/ops/auth/AuthenticateUserByXBoxLive.h"
@@ -91,8 +91,8 @@ namespace Modio
 					case AuthenticationProvider::Discord:
 						Modio::Detail::AuthenticateUserByDiscordAsync(User, Callback);
 						break;
-					case AuthenticationProvider::PSN:
-						Modio::Detail::AuthenticateUserByPSNAsync(User, Callback);
+					case AuthenticationProvider::PS:
+						Modio::Detail::AuthenticateUserByPSAsync(User, Callback);
 						break;
 					case AuthenticationProvider::Epic:
 						Modio::Detail::AuthenticateUserByEpicAsync(User, Callback);
@@ -117,6 +117,9 @@ namespace Modio
 						break;
 					case AuthenticationProvider::GoogleServerSideToken:
 						Modio::Detail::AuthenticateUserByGoogleServerSideTokenAsync(User, Callback);
+						break;
+					default:
+						assert(false && "Invalid value to AuthenticateUserExternalAsync(Modio::AuthenticationProvider)");
 						break;
 				}
 			}

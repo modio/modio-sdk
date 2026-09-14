@@ -36,6 +36,7 @@ namespace Modio
         static const HttpRequestParams AuthenticateViaItchioRequest { Modio::Detail::Verb::POST, "/external/itchioauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AuthenticateViaOculusRequest { Modio::Detail::Verb::POST, "/external/oculusauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AuthenticateViaOpenidRequest { Modio::Detail::Verb::POST, "/external/openidauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
+        static const HttpRequestParams LogoutViaOpenidRequest { Modio::Detail::Verb::POST, "/external/openidauth/logout" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AuthenticateViaSteamRequest { Modio::Detail::Verb::POST, "/external/steamauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AuthenticateViaSwitchRequest { Modio::Detail::Verb::POST, "/external/switchauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
         static const HttpRequestParams AuthenticateViaUdtRequest { Modio::Detail::Verb::POST, "/external/udtauth" , GetContentTypeEnum("application/x-www-form-urlencoded") }; 
