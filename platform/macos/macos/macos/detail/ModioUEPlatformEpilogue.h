@@ -8,4 +8,7 @@
  *
  */
 
+#undef FVector
+#pragma pop_macro("FVector")
+
 #pragma GCC diagnostic pop

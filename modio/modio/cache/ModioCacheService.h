@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io SDK.
  *
@@ -19,6 +19,8 @@
 #include "modio/core/entities/ModioModInfo.h"
 #include "modio/core/entities/ModioModInfoList.h"
 #include "modio/core/entities/ModioModCollection.h"
+#include "modio/core/entities/ModioModFileCookInfoList.h"
+
 #include <unordered_map>
 
 namespace Modio
@@ -56,6 +58,8 @@ namespace Modio
 
 			MODIO_IMPL void AddToCache(Modio::GameID GameIDDetail, Modio::ModInfoList ModInfoDetails);
 
+			MODIO_IMPL void AddToCache(Modio::ModID ModIDDetail, Modio::ModFileCookInfoList ModFileCookDetails);
+
 			MODIO_IMPL void AddToCache(Modio::GameID GameIDDetail, Modio::ModCollectionInfoList ModCollectionInfoDetails);
 
 			MODIO_IMPL void AddToCache(Modio::ModID ModId, std::uint64_t Filesize, bool recursive);
@@ -71,6 +75,8 @@ namespace Modio
 			MODIO_IMPL Modio::Optional<Modio::GameInfo> FetchGameInfoFromCache(Modio::GameID GameIDDetail) const;
 
 			MODIO_IMPL Modio::Optional<Modio::ModInfoList> FetchFromCache(Modio::GameID GameIDDetail) const;
+
+			MODIO_IMPL Modio::Optional<Modio::ModFileCookInfoList> FetchModFileCookListFromCache(Modio::ModID ModIDDetail) const;
 
 			MODIO_IMPL Modio::Optional<std::uint64_t> FetchModDependencyFilesizeFromCache(Modio::ModID ModIDDetail,
 																						  bool recursive) const;
@@ -100,6 +106,7 @@ namespace Modio
 				std::unordered_map<std::int64_t, Modio::ModCollectionInfo> ModCollectionInfoCache;
 				std::unordered_map<std::int64_t, Modio::GameInfo> GameInfoCache;
 				std::unordered_map<std::int64_t, std::vector<Modio::ModID>> ModInfoListCache;
+				std::unordered_map<std::int64_t, Modio::ModFileCookInfoList> ModFileCookListCache;
 				std::unordered_map<std::int64_t, ModDependencyFilesizeEntry> ModDependenciesFilesize;
 			};
 

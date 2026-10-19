@@ -52,7 +52,22 @@ namespace Modio
 		Detail::ParseSafe(Json, ModCollection.FileSize, "filesize");
 		Detail::ParseSafe(Json, ModCollection.FileSizeUncompressed, "filesize_uncompressed");
 		Detail::ParseSafe(Json, ModCollection.Platforms, "platforms");
-		Detail::ParseSafe(Json, ModCollection.Tags, "tags");
+
+		// "collection_tags" is authoritative. "tags" is only used when it is missing or null.
+		std::vector<Modio::ModTag> CollectionTags;
+		if (Detail::ParseSafe(Json, CollectionTags, "collection_tags"))
+		{
+			ModCollection.Tags.clear();
+			for (const Modio::ModTag& Tag : CollectionTags)
+			{
+				ModCollection.Tags.push_back(Tag.Tag);
+			}
+		}
+		else
+		{
+			Detail::ParseSafe(Json, ModCollection.Tags, "tags");
+		}
+
 		Detail::ParseSafe(Json, ModCollection.Stats, "stats");
 		Detail::ParseSafe(Json, ModCollection.Logo, "logo");
 		Detail::ParseSafe(Json, ModCollection.ProfileName, "name");

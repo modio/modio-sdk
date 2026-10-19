@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io SDK.
  *
@@ -152,7 +152,8 @@ namespace Modio
 			MODIO_IMPL static void SetPlatformEnvironment(std::string Environment);
 			MODIO_IMPL static Modio::Optional<std::string> GetPlatformEnvironment();
 
-			MODIO_IMPL static void SetPlatformStatusFilter(std::string PendingOnlyResults);
+			MODIO_IMPL static void SetPlatformStatusFilter(std::string PendingOnlyResults,
+														   std::string IncludeLiveResults = {});
 			MODIO_IMPL static Modio::Optional<Modio::PlatformStatus> GetPlatformStatusFilter();
 			MODIO_IMPL static std::string GetAcceptanceFilterStringForRequestedPlatformStatus();
 
@@ -189,6 +190,10 @@ namespace Modio
 			MODIO_IMPL static void ClearModCacheInvalid(Modio::ModID ID);
 			MODIO_IMPL static bool IsModCacheInvalid(Modio::ModID ID);
 
+			MODIO_IMPL static void InvalidateModFileCookCache(Modio::ModID ID);
+			MODIO_IMPL static void ClearModFileCookCacheInvalid(Modio::ModID ID);
+			MODIO_IMPL static bool IsModFileCookCacheInvalid(Modio::ModID ID);
+
 			MODIO_IMPL static void InvalidateModCollectionCache(Modio::ModCollectionID ID);
 			MODIO_IMPL static void ClearModCollectionCacheInvalid(Modio::ModCollectionID ID);
 			MODIO_IMPL static bool IsModCollectionCacheInvalid(Modio::ModCollectionID ID);
@@ -210,6 +215,10 @@ namespace Modio
 			MODIO_IMPL static bool HasModManagementEventQueued();
 			MODIO_IMPL static void IncrementModManagementEventQueued();
 			MODIO_IMPL static void DecrementModManagementEventQueued();
+
+			MODIO_IMPL static Modio::Optional<Modio::EmailAddress> GetLastUsedEmailAddress();
+			MODIO_IMPL static void SetLastUsedEmailAddress(Modio::EmailAddress Address);
+			MODIO_IMPL static void ClearLastUsedEmailAddress();
 
 		private:
 			enum class InitializationState : std::int32_t
@@ -262,6 +271,7 @@ namespace Modio
 			bool bTermsOfUseCacheInvalid = false;
 			bool bPurchaseCacheInvalid = false;
 			std::unordered_map<std::int64_t, bool> ModCacheInvalidMap {};
+			std::unordered_map<std::int64_t, bool> ModFileCookCacheInvalidMap {};
 			moodycamel::ConcurrentQueue<fu2::unique_function<void()>> IncomingTaskQueue;
 			std::map<Modio::ModID, Modio::ModInfo> UserModPurchaseCache {};
 			// Only populated if a cache storage quota is set
@@ -270,6 +280,7 @@ namespace Modio
 			Modio::FileSize TotalImageCacheSize {};
 			bool FetchExternalUpdatesRunning = false;
 			std::unordered_map<std::int64_t, bool> CollectionCacheInvalidMap;
+			Modio::Optional<Modio::EmailAddress> LastUsedEmailAddress;
 		};
 
 		class SDKModManagementOp

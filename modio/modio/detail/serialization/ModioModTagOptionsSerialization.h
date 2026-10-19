@@ -23,29 +23,29 @@ namespace Modio
 		Modio::Detail::ParseSafe(Json, TagLocalization.Translations, "translations");
 	}
 
-	inline void from_json(const nlohmann::json& Json, Modio::ModTagInfo& TagInfo)
+	inline void from_json(const nlohmann::json& Json, Modio::TagInfo& Info)
 	{
-		Modio::Detail::ParseSafe(Json, TagInfo.TagGroupValues, "tags");
-		Modio::Detail::ParseSafe(Json, TagInfo.TagGroupName, "name");
-		Modio::Detail::ParseSafe(Json, TagInfo.TagGroupNameLocData, "name_localization");
-		Modio::Detail::ParseSafe(Json, TagInfo.TagGroupValueLocData, "tags_localization");
+		Modio::Detail::ParseSafe(Json, Info.TagGroupValues, "tags");
+		Modio::Detail::ParseSafe(Json, Info.TagGroupName, "name");
+		Modio::Detail::ParseSafe(Json, Info.TagGroupNameLocData, "name_localization");
+		Modio::Detail::ParseSafe(Json, Info.TagGroupValueLocData, "tags_localization");
 		if (Json.contains("type") && !Json.at("type").is_null())
 		{
 			std::string TypeValue;
 			Json.at("type").get_to<std::string>(TypeValue);
 			if (TypeValue.compare("checkboxes"))
 			{
-				TagInfo.bAllowMultipleSelection = false;
+				Info.bAllowMultipleSelection = false;
 			}
 			else
 			{
-				TagInfo.bAllowMultipleSelection = true;
+				Info.bAllowMultipleSelection = true;
 			}
 		}
-		TagInfo.SetLocale(Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetLocalLanguage()));
+		Info.SetLocale(Modio::Detail::ToString(Modio::Detail::SDKSessionData::GetLocalLanguage()));
 
-		Modio::Detail::ParseSafe(Json, TagInfo.bHidden, "hidden");
-		Modio::Detail::ParseSafe(Json, TagInfo.bLocked, "locked");
+		Modio::Detail::ParseSafe(Json, Info.bHidden, "hidden");
+		Modio::Detail::ParseSafe(Json, Info.bLocked, "locked");
 	}
 
 	inline void from_json(const nlohmann::json& Json, Modio::ModTagOptions& Options)

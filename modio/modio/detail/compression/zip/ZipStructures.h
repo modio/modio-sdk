@@ -16,6 +16,8 @@
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioCompilerMacros.h"
 
+#include <algorithm>
+
 namespace Modio
 {
 	namespace Detail
@@ -189,6 +191,8 @@ namespace Modio
 					Modio::Detail::TypedBufferRead<std::uint32_t>(FileChunk, CurrentRecordOffset + 42);
 				std::string EntryFileName =
 					std::string(reinterpret_cast<const char*>(FileChunk.Data()) + CurrentRecordOffset + 46, FileNameLength);
+				// Normalize backslashes to forward slashes for cross-platform compatibility
+				std::replace(EntryFileName.begin(), EntryFileName.end(), '\\', '/');
 				// Zip64 files will use 0xffffffff in the (un)compressed part to direct the parser
 				// to the "extra field" section.
 				if (CompressedSize == Constants::ZipTag::MAX32 || UncompressedSize == Constants::ZipTag::MAX32 ||

@@ -9,7 +9,7 @@
  */
 
 #pragma once
-
+#include "file/ArchiveUtilities.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioStdTypes.h"
 #include "modio/detail/ModioProfiling.h"
@@ -22,6 +22,7 @@ namespace Modio
 {
 	namespace Detail
 	{
+
 		class ParseArchiveContentsOp
 		{
 			Modio::StableStorage<Modio::Detail::File> ArchiveFileOnDisk {};
@@ -43,7 +44,7 @@ namespace Modio
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {},
 							Modio::Optional<Modio::Detail::Buffer> FileChunk = {})
 			{
-				constexpr std::uint64_t ChunkOfBytes = 512 * 1024;
+				constexpr std::uint64_t ChunkOfBytes = MODIO_BLOCK_WRITE_SIZE;
 				std::uint64_t FileSize = 0;
 				std::uint64_t MaxBytesToRead = 0;
 				MODIO_PROFILE_SCOPE(ParseArchiveContents);
@@ -218,9 +219,11 @@ namespace Modio
 								return;
 							}
 
-							ArchiveState->TotalExtractedSize += Modio::FileSize(Entry.UncompressedSize);
 							PendingEntries.push_back(Entry);
 						}
+
+						ArchiveState->TotalExtractedSize = Modio::FileSize(Modio::Detail::ComputeDiskRequirementsForArchive(
+							PendingEntries.begin(), PendingEntries.end()).DiskSize);
 
 						// Now we have the information about the local headers for all the files, we need to read those
 						// parts of the zip locate the actual file offsets, specially because ExtraFieldLenght might not

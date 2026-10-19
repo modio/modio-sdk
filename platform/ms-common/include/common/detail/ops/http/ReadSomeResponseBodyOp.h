@@ -19,7 +19,7 @@ class ReadSomeResponseBodyOp
 	std::shared_ptr<HttpRequestImplementation> Request {};
 	Modio::Detail::DynamicBuffer DataBuffer {};
 	std::unique_ptr<Modio::Detail::Buffer> ResponseChunkBuffer {};
-	std::uintmax_t BufferSize = 512 * 1024;
+	std::uintmax_t BufferSize = MODIO_BLOCK_WRITE_SIZE;
 	std::pair<std::uintptr_t, std::uintmax_t> ExtendedStatus {};
 	std::weak_ptr<HttpSharedStateBase> SharedState {};
 	ModioAsio::coroutine CoroutineState {};
@@ -76,7 +76,7 @@ public:
 					ExtendedStatus = PinnedState->GetExtendedStatus(Request->RequestHandle);
 					if (ExtendedStatus.first != 0)
 					{
-						BufferSize = std::max<std::uintmax_t>(ExtendedStatus.first, 512 * 1024);
+						BufferSize = std::max<std::uintmax_t>(ExtendedStatus.first, MODIO_BLOCK_WRITE_SIZE);
 						ResponseChunkBuffer = std::make_unique<Modio::Detail::Buffer>(BufferSize);
 						WinHttpReadData(Request->RequestHandle, ResponseChunkBuffer->begin(), BufferSize, nullptr);
 						MODIO_PROFILE_PUSH("WaitForDataRead");

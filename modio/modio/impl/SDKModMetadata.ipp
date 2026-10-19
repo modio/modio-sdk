@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io SDK.
  *
@@ -16,6 +16,7 @@
 #include "modio/detail/ops/mod/GetModMediaLogoOp.h"
 #include "modio/detail/ops/mod/GetModTagsOp.h"
 #include "modio/detail/ops/mod/ListAllModsOp.h"
+#include "modio/detail/ops/mod/ListModFileCookInfoOp.h"
 #include "modio/detail/ops/mod/ListUserCreatedModsOp.h"
 #include "modio/detail/ops/mod/SubmitModRatingOp.h"
 #include "modio/detail/ops/mod/AddModDependenciesOp.h"
@@ -27,8 +28,9 @@
 
 namespace Modio
 {
+	struct ModFileCookInfo;
 	MODIOSDK_API void ListAllModsAsync(FilterParams Filter,
-						  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback)
+	                                   std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask(
 			[Filter = std::move(Filter), Callback = std::move(Callback)]() mutable {
@@ -40,17 +42,24 @@ namespace Modio
 	}
 
 	MODIOSDK_API void ListUserCreatedModsAsync(
-		FilterParams Filter,
-								  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback)
+		FilterParams Filter, bool bIncludeOnlyAccepted,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback)
 	{
 		Modio::Detail::SDKSessionData::EnqueueTask([Filter = std::move(Filter),
-													Callback = std::move(Callback)]() mutable {
+													Callback = std::move(Callback), bIncludeOnlyAccepted]() mutable {
 			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
 				Modio::Detail::RequireUserIsAuthenticated(Callback))
 			{
-				Modio::Detail::ListUserCreatedModsAsync(Filter, Callback);
+				Modio::Detail::ListUserCreatedModsAsync(Filter, Callback, bIncludeOnlyAccepted);
 			}
 		});
+	}
+	
+	MODIOSDK_API void ListUserCreatedModsAsync(
+		FilterParams Filter,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback)
+	{
+		Modio::ListUserCreatedModsAsync(std::move(Filter), false, std::move(Callback));
 	}
 
 	MODIOSDK_API void GetModInfoAsync(Modio::ModID ModId,
@@ -61,6 +70,20 @@ namespace Modio
 				Modio::Detail::RequireValidModID(ModId, Callback))
 			{
 				Modio::Detail::GetModInfoAsync(ModId, Callback);
+			}
+		});
+	}
+
+	MODIOSDK_API void ListModFileCookInfoAsync(
+		Modio::ModID ModId, FilterParams Filter,
+						 std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModFileCookInfoList>)> Callback)
+	{
+		Modio::Detail::SDKSessionData::EnqueueTask(
+			[ModId, Filter = std::move(Filter), Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireValidModID(ModId, Callback))
+			{
+				Modio::Detail::ListModFileCookInfoAsync(ModId, Filter, Callback);
 			}
 		});
 	}

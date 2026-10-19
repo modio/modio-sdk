@@ -29,6 +29,7 @@
 #include "modio/detail/ops/auth/AuthenticateUserDelegatedToken.h"
 #include "modio/detail/ops/auth/ModioGetTermsOfUseOp.h"
 #include "modio/detail/ops/user/GetUserMediaOp.h"
+#include "modio/detail/ops/user/GetUserRolesOp.h"
 #include "modio/detail/ops/userdata/GetUserRatingsOp.h"
 #include "modio/detail/ops/userdata/ListUserGamesOp.h"
 #include "modio/detail/ops/userdata/RefreshUserDataOp.h"
@@ -69,6 +70,10 @@ namespace Modio
 				if (User.bURLEncodeAuthToken == true)
 				{
 					User.AuthToken = Modio::Detail::String::URLEncode(User.AuthToken);
+				}
+				if (User.UserEmail && User.bURLEncodeEmail == true)
+				{
+					User.UserEmail.value() = Modio::Detail::String::URLEncode(User.UserEmail.value());
 				}
 
 				switch (Provider)
@@ -229,6 +234,20 @@ namespace Modio
 				Modio::Detail::RequireUserIsAuthenticated(Callback))
 			{
 				Modio::Detail::GetUserRatingsAsync(Callback);
+			}
+		});
+	}
+
+	MODIOSDK_API void GetUserRolesAsync(
+		Modio::UserRoleResourceType ResourceType,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserRoleInfoList>)> Callback)
+	{
+		Modio::Detail::SDKSessionData::EnqueueTask([ResourceType, Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && 
+				Modio::Detail::RequireNotRateLimited(Callback) &&
+				Modio::Detail::RequireUserIsAuthenticated(Callback))
+			{
+				Modio::Detail::GetUserRolesAsync(ResourceType, Callback);
 			}
 		});
 	}

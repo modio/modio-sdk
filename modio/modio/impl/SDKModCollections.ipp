@@ -10,6 +10,7 @@
 
 #include "modio/detail/serialization/ModioModCollectionInfoSerialization.h"
 #include "modio/detail/ops/collection/FollowModCollectionOp.h"
+#include "modio/detail/ops/collection/GetCollectionTagsOp.h"
 #include "modio/detail/ops/collection/GetModCollectionInfoOp.h"
 #include "modio/detail/ops/collection/GetModCollectionModsOp.h"
 #include "modio/detail/ops/collection/ListModCollectionsOp.h"
@@ -77,6 +78,17 @@ namespace Modio
 				Modio::Detail::RequireValidModCollectionID(ModCollectionID, Callback))
 			{
 				Modio::Detail::GetModCollectionModsAsync(ModCollectionID, Callback);
+			}
+		});
+	}
+
+	MODIOSDK_API void GetCollectionTagOptionsAsync(
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)> Callback)
+	{
+		Modio::Detail::SDKSessionData::EnqueueTask([Callback = std::move(Callback)]() mutable {
+			if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
+			{
+				Modio::Detail::GetCollectionTagsAsync(Callback);
 			}
 		});
 	}

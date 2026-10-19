@@ -18,6 +18,10 @@ namespace Modio
 {
 	namespace Detail
 	{
+		#ifndef MODIO_BLOCK_WRITE_SIZE
+		#define MODIO_BLOCK_WRITE_SIZE 512 * 1024
+		#endif
+
 		/// @docinternal
 		/// @brief Alignable moveable fixed-size buffer class. Aligned storage is more wasteful but will allow us to
 		/// swap to unbuffered IO on Windows/ERA platforms if we need additional performance

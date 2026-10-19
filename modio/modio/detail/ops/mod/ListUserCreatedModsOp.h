@@ -29,11 +29,17 @@ namespace Modio
 			Modio::Detail::DynamicBuffer ResponseBodyBuffer {};
 			Modio::FilterParams Filter {};
 			Modio::GameID GameID {};
+			bool bIncludeOnlyAccepted = false;
+			Modio::Detail::HttpRequestParams RequestParams {};
 
 			ModioAsio::coroutine CoroutineState {};
 
 		public:
-			ListUserCreatedModsOp(Modio::GameID GameID, FilterParams InFilter) : Filter(std::move(InFilter)), GameID(GameID) {}
+			ListUserCreatedModsOp(Modio::GameID GameID, FilterParams InFilter, bool bIncludeOnlyAccepted = false)
+				: Filter(std::move(InFilter)),
+				  GameID(GameID),
+				  bIncludeOnlyAccepted(bIncludeOnlyAccepted)
+			{}
 
 			template<typename CoroType>
 			void operator()(CoroType& Self, Modio::ErrorCode ec = {})
@@ -42,7 +48,7 @@ namespace Modio
 				reenter(CoroutineState)
 				{
 					// In case there is no filter, it could be possible to get all cached ModInfo
-					if (Filter.ToQueryParameters().empty())
+					if (!bIncludeOnlyAccepted && Filter.ToQueryParameters().empty())
 					{
 						Modio::Optional<Modio::ModInfoList> CachedModInfo =
 							Services::GetGlobalService<CacheService>().FetchFromCache(GameID);
@@ -54,13 +60,18 @@ namespace Modio
 						}
 					}
 					
+					RequestParams = Modio::Detail::GetUserModsRequest.SuppressPlatformHeader()
+										.SetGameID(GameID)
+										.AddCurrentGameIdQueryParam()
+										.AppendQueryParameterMap(Filter.ToQueryParameters());
+
+					if (bIncludeOnlyAccepted)
+					{
+						RequestParams.AddQueryParamRaw("status", "1");
+					}
+
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
-						ResponseBodyBuffer,
-						Modio::Detail::GetUserModsRequest.SuppressPlatformHeader()
-							.SetGameID(GameID)
-							.AddCurrentGameIdQueryParam()
-							.AppendQueryParameterMap(Filter.ToQueryParameters()),
-						Modio::Detail::CachedResponse::Allow, std::move(Self));
+						ResponseBodyBuffer, RequestParams, Modio::Detail::CachedResponse::Allow, std::move(Self));
 
 					if (ec)
 					{
@@ -104,11 +115,13 @@ namespace Modio
 		};
 
 		template<typename ListCompleteCallback>
-		void ListUserCreatedModsAsync(FilterParams InFilter, ListCompleteCallback&& OnListComplete)
+		void ListUserCreatedModsAsync(FilterParams InFilter, ListCompleteCallback&& OnListComplete,
+									  bool bIncludeOnlyAccepted = false)
 		{
 			return ModioAsio::async_compose<ListCompleteCallback,
 									   void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)>(
-				Modio::Detail::ListUserCreatedModsOp(Modio::Detail::SDKSessionData::CurrentGameID(), InFilter),
+				Modio::Detail::ListUserCreatedModsOp(Modio::Detail::SDKSessionData::CurrentGameID(), InFilter,
+													 bIncludeOnlyAccepted),
 				OnListComplete,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}

@@ -92,6 +92,7 @@ namespace Modio
 		Detail::ParseSafe(Json, GameInfo.MaturityOptions, "maturity_options");
 		Detail::ParseSafe(Json, GameInfo.VirtualTokenName, "token_name");
 		Detail::ParseSafe(Json, GameInfo.TagOptions, "tag_options");
+		Detail::ParseSafe(Json, GameInfo.CollectionTagOptions, "collection_tag_options");
 		Detail::ParseSafe(Json, GameInfo.CloudCookingStatus, "cloud_cooking_status");
 		Detail::ParseSafe(Json, GameInfo.Placements, "placements");
 

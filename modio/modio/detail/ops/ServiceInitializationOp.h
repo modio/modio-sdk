@@ -66,6 +66,7 @@ public:
 
 		Modio::Optional<std::string> PlatformOverride = GetExtendedParameterValue(InitParams, "PlatformOverride");
 		Modio::Optional<std::string> PendingOnlyResults = GetExtendedParameterValue(InitParams, "PendingOnlyResults");
+		Modio::Optional<std::string> IncludeLiveResults = GetExtendedParameterValue(InitParams, "IncludeLiveResults");
 		Modio::Optional<std::string> InstallationDirectory =
 			GetExtendedParameterValue(InitParams, "IgnoreModInstallationDirectoryOverride");
 		Modio::Optional<std::string> PlatformEnvironment = GetExtendedParameterValue(InitParams, "PlatformEnvironment");
@@ -99,7 +100,11 @@ public:
 					*MetricsSecretKey);
 			}
 
-			if (PendingOnlyResults.has_value()) 
+			if (PendingOnlyResults.has_value() && IncludeLiveResults.has_value()) 
+			{
+				Modio::Detail::SDKSessionData::SetPlatformStatusFilter(*PendingOnlyResults, *IncludeLiveResults);
+			}
+			else if (PendingOnlyResults.has_value())
 			{
 				Modio::Detail::SDKSessionData::SetPlatformStatusFilter(*PendingOnlyResults);
 			}

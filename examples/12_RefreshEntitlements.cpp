@@ -426,7 +426,7 @@ int main()
 	// in case there are any unconsumed entitlements that the user has purchased - for instance, making a platform
 	// purchase via a platform companion app or website outside of the game. Note that you only need to call
 	// RefreshUserEntitlementsAsync if you are selling virtual currency packs via a platform store, such as Steam,
-	// Playstation Store or XBox Store. If you are only allowing your users to purchase VC Packs via the mod.io website,
+	// Playstation Store or XBOX Store. If you are only allowing your users to purchase VC Packs via the mod.io website,
 	// they are directly added to the users wallet and you do not need to call this.
 	{
 		const Modio::EntitlementParams EntitlementParams;

@@ -30,12 +30,26 @@ namespace Modio
 				Detail::UserDataService& UserDataService =
 					Modio::Detail::Services::GetGlobalService<Detail::UserDataService>();
 
+				HttpRequestParams Request = ExchangeEmailSecurityCodeRequest.AppendPayloadValue(
+					Modio::Detail::Constants::APIStrings::SecurityCode, EmailCode.InternalCode);
+				if (auto Address = Modio::Detail::SDKSessionData::GetLastUsedEmailAddress())
+				{
+					if (Address.value().bURLEncodeEmail)
+					{
+						Request = Request.EncodeAndAppendPayloadValue(
+							Modio::Detail::Constants::APIStrings::EmailAddress, Address.value().InternalAddress);
+					}
+					else
+					{
+						Request = Request.AppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress,
+															 Address.value().InternalAddress);
+					}
+				}
+
 				reenter(CoroutineState)
 				{
 					yield Modio::Detail::PerformRequestAndGetResponseAsync(
-						Local.ResponseBodyBuffer,
-						ExchangeEmailSecurityCodeRequest.AppendPayloadValue(
-							Modio::Detail::Constants::APIStrings::SecurityCode, EmailCode.InternalCode),
+						Local.ResponseBodyBuffer, Request,
 						Detail::CachedResponse::Disallow, std::move(Self));
 
 					if (ec)

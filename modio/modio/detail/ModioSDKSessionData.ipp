@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io SDK.
  *
@@ -586,8 +586,14 @@ namespace Modio
 			return Get().EnvironmentOverrideUrl;
 		}
 
-		void SDKSessionData::SetPlatformStatusFilter(std::string PendingOnlyResults)
+		void SDKSessionData::SetPlatformStatusFilter(std::string PendingOnlyResults,
+													 std::string IncludeLiveResults)
 		{
+			if (PendingOnlyResults == "true" && IncludeLiveResults == "true")
+			{
+				Get().PlatformStatusFilter = Modio::PlatformStatus::LiveAndPending;
+			}
+			else
 			if (PendingOnlyResults == "true")
 			{
 				Get().PlatformStatusFilter = Modio::PlatformStatus::PendingOnly;
@@ -863,6 +869,42 @@ namespace Modio
 			return false;
 		}
 
+		void SDKSessionData::InvalidateModFileCookCache(Modio::ModID ID)
+		{
+			auto CacheEntryIterator = Get().ModFileCookCacheInvalidMap.find(ID);
+			if (CacheEntryIterator != Get().ModFileCookCacheInvalidMap.end())
+			{
+				CacheEntryIterator->second = true;
+			}
+			else
+			{
+				Get().ModCacheInvalidMap.emplace(std::make_pair(ID, true));
+			}
+		}
+
+		void SDKSessionData::ClearModFileCookCacheInvalid(Modio::ModID ID)
+		{
+			auto CacheEntryIterator = Get().ModFileCookCacheInvalidMap.find(ID);
+			if (CacheEntryIterator != Get().ModFileCookCacheInvalidMap.end())
+			{
+				CacheEntryIterator->second = false;
+			}
+			else
+			{
+				Get().ModFileCookCacheInvalidMap.emplace(std::make_pair(ID, false));
+			}
+		}
+
+		bool SDKSessionData::IsModFileCookCacheInvalid(Modio::ModID ID)
+		{
+			auto CacheEntryIterator = Get().ModFileCookCacheInvalidMap.find(ID);
+			if (CacheEntryIterator != Get().ModFileCookCacheInvalidMap.end())
+			{
+				return CacheEntryIterator->second;
+			}
+			return false;
+		}
+
 		void SDKSessionData::InvalidateModCollectionCache(Modio::ModCollectionID ID)
 		{
 			auto CacheEntryIterator = Get().CollectionCacheInvalidMap.find(ID);
@@ -897,6 +939,21 @@ namespace Modio
 				return CacheEntryIterator->second;
 			}
 			return false;
+		}
+
+		Modio::Optional<Modio::EmailAddress> SDKSessionData::GetLastUsedEmailAddress()
+		{
+			return Get().LastUsedEmailAddress;
+		}
+
+		void SDKSessionData::SetLastUsedEmailAddress(Modio::EmailAddress Address) 
+		{
+			Get().LastUsedEmailAddress = Address;
+		}
+
+		void SDKSessionData::ClearLastUsedEmailAddress()
+		{
+			Get().LastUsedEmailAddress.reset();
 		}
 
 		bool SDKSessionData::IsFetchExternalUpdatesRunning()

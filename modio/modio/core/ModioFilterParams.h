@@ -173,6 +173,14 @@ namespace Modio
 		MODIOSDK_API Modio::FilterParams& WithoutTags(std::vector<std::string> NewTags);
 
 		/// @docpublic
+		/// @brief Sets how multiple tags passed to <<WithTags>> are combined. Defaults to
+		/// [`Modio::LogicalOperator::And`](#logicaloperator), requiring mods to have every tag. Passing
+		/// [`Modio::LogicalOperator::Or`](#logicaloperator) instead returns mods that have at least one of the tags.
+		/// @param Operator The operator to combine included tags with
+		/// @return *this
+		MODIOSDK_API Modio::FilterParams& TagOperator(Modio::LogicalOperator Operator);
+
+		/// @docpublic
 		/// @brief Only include mods that contain a metadata blob that contains the specified string
 		/// @param SearchString String to search for
 		/// @return *this
@@ -238,6 +246,7 @@ namespace Modio
 		std::vector<std::string> Tags {};
 		std::vector<std::string> ExcludedTags {};
 
+
 		std::vector<Modio::ModID> IncludedIDs {};
 		std::vector<Modio::ModID> ExcludedIDs {};
 
@@ -252,6 +261,7 @@ namespace Modio
 		bool IsPaged = false;
 		std::size_t Index = 0;
 		std::size_t Count = 0;
+		Modio::LogicalOperator TagMatchOperator = Modio::LogicalOperator::And;
 		
 	};
 

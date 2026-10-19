@@ -42,7 +42,8 @@ namespace Modio
 							SubscriptionBuffer,
 							Modio::Detail::GetUserSubscriptionsRequest.AddLimitQueryParam()
 								.AddOffsetQueryParam(CurrentResultIndex)
-								.AddCurrentGameIdQueryParam(),
+								.AddCurrentGameIdQueryParam()
+								.AddPlatformStatusFilter(),
 							CachedResponse, std::move(Self));
 
 						Modio::Detail::SDKSessionData::ClearSubscriptionCacheInvalid();

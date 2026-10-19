@@ -28,7 +28,7 @@ namespace Modio
 										User.ExtendedParameters[Modio::Detail::Constants::APIStrings::UserID])
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::Nonce,
 										User.ExtendedParameters[Modio::Detail::Constants::APIStrings::Nonce])
-					.EncodeAndAppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
+					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed,
 										User.bUserHasAcceptedTerms ? "true" : "false");
 			Modio::Detail::AuthenticateUserExternalAsync(Params, Callback);

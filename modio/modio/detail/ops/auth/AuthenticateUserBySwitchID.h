@@ -22,7 +22,7 @@ namespace Modio
 			Modio::Detail::HttpRequestParams Params =
 				Modio::Detail::AuthenticateViaSwitchRequest
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::SwitchToken, User.AuthToken)
-					.EncodeAndAppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
+					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed, User.bUserHasAcceptedTerms ? "true" : "false")
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::DisplayName,
 										User.ExtendedParameters["DisplayName"]);

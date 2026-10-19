@@ -21,6 +21,9 @@
 #include "Mac/MacPlatformCompilerSetup.h"
 #include "Mac/MacPlatformAtomics.h"
 
+#pragma push_macro("FVector")
+#define FVector Modio_FVectorWorkaround
+
 #pragma GCC diagnostic push
 
 // This is required by file "resolver_base.hpp" in line 69 which complains about this:

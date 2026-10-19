@@ -153,7 +153,7 @@ namespace Modio
 		{
 			Modio::Detail::HttpRequestParams Params =
 				Modio::Detail::AuthenticateViaUdtRequest.AddHeaderRaw("X-Modio-Delegation-Token", User.AuthToken)
-					.EncodeAndAppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
+					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed,
 										User.bUserHasAcceptedTerms ? "true" : "false");
 

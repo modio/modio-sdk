@@ -93,7 +93,7 @@ namespace Modio
 				Modio::Optional<Modio::Detail::Buffer> FileChunk = {})
 			{
 				// Only read as many as "ChunkOfBytes" from the file, then send to the request.
-				constexpr std::size_t ChunkOfBytes = 512 * 1024;
+				constexpr std::size_t ChunkOfBytes = MODIO_BLOCK_WRITE_SIZE;
 
 				Modio::Detail::FileService& FileService =
 					Modio::Detail::Services::GetGlobalService<Modio::Detail::FileService>();

@@ -109,6 +109,12 @@ typedef enum EModioSortDirection
     EModioSortDirection_Descending
 } EModioSortDirection; 
 
+typedef enum EModioLogicalOperator
+{
+    EModioLogicalOperator_And = 0,
+    EModioLogicalOperator_Or = 1
+} EModioLogicalOperator; 
+
 typedef enum EModioLogLevel
 {
     EModioLogLevel_Trace = 0,
@@ -919,6 +925,7 @@ MODIODLL_EXPORT void ModioFilterParamsMatchingIDs(CModioFilterParams *Item, CMod
 MODIODLL_EXPORT void ModioFilterParamsExcludingIDs(CModioFilterParams *Item, CModioModIDList const* IDSet);
 MODIODLL_EXPORT void ModioFilterParamsWithTags(CModioFilterParams *Item, CModioStringList const* UserId);
 MODIODLL_EXPORT void ModioFilterParamsWithoutTags(CModioFilterParams *Item, CModioStringList const* UserId);
+MODIODLL_EXPORT void ModioFilterParamsTagOperator(CModioFilterParams *Item, EModioLogicalOperator Operator);
 MODIODLL_EXPORT void ModioFilterParamsMetadataLike(CModioFilterParams *Item, CModioString const* SearchString);
 MODIODLL_EXPORT void ModioFilterParamsIndexedResults(CModioFilterParams *Item, size_t StartIndex, size_t ResultCount);
 MODIODLL_EXPORT void ModioFilterParamsPagedResults(CModioFilterParams *Item, size_t PageNumber, size_t PageSize);
@@ -1540,6 +1547,7 @@ MODIODLL_EXPORT CModioModCollectionMap* ModioQueryUserInstallations(bool bInclud
 MODIODLL_EXPORT CModioModCollectionMap* ModioQuerySystemInstallations();
 MODIODLL_EXPORT void ModioSubmitModRatingAsync(CModioModID* ModID, EModioRating Rating, ModioErrorCodeCallback Callback, void* ContextPtr);
 MODIODLL_EXPORT void ModioGetModTagOptionsAsync(ModioModTagOptionsCallback Callback, void* ContextPtr);
+MODIODLL_EXPORT void ModioGetCollectionTagOptionsAsync(ModioModTagOptionsCallback Callback, void* ContextPtr);
 MODIODLL_EXPORT CModioUser* ModioQueryUserProfile();
 MODIODLL_EXPORT void ModioSetLanguage(EModioLanguage Locale);
 MODIODLL_EXPORT void ModioShutdownAsync(ModioErrorCodeCallback Callback, void* ContextPtr);

@@ -12,6 +12,7 @@ When setting up UGC in your game, you'll want users to be able to search for UGC
 This guide covers:
 
 * [Querying UGC](#querying-ugc)
+* [Featuring Content](#featuring-content)
 * [Next steps](#next-steps)
 
 ## Querying UGC
@@ -51,6 +52,61 @@ Modio::ListAllModsAsync(Modio::FilterParams.NameContains("Your Query").IndexedRe
 
 // Ranged results - return the 20th page of 10 results
 Modio::ListAllModsAsync(Modio::FilterParams.NameContains("Your Query").PagedResults(20, 10), ...)
+```
+
+## Featuring Content
+
+Game admins can configure Featured Content on their Game Dashboard on the mod.io website. Featured Content allows you to curate specific groups of UGC, such as "Trending this week", "Staff Picks" or even themed event content such as "Top Halloween Content", that you can use to feature specific content in your game's UI, for example as carousels on a home or discovery screen. These curated groups (called Placements) translate to [`FilterParams`](https://docs.mod.io/cppsdk/refdocs#FilterParams) that you can pass directly to  [`ListAllModsAsync`](https://docs.mod.io/cppsdk/refdocs#listallmodsasync).
+
+Each Placement carries everything you need to build and render one of these curated sections:
+
+* `Name` (and localized variant `NameLocalized`), to use as a heading
+* `DisplayPosition`, indicating the order Placements should be displayed in relative to each other
+* `Size` (`Small`, `Medium`, or `Large`), a hint for how prominently the Placement can be displayed
+* `Total`, the number of results the Placement should show
+* `bEnabled` - disabled Placements should not be displayed
+* `Filters`, a [`FilterParams`](https://docs.mod.io/cppsdk/refdocs#FilterParams) object describing which mods should populate the Placement
+
+Placements are returned as part of [`GetGameInfoAsync`](https://docs.mod.io/cppsdk/refdocs#getgameinfoasync).
+
+```cpp
+Modio::GetGameInfoAsync(Modio::GameID(YourGameID), [](Modio::ErrorCode ec, Modio::Optional<Modio::GameInfo> Info)
+{
+    if (ec)
+    {
+        // Error handling
+    }
+    else
+    {
+        CurrentPlacements = Info->Placements;
+    }
+});
+```
+
+For each enabled Placement you want to display, pass its `Filters` to [`ListAllModsAsync`](https://docs.mod.io/cppsdk/refdocs#listallmodsasync) to fetch the mods to show, limiting the number of results returned to `Total`:
+
+```cpp
+for(const Modio::Placement& Placement : CurrentPlacements)
+{
+    Modio::ListAllModsAsync(Placement.Filters, [](Modio::ErrorCode ec, Modio::Optional<Modio::ModInfoList> Results)
+{
+    if (ec)
+    {
+        // Error handling
+    }
+    else
+    {
+        // Print the Localized name of the Placement
+        std::cout << Placement.NameLocalized;
+
+        for (Modio::ModInfo& CurrentModProfile : *Results)
+        {
+            std::cout << CurrentModProfile.ProfileName;
+        }
+    }
+});
+}
+
 ```
 
 ## Next steps

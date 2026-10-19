@@ -39,6 +39,8 @@ namespace Modio
 	class CreateSourceFileParams;
 	class FilterParams;
 	class ModInfoList;
+	struct ModFileCookInfo;
+	class ModFileCookInfoList;
 	using Timestamp = std::uint64_t;
 	using GalleryIndex = std::size_t;
 	class ModTagOptions;
@@ -51,6 +53,9 @@ namespace Modio
 	class GameInfoList;
 	class UserList;
 	enum class Language : std::int32_t;
+	struct UserRoleInfo;
+	class UserRoleInfoList;
+	enum class UserRoleResourceType;
 
 	struct UserRatingList;
 	struct TransactionRecord;
@@ -67,6 +72,7 @@ namespace Modio
 	enum class LogoSize : std::uint8_t;
 	enum class GallerySize : std::uint8_t;
 	enum class Rating : std::int8_t;
+	enum class ResourceType : std::int32_t;
 
 	/// @docpublic
 	/// @brief nullable wrapper around object of type T. Used by async functions that return values - empty on function

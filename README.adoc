@@ -26,7 +26,7 @@ Welcome to the mod.io SDK repository, built using C++. It allows game developers
 |Windows            | ✔                             | MSVC (VS2019/22)    | C++17     
 |Windows (GDK)      | ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
 |Nintendo Switch    | ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
-|XBox (GDK)         | ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
+|XBOX (GDK)         | ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
 |PlayStation®4      | ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
 |PlayStation®5      | ✔ <<contact-us,(Contact Us)>> | Vendor-provided     | C++17
 |Linux              | ✔                             | Clang 10            | C++17

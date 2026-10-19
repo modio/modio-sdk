@@ -94,7 +94,7 @@ namespace Modio
 
 						yield Impl->ArchiveFile.ReadAsync(
 							std::min<std::uintmax_t>(Impl->EntryToExtract.CompressedSize - Impl->BytesProcessed,
-													 512 * 1024),
+													 MODIO_BLOCK_WRITE_SIZE),
 							Impl->FileData, std::move(Self));
 
 						if (ec && ec != Modio::GenericError::EndOfFile)

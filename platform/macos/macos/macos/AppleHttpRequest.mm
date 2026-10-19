@@ -11,8 +11,7 @@
 #import "macos/AppleHttpRequest.h"
 #import "macos/AppleHttp_Internal.h"
 
-#import <CoreFoundation/CoreFoundation.h>
-#import <Foundation/Foundation.h>
+#include "macos/AppleCoreIncludes.h"
 
 #include <algorithm>
 #include <cstring>

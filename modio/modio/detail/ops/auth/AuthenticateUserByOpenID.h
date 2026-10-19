@@ -22,7 +22,7 @@ namespace Modio
 			Modio::Detail::HttpRequestParams Params =
 				Modio::Detail::AuthenticateViaOpenidRequest
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::OpenIDToken, User.AuthToken)
-					.EncodeAndAppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
+					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed,
 										User.bUserHasAcceptedTerms ? "true" : "false");
 

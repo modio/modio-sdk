@@ -24,11 +24,22 @@ namespace Modio::Detail
 		{
 			reenter(CoroutineState)
 			{
-				yield Modio::Detail::PerformRequestAndGetResponseAsync(
-					ResponseBuffer,
-					Modio::Detail::RequestEmailSecurityCodeRequest.EncodeAndAppendPayloadValue(
-						Modio::Detail::Constants::APIStrings::EmailAddress, EmailAddress.InternalAddress),
-					CachedResponse::Disallow, std::move(Self));
+				Modio::Detail::SDKSessionData::SetLastUsedEmailAddress(EmailAddress);
+
+				Request = Modio::Detail::RequestEmailSecurityCodeRequest;
+				if (EmailAddress.bURLEncodeEmail)
+				{
+					Request = Request.EncodeAndAppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress,
+																  EmailAddress.InternalAddress);
+				}
+				else
+				{
+					Request = Request.AppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress,
+														 EmailAddress.InternalAddress);
+				}
+
+				yield Modio::Detail::PerformRequestAndGetResponseAsync(ResponseBuffer, Request,
+																	   CachedResponse::Disallow, std::move(Self));
 
 				Self.complete(ec);
 				return;
@@ -39,6 +50,7 @@ namespace Modio::Detail
 		ModioAsio::coroutine CoroutineState {};
 		Modio::Detail::DynamicBuffer ResponseBuffer {};
 		Modio::EmailAddress EmailAddress;
+		Modio::Detail::HttpRequestParams Request;
 	};
 
 	template<typename RequestEmailAuthCodeCompleteCallback>

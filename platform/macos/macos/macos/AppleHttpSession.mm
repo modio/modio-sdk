@@ -12,7 +12,7 @@
 #import "macos/AppleHttp_Internal.h"
 #import "macos/AppleHttpRequest.h"
 
-#import <Foundation/Foundation.h>
+#include "macos/AppleCoreIncludes.h"
 
 namespace ModioApple = Modio::Detail::Apple;
 

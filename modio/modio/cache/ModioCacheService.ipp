@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2021-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io SDK.
  *
@@ -15,6 +15,7 @@
 #include "modio/core/ModioBuffer.h"
 #include "modio/core/ModioLogEnum.h"
 #include "modio/core/ModioLogger.h"
+#include "modio/core/entities/ModioModFileCookInfo.h"
 #include "modio/detail/ModioProfiling.h"
 #include "modio/detail/ModioSDKSessionData.h"
 
@@ -88,6 +89,14 @@ namespace Modio
 			// The ModInfoCache would clean only when the mod.io SDK session ends. For that reason there is no
 			// timer for this case. Another way to remove this is by calling "ClearCache"
 			CacheInstance->ModInfoCache.insert_or_assign(ModInfoDetails.ModId, ModInfoDetails);
+		}
+
+		void CacheService::AddToCache(Modio::ModID ModIDDetail, Modio::ModFileCookInfoList ModFileCookDetails)
+		{
+			Modio::Detail::Logger().Log(LogLevel::Trace, LogCategory::Http, "Adding ModID {} to cache", ModIDDetail);
+			// The ModFileCookListCache would clean only when the mod.io SDK session ends. For that reason there is no
+			// timer for this case. Another way to remove this is by calling "ClearCache"
+			CacheInstance->ModFileCookListCache.insert_or_assign(ModIDDetail, ModFileCookDetails);
 		}
 
 		void CacheService::AddToCache(Modio::ModCollectionInfo ModModCollectionInfoDetails)
@@ -296,6 +305,24 @@ namespace Modio
 			}
 
 			return ModElems;
+		}
+
+		Modio::Optional<Modio::ModFileCookInfoList> CacheService::FetchModFileCookListFromCache(
+			Modio::ModID ModIDDetail) const
+		{
+			MODIO_PROFILE_SCOPE(CacheFetchModFileCookList);
+			auto CacheEntryIterator = CacheInstance->ModFileCookListCache.find(ModIDDetail);
+			if (CacheEntryIterator != CacheInstance->ModFileCookListCache.end())
+			{
+				if (Modio::Detail::SDKSessionData::IsModFileCookCacheInvalid(ModIDDetail) == true)
+				{
+					return {};
+				}
+
+				return CacheEntryIterator->second;
+			}
+
+			return {};
 		}
 
 		Modio::Optional<std::uint64_t> CacheService::FetchModDependencyFilesizeFromCache(Modio::ModID ModIDDetail,

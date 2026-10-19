@@ -125,7 +125,9 @@ namespace Modio
 		/// @brief Name of the Virtual Tokens for this game
 		std::string VirtualTokenName;
 		/// @brief Tags for this game
-		std::vector<Modio::ModTagInfo> TagOptions {};
+		std::vector<Modio::TagInfo> TagOptions {};
+		/// @brief Tags available for collections belonging to this game
+		std::vector<Modio::TagInfo> CollectionTagOptions {};
 		/// @brief Cloud Cooking status for this game
 		Modio::GameCloudCookingStatus CloudCookingStatus = GameCloudCookingStatus::Disabled;
 		/// @brief Placements for this game

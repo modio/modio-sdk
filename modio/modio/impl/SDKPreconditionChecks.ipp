@@ -23,10 +23,12 @@
 #include "modio/core/entities/ModioGameInfoList.h"
 #include "modio/core/entities/ModioUserList.h"
 #include "modio/core/entities/ModioUserRatingList.h"
+#include "modio/core/entities/ModioModFileCookInfoList.h"
 #include "modio/core/entities/ModioModInfoList.h"
 #include "modio/core/entities/ModioTerms.h"
 #include "modio/core/entities/ModioEntitlement.h"
 #include "modio/core/entities/ModioEntitlementConsumptionStatusList.h"
+#include "modio/core/entities/ModioUserRoleInfoList.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ModioConstants.h"
 #include "modio/file/ModioFileService.h"
@@ -54,6 +56,8 @@ namespace Modio
 				return false;
 			}
 		}
+		template bool RequireSDKIsInitialized<Modio::Optional<Modio::ModFileCookInfoList>>(
+			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModFileCookInfoList>)>&);
 		template bool RequireSDKIsInitialized<Modio::Optional<Modio::ModCollectionInfoList>>(
 			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModCollectionInfoList>)>&);
 		template bool RequireSDKIsInitialized<Modio::Optional<Modio::ModCollectionInfo>>(
@@ -96,6 +100,8 @@ namespace Modio
 		template bool RequireSDKIsInitialized<Modio::Optional<Modio::EntitlementList>>(
 			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementList>)>&);
 		template bool RequireSDKIsInitialized<>(std::function<void(Modio::ErrorCode)>&);
+		template bool RequireSDKIsInitialized<Modio::Optional<Modio::UserRoleInfoList>>(
+			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserRoleInfoList>)>&);
 
 		template<typename... OtherArgs>
 		bool RequireUserIsAuthenticated(std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
@@ -147,6 +153,8 @@ namespace Modio
 		template bool RequireUserIsAuthenticated<std::map<Modio::ModID, Modio::UserSubscriptionListChangeType>>(
 			std::function<void(Modio::ErrorCode, std::map<Modio::ModID, Modio::UserSubscriptionListChangeType>)>&
 				Handler);
+		template bool RequireUserIsAuthenticated<Modio::Optional<Modio::UserRoleInfoList>>(
+			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserRoleInfoList>)>&);
 
 		template<typename... OtherArgs>
 		bool RequireMetricsSessionIsInitialized(std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
@@ -268,6 +276,8 @@ namespace Modio
 				return false;
 			}
 		}
+		template bool RequireNotRateLimited<Modio::Optional<Modio::ModFileCookInfoList>>(
+			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModFileCookInfoList>)>&);
 		template bool RequireNotRateLimited<>(std::function<void(Modio::ErrorCode)>&);
 		template bool RequireNotRateLimited<std::string>(std::function<void(Modio::ErrorCode, std::string)>&);
 		template bool RequireNotRateLimited<Modio::Optional<std::uint64_t>>(
@@ -302,6 +312,8 @@ namespace Modio
 			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::EntitlementConsumptionStatusList>)>&);
 		template bool RequireNotRateLimited<std::map<Modio::ModID, Modio::UserSubscriptionListChangeType>>(
 			std::function<void(Modio::ErrorCode, std::map<Modio::ModID, Modio::UserSubscriptionListChangeType>)>&);
+		template bool RequireNotRateLimited<Modio::Optional<Modio::UserRoleInfoList>>(
+			std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserRoleInfoList>)>&);
 
 		template<typename... OtherArgs>
 		bool RequireModManagementEnabled(std::function<void(Modio::ErrorCode, OtherArgs...)>& Handler)
@@ -705,6 +717,8 @@ namespace Modio
 		}
 		template bool RequireValidModID<Modio::Optional<Modio::ModInfo>>(
 			const Modio::ModID&, std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)>&);
+		template bool RequireValidModID<Modio::Optional<Modio::ModFileCookInfoList>>(
+			const Modio::ModID&, std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModFileCookInfoList>)>&);
 		template bool RequireValidModID<Modio::Optional<Modio::ModDependencyList>>(
 			const Modio::ModID&, std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList>)>&);
 		template bool RequireValidModID<Modio::Optional<Modio::TransactionRecord>>(

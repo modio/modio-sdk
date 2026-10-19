@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "modio/compression/ModioArchiveReader.h"
+#include "modio/detail/compression/zip/ArchiveFileImplementation.h"
 #include "modio/core/ModioCoreTypes.h"
 #include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioServices.h"
@@ -23,54 +23,54 @@ namespace Modio
 {
 	namespace Detail
 	{
+		/// @docinternal
+		/// @brief A structure to represent the storage requirements for an uncompressed folder
+		struct ArchiveDiskRequirements
+		{
+			/// @brief the total disk space required for the archive
+			size_t DiskSize;
+			/// @brief the total number of files to be written out
+			size_t NumberOfFiles;
+			/// @brief the total number of directories in the archive
+			size_t NumberOfDirectories;
+		};
+
+		/// @docinternal
+		/// @brief Platform specific helper to compute the required disk space for a given archive contents
+		/// @param Begin the start of the archive contents
+		/// @param End the end of the archive contents
+		/// @return the storage requirements for the archive contents
+		static inline ArchiveDiskRequirements ComputeDiskRequirementsForArchive(
+			std::vector<Modio::Detail::ArchiveFileImplementation::ArchiveEntry>::iterator Begin,
+			std::vector<Modio::Detail::ArchiveFileImplementation::ArchiveEntry>::iterator End)
+		{
+			size_t TotalSize = 0;
+			size_t TotalFileCount = 0;
+			size_t TotalDirectoryCount = 0;
+			while (Begin != End)
+			{
+				// Files on cache storage consume a minimum of 16Kb, and will always be aligned
+				// to 16Kb in sizes when written to the disk.
+				if (Begin->bIsDirectory)
+				{
+					TotalDirectoryCount++;
+				}
+				else
+				{
+					size_t ThisFileSize = Begin->UncompressedSize;
+					TotalSize += ThisFileSize;
+					TotalFileCount++;
+				}
+
+				++Begin;
+			}
+			return ArchiveDiskRequirements {TotalSize, TotalFileCount, TotalDirectoryCount};
+		}
+
 
 #include <asio/yield.hpp>
 		class ValidateDiskSpaceForArchiveOp
 		{
-			/// @docinternal
-			/// @brief A structure to represent the storage requirements for an uncompressed folder
-			struct ArchiveDiskRequirements
-			{
-				/// @brief the total disk space required for the archive
-				size_t DiskSize;
-				/// @brief the total number of files to be written out
-				size_t NumberOfFiles;
-				/// @brief the total number of directories in the archive
-				size_t NumberOfDirectories;
-			};
-
-			/// @docinternal
-			/// @brief Platform specific helper to compute the required disk space for a given archive contents
-			/// @param Begin the start of the archive contents
-			/// @param End the end of the archive contents
-			/// @return the storage requirements for the archive contents
-			static inline ArchiveDiskRequirements ComputeDiskRequirementsForArchive(
-				std::vector<Modio::Detail::ArchiveFileImplementation::ArchiveEntry>::iterator Begin,
-				std::vector<Modio::Detail::ArchiveFileImplementation::ArchiveEntry>::iterator End)
-			{
-				size_t TotalSize = 0;
-				size_t TotalFileCount = 0;
-				size_t TotalDirectoryCount = 0;
-				while (Begin != End)
-				{
-					// Files on cache storage consume a minimum of 16Kb, and will always be aligned
-					// to 16Kb in sizes when written to the disk.
-					if (Begin->bIsDirectory)
-					{
-						TotalDirectoryCount++;
-					}
-					else
-					{
-						size_t ThisFileSize = Begin->UncompressedSize;
-						TotalSize += ThisFileSize;
-						TotalFileCount++;
-					}
-
-					++Begin;
-				}
-				return ArchiveDiskRequirements {TotalSize, TotalFileCount, TotalDirectoryCount};
-			}
-
 			Modio::filesystem::path OutputPath {};
 			Modio::Optional<Modio::ModID> ModId {};
 			ArchiveDiskRequirements Requirements {};

@@ -14,7 +14,7 @@
 	#error "AppleStrongRef.h must only be included from Obj-C++ (.mm) translation units."
 #endif
 
-#import <Foundation/Foundation.h>
+#include "macos/AppleCoreIncludes.h"
 
 #ifndef MODIO_APPLE_HAS_ARC
 	#if defined(__has_feature) && __has_feature(objc_arc)

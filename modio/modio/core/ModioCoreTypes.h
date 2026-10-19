@@ -286,10 +286,17 @@ namespace Modio
 	{
 		std::string InternalAddress;
 
+		bool bURLEncodeEmail;
+
 		/// @docpublic
 		/// @brief Explicit constructor
 		/// @param Code The code sent to the user's email
-		explicit EmailAddress(const std::string& Code) : InternalAddress(Code) {}
+		/// @param bURLEncode Boolean value to let the SDK know that the email address should be URL encoded
+		/// before being sent to the API
+		explicit EmailAddress(const std::string& Code, bool bURLEncode = true)
+			: InternalAddress(Code),
+			  bURLEncodeEmail(bURLEncode)
+		{}
 	};
 
 	/// @docpublic
@@ -751,6 +758,9 @@ namespace Modio
 		bool bURLEncodeAuthToken = false;
 		/// @brief ExtendedParameters A map to store extended parameters required by some providers.
 		std::map<std::string, std::string> ExtendedParameters;
+		/// @brief bURLEncodeEmail Boolean value to let the SDK know if the optional UserEmail requires
+		/// URL encoding before sending the string to the mod.io API. By default, it will perform URL encoding.
+		bool bURLEncodeEmail = true;
 	};
 
 	/// @docpublic
@@ -853,6 +863,14 @@ namespace Modio
 		Public = 1
 	};
 
+	/// @docpublic
+	/// @brief Boolean operator used when combining multiple values
+	enum class LogicalOperator : std::int8_t
+	{
+		And = 0, 
+		Or = 1
+	};
+
 	///	@brief File approval status to filter by. Passed in ExtendedInitializationParameters for the duration of a
 	/// session.
 	enum class PlatformStatus : std::int32_t
@@ -951,6 +969,8 @@ namespace Modio
 		/// @docnone
 		std::map<std::tuple<Modio::StorageLocation, Modio::StorageUsage>, Modio::FileSize> StorageData;
 	};
+
+
 } // namespace Modio
 
 namespace Modio

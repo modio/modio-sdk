@@ -22,7 +22,7 @@ namespace Modio
 			Modio::Detail::HttpRequestParams Params =
 				Modio::Detail::AuthenticateViaDiscordRequest
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::DiscordToken, User.AuthToken)
-					.EncodeAndAppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
+					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::EmailAddress, User.UserEmail)
 					.AppendPayloadValue(Modio::Detail::Constants::APIStrings::TermsAgreed,
 										User.bUserHasAcceptedTerms ? "true" : "false");
 			Modio::Detail::AuthenticateUserExternalAsync(Params, Callback);

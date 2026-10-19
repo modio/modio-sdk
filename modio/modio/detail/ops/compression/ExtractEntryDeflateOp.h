@@ -108,7 +108,7 @@ namespace Modio
 
 						yield Impl->ArchiveFile.ReadAsync(
 							std::min<std::uintmax_t>(Impl->EntryToExtract.CompressedSize - Impl->BytesProcessed,
-													 512 * 1024),
+													 MODIO_BLOCK_WRITE_SIZE),
 							Impl->FileData, std::move(Self));
 
 						if (ec && ec != Modio::GenericError::EndOfFile)
@@ -137,7 +137,7 @@ namespace Modio
 
 						while (!Impl->DeflateStatus && Impl->ZState.avail_in > 0)
 						{
-							Impl->DecompressedData = Modio::Detail::Buffer(512 * 1024, 1024 * 4);
+							Impl->DecompressedData = Modio::Detail::Buffer(MODIO_BLOCK_WRITE_SIZE, 1024 * 4);
 							Impl->ZState.next_out = Impl->DecompressedData->Data();
 							Impl->ZState.avail_out = Impl->DecompressedData->GetSize();
 							Impl->ZState.total_out = 0;

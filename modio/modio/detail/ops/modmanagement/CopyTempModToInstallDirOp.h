@@ -48,7 +48,7 @@ namespace Modio
 
 			Modio::StableStorage<CopyTempModToInstallDirImpl> Impl;
 			ModioAsio::coroutine CoroutineState {};
-			static constexpr std::uintmax_t ChunkSize = 512 * 1024;
+			static constexpr std::uintmax_t ChunkSize = MODIO_BLOCK_WRITE_SIZE;
 
 		public:
 			CopyTempModToInstallDirOp(Modio::filesystem::path SourcePath, Modio::filesystem::path DestinationPath)

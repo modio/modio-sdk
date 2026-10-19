@@ -32,6 +32,7 @@ namespace Modio
 		DateRangeEnd == Other.DateRangeEnd &&
 		Tags == Other.Tags &&
 		ExcludedTags == Other.ExcludedTags &&
+		TagMatchOperator == Other.TagMatchOperator &&
 		IncludedIDs == Other.IncludedIDs &&
 		ExcludedIDs == Other.ExcludedIDs &&
 		Revenue == Other.Revenue &&
@@ -154,6 +155,12 @@ namespace Modio
 	{
 		ExcludedTags.clear();
 		ExcludedTags.push_back(Tag);
+		return *this;
+	}
+
+	MODIOSDK_API Modio::FilterParams& FilterParams::TagOperator(Modio::LogicalOperator Operator)
+	{
+		TagMatchOperator = Operator;
 		return *this;
 	}
 
@@ -292,7 +299,8 @@ namespace Modio
 				TagStr += Modio::Detail::String::URLEncode(Tag) + ",";
 			}
 			TagStr.resize(TagStr.size() - 1);
-			FilterFields.emplace("tags", TagStr);
+			// 'tags' requires a mod to have every tag, 'tags-in' requires at least one
+			FilterFields.emplace(TagMatchOperator == Modio::LogicalOperator::Or ? "tags-in" : "tags", TagStr);
 		}
 
 		if (!ExcludedTags.empty())

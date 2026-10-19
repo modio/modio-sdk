@@ -34,6 +34,8 @@
 	#include "modio/core/ModioServerInitializeOptions.h"
 	#include "modio/core/entities/ModioEntitlement.h"
 	#include "modio/core/entities/ModioEntitlementConsumptionStatusList.h"
+	#include "modio/core/entities/ModioModFileCookInfo.h"
+	#include "modio/core/entities/ModioModFileCookInfoList.h"
 	#include "modio/core/entities/ModioGameInfo.h"
 	#include "modio/core/entities/ModioGameInfoList.h"
 	#include "modio/core/entities/ModioModCollection.h"
@@ -46,6 +48,7 @@
 	#include "modio/core/entities/ModioUser.h"
 	#include "modio/core/entities/ModioUserList.h"
 	#include "modio/core/entities/ModioUserRatingList.h"
+	#include "modio/core/entities/ModioUserRoleInfoList.h"
 #endif
 
 namespace Modio
@@ -451,6 +454,20 @@ namespace Modio
 									  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfo>)> Callback);
 
 	/// @docpublic
+	/// @brief Provides a list of mod file cook info objects for a given Mod ID, that match the parameters specified in the filter
+	/// @param ModId Mod ID of the mod to fetch data
+	/// @param Filter Modio::FilterParams object containing any filters that should be applied to the query
+	/// @param Callback Callback invoked with a status code and an optional ModFileCookInfoList providing mod file cook info objects
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	MODIOSDK_API void ListModFileCookInfoAsync(
+		Modio::ModID ModId, Modio::FilterParams Filter,
+									  std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModFileCookInfoList>)> Callback);
+
+	/// @docpublic
 	/// @brief Downloads the logo for the specified mod. Will use existing file if it is already present on disk
 	/// @param ModId Mod ID for use in logo retrieval
 	/// @param LogoSize Parameter indicating the size of logo that's required
@@ -731,6 +748,23 @@ namespace Modio
 	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	MODIOSDK_API void ListUserCreatedModsAsync(
 		Modio::FilterParams Filter,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback);
+
+	/// @docpublic
+	/// @brief Provides a list of mods that the user has submitted, or is a team member for, for the current game,
+	/// applying the parameters specified in the filter
+	/// @param Filter Modio::FilterParams object containing any filters that should be applied to the query
+	/// @param bIncludeOnlyAccepted If true, only mods that are accepted and live are returned, excluding archived and
+	/// not-accepted mods. If false, mods are returned regardless of their status.
+	/// @param Callback Callback invoked with a status code and an optional ModInfoList providing mod profiles
+	/// @requires authenticated-user
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	MODIOSDK_API void ListUserCreatedModsAsync(
+		Modio::FilterParams Filter, bool bIncludeOnlyAccepted,
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback);
 
 	/// @docpublic
@@ -1168,6 +1202,19 @@ namespace Modio
 		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModInfoList>)> Callback);
 
 	/// @docpublic
+	/// @brief Fetches the available tags used on collections for the current game. These tags can then be used in
+	/// conjunction with the FilterParams passed to ListModCollectionsAsync
+	/// @param Callback Callback providing a status code and an optional ModTagOptions object containing the available
+	/// collection tags
+	/// @requires initialized-sdk
+	/// @requires no-rate-limiting
+	/// @errorcategory NetworkError|Couldn't connect to mod.io servers
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	MODIOSDK_API void GetCollectionTagOptionsAsync(
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModTagOptions>)> Callback);
+
+	/// @docpublic
 	/// @brief Submits a rating for a mod collection on behalf of the currently authenticated user.
 	/// @param ModCollectionId The mod collection to submit a rating for
 	/// @param Rating The rating to submit \r\n NOTE: To clear a rating for a mod collection, submit a rating of
@@ -1371,6 +1418,19 @@ namespace Modio
 	/// @error GenericError::BadParameter|The supplied user ID is invalid
 	/// @experimental
 	MODIOSDK_API void UnfollowUserAsync(Modio::UserID UserID, std::function<void(Modio::ErrorCode)> Callback);
+
+	/// @docpublic
+	/// @brief	returns the list of roles that this user has in regards to the current game
+	/// @param	ResourceType the type of reqource to query
+	/// @param	Callback A Callback returning a list of user roles, or an error code indicated the result of the operation
+	/// @requires authenticated-user
+	/// @requires initialized-sdk
+	/// @error GenericError::SDKNotInitialized|SDK not initialized
+	/// @error UserDataError::InvalidUser|No authenticated user
+	/// @experimental
+	MODIOSDK_API void GetUserRolesAsync(
+		Modio::UserRoleResourceType ResourceType,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::UserRoleInfoList>)> Callback);
 
 } // namespace Modio
 

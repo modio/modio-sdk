@@ -1,17 +1,234 @@
-?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
-  <Type Name="tl::optional<*>">
-    <DisplayString Condition="m_has_value == true">{{ Value = {m_value}}}</DisplayString>
-    <DisplayString Condition="m_has_value == false">{{Not Set}}</DisplayString>
+  <!-- Modio::Optional<T> is an alias for tl::optional<T> -->
+  <Type Name="tl::optional&lt;*&gt;">
+    <DisplayString Condition="m_has_value">{m_value}</DisplayString>
+    <DisplayString>{{Not Set}}</DisplayString>
+    <Expand>
+      <ExpandedItem Condition="m_has_value">m_value</ExpandedItem>
+    </Expand>
   </Type>
 
-  <Type Name="Modio::StrongInteger<*>">
-    <DisplayString>{{ID = {Value}}}</DisplayString>
+  <Type Name="Modio::StrongInteger&lt;*&gt;">
+    <DisplayString>{Value}</DisplayString>
   </Type>
 
-    <Type Name="Modio::ErrorCode">
-    <DisplayString>{{{_Myval} - {message()}}}</DisplayString>
+  <Type Name="Modio::UserID">
+    <DisplayString>UserID {Value}</DisplayString>
+  </Type>
+  <Type Name="Modio::ModID">
+    <DisplayString Condition="Value == -1">ModID Invalid</DisplayString>
+    <DisplayString>ModID {Value}</DisplayString>
+  </Type>
+  <Type Name="Modio::GameID">
+    <DisplayString Condition="Value == -1">GameID Invalid</DisplayString>
+    <DisplayString>GameID {Value}</DisplayString>
+  </Type>
+  <Type Name="Modio::ModCollectionID">
+    <DisplayString>ModCollectionID {Value}</DisplayString>
+  </Type>
+  <Type Name="Modio::FileMetadataID">
+    <DisplayString>FileMetadataID {Value}</DisplayString>
+  </Type>
+  <Type Name="Modio::MediaFileID">
+    <DisplayString>MediaFileID {Value}</DisplayString>
+  </Type>
+  <Type Name="Modio::ModCreationHandle">
+    <DisplayString>ModCreationHandle {Value}</DisplayString>
+  </Type>
+  <Type Name="Modio::FileOffset">
+    <DisplayString>{Value} bytes</DisplayString>
+  </Type>
+  <Type Name="Modio::FileSize">
+    <DisplayString>{Value} bytes</DisplayString>
+  </Type>
+
+  <!-- Function calls (e.g. message()) are not allowed in natvis, so show the value and the
+       category vtable, which identifies the Modio::*ErrorCategoryImpl the code belongs to. -->
+  <Type Name="Modio::ErrorCode">
+    <DisplayString Condition="_Myval == 0">Success</DisplayString>
+    <DisplayString>{_Myval} {_Mycat,na}</DisplayString>
+    <Expand>
+      <Item Name="Value">_Myval</Item>
+      <Item Name="Category">_Mycat</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="Modio::FlagImpl&lt;*&gt;">
+    <DisplayString Condition="Internal == 0">None</DisplayString>
+    <DisplayString>{($T1)Internal}</DisplayString>
+    <Expand>
+      <Item Name="Flags">($T1)Internal</Item>
+      <Item Name="Raw">Internal,x</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="Modio::ApiKey">
+    <DisplayString>{InternalApiKey}</DisplayString>
+  </Type>
+  <Type Name="Modio::EmailAddress">
+    <DisplayString>{InternalAddress}</DisplayString>
+  </Type>
+  <Type Name="Modio::EmailAuthCode">
+    <DisplayString>{InternalCode}</DisplayString>
+  </Type>
+  <Type Name="Modio::Guid">
+    <DisplayString>{InternalGuid}</DisplayString>
+  </Type>
+  <Type Name="Modio::GuidV4">
+    <DisplayString>{{ {Raw64[0],X} {Raw64[1],X} }}</DisplayString>
+    <Expand>
+      <ArrayItems>
+        <Size>16</Size>
+        <ValuePointer>Raw8</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="Modio::FieldError">
+    <DisplayString>{Field}: {Error}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::List&lt;*,*&gt;">
+    <DisplayString>{InternalList}</DisplayString>
+    <Expand>
+      <ExpandedItem>InternalList</ExpandedItem>
+    </Expand>
+  </Type>
+
+  <Type Name="Modio::PagedResult">
+    <DisplayString>{{ Page {PageIndex + 1}/{PageCount}, {ResultCount} of {TotalResultCount} }}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::ModInfoList">
+    <AlternativeType Name="Modio::UserList" />
+    <AlternativeType Name="Modio::GameInfoList" />
+    <AlternativeType Name="Modio::PlacementList" />
+    <AlternativeType Name="Modio::EntitlementList" />
+    <AlternativeType Name="Modio::EntitlementConsumptionStatusList" />
+    <AlternativeType Name="Modio::ModCollectionInfoList" />
+    <AlternativeType Name="Modio::ModDependencyList" />
+    <AlternativeType Name="Modio::ModDetails" />
+    <AlternativeType Name="Modio::ModTagOptions" />
+    <DisplayString>{InternalList} Page {PageIndex + 1}/{PageCount}, Total={TotalResultCount}</DisplayString>
+    <Expand>
+      <Item Name="[Paging]">(Modio::PagedResult*)this,nd</Item>
+      <ExpandedItem>InternalList</ExpandedItem>
+    </Expand>
+  </Type>
+
+  <Type Name="Modio::BaseModList">
+    <DisplayString>{InternalList}</DisplayString>
+    <Expand>
+      <ExpandedItem>InternalList</ExpandedItem>
+    </Expand>
+  </Type>
+
+  <Type Name="Modio::ModCollection">
+    <DisplayString>{ModEntries}</DisplayString>
+    <Expand>
+      <ExpandedItem>ModEntries</ExpandedItem>
+    </Expand>
+  </Type>
+
+  <Type Name="Modio::ModEventLog">
+    <DisplayString>{InternalData}</DisplayString>
+    <Expand>
+      <ExpandedItem>InternalData</ExpandedItem>
+    </Expand>
+  </Type>
+
+  <Type Name="Modio::ModInfo">
+    <DisplayString>{{ {ModId.Value} "{ProfileName,sb}" v{Version,sb} }}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::FileMetadata">
+    <DisplayString>{{ {MetadataId.Value} Mod={ModId.Value} {Filename,sb} v{Version,sb} }}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::User">
+    <DisplayString>{{ {UserId.Value} {Username,sb} }}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::GameInfo">
+    <DisplayString>{{ {GameID.Value} "{Name,sb}" }}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::ModCollectionInfo">
+    <DisplayString>{{ {Id.Value} "{ProfileName,sb}" }}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::ModTag">
+    <DisplayString>{Tag,sb}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::Metadata">
+    <DisplayString>{Key,sb} = {Value,sb}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::ModDependency">
+    <DisplayString>{{ {ModID.Value} "{ModName,sb}" }}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::TagInfo">
+    <DisplayString>{TagGroupName,sb} {TagGroupValues}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::Entitlement">
+    <DisplayString>{{ {Type} {SkuId,sb} }}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::Placement">
+    <DisplayString>{{ {Type} "{Name,sb}" }}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::Logo">
+    <AlternativeType Name="Modio::Avatar" />
+    <AlternativeType Name="Modio::Image" />
+    <DisplayString>{Filename,sb}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::OAuthToken">
+    <DisplayString>{{ {State}, Expires={ExpireDate} }}</DisplayString>
+  </Type>
+
+
+  <Type Name="Modio::ModCollectionEntry">
+    <DisplayString>{{ {ID.Value} {CurrentState} "{ModProfile.ProfileName,sb}" }}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::ModProgressInfo">
+    <DisplayString Condition="CurrentState == Modio::ModProgressInfo::EModProgressState::Downloading">{{ {ID.Value} Downloading {DownloadCurrent.Value}/{DownloadTotal.Value} }}</DisplayString>
+    <DisplayString Condition="CurrentState == Modio::ModProgressInfo::EModProgressState::Extracting">{{ {ID.Value} Extracting {ExtractCurrent.Value}/{ExtractTotal.Value} }}</DisplayString>
+    <DisplayString Condition="CurrentState == Modio::ModProgressInfo::EModProgressState::Compressing">{{ {ID.Value} Compressing {CompressCurrent.Value}/{CompressTotal.Value} }}</DisplayString>
+    <DisplayString Condition="CurrentState == Modio::ModProgressInfo::EModProgressState::Uploading">{{ {ID.Value} Uploading {UploadCurrent.Value}/{UploadTotal.Value} }}</DisplayString>
+    <DisplayString>{{ {ID.Value} {CurrentState} }}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::ModManagementEvent">
+    <DisplayString Condition="Status._Myval == 0">{{ {ID.Value} {Event} }}</DisplayString>
+    <DisplayString>{{ {ID.Value} {Event} Failed: {Status} }}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::Detail::HttpRequestParams">
+    <DisplayString Condition="bFileDownload">{CurrentOperationType} {FileDownloadServer,sb}{ResourcePath,sb}</DisplayString>
+    <DisplayString>{CurrentOperationType} {ResourcePath,sb}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::Detail::UploadSession">
+    <DisplayString>{{ {UploadStatus} {UploadID} }}</DisplayString>
+  </Type>
+
+  <Type Name="Modio::Detail::Buffer">
+    <DisplayString>{{ Size={Size} }}</DisplayString>
+    <Expand>
+      <Item Name="Alignment">Alignment</Item>
+      <ArrayItems>
+        <Size>Size</Size>
+        <ValuePointer>InternalData._Mypair._Myval2 + AlignmentOffset</ValuePointer>
+      </ArrayItems>
+    </Expand>
   </Type>
 
 </AutoVisualizer>

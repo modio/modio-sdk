@@ -44,7 +44,7 @@ namespace Modio
 				  SharedState(SharedState),
 				  ReadBuffer(ReadBuffer),
 				  ReadCount(0),
-				  ReadChunk(512 * 1024)
+				  ReadChunk(MODIO_BLOCK_WRITE_SIZE)
 			{}
 
 			template<typename CoroType>

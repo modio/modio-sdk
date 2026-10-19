@@ -30,6 +30,10 @@ add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/entities/ModioM
 add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/entities/ModioModTagOptions.h)
 add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/entities/ModioUser.h)
 add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/entities/ModioModInfoList.h)
+add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/entities/ModioModFileCookInfo.h)
+add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/entities/ModioModFileCookInfoList.h)
+add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/entities/ModioUserRoleInfo.h)
+add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/entities/ModioUserRoleInfoList.h)
 add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/ModioReportParams.h)
 add_public_header(${MODIO_TARGET_NAME} ${CMAKE_CURRENT_LIST_DIR}/ModioServerInitializeOptions.h)
 

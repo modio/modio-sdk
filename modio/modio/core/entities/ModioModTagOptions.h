@@ -44,8 +44,8 @@ namespace Modio
 	};
 
 	/// @docpublic
-	/// @brief Metadata about a group of tags that can be used for filtering mods
-	struct ModTagInfo
+	/// @brief Metadata about a group of tags that can be used for filtering mods or collections
+	struct TagInfo
 	{
 		/// @brief Raw unlocalized tag group name
 		std::string TagGroupName {};
@@ -111,8 +111,12 @@ namespace Modio
 	};
 
 	/// @docpublic
+	/// @brief Alias for TagInfo, retained for backwards compatibility
+	using ModTagInfo = TagInfo;
+
+	/// @docpublic
 	/// @brief Container for a collection of ModTagInfo objects
-	class ModTagOptions : public Modio::PagedResult, public Modio::List<std::vector, Modio::ModTagInfo>
+	class ModTagOptions : public Modio::PagedResult, public Modio::List<std::vector, Modio::TagInfo>
 	{
 	};
 } // namespace Modio

@@ -33,7 +33,7 @@
 #include <utility>
 #include <vector>
 
-#import <Foundation/Foundation.h>
+#include "macos/AppleCoreIncludes.h"
 
 @class ModioHttpDelegate;
 

@@ -138,6 +138,12 @@ EModioSortDirection ConvertEnumToC(Modio::FilterParams::SortDirection InValue)
 }
 
 
+EModioLogicalOperator ConvertEnumToC(Modio::LogicalOperator InValue)
+{
+	return static_cast<EModioLogicalOperator>(static_cast<std::underlying_type_t<Modio::LogicalOperator>>(InValue));
+}
+
+
 EModioLogLevel ConvertEnumToC(Modio::LogLevel InValue)
 {
 	return static_cast<EModioLogLevel>(static_cast<std::underlying_type_t<Modio::LogLevel>>(InValue));
@@ -2838,6 +2844,11 @@ MODIODLL_EXPORT void ModioFilterParamsWithTags(CModioFilterParams *Item, CModioS
 MODIODLL_EXPORT void ModioFilterParamsWithoutTags(CModioFilterParams *Item, CModioStringList const* UserId)
 {
 		Modio::GetImpl(Item).WithoutTags(Modio::GetImpl(UserId));
+}
+
+MODIODLL_EXPORT void ModioFilterParamsTagOperator(CModioFilterParams *Item, EModioLogicalOperator Operator)
+{
+		Modio::GetImpl(Item).TagOperator(static_cast<Modio::LogicalOperator>(Operator));
 }
 
 MODIODLL_EXPORT void ModioFilterParamsMetadataLike(CModioFilterParams *Item, CModioString const* SearchString)
@@ -6612,7 +6623,30 @@ MODIODLL_EXPORT void ModioGetModTagOptionsAsync(ModioModTagOptionsCallback Callb
 	{
 		Modio::GetModTagOptionsAsync(WrappedCallback);
 	}
-}	
+}
+
+
+MODIODLL_EXPORT void ModioGetCollectionTagOptionsAsync(ModioModTagOptionsCallback Callback, void* ContextPtr)
+{
+	std::function<void(Modio::ErrorCode, tl::optional<Modio::ModTagOptions>)> WrappedCallback =
+	[Callback, ContextPtr](Modio::ErrorCode ec, tl::optional<Modio::ModTagOptions> InOptions) {
+		CModioErrorCode ErrorCode { ec };
+
+		if (!ec)
+		{
+			CModioModTagOptions Options { *InOptions };
+			Callback(&ErrorCode, &Options, ContextPtr);
+		}
+		else
+		{
+			Callback(&ErrorCode, nullptr, ContextPtr);
+		}
+	};
+	if (RequireParametersNotNull(WrappedCallback))
+	{
+		Modio::GetCollectionTagOptionsAsync(WrappedCallback);
+	}
+}
 
 
 MODIODLL_EXPORT CModioUser* ModioQueryUserProfile()

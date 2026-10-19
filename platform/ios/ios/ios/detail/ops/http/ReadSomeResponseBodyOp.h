@@ -69,7 +69,7 @@ namespace Modio
 
 					// Drain up to 512KB at a time
 					{
-						static constexpr std::size_t MaxDrainBytes = 512 * 1024;
+						static constexpr std::size_t MaxDrainBytes = MODIO_BLOCK_WRITE_SIZE;
 						std::size_t Drained = Request->AppleRequest->DrainResponseBody(ResponseBuffer, MaxDrainBytes);
 						Request->ResponseBodyReceivedLength += Drained;
 					}
